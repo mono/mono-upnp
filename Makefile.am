@@ -12,7 +12,7 @@ MAINTAINERCLEANFILES = \
 	missing
 
 EXTRA_DIST = \
-	Mono.Ssdp.sln
+	Mono.Upnp.sln
 
 PKV=$(PACKAGE)-$(VERSION)
 PKB=$(PKV)-binary
@@ -20,7 +20,7 @@ PKB=$(PKV)-binary
 dist-windows: all
 	@rm -rf $(PKB) && \
 	mkdir -p $(PKB)/bin && \
-	cp src/MZClient/MZClient.exe src/Mono.Zeroconf/Mono.Zeroconf.dll src/Mono.Zeroconf.Providers.Bonjour/Mono.Zeroconf.Providers.Bonjour.dll $(PKB)/bin && \
+	cp src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Client.dll src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server.dll $(PKB)/bin && \
 	cp AUTHORS NEWS README README.Windows $(PKB) && \
 	cp COPYING $(PKB)/LICENSE && \
 	zip -r9 $(PKB).zip $(PKB) && \

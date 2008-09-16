@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <monodoc>
 	<source provider="ecma" basefile="mono-ssdp-docs" path="various" title="Mono.Ssdp" />
+	<source provider="ecma" basefile="mono-upnp-docs" path="various" title="Mono.Upnp" />
 </monodoc>
 

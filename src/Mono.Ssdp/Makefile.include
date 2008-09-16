@@ -1,0 +1,24 @@
+POLICY_ASSEMBLIES = $(addsuffix .$(ASSEMBLY_NAME).dll, $(addprefix policy., $(POLICY_VERSIONS)))
+POLICY_CONFIGS = $(addsuffix .config, $(addprefix policy., $(POLICY_VERSIONS)))
+
+$(POLICY_ASSEMBLIES): $(top_builddir)/src/Mono.Ssdp/policy.config $(top_srcdir)/src/Mono.Ssdp/Mono.Ssdp/mono-ssdp.snk
+	for i in $(POLICY_VERSIONS); do	\
+	  echo "Creating policy.$$i.$(ASSEMBLY_NAME)";	\
+	  sed -e "s/@ASSEMBLY_NAME@/$(ASSEMBLY_NAME)/g" -e "s/@POLICY@/$$i/g" $(top_builddir)/src/Mono.Ssdp/policy.config > policy.$$i.config;	\
+	  $(AL) -link:policy.$$i.config -out:policy.$$i.$(ASSEMBLY_NAME).dll -keyfile:$(top_srcdir)/src/Mono.Ssdp/Mono.Ssdp/mono-ssdp.snk; \
+	done
+
+gac-install: $(POLICY_ASSEMBLIES)
+	$(GACUTIL) /i $(ASSEMBLY) /f $(GACUTIL_FLAGS) || exit 1;
+	for p in $(POLICY_ASSEMBLIES); do \
+		echo $(GACUTIL) /i $$p /f $(GACUTIL_POLICY_FLAGS) || exit 1; \
+		$(GACUTIL) /i $$p /f $(GACUTIL_POLICY_FLAGS) || exit 1; \
+	done
+
+gac-uninstall:
+	$(GACUTIL) /us $(ASSEMBLY) $(GACUTIL_FLAGS) || exit 1;
+	@for p in $(POLICY_ASSEMBLIES); do \
+		echo $(GACUTIL) /us $$p /f $(GACUTIL_POLICY_FLAGS) || exit 1; \
+		$(GACUTIL) /us $$p /f $(GACUTIL_POLICY_FLAGS) || exit 1; \
+	done
+

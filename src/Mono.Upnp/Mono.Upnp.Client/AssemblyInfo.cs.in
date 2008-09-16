@@ -1,0 +1,25 @@
+using System;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
+[assembly: AssemblyVersion ("@ASM_VERSION@")]
+[assembly: AssemblyDisplayVersion ("@ASM_DISPLAY_VERSION@")]
+[assembly: AssemblyTitle ("Mono.Upnp.Client")]
+[assembly: AssemblyDescription ("A library for UPnP clients")]
+[assembly: AssemblyCopyright ("Copyright (C) 2008 S&S Black")]
+[assembly: AssemblyCompany ("S&S Black Ltd.")]
+
+[AttributeUsage (AttributeTargets.Assembly, Inherited = false)]
+internal sealed class AssemblyDisplayVersionAttribute : Attribute
+{
+    private string version;
+    public string Version {
+        get { return version; }
+    }
+
+    public AssemblyDisplayVersionAttribute (string version)
+    {
+        this.version = version;
+    }
+}
+

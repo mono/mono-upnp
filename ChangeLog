@@ -1,3 +1,8 @@
+2008-09-16  Scott Peterson  <lunchtimemama@gmail.com>
+
+  Added initial SSDP server capabilities and UPnP client capabilities.
+  VERY EXPERIMENTAL!
+
 2008-07-22  Aaron Bockover  <abock@gnome.org>
 	
 	* src/Mono.Ssdp.ConsoleClient/Mono.Ssdp.ConsoleClient/ConsoleClient.cs:

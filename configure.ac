@@ -41,12 +41,15 @@ SHAMROCK_EXPAND_LIBDIR
 
 AC_OUTPUT([
 Makefile
-src/Makefile
-src/policy.config
-src/mono-ssdp.pc
-src/Mono.Ssdp/Makefile
-src/Mono.Ssdp.ConsoleClient/Makefile
-src/Mono.Ssdp.ConsoleClient/mssdp-client
+src/MakeFile
+src/Mono.Ssdp/MakeFile
+src/Mono.Ssdp/policy.config
+src/Mono.Ssdp/mono-ssdp.pc
+src/Mono.Ssdp/Mono.Ssdp/Makefile
+src/Mono.Ssdp/Mono.Ssdp.ConsoleClient/Makefile
+src/Mono.Ssdp/Mono.Ssdp.ConsoleClient/mssdp-client
+src/Mono.Upnp/MakeFile
+
 docs/Makefile
 ])
 

@@ -1,5 +1,5 @@
-WARNING: Mono.Ssdp is under initial development. It is not meant to be used
-         at all unless you are actively working on Mono.Ssdp!
+WARNING: Mono.Ssdp and Mono.UPnP are under initial development. They are not
+         meant to be used at all unless you are actively working on them!
 
 Mono.Ssdp provides a fully managed implementation of the Simple Service
 Discovery Protocol. SSDP is used primarily for discovery of UPnP services
@@ -8,3 +8,9 @@ on a local administrative network.
   http://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol
   http://quimby.gnus.org/internet-drafts/draft-cai-ssdp-v1-03.txt
 
+Mono.Upnp provides a fully managed implementation of the Universal Plug
+and Play standard. It enables both browsing for and broadcasting of
+UPnP services.
+
+  http://en.wikipedia.org/wiki/UPnP
+  http://www.upnp.org/

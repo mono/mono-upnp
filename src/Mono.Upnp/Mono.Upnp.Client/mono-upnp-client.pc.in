@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=@libdir@
+
+Name: Mono.Upnp.Client
+Description: Mono library for cross platform UPnP (Universal Plug and Play) client support.
+Version: @VERSION@
+Requires:
+Libs: -r:${libdir}/mono/mono-upnp/Mono.Upnp.dll
+

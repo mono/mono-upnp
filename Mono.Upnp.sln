@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Ssdp", "Mono.Ssdp", "{74E2D43F-96D6-4CC6-89A0-C7DF1BA3CBCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp", "src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj", "{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.ConsoleClient", "src\Mono.Ssdp\Mono.Ssdp.ConsoleClient\Mono.Ssdp.ConsoleClient.csproj", "{A14270F0-4144-48D8-94B9-1272441F5FDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.ConsoleServer", "src\Mono.Ssdp\Mono.Ssdp.ConsoleServer\Mono.Ssdp.ConsoleServer.csproj", "{B4294928-E3E8-4481-87B6-F9DC738FAFD9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp", "Mono.Upnp", "{91CCCAC1-23FB-460B-9A7D-F38303E2B289}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.ConsoleClient", "src\Mono.Upnp\Mono.Upnp.ConsoleClient\Mono.Upnp.ConsoleClient.csproj", "{766A0822-B08C-46FB-A933-69CCF42ACCA6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Client", "src\Mono.Upnp\Mono.Upnp.Client\Mono.Upnp.Client.csproj", "{F88B8BD0-B03C-41DD-BA82-86D865E46B43}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{A14270F0-4144-48D8-94B9-1272441F5FDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A14270F0-4144-48D8-94B9-1272441F5FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A14270F0-4144-48D8-94B9-1272441F5FDC}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{A14270F0-4144-48D8-94B9-1272441F5FDC}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{B4294928-E3E8-4481-87B6-F9DC738FAFD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4294928-E3E8-4481-87B6-F9DC738FAFD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4294928-E3E8-4481-87B6-F9DC738FAFD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{766A0822-B08C-46FB-A933-69CCF42ACCA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{766A0822-B08C-46FB-A933-69CCF42ACCA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{766A0822-B08C-46FB-A933-69CCF42ACCA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{766A0822-B08C-46FB-A933-69CCF42ACCA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F88B8BD0-B03C-41DD-BA82-86D865E46B43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F88B8BD0-B03C-41DD-BA82-86D865E46B43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F88B8BD0-B03C-41DD-BA82-86D865E46B43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F88B8BD0-B03C-41DD-BA82-86D865E46B43}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D} = {74E2D43F-96D6-4CC6-89A0-C7DF1BA3CBCC}
+		{A14270F0-4144-48D8-94B9-1272441F5FDC} = {74E2D43F-96D6-4CC6-89A0-C7DF1BA3CBCC}
+		{B4294928-E3E8-4481-87B6-F9DC738FAFD9} = {74E2D43F-96D6-4CC6-89A0-C7DF1BA3CBCC}
+		{766A0822-B08C-46FB-A933-69CCF42ACCA6} = {91CCCAC1-23FB-460B-9A7D-F38303E2B289}
+		{F88B8BD0-B03C-41DD-BA82-86D865E46B43} = {91CCCAC1-23FB-460B-9A7D-F38303E2B289}
+	EndGlobalSection
+EndGlobal
