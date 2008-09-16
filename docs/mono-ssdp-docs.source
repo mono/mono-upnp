@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<monodoc>
+	<source provider="ecma" basefile="mono-ssdp-docs" path="various" title="Mono.Ssdp" />
+</monodoc>
+

@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp", "src\Mono.Ssdp\Mono.Ssdp.csproj", "{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.ConsoleClient", "src\Mono.Ssdp.ConsoleClient\Mono.Ssdp.ConsoleClient.csproj", "{A14270F0-4144-48D8-94B9-1272441F5FDC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A14270F0-4144-48D8-94B9-1272441F5FDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A14270F0-4144-48D8-94B9-1272441F5FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		name = Mono.Ssdp
+		version = 0.1
+		outputpath = bin
+		StartupItem = src\Mono.Ssdp.ConsoleClient\Mono.Ssdp.ConsoleClient.csproj
+		MonoDevelop.ChangeLogAddIn.ChangeLogInfo = $0
+		$0.policy = UpdateNearestChangeLog
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,71 @@
+<Type Name="ServiceArgs" FullName="Mono.Ssdp.ServiceArgs">
+  <TypeSignature Language="C#" Value="public sealed class ServiceArgs : EventArgs" />
+  <AssemblyInfo>
+    <AssemblyName>Mono.Ssdp</AssemblyName>
+    <AssemblyVersion>0.0.0.0</AssemblyVersion>
+  </AssemblyInfo>
+  <Base>
+    <BaseTypeName>System.EventArgs</BaseTypeName>
+  </Base>
+  <Interfaces />
+  <Docs>
+    <summary>To be added.</summary>
+    <remarks>To be added.</remarks>
+  </Docs>
+  <Members>
+    
+    
+    
+    
+    
+    <Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public ServiceArgs (string usn);" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters><Parameter Name="usn" Type="System.String" /></Parameters>
+      <Docs><param name="usn">To be added.</param><summary>To be added.</summary><remarks>To be added.</remarks></Docs>
+    </Member><Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public ServiceArgs (Mono.Ssdp.ServiceOperation operation, Mono.Ssdp.Service service);" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters><Parameter Name="operation" Type="Mono.Ssdp.ServiceOperation" /><Parameter Name="service" Type="Mono.Ssdp.Service" /></Parameters>
+      <Docs><param name="operation">To be added.</param><param name="service">To be added.</param><summary>To be added.</summary><remarks>To be added.</remarks></Docs>
+    </Member><Member MemberName=".ctor">
+      <MemberSignature Language="C#" Value="public ServiceArgs (Mono.Ssdp.ServiceOperation operation, string usn, Mono.Ssdp.Service service);" />
+      <MemberType>Constructor</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <Parameters><Parameter Name="operation" Type="Mono.Ssdp.ServiceOperation" /><Parameter Name="usn" Type="System.String" /><Parameter Name="service" Type="Mono.Ssdp.Service" /></Parameters>
+      <Docs><param name="operation">To be added.</param><param name="usn">To be added.</param><param name="service">To be added.</param><summary>To be added.</summary><remarks>To be added.</remarks></Docs>
+    </Member><Member MemberName="Operation">
+      <MemberSignature Language="C#" Value="public Mono.Ssdp.ServiceOperation Operation { get; }" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue><ReturnType>Mono.Ssdp.ServiceOperation</ReturnType></ReturnValue>
+      <Docs><summary>To be added.</summary><value>To be added.</value><remarks>To be added.</remarks></Docs>
+    </Member><Member MemberName="Service">
+      <MemberSignature Language="C#" Value="public Mono.Ssdp.Service Service { get; }" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue><ReturnType>Mono.Ssdp.Service</ReturnType></ReturnValue>
+      <Docs><summary>To be added.</summary><value>To be added.</value><remarks>To be added.</remarks></Docs>
+    </Member><Member MemberName="Usn">
+      <MemberSignature Language="C#" Value="public string Usn { get; }" />
+      <MemberType>Property</MemberType>
+      <AssemblyInfo>
+        <AssemblyVersion>0.0.0.0</AssemblyVersion>
+      </AssemblyInfo>
+      <ReturnValue><ReturnType>System.String</ReturnType></ReturnValue>
+      <Docs><summary>To be added.</summary><value>To be added.</value><remarks>To be added.</remarks></Docs>
+    </Member>
+  </Members>
+</Type>

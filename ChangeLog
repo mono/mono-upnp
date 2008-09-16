@@ -1,0 +1,70 @@
+2008-07-22  Aaron Bockover  <abock@gnome.org>
+	
+	* src/Mono.Ssdp.ConsoleClient/Mono.Ssdp.ConsoleClient/ConsoleClient.cs:
+	Implemented a proper console client that supports browsing against multiple
+	search targets and verbose logging
+
+	* docs/en/Mono.Ssdp/Service.xml:
+	* docs/en/Mono.Ssdp/BrowseService.xml:
+	* docs/en/Mono.Ssdp/Browser.xml:
+	* docs/en/Mono.Ssdp/Client.xml:
+	* docs/en/index.xml: Updated docs
+
+	* src/Mono.Ssdp/Mono.Ssdp.Internal/Log.cs: Fix compile
+
+2008-07-22  Aaron Bockover  <abock@gnome.org>
+
+	* src/Mono.Ssdp/Mono.Ssdp/Client.cs: Added a static StrictProtocol bool
+	that can disable the strict implementation of the SSDP protocol; turning
+	strict off might be necessary in some cases if a user finds that the
+	UPnP devices they're interacting with don't actually implement SSDP \
+	properly
+
+	* src/Mono.Ssdp/Mono.Ssdp/Service.cs: Split Service into a base Service
+	class and moved browse specific code to BrowseService; make Location a
+	collection/enumerable since multiple Locations can be specified
+
+	* src/Mono.Ssdp/Mono.Ssdp/BrowseService.cs: Implement proper Location/AL
+	parsing and strict header parsing per the SSDP 'spec' as documented in
+	the UPnP Design by Example book from Intel Press
+
+	* src/Mono.Ssdp/Mono.Ssdp/Browser.cs:
+	* src/Mono.Ssdp/Mono.Ssdp.Internal/NotifyListener.cs: Added exception
+	handling and throwing for when datagrams can't be parsed
+
+	* src/Mono.Ssdp/Mono.Ssdp.Internal/Log.cs: Added a basic logger so we
+	don't just silently dismiss excetions; logger can be enabled by setting
+	MONO_SSDP_DEBUG environment variable
+
+	* src/Mono.Ssdp/Mono.Ssdp.Internal/ServiceCache.cs: Do proper 
+	merge/updating with GENA NOTIFY service datagrams instead of creating
+	a new service
+
+2008-07-21  Aaron Bockover  <abock@gnome.org>
+
+	* src/Mono.Ssdp/Mono.Ssdp/Client.cs: Add ServiceTypeRegistered method
+	returning true if an NT/ST value has been registered by a browser child
+
+	* src/Mono.Ssdp/Mono.Ssdp/Service.cs: Support expiration by parsing the
+	'Cache-Control: max-age=SEC' header or the 'Expires' header
+
+	* src/Mono.Ssdp/Mono.Ssdp.Internal/NotifyListener.cs: Do not register
+	services that come in via NOTIFY if a browse has not been created for 
+	the service type in question
+
+	* src/Mono.Ssdp/Mono.Ssdp.Internal/Protocol.cs: Create a const for ssdp:all
+
+	* src/Mono.Ssdp/Mono.Ssdp.Internal/ServiceCache.cs: Register service
+	expiration timeouts with the new TimeoutDispatcher and expire them if
+	they ever time out
+
+	* src/Mono.Ssdp/Mono.Ssdp.Internal/TimerDispatcher.cs: Support handler
+	re-registration and cancelation
+
+	* src/Mono.Ssdp.ConsoleClient/Mono.Ssdp.ConsoleClient/ConsoleClient.cs:
+	Show timestamps for debugging
+
+2008-07-20  Aaron Bockover  <abockover@novell.com>
+
+	* Mono.Ssdp: Initial Import
+

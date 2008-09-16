@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=@libdir@
+
+Name: Mono.Ssdp
+Description: Mono library for cross platform SSDP (Simple Service Discovery Protocol) support. Discovery protocol used by UPnP.
+Version: @VERSION@
+Requires:
+Libs: -r:${libdir}/mono/mono-ssdp/Mono.Ssdp.dll
+
