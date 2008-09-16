@@ -81,11 +81,25 @@ namespace Mono.Upnp.Control
 
         private event EventHandler changed;
         public event EventHandler Changed {
-            add { changed += value; }
-            remove { changed -= value; }
+            add {
+                if (!send_events) {
+                    throw new InvalidOperationException ("This state variable does not send events.");
+                } else if (value == null) {
+                    return;
+                }
+                changed += value;
+            }
+            remove {
+                if (!send_events) {
+                    throw new InvalidOperationException ("This state variable does not send events.");
+                } else if (value == null) {
+                    return;
+                }
+                changed -= value;
+            }
         }
 
-        internal virtual void OnChanged ()
+        protected internal virtual void OnChanged ()
         {
             EventHandler changed = this.changed;
             if (changed != null) {

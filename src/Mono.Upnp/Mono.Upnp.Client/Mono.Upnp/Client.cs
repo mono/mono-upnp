@@ -38,6 +38,46 @@ namespace Mono.Upnp
 {
 	public class Client
 	{
+        // Allow me to briefly provide an explaination for some of this complexity. UPnP discovery
+        // happens over the very light-weight UDP-based SSDP. SSDP announcements are very sparse in
+        // their information; they basically just tell you that some device or some service exists.
+        // If you want more information about that device or service, you request an XML description
+        // which is sent over HTTP. The user is given a reference to services and devices when they
+        // are first "discovered!" over SSDP but we delay fetching the XML description until the user
+        // interacts with the service or device in a way that requires it.
+        //
+        // When we request a device description, it provides a list of devices and services availible
+        // under a given root device. It may or may not be the case that we intercepted all of the
+        // SSDP announcements for all of the devices and services under a given root device (UDP
+        // packets have a way of getting lost in the shuffle). We will only know if a device or service
+        // in the XML has already been instantiated from an SSDP announcement AFTER the XML has been
+        // completely parsed. Therefore, we always create a new Service or Device to parse the XML and
+        // then we look to see if we already instantiated that device or service from SSDP. If so, we
+        // copy all of the info from the new XML-instantiated object to the old object (to which the
+        // user may have a reference). Otherwise, we report the XML-instantiated object as having been
+        // "discovered!"
+        //
+        // Now things wouldn't be so bad if that were the end of the story. Alas, not. First, SSDP
+        // announcements are broadcast once per device and once per service TYPE. That is to say, if
+        // some device has two services of the same type, only one service announcement will be made
+        // over SSDP, but both services will appear in the XML device description. For this reason, we
+        // keep a dictionary of the service types we've found. This means that if we come accross the
+        // single service type SSDP announcement and then encounter the XML description with both
+        // services, the first service in the XML description is copied to the SSDP-instantiated object
+        // (to which the user may have a reference), and the second service is announced as having been
+        // "discovered!"
+        //
+        // If that weren't enough, some clever people *cough*D-Link*cough* have done the very clever
+        // thing of giving an embedded device the same UUID (that's Universal UNIQUE Identifier) as
+        // its parent device. Since service SSDP announcements only mention the UUID of the device
+        // to which they belong, it is impossible to know exactly what device contains what service
+        // based on the SSDP information alone. So the service type dictionary is keyed to a UUID
+        // string which also keys a LIST of possible parent devices. When (if) the XML description
+        // comes in, we successfully pare all of the services to their proper devices and update all
+        // of the objects which we've already given to the user. Sigh. I said this would be brief.
+        // Sorry.
+
+
         private Dictionary<string, List<Device>> devices = new Dictionary<string, List<Device>> ();
         internal IDictionary<string, List<Device>> Devices {
             get { return devices; }
@@ -61,11 +101,6 @@ namespace Mono.Upnp
             client.ServiceRemoved += ClientServiceRemoved;
         }
 
-        // Apparently a root device can have an embedded device with the same UDN but a different device type.
-        // Since the service announcement datagrams only contain their containing device's UDN, it is impossible
-        // to determin which services belong to which devices based on the SSDP information alone. Lame, I know.
-        // In addition, apparently things can have multiple locations. All of this conspires to increase the
-        // complexity of this code. I'm sorry, but all of this riff raff is nessisary if it's going to work.
         private void ClientServiceAdded (object sender, Mono.Ssdp.ServiceArgs args)
         {
             // All USNs should start with "uuid:"

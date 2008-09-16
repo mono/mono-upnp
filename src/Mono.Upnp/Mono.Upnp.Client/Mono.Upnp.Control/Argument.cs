@@ -106,7 +106,7 @@ namespace Mono.Upnp.Control
 
         public override string ToString ()
         {
-            return name;
+            return String.Format ("{0} {{{1}}}", name, value);
         }
 
         #region Deserialization

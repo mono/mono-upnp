@@ -35,11 +35,13 @@ namespace Mono.Upnp.Internal
 {
 	internal class Helper
 	{
-        //public static string HostAddress {
-        //    get {
+        //public static string HostAddress
+        //{
+        //    get
+        //    {
         //        foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
         //            if (address.AddressFamily == AddressFamily.InterNetwork) {
-        //                return address.ToString ();
+        //                return address;
         //            }
         //        }
         //    }

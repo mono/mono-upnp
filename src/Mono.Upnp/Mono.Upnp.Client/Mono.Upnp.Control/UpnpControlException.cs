@@ -74,7 +74,10 @@ namespace Mono.Upnp.Control
             switch (element) {
             case "errorCode":
                 reader.Read ();
-                code.Status = (UpnpControlExceptionStatus)reader.ReadContentAsInt ();
+                int value = reader.ReadContentAsInt ();
+                code.Status = Enum.IsDefined (typeof(UpnpControlExceptionStatus), value)
+                    ? (UpnpControlExceptionStatus)value
+                    : UpnpControlExceptionStatus.Unknown;
                 break;
             case "errorDescription":
                 code.Message = reader.ReadString ();

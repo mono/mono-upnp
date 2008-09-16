@@ -30,6 +30,7 @@ namespace Mono.Upnp.Control
 {
 	public enum UpnpControlExceptionStatus
 	{
+        Unknown = 0,
         InvalidAction = 401,
         InvalidArgs = 402,
         InvalidVar = 404,

@@ -1,3 +1,30 @@
+2008-09-17  Scott Peterson  <lunchtimemama@gmail.com>
+
+  * src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.Internal/TimeoutDispatcher.cs:
+  Got rid of some unnessisary concurrency cruft, fixed drift and
+  implimented IDisposable (thanks alan!)
+  
+  * src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/Argument.cs:
+  Tweaked ToString()
+  
+  * src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/StateVariable.cs:
+  Preparing for event support
+  
+  * src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/UpnpControlException.cs:
+  We won't die if the return code is unrecognized.
+  
+  * src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/UpnpControlExceptionStatus.cs:
+  Added Unknown value
+  
+  * src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Internal/EventSubscriber.cs:
+  Added what will be the event support class. Doesn't  do anything right now
+  
+  * src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Internal/TimeoutDispatcher.cs:
+  Copied from Mono.Ssdp.
+  
+  * src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Client.cs:
+  Added a little essay at the top of the file on its workings.
+
 2008-09-16  Scott Peterson  <lunchtimemama@gmail.com>
 
   Added initial SSDP server capabilities and UPnP client capabilities.

@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -51,9 +52,11 @@
     <Compile Include="Mono.Upnp.Control\StateVariable.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpControlException.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpControlExceptionStatus.cs" />
+    <Compile Include="Mono.Upnp.Internal\EventSubscriber.cs" />
     <Compile Include="Mono.Upnp.Internal\Helper.cs" />
     <Compile Include="Mono.Upnp.Internal\Log.cs" />
     <Compile Include="Mono.Upnp.Internal\Protocol.cs" />
+    <Compile Include="Mono.Upnp.Internal\TimeoutDispatcher.cs" />
     <Compile Include="Mono.Upnp.Internal\UpnpDeserializationException.cs" />
     <Compile Include="Mono.Upnp.Internal\SoapAdapter.cs" />
     <Compile Include="Mono.Upnp\Client.cs" />
