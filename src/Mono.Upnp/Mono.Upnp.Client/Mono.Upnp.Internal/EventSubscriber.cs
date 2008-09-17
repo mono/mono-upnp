@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 
@@ -34,50 +35,210 @@ namespace Mono.Upnp.Internal
 {
 	internal class EventSubscriber : IDisposable
 	{
+        private static int id;
+
         private readonly object mutex = new object ();
         private Service service;
         private TimeoutDispatcher dispatcher = new TimeoutDispatcher();
-        private bool subscribed;
-        private int timeout_id;
+        private bool started;
+        private bool confidently_subscribed;
+        private uint expire_timeout_id;
+        private uint renew_timeout_id;
+        private HttpListener listener;
+        private string prefix;
 
         private string delivery_url;
         private string subscription_uuid;
-        private uint event_key;
 
         public EventSubscriber (Service service)
         {
             this.service = service;
+            // TODO relocate this stuff?
+            prefix = GeneratePrefix ();
+            delivery_url = String.Format ("<{0}>", prefix);
         }
 
-        public void Subscribe ()
+        private string GeneratePrefix ()
+        {
+            foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
+                if (address.AddressFamily == AddressFamily.InterNetwork) {
+                    return String.Format ("http://{0}:3641/{1}/", address, id++);
+                }
+            }
+            // FIXME better way?
+            return null;
+        }
+
+        public void Start ()
         {
             lock (mutex) {
-                if (subscribed) {
+                if (started) {
                     return;
                 }
+                StartListening ();
+                Subscribe ();
 
+                started = true;
+            }
+        }
+
+        private void StartListening ()
+        {
+            listener = new HttpListener ();
+            listener.Prefixes.Add (prefix);
+            listener.Start ();
+            listener.BeginGetContext (OnGotContext, listener);
+        }
+
+        private void OnGotContext (IAsyncResult asyncResult)
+        {
+            HttpListener listener = (HttpListener)asyncResult.AsyncState;
+            HttpListenerContext context = listener.EndGetContext (asyncResult);
+            service.DeserializeEvents (context.Request);
+            context.Response.Close ();
+            listener.BeginGetContext (OnGotContext, listener);
+        }
+
+        private void StopListening ()
+        {
+            listener.Abort ();
+            listener = null;
+        }
+
+        private void Subscribe ()
+        {
+            lock (mutex) {
                 WebRequest request = WebRequest.Create (service.EventUrl);
                 request.Method = "SUBSCRIBE";
                 request.Headers.Add ("CALLBACK", delivery_url);
                 request.Headers.Add ("NT", "upnp:event");
-
-                subscribed = true;
+                request.BeginGetResponse (OnSubscribeResponse, request);
+                expire_timeout_id = dispatcher.Add (TimeSpan.FromSeconds (30), OnSubscribeTimeout, request);
+                confidently_subscribed = false;
             }
         }
 
-        public void Unsubscribe ()
+        private bool OnSubscribeTimeout (object state, ref TimeSpan interval)
         {
             lock (mutex) {
-                if (!subscribed) {
+                expire_timeout_id = 0;
+                if (!confidently_subscribed) {
+                    WebRequest request = (WebRequest)state;
+                    request.Abort ();
+                    Stop ();
+                    // TODO retry
+                    Log.Exception (new UpnpException ("Failed to subscribe or renew. The server did not respond in 30 seconds."));
+                }
+                return false;
+            }
+        }
+
+        private void OnSubscribeResponse (IAsyncResult asyncResult)
+        {
+            lock (mutex) {
+                if (expire_timeout_id != 0) {
+                    dispatcher.Remove (expire_timeout_id);
+                }
+                WebRequest request = (WebRequest)asyncResult.AsyncState;
+                try {
+                    HttpWebResponse response = (HttpWebResponse)request.EndGetResponse (asyncResult);
+                    if (response.StatusCode != HttpStatusCode.OK) {
+                        throw new WebException ();
+                    }
+                    if (!started) {
+                        response.Close ();
+                        return;
+                    }
+                    subscription_uuid = response.Headers["SID"];
+                    string timeout_header = response.Headers["TIMEOUT"];
+                    if (timeout_header == "infinate") {
+                        return;
+                    }
+                    TimeSpan timeout = TimeSpan.FromSeconds (Double.Parse (timeout_header.Substring (7)));
+                    timeout -= TimeSpan.FromMinutes (1);
+                    renew_timeout_id = dispatcher.Add (timeout, OnRenewTimeout);
+                    confidently_subscribed = true;
+                    response.Close ();
+                } catch (WebException e) {
+                    Stop ();
+                    // TODO more info
+                    Log.Exception (new UpnpException ("Failed to subscribe or renew.", e));
+                }
+            }
+        }
+
+        private bool OnRenewTimeout (object state, ref TimeSpan interval)
+        {
+            lock (mutex) {
+                if (started) {
+                    Renew ();
+                }
+                renew_timeout_id = 0;
+                return false;
+            }
+        }
+
+        private void Renew ()
+        {
+            lock (mutex) {
+                WebRequest request = WebRequest.Create (service.EventUrl);
+                request.Method = "SUBSCRIBE";
+                request.Headers.Add ("SID", subscription_uuid);
+                request.BeginGetResponse (OnSubscribeResponse, request);
+                expire_timeout_id = dispatcher.Add (TimeSpan.FromSeconds (30), OnSubscribeTimeout, request);
+                confidently_subscribed = false;
+            }
+        }
+
+        private void Unsubscribe ()
+        {
+            lock (mutex) {
+                WebRequest request = WebRequest.Create (service.EventUrl);
+                request.Method = "UNSUBSCRIBE";
+                request.Headers.Add ("SID", subscription_uuid);
+                request.BeginGetResponse (OnUnsubscribeResponse, request);
+                confidently_subscribed = false;
+            }
+        }
+
+        private void OnUnsubscribeResponse (IAsyncResult asyncResult)
+        {
+            try {
+                WebResponse response = ((WebRequest)asyncResult).EndGetResponse (asyncResult);
+                response.Close ();
+            } catch {
+            }
+        }
+
+        public void Stop ()
+        {
+            lock (mutex) {
+                if (!started) {
                     return;
                 }
-                subscribed = false;
+
+                if (renew_timeout_id != 0) {
+                    dispatcher.Remove (renew_timeout_id);
+                    renew_timeout_id = 0;
+                }
+
+                if (expire_timeout_id != 0) {
+                    dispatcher.Remove (expire_timeout_id);
+                    expire_timeout_id = 0;
+                }
+
+                if (confidently_subscribed) {
+                    Unsubscribe ();
+                }
+                StopListening ();
+
+                started = false;
             }
         }
 
         public void Dispose ()
         {
-            Unsubscribe ();
+            Stop ();
         }
 	}
 }

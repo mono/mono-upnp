@@ -64,6 +64,7 @@
     <Compile Include="Mono.Upnp\DeviceType.cs" />
     <Compile Include="Mono.Upnp\ReadOnlyDictionary.cs" />
     <Compile Include="Mono.Upnp\ServiceType.cs" />
+    <Compile Include="Mono.Upnp\StateVariableChangedArgs.cs" />
     <Compile Include="Mono.Upnp\UpnpArgs.cs" />
     <Compile Include="Mono.Upnp\Icon.cs" />
     <Compile Include="Mono.Upnp\Root.cs" />

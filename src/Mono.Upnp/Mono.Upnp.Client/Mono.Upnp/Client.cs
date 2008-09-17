@@ -77,7 +77,6 @@ namespace Mono.Upnp
         // of the objects which we've already given to the user. Sigh. I said this would be brief.
         // Sorry.
 
-
         private Dictionary<string, List<Device>> devices = new Dictionary<string, List<Device>> ();
         internal IDictionary<string, List<Device>> Devices {
             get { return devices; }

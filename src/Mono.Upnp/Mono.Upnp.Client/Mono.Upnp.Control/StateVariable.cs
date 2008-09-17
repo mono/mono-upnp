@@ -79,14 +79,15 @@ namespace Mono.Upnp.Control
             get { return allowed_value_range; }
         }
 
-        private event EventHandler changed;
-        public event EventHandler Changed {
+        private event EventHandler<StateVariableChangedArgs> changed;
+        public event EventHandler<StateVariableChangedArgs> Changed {
             add {
                 if (!send_events) {
                     throw new InvalidOperationException ("This state variable does not send events.");
                 } else if (value == null) {
                     return;
                 }
+                service.RefEvents ();
                 changed += value;
             }
             remove {
@@ -95,15 +96,16 @@ namespace Mono.Upnp.Control
                 } else if (value == null) {
                     return;
                 }
+                service.UnrefEvents ();
                 changed -= value;
             }
         }
 
-        protected internal virtual void OnChanged ()
+        protected internal virtual void OnChanged (string newValue)
         {
-            EventHandler changed = this.changed;
+            EventHandler<StateVariableChangedArgs> changed = this.changed;
             if (changed != null) {
-                changed (this, EventArgs.Empty);
+                changed (this, new StateVariableChangedArgs (newValue));
             }
         }
 
@@ -112,45 +114,7 @@ namespace Mono.Upnp.Control
             get { return retry; }
         }
 
-        private string value;
-        public virtual string GetValue ()
-        {
-            service.SoapAdapter.Query (this);
-            return value;
-        }
-
         #region Deserialization
-
-        protected internal virtual void SerializeRequest (WebHeaderCollection headers, XmlWriter writer)
-        {
-            Helper.WriteStartSoapBody (writer);
-            SerializeRequestSoapBody (writer);
-            Helper.WriteEndSoapBody (writer);
-        }
-
-        protected virtual void SerializeRequestSoapBody (XmlWriter writer)
-        {
-            writer.WriteStartElement ("u", "QueryStateVariable", Protocol.ControlUrn);
-            writer.WriteStartElement ("varName", Protocol.ControlUrn);
-            writer.WriteValue (name);
-            writer.WriteEndElement ();
-            writer.WriteEndElement ();
-        }
-
-        protected internal virtual void DeserializeResponse (HttpWebResponse response)
-        {
-            XmlReader reader = XmlReader.Create (response.GetResponseStream ());
-            reader.ReadToFollowing ("QueryStateVariableResponse", Protocol.ControlUrn);
-            if (reader.ReadToDescendant ("return")) {
-                value = reader.ReadString ();
-            }
-            reader.Close ();
-        }
-
-        protected internal virtual void DeserializeResponseFault (HttpWebResponse response)
-        {
-            throw new UpnpControlException (XmlReader.Create (response.GetResponseStream ()));
-        }
 
         private void Deserialize (WebHeaderCollection headers, XmlReader reader)
         {

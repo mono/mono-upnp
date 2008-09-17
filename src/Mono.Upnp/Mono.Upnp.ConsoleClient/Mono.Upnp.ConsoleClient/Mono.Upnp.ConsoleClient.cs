@@ -26,6 +26,8 @@ namespace Mono.Upnp.ConsoleClient
         static void client_ServiceAdded (object sender, ServiceArgs e)
         {
             if (e.Service.Type.ToString () == "urn:schemas-upnp-org:service:ContentDirectory:1") {
+                e.Service.StateVariables["SystemUpdateID"].Changed += new EventHandler<StateVariableChangedArgs> (Program_Changed);
+                return;
                 var browse = e.Service.Actions["Browse"];
 
                 //try {
@@ -48,6 +50,11 @@ namespace Mono.Upnp.ConsoleClient
                 Console.WriteLine (browse.OutArguments["Result"]);
                 Console.WriteLine (e.Service.Actions["Browse"].InArguments.Count);
             }
+        }
+
+        static void Program_Changed (object sender, StateVariableChangedArgs e)
+        {
+            Console.WriteLine ("SystemUpdateID changed: {0}", e.NewValue);
         }
     }
 }

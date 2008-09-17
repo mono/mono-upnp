@@ -64,6 +64,7 @@ namespace Mono.Upnp
 
         private Client client;
         private bool device_description_loaded;
+        private EventSubscriber subscriber;
 
         private Dictionary<string, Uri> locations = new Dictionary<string, Uri> ();
         internal IEnumerable<Uri> Locations {
@@ -151,6 +152,27 @@ namespace Mono.Upnp
             Deserialize (response.Headers, reader.ReadSubtree ());
             reader.Close ();
             response.Close ();
+        }
+
+        private int events_ref_count;
+
+        internal void RefEvents ()
+        {
+            if (events_ref_count == 0) {
+                if (subscriber == null) {
+                    subscriber = new EventSubscriber (this);
+                }
+                subscriber.Start ();
+            }
+            events_ref_count++;
+        }
+
+        internal void UnrefEvents ()
+        {
+            events_ref_count--;
+            if (events_ref_count == 0) {
+                subscriber.Stop ();
+            }
         }
 
         #endregion
@@ -281,6 +303,20 @@ namespace Mono.Upnp
                 state_variable_dict.Add (variable.Name, variable);
             }
             reader.Close ();
+        }
+
+        protected internal virtual void DeserializeEvents (HttpListenerRequest response)
+        {
+            DeserializeEvents (XmlReader.Create (response.InputStream));
+        }
+
+        protected virtual void DeserializeEvents (XmlReader reader)
+        {
+            while (reader.ReadToFollowing ("property", Protocol.EventUrn)) {
+                if (Helper.ReadToNextElement (reader)) {
+                    StateVariables[reader.Name].OnChanged (reader.ReadString ());
+                }
+            }
         }
 
         protected virtual void Verify ()

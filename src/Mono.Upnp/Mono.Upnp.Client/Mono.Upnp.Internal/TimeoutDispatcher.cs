@@ -142,9 +142,12 @@ namespace Mono.Upnp.Internal
         
         private void TimerThread (object state)
         {
-            while (timeouts.Count > 0) {
+            while (true) {
                 TimeoutItem item;
                 lock (timeouts) {
+                    if (timeouts.Count == 0) {
+                        break;
+                    }
                     item = timeouts[0];
                 }
                 
