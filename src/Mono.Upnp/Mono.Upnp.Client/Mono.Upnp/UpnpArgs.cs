@@ -36,18 +36,26 @@ namespace Mono.Upnp
         Removed
     }
 
-	public class DeviceArgs : EventArgs
+    public class DeviceArgs : DeviceArgs<Device>
+    {
+        public DeviceArgs (Device device, UpnpOperation operation)
+            : base (device, operation)
+        {
+        }
+    }
+
+	public class DeviceArgs<T> : EventArgs where T : Device
 	{
-        private readonly Device device;
+        private readonly T device;
         private readonly UpnpOperation operation;
 
-        public DeviceArgs (Device device, UpnpOperation operation)
+        public DeviceArgs (T device, UpnpOperation operation)
         {
             this.device = device;
             this.operation = operation;
         }
 
-        public Device Device {
+        public T Device {
             get { return device; }
         }
 
@@ -56,18 +64,26 @@ namespace Mono.Upnp
         }
 	}
 
-    public class ServiceArgs : EventArgs
+    public class ServiceArgs : ServiceArgs<Service>
     {
-        private readonly Service service;
+        public ServiceArgs (Service service, UpnpOperation operation)
+            : base (service, operation)
+        {
+        }
+    }
+
+    public class ServiceArgs<T> : EventArgs where T : Service
+    {
+        private readonly T service;
         private readonly UpnpOperation operation;
 
-        public ServiceArgs (Service service, UpnpOperation operation)
+        public ServiceArgs (T service, UpnpOperation operation)
         {
             this.service = service;
             this.operation = operation;
         }
 
-        public Service Service {
+        public T Service {
             get { return service; }
         }
 

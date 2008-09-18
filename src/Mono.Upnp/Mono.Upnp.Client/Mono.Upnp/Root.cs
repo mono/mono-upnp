@@ -40,7 +40,7 @@ namespace Mono.Upnp
 	{
         private Client client;
 
-        internal Root (Client client, Uri url_base, WebHeaderCollection headers, XmlReader reader)
+        protected internal Root (Client client, Uri url_base, WebHeaderCollection headers, XmlReader reader)
         {
             this.client = client;
             this.url_base = url_base;
@@ -92,14 +92,10 @@ namespace Mono.Upnp
                 if (device != null) {
                     throw new UpnpDeserializationException ("There are multiple root devices.");
                 }
-                device = new Device (client, this, headers, reader.ReadSubtree ());
-                if (client.Devices.ContainsKey (device.Udn)) {
-                    foreach (Device d in client.Devices[device.Udn]) {
-                        if (d.Type == device.Type) {
-                            d.CopyFrom (device);
-                            device = d;
-                        }
-                    }
+                device = Helper.DeserializeDevice (client, this, headers, reader);
+                if (client.Devices.ContainsKey (device.Udn) && client.Devices[device.Udn].ContainsKey (device.Type)) {
+                    client.Devices[device.Udn][device.Type].CopyFrom (device);
+                    device = client.Devices[device.Udn][device.Type];
                 }
                 break;
             default: // This is a workaround for Mono bug 334752

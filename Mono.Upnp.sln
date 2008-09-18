@@ -15,6 +15,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.ConsoleClient", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Client", "src\Mono.Upnp\Mono.Upnp.Client\Mono.Upnp.Client.csproj", "{F88B8BD0-B03C-41DD-BA82-86D865E46B43}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.Dcp", "Mono.Upnp.Dcp", "{19359AA2-5A96-4745-A30F-D09882179BF5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.Dcp.MediaServer", "Mono.Upnp.Dcp.MediaServer", "{9A808AE1-F0B3-49E7-9F03-A54954C230A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Client", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer\Mono.Upnp.Dcp.MediaServer1.Client\Mono.Upnp.Dcp.MediaServer1.Client.csproj", "{70A00793-C96D-4626-98FF-0784E425A6F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.Sharpener", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.Sharpener\Mono.Upnp.Dcp.Sharpener.csproj", "{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +48,14 @@ Global
 		{F88B8BD0-B03C-41DD-BA82-86D865E46B43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F88B8BD0-B03C-41DD-BA82-86D865E46B43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F88B8BD0-B03C-41DD-BA82-86D865E46B43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70A00793-C96D-4626-98FF-0784E425A6F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70A00793-C96D-4626-98FF-0784E425A6F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70A00793-C96D-4626-98FF-0784E425A6F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70A00793-C96D-4626-98FF-0784E425A6F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,5 +66,8 @@ Global
 		{B4294928-E3E8-4481-87B6-F9DC738FAFD9} = {74E2D43F-96D6-4CC6-89A0-C7DF1BA3CBCC}
 		{766A0822-B08C-46FB-A933-69CCF42ACCA6} = {91CCCAC1-23FB-460B-9A7D-F38303E2B289}
 		{F88B8BD0-B03C-41DD-BA82-86D865E46B43} = {91CCCAC1-23FB-460B-9A7D-F38303E2B289}
+		{9A808AE1-F0B3-49E7-9F03-A54954C230A1} = {19359AA2-5A96-4745-A30F-D09882179BF5}
+		{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1} = {19359AA2-5A96-4745-A30F-D09882179BF5}
+		{70A00793-C96D-4626-98FF-0784E425A6F8} = {9A808AE1-F0B3-49E7-9F03-A54954C230A1}
 	EndGlobalSection
 EndGlobal

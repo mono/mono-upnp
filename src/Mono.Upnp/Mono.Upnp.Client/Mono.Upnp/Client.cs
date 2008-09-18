@@ -77,8 +77,32 @@ namespace Mono.Upnp
         // of the objects which we've already given to the user. Sigh. I said this would be brief.
         // Sorry.
 
-        private Dictionary<string, List<Device>> devices = new Dictionary<string, List<Device>> ();
-        internal IDictionary<string, List<Device>> Devices {
+        private IDeviceFactory default_device_factory = new DefaultDeviceFactory ();
+        public IDeviceFactory DefaultDeviceFactory
+        {
+            get { return default_device_factory; }
+            set { default_device_factory = value; }
+        }
+
+        private IServiceFactory default_service_factory = new DefaultServiceFactory ();
+        public IServiceFactory DefaultServiceFactory {
+            get { return default_service_factory; }
+            set { default_service_factory = value; }
+        }
+
+        private Dictionary<DeviceType, IDeviceFactory> device_factories = new Dictionary<DeviceType, IDeviceFactory> ();
+        internal IDictionary<DeviceType, IDeviceFactory> DeviceFactories
+        {
+            get { return device_factories; }
+        }
+
+        private Dictionary<ServiceType, IServiceFactory> service_factories = new Dictionary<ServiceType, IServiceFactory> ();
+        internal Dictionary<ServiceType, IServiceFactory> ServiceFactories {
+            get { return service_factories; }
+        }
+
+        private Dictionary<string, Dictionary<DeviceType, Device>> devices = new Dictionary<string, Dictionary<DeviceType, Device>> ();
+        internal IDictionary<string, Dictionary<DeviceType, Device>> Devices {
             get { return devices; }
         }
 
@@ -110,54 +134,47 @@ namespace Mono.Upnp
             int colon = args.Usn.IndexOf (':', 5);
             string uuid = colon == -1 ? args.Usn : args.Usn.Substring (0, colon);
 
-            if (devices.ContainsKey (uuid)) {
-                List<Device> device_list = devices[uuid];
+            if (!devices.ContainsKey (uuid)) {
+                devices.Add (uuid, new Dictionary<DeviceType, Device> ());
+                services.Add (uuid, new Dictionary<ServiceType, Service> ());
+            }
 
-                if (args.Usn.Contains (":service:")) {
-                    ServiceType type = new ServiceType (args.Service.ServiceType);
-
-                    if (!services[uuid].ContainsKey (type)) {
-                        Service service = new Service (this, type, args.Service.Locations);
-                        services[uuid].Add (type, service);
-                        OnServiceAdded (service);
-                    }
-                } else if (args.Usn.Contains (":device:")) {
-                    DeviceType type = new DeviceType (args.Service.ServiceType);
-                    Device open_device = null;
-
-                    foreach (Device device in device_list) {
-                        if (device.Type == type) {
-                            return;
-                        } else if (device.Type == null) {
-                            open_device = device;
-                        }
-                    }
-
-                    if (open_device != null) {
-                        open_device.Type = type;
-                        OnDeviceAdded (open_device);
-                    }
-                }
-            } else {
-                List<Device> device_list = new List<Device> ();
-                Dictionary<ServiceType, Service> service_types = new Dictionary<ServiceType, Service> ();
-                services.Add (uuid, service_types);
-                devices.Add (uuid, device_list);
-                if (args.Usn.Contains (":service:")) {
-                    Device device = new Device (this, uuid);
-                    ServiceType type = new ServiceType (args.Service.ServiceType);
-                    Service service = new Service (this, type, args.Service.Locations);
-                    service_types.Add (type, service);
-                    device_list.Add (device);
-                    OnServiceAdded (service);
-                } else if (args.Usn.Contains (":device:")) {
-                    Device device = new Device (this, uuid, args.Service.Locations, args.Service.ServiceType);
-                    device_list.Add (device);
+            if (args.Usn.Contains (":device:")) {
+                DeviceType type = new DeviceType (args.Service.ServiceType);
+                if (!devices[uuid].ContainsKey (type)) {
+                    Device device = CreateDevice (type, uuid, args.Service.Locations);
+                    devices[uuid].Add (type, device);
                     OnDeviceAdded (device);
-                } else {
-                    Device device = new Device (this, uuid, args.Service.Locations);
-                    device_list.Add (device);
                 }
+            } else if (args.Usn.Contains (":service:")) {
+                ServiceType type = new ServiceType (args.Service.ServiceType);
+                if (!services[uuid].ContainsKey (type)) {
+                    Service service = CreateService (type, args.Service.Locations);
+                    services[uuid].Add (type, service);
+                    OnServiceAdded (service);
+                }
+            }
+        }
+
+        private Device CreateDevice (DeviceType type, string udn, IEnumerable<string> locations)
+        {
+            if (device_factories.ContainsKey (type)) {
+                return device_factories[type].CreateDevice (this, udn, locations);
+            } else {
+                Device device = DefaultDeviceFactory.CreateDevice (this, udn, locations);
+                device.Type = type;
+                return device;
+            }
+        }
+
+        private Service CreateService (ServiceType type, IEnumerable<string> locations)
+        {
+            if (service_factories.ContainsKey (type)) {
+                return service_factories[type].CreateService (this, locations);
+            } else {
+                Service service = DefaultServiceFactory.CreateService (this, locations);
+                service.Type = type;
+                return service;
             }
         }
 
@@ -196,12 +213,15 @@ namespace Mono.Upnp
             LoadDeviceDescription (GetLocations (service));
         }
 
-        private void LoadDeviceDescription (IEnumerable<Uri> locations)
+        private void LoadDeviceDescription (IEnumerable<string> locations)
         {
             Exception exception = null;
-            foreach (Uri location in locations) {
+            foreach (string location in locations) {
+                if (!Uri.IsWellFormedUriString (location, UriKind.Absolute)) {
+                    continue;
+                }
                 try {
-                    LoadDeviceDescription (location);
+                    LoadDeviceDescription (new Uri (location));
                     exception = null;
                     break;
                 } catch (Exception e) {
@@ -228,20 +248,12 @@ namespace Mono.Upnp
         {
             if (!devices.ContainsKey (device.Udn)) {
                 services.Add (device.Udn, new Dictionary<ServiceType, Service> ());
-                List<Device> device_list = new List<Device> ();
-                device_list.Add (device);
-                devices.Add (device.Udn, device_list);
+                devices.Add (device.Udn, new Dictionary<DeviceType, Device> ());
+                devices[device.Udn].Add (device.Type, device);
                 OnDeviceAdded (device);
             } else {
-                bool found = false;
-                foreach (Device d in devices[device.Udn]) {
-                    if (d.Type == device.Type) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    devices[device.Udn].Add (device);
+                if (!devices[device.Udn].ContainsKey (device.Type)) {
+                    devices[device.Udn].Add (device.Type, device);
                     OnDeviceAdded (device);
                 }
             }
@@ -258,18 +270,80 @@ namespace Mono.Upnp
             }
         }
 
-        private IEnumerable<Uri> GetLocations (Service service)
+        private IEnumerable<string> GetLocations (Service service)
         {
-            Dictionary<Uri, Uri> locations = new Dictionary<Uri, Uri> ();
-            foreach (Uri location in service.Locations) {
+            Dictionary<string, string> locations = new Dictionary<string, string> ();
+            foreach (string location in service.Locations) {
                 locations.Add (location, location);
                 yield return location;
             }
-            foreach (Uri location in service.Device.Locations) {
+            foreach (string location in service.Device.Locations) {
                 if (!locations.ContainsKey (location)) {
                     yield return location;
                 }
             }
+        }
+
+        private void RegisterFactory (IDeviceFactory factory)
+        {
+            if (!DeviceFactories.ContainsKey (factory.Type)) {
+                DeviceFactories.Add (factory.Type, factory);
+            }
+            foreach (IDeviceFactory device_factory in factory.Devices) {
+                RegisterFactory (device_factory);
+            }
+            foreach (IServiceFactory service_factory in factory.Services) {
+                RegisterFactory (service_factory);
+            }
+        }
+
+        private void RegisterFactory (IServiceFactory factory)
+        {
+            if (!ServiceFactories.ContainsKey (factory.Type)) {
+                ServiceFactories.Add (factory.Type, factory);
+            }
+        }
+
+        public void Browse<T> (IDeviceFactory factory, EventHandler<DeviceArgs<T>> handler) where T : Device
+        {
+            if (factory == null) {
+                throw new ArgumentNullException ("factory");
+            }
+            if (handler == null) {
+                throw new ArgumentNullException ("handler");
+            }
+
+            RegisterFactory (factory);
+
+            DeviceAdded += delegate (object sender, DeviceArgs args) {
+                T device = args.Device as T;
+                if (device != null) {
+                    handler (sender, new DeviceArgs<T> (device, args.Operation));
+                }
+            };
+
+            client.Browse (factory.Type.ToString ());
+        }
+
+        public void Browse<T> (IServiceFactory factory, EventHandler<ServiceArgs<T>> handler) where T : Service
+        {
+            if (factory == null) {
+                throw new ArgumentNullException ("factory");
+            }
+            if (handler == null) {
+                throw new ArgumentNullException ("handler");
+            }
+
+            RegisterFactory (factory);
+
+            ServiceAdded += delegate (object sender, ServiceArgs args) {
+                T service = args.Service as T;
+                if (service != null) {
+                    handler (sender, new ServiceArgs<T> (service, args.Operation));
+                }
+            };
+
+            client.Browse (factory.Type.ToString ());
         }
 	}
 }

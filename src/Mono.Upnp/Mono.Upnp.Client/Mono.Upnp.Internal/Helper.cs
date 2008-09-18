@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Xml;
@@ -114,6 +115,23 @@ namespace Mono.Upnp.Internal
             writer.WriteEndElement ();
             writer.WriteEndElement ();
             writer.WriteEndDocument ();
+        }
+
+        public static Device DeserializeDevice (Client client, Root root, WebHeaderCollection headers, XmlReader reader)
+        {
+            // Life would be much easier if the device type were an attribute in the device node.
+            string xml = reader.ReadOuterXml ();
+
+            reader = XmlReader.Create (new StringReader (xml));
+            reader.ReadToFollowing ("deviceType");
+            DeviceType type = new DeviceType (reader.ReadString ());
+            reader.Close ();
+
+            IDeviceFactory factory = client.DeviceFactories.ContainsKey (type)
+                ? client.DeviceFactories[type]
+                : client.DefaultDeviceFactory;
+
+            return factory.CreateDevice (client, root, headers, XmlReader.Create (new StringReader (xml)));
         }
 	}
 }

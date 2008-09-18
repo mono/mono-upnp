@@ -41,21 +41,21 @@ namespace Mono.Upnp
 	{
         #region Constructors
 
-        internal Service (Device device, WebHeaderCollection headers, XmlReader reader)
+        protected internal Service (Client client, IEnumerable<string> locations, ServiceType type)
+        {
+            this.type = type;
+            this.client = client;
+            foreach (string location in locations) {
+                if (!this.locations.ContainsKey (location)) {
+                    this.locations.Add (location, location);
+                }
+            }
+        }
+
+        protected internal Service (Device device, WebHeaderCollection headers, XmlReader reader)
         {
             this.device = device;
             Deserialize (headers, reader);
-        }
-
-        protected internal Service (Client client, ServiceType type, IEnumerable<string> locations)
-        {
-            this.client = client;
-            this.type = type;
-            foreach (string location in locations) {
-                if (Uri.IsWellFormedUriString (location, UriKind.Absolute) && !this.locations.ContainsKey (location)) {
-                    this.locations.Add (location, new Uri (location));
-                }
-            }
         }
 
         #endregion
@@ -66,8 +66,8 @@ namespace Mono.Upnp
         private bool device_description_loaded;
         private EventSubscriber subscriber;
 
-        private Dictionary<string, Uri> locations = new Dictionary<string, Uri> ();
-        internal IEnumerable<Uri> Locations {
+        private Dictionary<string, string> locations = new Dictionary<string, string> ();
+        internal IEnumerable<string> Locations {
             get { return locations.Values; }
         }
 
@@ -79,6 +79,7 @@ namespace Mono.Upnp
         private ServiceType type;
         public ServiceType Type {
             get { return type; }
+            internal set { type = value; }
         }
 
         private string id;
@@ -86,13 +87,13 @@ namespace Mono.Upnp
             get { return GetDeviceDescriptionField (ref id); }
         }
 
-        Dictionary<string, Action> action_dict;
+        private Dictionary<string, Action> action_dict;
         private ReadOnlyDictionary<string, Action> actions;
         public ReadOnlyDictionary<string, Action> Actions {
             get { return GetServiceDescriptionField (ref actions); }
         }
 
-        Dictionary<string, StateVariable> state_variable_dict;
+        private Dictionary<string, StateVariable> state_variable_dict;
         private ReadOnlyDictionary<string, StateVariable> state_variables;
         public ReadOnlyDictionary<string, StateVariable> StateVariables {
             get { return GetServiceDescriptionField (ref state_variables); }
@@ -141,11 +142,6 @@ namespace Mono.Upnp
 
         private void LoadServiceDescription ()
         {
-            action_dict = new Dictionary<string, Action> ();
-            actions = new ReadOnlyDictionary<string,Action> (action_dict);
-            state_variable_dict = new Dictionary<string, StateVariable> ();
-            state_variables = new ReadOnlyDictionary<string,StateVariable> (state_variable_dict);
-
             WebResponse response = Helper.GetResponse (DescriptionUrl);
             XmlReader reader = XmlReader.Create (response.GetResponseStream ());
             reader.ReadToFollowing ("scpd");
@@ -219,9 +215,15 @@ namespace Mono.Upnp
         private void Deserialize (WebHeaderCollection headers, XmlReader reader)
         {
             this.headers = headers;
+            action_dict = new Dictionary<string, Action> ();
+            actions = new ReadOnlyDictionary<string, Action> (action_dict);
+            state_variable_dict = new Dictionary<string, StateVariable> ();
+            state_variables = new ReadOnlyDictionary<string, StateVariable> (state_variable_dict);
+            
             Deserialize (headers);
             Deserialize (reader);
             Verify ();
+
             this.headers = null;
             device_description_loaded = true;
         }
@@ -237,7 +239,6 @@ namespace Mono.Upnp
                 while (Helper.ReadToNextElement (reader)) {
                     Deserialize (reader.ReadSubtree (), reader.Name);
                 }
-                reader.Close ();
             } catch (Exception e) {
                 string message = String.IsNullOrEmpty (id)
                     ? "There was a problem deserializing a service."

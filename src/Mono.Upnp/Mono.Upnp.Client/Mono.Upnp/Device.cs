@@ -29,6 +29,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Net;
 using System.Xml;
 
@@ -45,33 +46,19 @@ namespace Mono.Upnp
             this.client = client;
         }
 
-        internal Device (Client client, Root root, WebHeaderCollection headers, XmlReader reader)
+        protected internal Device (Client client, string udn, IEnumerable<string> locations, DeviceType type)
+            : this (client)
+        {
+            this.type = type;
+            this.udn = udn;
+            SetLocations (locations);
+        }
+
+        protected internal Device (Client client, Root root, WebHeaderCollection headers, XmlReader reader)
             : this (client)
         {
             this.root = root;
             Deserialize (headers, reader);
-        }
-
-        protected internal Device (Client client, string udn)
-            : this (client)
-        {
-            this.udn = udn;
-        }
-
-        protected internal Device (Client client, string udn, IEnumerable<string> locations)
-            : this (client, udn)
-        {
-            foreach (string location in locations) {
-                if (Uri.IsWellFormedUriString (location, UriKind.Absolute) && !this.locations.ContainsKey (location)) {
-                    this.locations.Add (location, new Uri (location));
-                }
-            }
-        }
-
-        protected internal Device (Client client, string udn, IEnumerable<string> locations, string typeDesctiption)
-            : this (client, udn, locations)
-        {
-            this.type = new DeviceType (typeDesctiption);
         }
 
         #endregion
@@ -81,10 +68,18 @@ namespace Mono.Upnp
         private Client client;
         private bool device_description_loaded;
 
-        private Dictionary<string, Uri> locations = new Dictionary<string, Uri> ();
-        internal IEnumerable<Uri> Locations
-        {
+        private Dictionary<string, string> locations = new Dictionary<string, string> ();
+        internal IEnumerable<string> Locations {
             get { return locations.Values; }
+        }
+
+        internal void SetLocations (IEnumerable<string> locations)
+        {
+            foreach (string location in locations) {
+                if (!this.locations.ContainsKey (location)) {
+                    this.locations.Add (location, location);
+                }
+            }
         }
 
         private Root root;
@@ -177,6 +172,28 @@ namespace Mono.Upnp
                 client.LoadDeviceDescription (this);
             }
             return field;
+        }
+
+        protected T GetService<T> () where T : Service
+        {
+            foreach (Service service in Services) {
+                T s = service as T;
+                if (s != null) {
+                    return s;
+                }
+            }
+            return null;
+        }
+
+        protected T GetDevice<T> () where T : Device
+        {
+            foreach (Device device in Devices) {
+                T d = device as T;
+                if (d != null) {
+                    return d;
+                }
+            }
+            return null;
         }
 
         #endregion
@@ -327,8 +344,8 @@ namespace Mono.Upnp
         private void DeserializeServices (XmlReader reader)
         {
             while (reader.ReadToFollowing ("service") && reader.NodeType == XmlNodeType.Element) {
-                Service service = new Service (this, headers, reader.ReadSubtree ());
-                if (client.Services[udn].ContainsKey (service.Type)) {
+                Service service = DeserializeService (reader.ReadSubtree ());
+                if (client.Services.ContainsKey (udn) && client.Services[udn].ContainsKey (service.Type)) {
                     client.Services[udn][service.Type].CopyFrom (service);
                     service = client.Services[udn][service.Type];
                     client.Services[udn][service.Type] = null;
@@ -338,17 +355,32 @@ namespace Mono.Upnp
             reader.Close ();
         }
 
+        private Service DeserializeService (XmlReader reader)
+        {
+            // Life would be much easier if the service type were an attribute in the service node.
+            reader.Read ();
+            string xml = reader.ReadOuterXml ();
+            reader.Close ();
+
+            reader = XmlReader.Create (new StringReader (xml));
+            reader.ReadToFollowing ("serviceType");
+            ServiceType type = new ServiceType (reader.ReadString ());
+            reader.Close ();
+
+            IServiceFactory factory = client.ServiceFactories.ContainsKey (type)
+                ? client.ServiceFactories[type]
+                : client.DefaultServiceFactory;
+
+            return factory.CreateService (this, headers, XmlReader.Create (new StringReader (xml)));
+        }
+
         private void DeserializeDevices (XmlReader reader)
         {
             while (reader.ReadToFollowing ("device") && reader.NodeType == XmlNodeType.Element) {
-                Device device = new Device (client, root, headers, reader.ReadSubtree ());
-                if (client.Devices.ContainsKey (device.udn)) {
-                    foreach (Device d in client.Devices [device.udn]) {
-                        if (d.type == device.type) {
-                            d.CopyFrom (device);
-                            device = d;
-                        }
-                    }
+                Device device = Helper.DeserializeDevice (client, root, headers, reader);
+                if (client.Devices.ContainsKey (device.udn) && client.Devices[device.udn].ContainsKey (device.type)) {
+                    client.Devices[device.udn][device.type].CopyFrom (device);
+                    device = client.Devices[device.udn][device.type];
                 }
                 device_list.Add (device);
             }

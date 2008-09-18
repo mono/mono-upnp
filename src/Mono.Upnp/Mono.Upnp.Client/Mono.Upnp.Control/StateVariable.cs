@@ -79,8 +79,8 @@ namespace Mono.Upnp.Control
             get { return allowed_value_range; }
         }
 
-        private event EventHandler<StateVariableChangedArgs> changed;
-        public event EventHandler<StateVariableChangedArgs> Changed {
+        private event EventHandler<StateVariableChangedArgs<string>> changed;
+        public event EventHandler<StateVariableChangedArgs<string>> Changed {
             add {
                 if (!send_events) {
                     throw new InvalidOperationException ("This state variable does not send events.");
@@ -103,9 +103,9 @@ namespace Mono.Upnp.Control
 
         protected internal virtual void OnChanged (string newValue)
         {
-            EventHandler<StateVariableChangedArgs> changed = this.changed;
+            EventHandler<StateVariableChangedArgs<string>> changed = this.changed;
             if (changed != null) {
-                changed (this, new StateVariableChangedArgs (newValue));
+                changed (this, new StateVariableChangedArgs<string> (newValue));
             }
         }
 
@@ -220,6 +220,9 @@ namespace Mono.Upnp.Control
                 break;
             case "allowedValueRange":
                 allowed_value_range = new AllowedValueRange (reader.ReadSubtree ());
+                break;
+            case "sendEventsAttribute":
+                send_events = reader.ReadString () != "no";
                 break;
             default: // This is a workaround for Mono bug 334752
                 reader.Skip ();

@@ -1,3 +1,39 @@
+2008-09-19  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.MediaServer/*: Stubbed out some
+	MediaServer1 stuff
+	
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/*: Started a little project
+	to automatically generate C# source code from UPnP DCP XML files
+	
+	* src/Mono.Upnp.Client/Mono.Upnp.Control/StateVariable.cs: Made
+	StateVariableChangedArgs generic and added support for the
+	sendEventsAttribute elemen which appears in DCP XML files
+	
+	* src/Mono.Upnp.Client/Mono.Upnp.Control/StateVariableChangedArgs.cs:
+	Moved and made generic
+	
+	* src/Mono.Upnp.Client/Mono.Upnp.Internal/DefaultDeviceFactory.cs:
+	* src/Mono.Upnp.Client/Mono.Upnp.Internal/DefaultServiceFactory.cs:
+	Default implimentations of the new factory interfaces
+	
+	* src/Mono.Upnp.Client/Mono.Upnp.Internal/Helper.cs: Added some new
+	helper functions. I think they may still need tweaking - I found a
+	bug in the .NET BCL:
+	https://connect.microsoft.com/VisualStudio/feedback/ViewFeedback.aspx?FeedbackID=368387
+	
+	* src/Mono.Upnp.Client/Mono.Upnp/Client.cs:
+	* src/Mono.Upnp.Client/Mono.Upnp/Device.cs:
+	* src/Mono.Upnp.Client/Mono.Upnp/Root.cs:
+	src/Mono.Upnp.Client/Mono.Upnp/Service.cs: Reworked to add preliminary
+	support for new factory interfaces
+	
+	* src/Mono.Upnp.Client/Mono.Upnp/IDeviceFactory.cs:
+	* src/Mono.Upnp.Client/Mono.Upnp/IServiceFactory.cs: Added factory
+	interfaces
+	
+	 * src/Mono.Upnp.Client/Mono.Upnp/UpnpArgs.cs: Added some generics
+
 2008-09-18  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.Internal/TimeoutDispatcher.cs:
