@@ -156,10 +156,13 @@ namespace Mono.Ssdp.Internal
                 }
 
                 if (!wait.WaitOne (interval, false)) {
-                    Remove (item.Id);
-                    if (item.Handler (item.State, ref item.Timeout)) {
-                        item.Trigger += item.Timeout;
-                        Add (ref item);
+                    bool requeue = item.Handler (item.State, ref item.Timeout);
+                    lock (timeouts) {
+                        Remove(item.Id);
+                        if (requeue) {
+                            item.Trigger += item.Timeout;
+                            Add(ref item);
+                        }
                     }
                 }
             }

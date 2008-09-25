@@ -1,3 +1,9 @@
+2008-09-26  Alan McGovern  <amcgovern@novell.com>
+
+	* src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.Internal/TimeoutDispatcher.cs:
+	Fixed race condition when executing a task. The remove/add needs to
+	be an atomic operation otherwise multiple TimerThreads can be spawned
+
 2008-09-19  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.MediaServer/*: Stubbed out some
