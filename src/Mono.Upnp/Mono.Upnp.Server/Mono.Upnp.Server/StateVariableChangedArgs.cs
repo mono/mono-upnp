@@ -1,5 +1,5 @@
 ﻿//
-// DeviceType.cs
+// StateVariableChangedArgs.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -28,17 +28,19 @@
 
 using System;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.Server
 {
-    public sealed class DeviceType : TypeInfo
-    {
-        public DeviceType (string typeDescription)
-            : base (typeDescription)
+	public class StateVariableChangedArgs<T> : EventArgs
+	{
+        private readonly T new_value;
+
+        public StateVariableChangedArgs (T newValue)
         {
+            new_value = newValue;
         }
 
-        protected override string Kind {
-            get { return "device"; }
+        public T NewValue {
+            get { return new_value; }
         }
-    }
+	}
 }

@@ -1,3 +1,10 @@
+2008-10-03  Scott Peterson  <lunchtimemama@gmail.com>
+
+	Forgive the lame ChangeLog entry, but this is a big update with
+	lots of work. I'd catalog everything, but I won't. Sorry. I suck.
+	I know. This adds the server stuff. It's really just sketched out,
+	but you can run a server and a client and they talk to each other!
+
 2008-09-26  Alan McGovern  <amcgovern@novell.com>
 
 	* src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.Internal/TimeoutDispatcher.cs:

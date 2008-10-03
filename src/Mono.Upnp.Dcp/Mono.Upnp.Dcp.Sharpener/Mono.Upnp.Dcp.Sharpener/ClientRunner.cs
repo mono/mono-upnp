@@ -8,36 +8,111 @@ namespace Mono.Upnp.Dcp.Sharpener
 {
 	public class ClientRunner
 	{
-        public static void Run (RunnerContext context)
+        private RunnerContext context;
+
+        public ClientRunner (RunnerContext context)
+        {
+            this.context = context;
+        }
+
+        public void Run ()
         {
             while (context.Reader.Read () && context.Reader.NodeType != XmlNodeType.Element) {
             }
             if (context.Reader.Name == "root") {
-                RunDevice (context);
+                RunDevice ();
             } else if (context.Reader.Name == "scpd") {
-                RunService (context);
+                RunService ();
             }
         }
 
-        private static void RunDevice (RunnerContext context)
+        private void RunDevice ()
         {
             context.Reader.ReadToFollowing ("device");
             OfflineDevice device = new OfflineDevice (context.Reader.ReadSubtree ());
         }
 
-        private static void RunService (RunnerContext context)
+        private void RunService ()
         {
-            OfflineService service = new OfflineService (context.Reader);
+            Service service = new OfflineService (context.Reader);
+            WriteEnums (service);
+            WriteService (service);
+            WriteServiceFactory (service);
+        }
+
+        private void WriteServiceFactory (Service service)
+        {
+            StreamWriter writer = new StreamWriter (context.ClassName + "Factory.cs");
+            CodeMonkey monkey = new CodeMonkey (writer);
+            monkey.Write ("// {0}.cs auto-generated at {1} by Sharpener", context.ClassName, DateTime.Now);
+            monkey.WriteLine ();
+            monkey.WriteUsing ("System.Collections.Generic", "System.Net", "System.Xml");
+            monkey.WriteLine ();
+            if (!context.Namespace.StartsWith ("Mono.Upnp")) {
+                monkey.WriteUsing ("Mono.Upnp");
+                monkey.WriteLine ();
+            }
+            monkey.StartWriteBlock ("namespace {0}", context.Namespace);
+            monkey.StartWriteBlock ("public class {0}Factory : IServiceFactory", context.ClassName);
+            monkey.WriteLine (@"private static readonly ServiceType type = new ServiceType (""{0}"");", context.Type);
+            monkey.StartWriteBlock ("internal static ServiceType Type", false);
+            monkey.WriteLine ("get { return type; }");
+            monkey.EndWriteBlock ();
+            monkey.WriteLine ();
+            monkey.StartWriteBlock ("ServiceType IServiceFactory.Type", false);
+            monkey.WriteLine ("get { return Type; }");
+            monkey.EndWriteBlock ();
+            monkey.WriteLine ();
+            monkey.StartWriteBlock ("public Service CreateService (Client client, IEnumerable<string> locations)");
+            monkey.WriteLine ("return new {0} (client, locations);", context.ClassName);
+            monkey.EndWriteBlock ();
+            monkey.WriteLine ();
+            monkey.StartWriteBlock ("public Service CreateService (Device device, WebHeaderCollection headers, XmlReader reader)");
+            monkey.WriteLine ("return new {0} (device, headers, reader);", context.ClassName);
+            monkey.EndWriteBlock ();
+            monkey.EndWriteBlock ();
+            monkey.EndWriteBlock ();
+            writer.Close ();
+        }
+
+        private void WriteService (Service service)
+        {
             StreamWriter writer = new StreamWriter (context.ClassName + ".cs");
             CodeMonkey monkey = new CodeMonkey (writer);
-            StartWriteService (monkey, service, context);
+            StartWriteService (monkey, service);
             WriteMethods (monkey, service);
             WriteEvents (monkey, service);
             EndWriteService (monkey);
             writer.Close ();
         }
 
-        private static void StartWriteService (CodeMonkey monkey, OfflineService service, RunnerContext context)
+        private void WriteEnums (Service service)
+        {
+            foreach (StateVariable variable in service.StateVariables.Values) {
+                if (variable.AllowedValues != null) {
+                    StreamWriter writer = new StreamWriter (variable.Name + "AllowedValues.cs");
+                    CodeMonkey monkey = new CodeMonkey (writer);
+                    monkey.Write ("// {0}AllowedValues.cs auto-generated at {1} by Sharpener", variable.Name, DateTime.Now);
+                    monkey.WriteLine ();
+                    monkey.StartWriteBlock ("namespace {0}", context.Namespace);
+                    monkey.StartWriteBlock ("public enum {0}AllowedValues", variable.Name);
+                    bool first = true;
+                    foreach (string value in variable.AllowedValues) {
+                        if (first) {
+                            first = false;
+                        } else {
+                            monkey.Write (",");
+                        }
+                        monkey.WriteLine (value);
+                    }
+                    monkey.EndWriteBlock ();
+                    monkey.EndWriteBlock ();
+                    writer.Close ();
+                }
+            }
+        }
+
+        private void StartWriteService (CodeMonkey monkey, Service service)
         {
             monkey.Write ("// {0}.cs auto-generated at {1} by Sharpener", context.ClassName, DateTime.Now);
             monkey.WriteLine ();
@@ -60,7 +135,7 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.WriteLine ();
         }
 
-        private static void WriteMethods (CodeMonkey monkey, Service service)
+        private void WriteMethods (CodeMonkey monkey, Service service)
         {
             foreach (Action action in service.Actions.Values) {
                 bool return_single_out_arg = action.ReturnArgument == null && action.OutArguments.Count == 1;
@@ -75,7 +150,7 @@ namespace Mono.Upnp.Dcp.Sharpener
                         monkey.Write (", ");
                     }
                     // TODO proper typing and pascal casing
-                    monkey.Write ("string {0}", argument.Name);
+                    WriteInArgumentParameterDefinition (monkey, argument);
                 }
                 if (action.OutArguments.Count > 0 && !return_single_out_arg) {
                     foreach (Argument argument in action.OutArguments.Values) {
@@ -91,7 +166,7 @@ namespace Mono.Upnp.Dcp.Sharpener
                 monkey.StartWriteBlock ();
                 monkey.WriteLine (@"Action action = Actions[""{0}""];", action.Name);
                 foreach (Argument argument in action.InArguments.Values) {
-                    monkey.WriteLine (@"action.InArguments[""{0}""].Value = {0};", argument.Name);
+                    monkey.WriteLine (@"action.InArguments[""{0}""].Value = {1};", argument.Name, InArgumentAssignment (argument));
                 }
                 monkey.WriteLine ("action.Execute ();");
                 if (action.ReturnArgument != null) {
@@ -113,7 +188,56 @@ namespace Mono.Upnp.Dcp.Sharpener
             }
         }
 
-        private static void WriteEvents (CodeMonkey monkey, Service service)
+        private string InArgumentAssignment (Argument argument)
+        {
+            if (argument.Type == typeof (string) && argument.AllowedValues == null) {
+                return argument.Name;
+            } else {
+                return argument.Name + ".ToString ()";
+            }
+        }
+
+        private void WriteInArgumentParameterDefinition (CodeMonkey monkey, Argument argument)
+        {
+            if (argument.AllowedValues != null) {
+                monkey.Write ("{0}AllowedValues {1}", argument.RelatedStateVariable.Name, argument.Name);
+            } else{
+                monkey.Write ("{0} {1}", GetTypeName (argument.Type), argument.Name);
+            }
+        }
+
+        private string GetTypeName (Type type)
+        {
+            if (type == typeof (string)) {
+                return "string";
+            } else if (type == typeof (byte)) {
+                return "byte";
+            } else if (type == typeof (sbyte)) {
+                return "sbyte";
+            } else if (type == typeof (short)) {
+                return "short";
+            } else if (type == typeof (ushort)) {
+                return "ushort";
+            } else if (type == typeof (int)) {
+                return "int";
+            } else if (type == typeof (uint)) {
+                return "uint";
+            } else if (type == typeof (long)) {
+                return "long";
+            } else if (type == typeof (ulong)) {
+                return "ulong";
+            } else if (type == typeof (float)) {
+                return "float";
+            } else if (type == typeof (double)) {
+                return "double";
+            } else if (type == typeof (char)) {
+                return "char";
+            } else {
+                return type.Name;
+            }
+        }
+
+        private void WriteEvents (CodeMonkey monkey, Service service)
         {
             foreach (StateVariable variable in service.StateVariables.Values) {
                 if (variable.SendEvents) {
@@ -125,7 +249,7 @@ namespace Mono.Upnp.Dcp.Sharpener
             }
         }
 
-        private static void EndWriteService (CodeMonkey monkey)
+        private void EndWriteService (CodeMonkey monkey)
         {
             monkey.EndWriteBlock ();
             monkey.EndWriteBlock ();

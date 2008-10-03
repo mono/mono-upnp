@@ -307,7 +307,7 @@ namespace Mono.Upnp
                 serial_number = reader.ReadString ();
                 break;
             case "UDN":
-                udn = reader.ReadString ();
+                udn = reader.ReadString ().Trim ();
                 break;
             case "UPC":
                 upc = reader.ReadString ();

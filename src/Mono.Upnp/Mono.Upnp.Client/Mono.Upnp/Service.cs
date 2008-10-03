@@ -256,7 +256,7 @@ namespace Mono.Upnp
                 break;
             case "serviceId":
                 // TODO better handling of this complex string
-                id = reader.ReadString ();
+                id = reader.ReadString ().Trim ();
                 break;
             case "SCPDURL":
                 description_url = device.Root.DeserializeUrl (reader.ReadSubtree ());

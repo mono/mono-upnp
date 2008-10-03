@@ -37,6 +37,8 @@ namespace Mono.Ssdp
     public class Server : IDisposable
 	{
         private readonly object mutex = new object ();
+        private readonly string default_location;
+
         private RequestListener request_listener;
         private Dictionary<string, Announcer> announcers;
 
@@ -74,9 +76,25 @@ namespace Mono.Ssdp
             announcers = new Dictionary<string, Announcer> ();
         }
 
+        public Server (string location)
+            : this ()
+        {
+            default_location = location;
+        }
+
+        public Announcer Announce (string type, string name)
+        {
+            return Announce (type, name, default_location, true);
+        }
+
         public Announcer Announce (string type, string name, string location)
         {
             return Announce (type, name, location, true);
+        }
+
+        public Announcer Announce (string type, string name, bool autoStart)
+        {
+            return Announce (type, name, default_location, autoStart);
         }
 
         public Announcer Announce (string type, string name, string location, bool autoStart)

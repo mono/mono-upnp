@@ -133,16 +133,16 @@ namespace Mono.Upnp.Control
             reader.Read ();
             switch (element) {
             case "name":
-                name = reader.ReadString (); ;
+                name = reader.ReadString ().Trim ();
                 break;
             case "direction":
-                direction = reader.ReadString () == "in" ? ArgumentDirection.In : ArgumentDirection.Out;
+                direction = reader.ReadString ().Trim () == "in" ? ArgumentDirection.In : ArgumentDirection.Out;
                 break;
             case "retval":
                 is_return_value = true;
                 break;
             case "relatedStateVariable":
-                related_state_variable_name = reader.ReadString ();
+                related_state_variable_name = reader.ReadString ().Trim ();
                 break;
             default: // This is a workaround for Mono bug 334752
                 reader.Skip ();

@@ -29,30 +29,27 @@
 using System;
 using System.Xml;
 
-using Mono.Upnp.Internal;
+using Mono.Upnp.Server.Internal;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.Server
 {
 	public abstract class TypeInfo
 	{
-        internal TypeInfo (string typeDescription)
+        internal TypeInfo (string domainName, string type, Version version)
         {
-            try {
-                typeDescription = typeDescription.Trim ();
-                string[] sections = typeDescription.Split (':');
-                Version version;
-                string[] versions = sections[4].Split ('.');
-                if (versions.Length == 1) {
-                    version = new Version (Int32.Parse (versions[0]), 0);
-                } else {
-                    version = new Version (Int32.Parse (versions[0]), Int32.Parse (versions[1]));
-                }
-                domain_name = sections[1];
-                type = sections[3];
-                this.version = version;
-            } catch (Exception e) {
-                throw new UpnpDeserializationException ("There was a problem deseriailizing a type description.", e);
+            if (domainName == null) {
+                throw new ArgumentNullException ("domainName");
             }
+            if (type == null) {
+                throw new ArgumentNullException ("type");
+            }
+            if (version == null) {
+                throw new ArgumentNullException ("version");
+            }
+
+            this.domain_name = domainName;
+            this.type = type;
+            this.version = version;
         }
 
         protected abstract string Kind { get; }
@@ -72,14 +69,28 @@ namespace Mono.Upnp
             get { return version; }
         }
 
-        #region Equality
-
+        private string to_string;
         public override string ToString ()
         {
-            string version = this.version.Minor == 0
-                ? this.version.Major.ToString ()
-                : String.Format ("{0}.{1}", this.version.Major, this.version.Minor);
-            return String.Format ("urn:{0}:{1}:{2}:{3}", domain_name, Kind, type, version);
+            if (to_string == null) {
+                string version = this.version.Minor == 0
+                    ? this.version.Major.ToString ()
+                    : String.Format ("{0}.{1}", this.version.Major, this.version.Minor);
+                to_string = String.Format ("urn:{0}:{1}:{2}:{3}", domain_name, Kind, type, version);
+            }
+            return to_string;
+        }
+
+        private string to_url_string;
+        public string ToUrlString ()
+        {
+            if (to_url_string == null) {
+                string version = this.version.Minor == 0
+                    ? this.version.Major.ToString ()
+                    : String.Format ("{0}.{1}", this.version.Major, this.version.Minor);
+                to_url_string = String.Format ("{0}/{1}/{2}", domain_name, type, version);
+            }
+            return to_url_string;
         }
 
         public override bool Equals (object obj)
@@ -118,8 +129,6 @@ namespace Mono.Upnp
                 type1.Version != type2.Version ||
                 type1.Kind != type2.Kind;
         }
-
-        #endregion
 
     }
 }

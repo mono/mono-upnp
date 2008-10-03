@@ -1,5 +1,5 @@
 ﻿//
-// DeviceType.cs
+// ArgumentDirection.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -26,19 +26,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-
-namespace Mono.Upnp
+namespace Mono.Upnp.Server
 {
-    public sealed class DeviceType : TypeInfo
+    public enum ArgumentDirection
     {
-        public DeviceType (string typeDescription)
-            : base (typeDescription)
-        {
-        }
-
-        protected override string Kind {
-            get { return "device"; }
-        }
+        In,
+        Out
     }
 }

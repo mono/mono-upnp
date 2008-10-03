@@ -11,8 +11,7 @@ namespace Mono.Upnp.Dcp.MediaServer1
             get { return type; }
         }
 
-        ServiceType IServiceFactory.Type
-        {
+        ServiceType IServiceFactory.Type {
             get { return Type; }
         }
 

@@ -30,7 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Mono.Ssdp.Internal
+namespace Mono.Upnp.Server.Internal
 {
     internal delegate bool TimeoutHandler (object state, ref TimeSpan interval);
 

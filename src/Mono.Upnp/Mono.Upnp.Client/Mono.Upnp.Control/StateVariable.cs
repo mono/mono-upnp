@@ -149,10 +149,10 @@ namespace Mono.Upnp.Control
             reader.Read ();
             switch (element) {
             case "name":
-                name = reader.ReadString ();
+                name = reader.ReadString ().Trim ();
                 break;
             case "dataType":
-                data_type = reader.ReadString ();
+                data_type = reader.ReadString ().Trim ();
                 switch (data_type) {
                 case "ui1":
                     type = typeof (byte);
@@ -222,7 +222,7 @@ namespace Mono.Upnp.Control
                 allowed_value_range = new AllowedValueRange (reader.ReadSubtree ());
                 break;
             case "sendEventsAttribute":
-                send_events = reader.ReadString () != "no";
+                send_events = reader.ReadString ().Trim () != "no";
                 break;
             default: // This is a workaround for Mono bug 334752
                 reader.Skip ();

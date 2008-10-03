@@ -8,7 +8,7 @@ MONO_SSDP_SRC =  \
 	Mono.Ssdp.Internal/Log.cs \
 	Mono.Ssdp.Internal/NotifyListener.cs \
 	Mono.Ssdp.Internal/Protocol.cs \
-  Mono.Ssdp.Internal/RequestListener.cs \
+	Mono.Ssdp.Internal/RequestListener.cs \
 	Mono.Ssdp.Internal/ServiceCache.cs \
 	Mono.Ssdp.Internal/SsdpSocket.cs \
 	Mono.Ssdp.Internal/TimeoutDispatcher.cs \

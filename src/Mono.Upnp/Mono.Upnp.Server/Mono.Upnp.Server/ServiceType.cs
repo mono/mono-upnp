@@ -1,5 +1,5 @@
 ﻿//
-// DeviceType.cs
+// ServiceType.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -28,17 +28,17 @@
 
 using System;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.Server
 {
-    public sealed class DeviceType : TypeInfo
-    {
-        public DeviceType (string typeDescription)
-            : base (typeDescription)
+    public sealed class ServiceType : TypeInfo
+	{
+        public ServiceType (string domainName, string type, Version version)
+            : base (domainName, type, version)
         {
         }
 
         protected override string Kind {
-            get { return "device"; }
+            get { return "service"; }
         }
     }
 }

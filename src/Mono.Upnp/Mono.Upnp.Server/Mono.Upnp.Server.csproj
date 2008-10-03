@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EBBD8A18-412E-4DC5-BC52-F1BE65116D53}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Mono.Upnp.Server</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>mono-upnp-server.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>.\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Mono.Upnp.Server.Internal\ActionServer.cs" />
+    <Compile Include="Mono.Upnp.Server.Internal\DescriptionServer.cs" />
+    <Compile Include="Mono.Upnp.Server.Internal\EventServer.cs" />
+    <Compile Include="Mono.Upnp.Server.Internal\Protocol.cs" />
+    <Compile Include="Mono.Upnp.Server.Internal\TimeoutDispatcher.cs" />
+    <Compile Include="Mono.Upnp.Server.Internal\UpnpServer.cs" />
+    <Compile Include="Mono.Upnp.Server\Action.cs" />
+    <Compile Include="Mono.Upnp.Server\AllowedValueRange.cs" />
+    <Compile Include="Mono.Upnp.Server\ArgumentDirection.cs" />
+    <Compile Include="Mono.Upnp.Server.Internal\Helper.cs" />
+    <Compile Include="Mono.Upnp.Server\Icon.cs" />
+    <Compile Include="Mono.Upnp.Server\Server.cs" />
+    <Compile Include="Mono.Upnp.Server\StateVariable.cs" />
+    <Compile Include="Mono.Upnp.Server.Internal\Subscriber.cs" />
+    <Compile Include="Mono.Upnp.Server\Device.cs" />
+    <Compile Include="Mono.Upnp.Server\DeviceType.cs" />
+    <Compile Include="Mono.Upnp.Server\ServiceType.cs" />
+    <Compile Include="Mono.Upnp.Server\StateVariableChangedArgs.cs" />
+    <Compile Include="Mono.Upnp.Server\TypeInfo.cs" />
+    <Compile Include="Mono.Upnp.Server\UpnpActionAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server\Argument.cs" />
+    <Compile Include="Mono.Upnp.Server\UpnpArgumentAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server\Service.cs" />
+    <Compile Include="Mono.Upnp.Server\UpnpStateVariableAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server\UpnpException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="mono-upnp-server.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj">
+      <Project>{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}</Project>
+      <Name>Mono.Ssdp %28Mono.Ssdp\Mono.Ssdp%29</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

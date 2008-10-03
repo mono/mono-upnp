@@ -28,12 +28,12 @@
 
 using System;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.Server
 {
     public sealed class DeviceType : TypeInfo
     {
-        public DeviceType (string typeDescription)
-            : base (typeDescription)
+        public DeviceType (string domainName, string type, Version version)
+            : base (domainName, type, version)
         {
         }
 
