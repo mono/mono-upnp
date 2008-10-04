@@ -25,12 +25,6 @@ namespace Mono.Upnp.ConsoleClient
         static void client_ServiceAdded (object sender, ServiceArgs e)
         {
             Console.WriteLine ("Found {0} {1}", e.Service.Type, e.Service.Id);
-            var service = e.Service;
-            if (service.Type.DomainName == "mono") {
-                service.Actions ["Test3"].InArguments ["i"].Value = "5";
-                service.Actions ["Test3"].Execute ();
-                Console.Write (service.Actions ["Test3"].OutArguments ["s"].Value);
-            }
         }
     }
 }

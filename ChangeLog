@@ -1,3 +1,24 @@
+2008-10-04  Scott Peterson  <lunchtimemama@gmail.com>
+
+  * src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Program.cs:
+  * src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Sharpener.cs:
+  Renamed file.
+  
+  * src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/CodeMonkey.cs:
+  Added an overload and a Close() method to close the underlying
+  stream.
+  
+  * src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/ClientRunner.cs:
+  * src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Runner.cs:
+  Abstracted some stuff from ClientRunner into Runner.
+  
+  * src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/ServerRunner.cs:
+  Added a server runner.
+  
+  * src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/Argument.cs:
+  Added DefaultValue property which proxies
+  RelatedStateVariable.DefaultValue.
+
 2008-10-03  Scott Peterson  <lunchtimemama@gmail.com>
 
 	Forgive the lame ChangeLog entry, but this is a big update with

@@ -78,6 +78,10 @@ namespace Mono.Upnp.Control
             get { return RelatedStateVariable.AllowedValueRange; }
         }
 
+        public string DefaultValue {
+            get { return RelatedStateVariable.DefaultValue; }
+        }
+
         private bool is_return_value;
         internal bool IsReturnValue {
             get { return is_return_value; }

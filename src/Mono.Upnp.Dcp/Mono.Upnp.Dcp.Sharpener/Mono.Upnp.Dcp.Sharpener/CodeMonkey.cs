@@ -10,6 +10,11 @@ namespace Mono.Upnp.Dcp.Sharpener
         private readonly TextWriter writer;
         private int indentation_level;
 
+        public CodeMonkey (string path)
+            : this (new StreamWriter (path))
+        {
+        }
+
         public CodeMonkey (TextWriter writer)
         {
             if (writer == null) {
@@ -40,6 +45,11 @@ namespace Mono.Upnp.Dcp.Sharpener
         public void Write (string format, object obj0, object obj1)
         {
             Write (String.Format (format, obj0, obj1));
+        }
+
+        public void Write (string format, params object [] objs)
+        {
+            Write (String.Format (format, objs));
         }
 
         public void Write (string value)
@@ -132,6 +142,11 @@ namespace Mono.Upnp.Dcp.Sharpener
             foreach (string @namespace in namespaces) {
                 WriteUsing (@namespace);
             }
+        }
+
+        public void Close ()
+        {
+            writer.Close ();
         }
 	}
 }

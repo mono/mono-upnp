@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace Mono.Upnp.Dcp.Sharpener
 {
-	internal class Program
+	internal class Sharpener
 	{
         public static int Main (string[] args)
         {
@@ -12,7 +12,7 @@ namespace Mono.Upnp.Dcp.Sharpener
                 "ContentDirectory1",
                 "Mono.Upnp.Dcp.MediaServer1",
                 @"C:\Users\Scott\Desktop\ContentDirectory1.xml");
-            var runner = new ClientRunner (context);
+            var runner = new ServerRunner (context);
             runner.Run ();
             return 0;
         }

@@ -30,8 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
@@ -43,11 +42,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mono.Upnp.Dcp.Sharpener\CodeMonkey.cs" />
-    <Compile Include="Mono.Upnp.Dcp.Sharpener\Program.cs" />
+    <Compile Include="Mono.Upnp.Dcp.Sharpener\Sharpener.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\OfflineDevice.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\OfflineService.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\ClientRunner.cs" />
+    <Compile Include="Mono.Upnp.Dcp.Sharpener\Runner.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\RunnerContext.cs" />
+    <Compile Include="Mono.Upnp.Dcp.Sharpener\ServerRunner.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
