@@ -30,32 +30,42 @@ namespace Mono.Upnp.Server
             if (name == null) {
                 throw new ArgumentNullException ("name");
             }
-            if (dataType == null) {
-                throw new ArgumentNullException ("dataType");
-            }
 
             // TODO check that allowedValueRange is only used with numeric types
 
             this.service = service;
             this.name = name;
-            this.data_type = dataType.IsByRef ? dataType.GetElementType () : dataType;
+            if (dataType != null) {
+                this.data_type = dataType.IsByRef ? dataType.GetElementType () : dataType;
+                Helper.GetDataType (data_type);
+            }
             this.default_value = defaultValue;
             this.allowed_value_range = allowedValueRange;
             this.send_events = sendEvents;
-            Helper.GetDataType (data_type);
         }
 
         protected internal virtual void Initialize (EventInfo @event)
         {
-            if (@event.EventHandlerType.GetGenericTypeDefinition () != typeof (StateVariableChangedArgs<>)) {
-                throw new UpnpException (String.Format (
-                    "The UPnP state variable {0} must be of the type EventHandler<StateVariableChangedArgs<>>.", name));
+            Type type = @event.EventHandlerType;
+            if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (EventHandler<>)) {
+                Die ();
             }
-            data_type = @event.EventHandlerType.GetGenericArguments ()[0].GetGenericArguments ()[0];
+            type = type.GetGenericArguments ()[0];
+            if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (StateVariableChangedArgs<>)) {
+                Die ();
+            }
+            data_type = type.GetGenericArguments ()[0];
             Delegate del = Delegate.CreateDelegate (
                 typeof (EventHandler<>).MakeGenericType (typeof (StateVariableChangedArgs<>).MakeGenericType (data_type)),
-                on_event);
+                this,
+                on_event.MakeGenericMethod (data_type));
             @event.AddEventHandler (service, del);
+        }
+
+        private void Die ()
+        {
+            throw new UpnpException (String.Format (
+                "The UPnP state variable {0} must be of the type EventHandler<StateVariableChangedArgs<>>.", name));
         }
 
         private void OnEvent<T> (object sender, StateVariableChangedArgs<T> args)

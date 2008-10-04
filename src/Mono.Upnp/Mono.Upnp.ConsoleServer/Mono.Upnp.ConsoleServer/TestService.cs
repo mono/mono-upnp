@@ -42,5 +42,16 @@ namespace Mono.Upnp.Server.ConsoleServer
             s = "Hello from Test3!";
             b = true;
         }
+
+        [UpnpStateVariable ("Message")]
+        public event EventHandler<StateVariableChangedArgs<string>> MessageChanged;
+        public string Message {
+            set {
+                var handler = MessageChanged;
+                if (handler != null) {
+                    handler (this, new StateVariableChangedArgs<string> (value));
+                }
+            }
+        }
     }
 }

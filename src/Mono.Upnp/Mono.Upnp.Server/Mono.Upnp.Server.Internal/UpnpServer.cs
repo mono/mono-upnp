@@ -5,6 +5,11 @@ namespace Mono.Upnp.Server.Internal
 {
 	internal abstract class UpnpServer : IDisposable
 	{
+        static UpnpServer ()
+        {
+            ServicePointManager.Expect100Continue = false;
+        }
+
         private readonly HttpListener listener;
 
         protected UpnpServer (Uri url)

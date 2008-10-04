@@ -58,11 +58,12 @@ namespace Mono.Upnp.Internal
             delivery_url = String.Format ("<{0}>", prefix);
         }
 
+        private static readonly Random random = new Random ();
         private string GeneratePrefix ()
         {
             foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
                 if (address.AddressFamily == AddressFamily.InterNetwork) {
-                    return String.Format ("http://{0}:3641/{1}/", address, id++);
+                    return String.Format ("http://{0}:{1}/upnp/event-subscriber/{2}/", address, random.Next (1024, 5000), id++);
                 }
             }
             // FIXME better way?
@@ -84,8 +85,10 @@ namespace Mono.Upnp.Internal
 
         private void StartListening ()
         {
-            listener = new HttpListener ();
-            listener.Prefixes.Add (prefix);
+            if (listener == null) {
+                listener = new HttpListener ();
+                listener.Prefixes.Add (prefix);
+            }
             listener.Start ();
             listener.BeginGetContext (OnGotContext, listener);
         }
@@ -94,15 +97,18 @@ namespace Mono.Upnp.Internal
         {
             HttpListener listener = (HttpListener)asyncResult.AsyncState;
             HttpListenerContext context = listener.EndGetContext (asyncResult);
-            service.DeserializeEvents (context.Request);
+            try {
+                service.DeserializeEvents (context.Request);
+            } catch {
+                // TODO log
+            }
             context.Response.Close ();
             listener.BeginGetContext (OnGotContext, listener);
         }
 
         private void StopListening ()
         {
-            listener.Abort ();
-            listener = null;
+            listener.Stop ();
         }
 
         private void Subscribe ()
@@ -239,6 +245,7 @@ namespace Mono.Upnp.Internal
         public void Dispose ()
         {
             Stop ();
+            listener.Close ();
         }
 	}
 }

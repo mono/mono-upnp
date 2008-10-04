@@ -174,7 +174,7 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.StartWriteBlock ("set", false);
             monkey.WriteLine ("EventHandler<StateVariableChangedArgs<{0}>> handler = {1}Changed;", type, state_variable.Name);
             monkey.StartWriteBlock ("if (handler != null)", false);
-            monkey.WriteLine ("handler (value);");
+            monkey.WriteLine ("handler (this, new StateVariableChangedArgs<{0}> (value));", type);
             monkey.EndWriteBlock ();
             monkey.EndWriteBlock ();
             monkey.EndWriteBlock ();

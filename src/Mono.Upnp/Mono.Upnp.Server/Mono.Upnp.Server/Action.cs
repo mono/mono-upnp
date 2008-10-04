@@ -12,11 +12,15 @@ namespace Mono.Upnp.Server
         private readonly Service service;
         private readonly string name;
         private readonly Dictionary<string, Argument> arguments = new Dictionary<string, Argument> ();
-        private Argument return_argument;
         private MethodInfo method;
 
         public IDictionary<string, Argument> Arguments  {
             get { return arguments; }
+        }
+
+        private Argument return_argument;
+        public Argument ReturnArgument { // TODO make internal?
+            get { return return_argument; }
         }
 
         protected internal Action (Service service, string name)
@@ -92,7 +96,7 @@ namespace Mono.Upnp.Server
             StateVariable related_state_variable = CreateRelatedStateVariable (name, parameter.ParameterType, default_value, allowed_value_range);
             ArgumentDirection direction = parameter.IsOut | isRetVal ? ArgumentDirection.Out : ArgumentDirection.In;
             Argument argument = new Argument (this, name, isRetVal, related_state_variable, direction);
-            if (parameter.IsRetval) {
+            if (isRetVal) {
                 SetReturnArgument (argument);
             } else {
                 AddParameterArgument (argument);
@@ -124,7 +128,7 @@ namespace Mono.Upnp.Server
                 return false;
             }
             StateVariable variable = service.StateVariables[name];
-            return variable.DataType != dataType && variable.SendEvents == true;
+            return variable.DataType != dataType || variable.SendEvents == true;
         }
 
         protected void AddParameterArgument (Argument argument)
@@ -160,6 +164,9 @@ namespace Mono.Upnp.Server
             writer.WriteStartElement ("argumentList");
             foreach (Argument argument in arguments.Values) {
                 argument.Serialize (writer);
+            }
+            if (return_argument != null) {
+                return_argument.Serialize (writer);
             }
             writer.WriteEndElement ();
             writer.WriteEndElement ();

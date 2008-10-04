@@ -119,7 +119,12 @@ namespace Mono.Upnp.Control
         private void DeserializeResponse (XmlReader reader)
         {
             reader.Read ();
-            out_arguments[reader.Name].Value = reader.ReadString ();
+            string value = reader.ReadString ();
+            if (return_argument != null && return_argument.Name == reader.Name) {
+                return_argument.Value = value;
+            } else if (out_arguments.ContainsKey (reader.Name)) {
+                out_arguments[reader.Name].Value = value;
+            }
             reader.Close ();
         }
 

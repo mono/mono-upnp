@@ -78,15 +78,23 @@ namespace Mono.Upnp.Server.Internal
             writer.WriteStartElement (action.Name + "Response", action.Service.Type.ToString ());
             foreach (Argument argument in action.Arguments.Values) {
                 if (argument.Direction == ArgumentDirection.Out) {
-                    writer.WriteStartElement (argument.Name);
-                    writer.WriteValue (argument.Value);
-                    writer.WriteEndElement ();
+                    DebriefArgument (writer, argument);
                 }
+            }
+            if (action.ReturnArgument != null) {
+                DebriefArgument (writer, action.ReturnArgument);
             }
             writer.WriteEndElement ();
             Helper.WriteEndSoapBody (writer);
             writer.Flush ();
             context.Response.ContentLength64 = stream.Length;
+        }
+
+        private void DebriefArgument (XmlWriter writer, Argument argument)
+        {
+            writer.WriteStartElement (argument.Name);
+            writer.WriteValue (argument.Value);
+            writer.WriteEndElement ();
         }
 
         // TODO move to Protocol.cs when it exists

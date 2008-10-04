@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Xml;
@@ -14,6 +15,7 @@ namespace Mono.Upnp.Server.Internal
             public string Sid;
             public uint TimeoutId;
             public uint Seq;
+            public int ConnectFailures;
 
             public Subscriber (Uri callback, string uuid)
             {
@@ -33,11 +35,28 @@ namespace Mono.Upnp.Server.Internal
             this.service = service;
         }
 
+        private readonly Stack<Subscriber> dead_subscribers = new Stack<Subscriber> ();
+
         public void PublishUpdates ()
         {
             lock (mutex) {
                 foreach (Subscriber subscriber in subscribers.Values) {
-                    PublishUpdates (subscriber);
+                    try {
+                        PublishUpdates (subscriber);
+                        subscriber.ConnectFailures = 0;
+                    } catch (WebException e) {
+                        // TODO this for all exception types?
+                        if (e.Status == WebExceptionStatus.ConnectFailure) {
+                            subscriber.ConnectFailures++;
+                        }
+                        if (subscriber.ConnectFailures == 2) {
+                            dead_subscribers.Push (subscriber);
+                        }
+                    } catch {
+                    }
+                }
+                while (dead_subscribers.Count > 0) {
+                    subscribers.Remove (dead_subscribers.Pop ().Sid);
                 }
             }
         }
@@ -51,8 +70,10 @@ namespace Mono.Upnp.Server.Internal
             request.Headers.Add ("NTS", "upnp:propchange");
             request.Headers.Add ("SID", subscriber.Sid);
             request.Headers.Add ("SEQ", subscriber.Seq.ToString ());
+            request.KeepAlive = false;
             subscriber.Seq++;
-            XmlWriter writer = XmlWriter.Create (request.GetRequestStream ());
+            Stream stream = request.GetRequestStream ();
+            XmlWriter writer = XmlWriter.Create (stream);
             writer.WriteStartDocument ();
             writer.WriteStartElement ("e", "propertyset", Protocol.EventUrn);
             foreach (StateVariable state_variable in service.StateVariables.Values) {
@@ -65,11 +86,18 @@ namespace Mono.Upnp.Server.Internal
                 }
             }
             writer.WriteEndElement ();
-            writer.WriteEndElement ();
             writer.WriteEndDocument ();
-            writer.Flush ();
+            writer.Close ();
+            stream.Close ();
+            request.BeginGetResponse (OnGotResponse, request);
+        }
+
+        private void OnGotResponse (IAsyncResult async)
+        {
+            HttpWebRequest request = (HttpWebRequest)async.AsyncState;
             try {
-                request.GetResponse ();
+                HttpWebResponse response = (HttpWebResponse)request.EndGetResponse (async);
+                response.Close ();
             } catch {
             }
         }
@@ -82,7 +110,7 @@ namespace Mono.Upnp.Server.Internal
                     if (callback != null) {
                         string uuid = GenerateUuid ();
                         // TODO try/catch
-                        Subscriber subscriber = new Subscriber (new Uri (callback), uuid);
+                        Subscriber subscriber = new Subscriber (new Uri (callback.Substring (1, callback.Length - 2)), uuid);
                         subscribers.Add (uuid, subscriber);
                         HandleSubscription (context, subscriber);
                         context.Response.Close ();

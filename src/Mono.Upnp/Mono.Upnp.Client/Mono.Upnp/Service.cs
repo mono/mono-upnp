@@ -142,6 +142,11 @@ namespace Mono.Upnp
 
         private void LoadServiceDescription ()
         {
+            action_dict = new Dictionary<string, Action> ();
+            actions = new ReadOnlyDictionary<string, Action> (action_dict);
+            state_variable_dict = new Dictionary<string, StateVariable> ();
+            state_variables = new ReadOnlyDictionary<string, StateVariable> (state_variable_dict);
+
             WebResponse response = Helper.GetResponse (DescriptionUrl);
             XmlReader reader = XmlReader.Create (response.GetResponseStream ());
             reader.ReadToFollowing ("scpd");
@@ -215,10 +220,6 @@ namespace Mono.Upnp
         private void Deserialize (WebHeaderCollection headers, XmlReader reader)
         {
             this.headers = headers;
-            action_dict = new Dictionary<string, Action> ();
-            actions = new ReadOnlyDictionary<string, Action> (action_dict);
-            state_variable_dict = new Dictionary<string, StateVariable> ();
-            state_variables = new ReadOnlyDictionary<string, StateVariable> (state_variable_dict);
             
             Deserialize (headers);
             Deserialize (reader);

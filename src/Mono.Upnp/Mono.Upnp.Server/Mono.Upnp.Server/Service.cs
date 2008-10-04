@@ -122,7 +122,12 @@ namespace Mono.Upnp.Server
                 ProcessStateVariable (@event);
             }
             foreach (EventInfo @event in GetType ().GetEvents (BindingFlags.Instance | BindingFlags.NonPublic)) {
-                ProcessStateVariable (@event);
+                foreach (object attribute in @event.GetCustomAttributes (true)) {
+                    UpnpStateVariableAttribute state_variable_attribute = attribute as UpnpStateVariableAttribute;
+                    if (state_variable_attribute != null) {
+                        throw new UpnpException ("State variable events must be public.");
+                    }
+                }
             }
         }
 

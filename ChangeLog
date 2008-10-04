@@ -1,5 +1,39 @@
 2008-10-04  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/ServerRunner.cs:
+	Fixed the event declaration type.
+	
+	* src/Mono.Upnp.Client/Mono.Upnp.Control/Action.cs:
+	Deserialize the return argument.
+	
+	* src/Mono.Upnp.Client/Mono.Upnp.Internal/EventSubscriber.cs:
+	Choose port randomly, keep one HttpListener around until Dispose.
+	
+	* src/Mono.Upnp.Client/Mono.Upnp/Service.cs: Moved collection
+	instantiation out of Deserialize ().
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server.Internal/ActionServer.cs:
+	Debrief return argument.
+
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server.Internal/EventServer.cs:
+	Use async GetResponse and we remove subscribers after they fail to
+	connect twice in a row.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server.Internal/UpnpServer.cs:
+	Turn off Expect100Continue.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/Action.cs:
+	Exposed ReturnArgument, fixed bug.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/Service.cs:
+	Throw an exception if UpnpStateVariableAttribute is used on
+	a non-public event (because we cannot subscribe a delegate to it).
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/StateVariable.cs:
+	Fixed event delegate registration.
+
+2008-10-04  Scott Peterson  <lunchtimemama@gmail.com>
+
   * src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Program.cs:
   * src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Sharpener.cs:
   Renamed file.
