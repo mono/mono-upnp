@@ -59,41 +59,40 @@ namespace Mono.Ssdp.Internal
         
         private static string discovery_request =
             "M-SEARCH * HTTP/1.1\r\n" + 
-            "Host: {0}:{1}\r\n" + 
-            "Man: \"ssdp:discover\"\r\n" +
+            "HOST: {0}:{1}\r\n" + 
+            "MAN: \"ssdp:discover\"\r\n" +
             "ST: {2}\r\n" +
             "MX: {3}\r\n" +
-            "User-Agent: " + user_agent + "\r\n" +
             "\r\n";
 
         private static string alive_notify =
             "NOTIFY * HTTP/1.1\r\n" +
-            "Host: {0}:{1}\r\n" +
-            "Cache-Control: max-age = {2}\r\n" +
-            "Location: {3}\r\n" +
+            "HOST: {0}:{1}\r\n" +
+            "CACHE-CONTROL: max-age = {2}\r\n" +
+            "LOCATION: {3}\r\n" +
             "NT: {4}\r\n" +
             "NTS: ssdp:alive\r\n" +
-            "Server: {5} UPnP/1.1 {6}\r\n" +
+            "SERVER: {5} UPnP/1.1 {6}\r\n" +
             "USN: {7}\r\n" +
             "\r\n";
 
         private static string alive_response =
             "HTTP/1.1 200 OK\r\n" +
-            "Cache-Control: max-age = {0}\r\n" +
-            "Date: {1}\r\n" +
+            "CACHE-CONTROL: max-age = {0}\r\n" +
+            "DATE: {1}\r\n" +
             "EXT:\r\n" +
-            "Location: {2}\r\n" +
-            "Server: {3} UPnP/1.1 {4}\r\n" +
+            "LOCATION: {2}\r\n" +
+            "SERVER: {3} UPnP/1.1 {4}\r\n" +
             "ST: {5}\r\n" +
             "USN: {6}\r\n" +
             "\r\n";
 
         private static string byebye_notify =
             "NOTIFY * HTTP/1.1\r\n" +
-            "Host: {0}:{1}\r\n" +
+            "HOST: {0}:{1}\r\n" +
             "NT: {2}\r\n" +
             "NTS: ssdp:byebye\r\n" +
-            "USN: uuid:{3}\r\n" +
+            "USN: {3}\r\n" +
             "\r\n";
             
         public static byte[] CreateDiscoveryRequest (string serviceType, ushort mx)

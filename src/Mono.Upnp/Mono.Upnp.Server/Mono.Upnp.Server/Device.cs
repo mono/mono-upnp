@@ -1,12 +1,43 @@
-﻿using System;
+﻿//
+// Device.cs
+//
+// Author:
+//   Scott Peterson <lunchtimemama@gmail.com>
+//
+// Copyright (C) 2008 S&S Black Ltd.
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
+using System;
 using System.Collections.Generic;
 using System.Xml;
 
+using Mono.Upnp.Server.Internal;
+
 namespace Mono.Upnp.Server
 {
-	public class Device : IDisposable
+	public class Device
 	{
-        private readonly object mutex = new object ();
+        private IconServer icon_server;
+        private bool initialized;
 
         public Device (DeviceType type, IEnumerable<Service> services, string id, string friendlyName, string manufacturer, string modelName)
         {
@@ -26,13 +57,14 @@ namespace Mono.Upnp.Server
                 throw new ArgumentNullException ("modelName");
             }
 
-            if (!id.StartsWith ("uuid:")) {
-                id = "uuid:" + id;
+            if (id.StartsWith ("uuid:")) {
+                id = id.Substring (5);
             }
 
             this.type = type;
             this.services = services;
             this.id = id;
+            this.udn = "uuid:" + id;
             this.friendly_name = friendlyName;
             this.manufacturer = manufacturer;
             this.model_name = modelName;
@@ -46,6 +78,11 @@ namespace Mono.Upnp.Server
         private readonly string id;
         public string Id {
             get { return id; }
+        }
+
+        private readonly string udn;
+        public string Udn {
+            get { return udn; }
         }
 
         private readonly IEnumerable<Service> services;
@@ -72,79 +109,71 @@ namespace Mono.Upnp.Server
         private Uri manufacturer_url;
         public Uri ManufacturerUrl {
             get { return manufacturer_url; }
-            set { manufacturer_url = value; }
+            set {
+                CheckInitialized ();
+                manufacturer_url = value;
+            }
         }
 
         private string model_description;
         public string ModelDescription {
             get { return model_description; }
-            set { model_description = value; }
+            set {
+                CheckInitialized ();
+                model_description = value;
+            }
         }
 
         private readonly string model_name;
         public string ModelName {
-            get { return model_name; }
+            get {
+                CheckInitialized ();
+                return model_name;
+            }
         }
 
         private string model_number;
         public string ModelNumber {
             get { return model_number; }
-            set { model_number = value; }
+            set {
+                CheckInitialized ();
+                model_number = value;
+            }
         }
 
         private Uri model_uri;
         public Uri ModelUrl {
             get { return model_uri; }
-            set { model_uri = value; }
+            set {
+                CheckInitialized ();
+                model_uri = value;
+            }
         }
 
         private string serial_number;
         public string SerialNumber {
             get { return serial_number; }
-            set { serial_number = value; }
+            set {
+                CheckInitialized ();
+                serial_number = value;
+            }
         }
 
         private string upc;
         public string Upc {
             get { return upc; }
-            set { upc = value; }
-        }
-
-        private IEnumerable<Icon> icons;
-        public IEnumerable<Icon> Icons {
-            get { return icons; }
-            set { icons = value; }
-        }
-
-        public virtual void Start ()
-        {
-            lock (mutex) {
-                if (services != null) {
-                    foreach (Service service in services) {
-                        service.Start ();
-                    }
-                }
-                if (devices != null) {
-                    foreach (Device device in devices) {
-                        device.Start ();
-                    }
-                }
+            set {
+                CheckInitialized ();
+                upc = value;
             }
         }
 
-        public virtual void Stop ()
-        {
-            lock (mutex) {
-                if (services != null) {
-                    foreach (Service service in services) {
-                        service.Stop ();
-                    }
-                }
-                if (devices != null) {
-                    foreach (Device device in devices) {
-                        device.Stop ();
-                    }
-                }
+        private IList<Icon> icons;
+        public IList<Icon> Icons {
+            get { return icons; }
+            set {
+                CheckInitialized ();
+                icons = value;
             }
         }
 
@@ -161,6 +190,55 @@ namespace Mono.Upnp.Server
                     device.Initialize (url);
                 }
             }
+            if (icons != null && icons.Count > 0) {
+                url = new Uri (url, "icons/");
+                icon_server = new IconServer (this, url);
+                for (int i = 0; i < icons.Count; i++) {
+                    icons[i].Initialize (new Uri (url, String.Format ("{0}/", i)));
+                }
+            }
+            initialized = true;
+        }
+
+        private void CheckInitialized ()
+        {
+            if (initialized) {
+                throw new InvalidOperationException ("You may not alter the device after it has been initialized.");
+            }
+        }
+
+        protected internal virtual void Start ()
+        {
+            if (services != null) {
+                foreach (Service service in services) {
+                    service.Start ();
+                }
+            }
+            if (devices != null) {
+                foreach (Device device in devices) {
+                    device.Start ();
+                }
+            }
+            if (icon_server != null) {
+                icon_server.Start ();
+            }
+        }
+
+        protected internal virtual void Stop ()
+        {
+            if (services != null) {
+                foreach (Service service in services) {
+                    service.Stop ();
+                }
+            }
+            if (devices != null) {
+                foreach (Device device in devices) {
+                    device.Stop ();
+                }
+            }
+            if (icon_server != null) {
+                icon_server.Stop ();
+            }
         }
 
         protected internal void Serialize (XmlWriter writer)
@@ -175,7 +253,7 @@ namespace Mono.Upnp.Server
             WriteElement (writer, "modelNumber", model_number);
             WriteElement (writer, "modelURL", model_uri);
             WriteElement (writer, "serialNumber", serial_number);
-            WriteElement (writer, "UDN", id);
+            WriteElement (writer, "UDN", udn);
             WriteElement (writer, "UPC", upc);
             if (icons != null) {
                 writer.WriteStartElement ("iconList");
@@ -211,18 +289,29 @@ namespace Mono.Upnp.Server
             }
         }
 
-        public void Dispose ()
+        internal void Dispose ()
         {
-            lock (mutex) {
-                Dispose (true);
-                GC.SuppressFinalize (this);
-            }
+            Dispose (true);
+            GC.SuppressFinalize (this);
         }
 
         protected virtual void Dispose (bool disposing)
         {
-            if (disposing) {
-                Stop ();
+            if (!disposing) {
+                return;
+            }
+
+            Stop ();
+
+            if (devices != null) {
+                foreach (Device device in devices) {
+                    device.Dispose ();
+                }
+            }
+            if (services != null) {
+                foreach (Service service in services) {
+                    service.Dispose ();
+                }
             }
         }
     }

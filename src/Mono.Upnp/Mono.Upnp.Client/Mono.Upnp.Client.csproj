@@ -57,10 +57,10 @@
     <Compile Include="Mono.Upnp.Internal\Helper.cs" />
     <Compile Include="Mono.Upnp.Internal\Log.cs" />
     <Compile Include="Mono.Upnp.Internal\Protocol.cs" />
-    <Compile Include="Mono.Upnp\IDeviceFactory.cs" />
-    <Compile Include="Mono.Upnp\IServiceFactory.cs" />
+    <Compile Include="Mono.Upnp\DeviceFactory.cs" />
+    <Compile Include="Mono.Upnp\ServiceFactory.cs" />
     <Compile Include="Mono.Upnp.Internal\TimeoutDispatcher.cs" />
-    <Compile Include="Mono.Upnp.Internal\UpnpDeserializationException.cs" />
+    <Compile Include="Mono.Upnp\UpnpDeserializationException.cs" />
     <Compile Include="Mono.Upnp.Internal\SoapAdapter.cs" />
     <Compile Include="Mono.Upnp\Client.cs" />
     <Compile Include="Mono.Upnp\Device.cs" />

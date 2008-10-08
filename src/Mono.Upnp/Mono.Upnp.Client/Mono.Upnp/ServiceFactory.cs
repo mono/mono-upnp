@@ -1,5 +1,5 @@
 ﻿//
-// DefaultDeviceFactory.cs
+// ServiceFactory.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -30,30 +30,47 @@ using System.Collections.Generic;
 using System.Net;
 using System.Xml;
 
-namespace Mono.Upnp.Internal
+namespace Mono.Upnp
 {
-	internal class DefaultDeviceFactory : DeviceFactory
-	{
-        public override DeviceType Type {
-            get { return null; }
-        }
+    public abstract class ServiceFactory
+    {
+        private bool verify;
 
-        protected override Device CreateDeviceCore (Client client, string udn, IEnumerable<string> locations)
+        protected ServiceFactory ()
+            : this (true)
         {
-            return new Device (client, udn, locations, null);
         }
 
-        protected override Device CreateDeviceCore (DeviceFactory factory, Client client, Root root, XmlReader reader, WebHeaderCollection headers)
+        protected ServiceFactory (bool verify)
         {
-            return new Device (factory, client, root, reader, headers);
+            this.verify = verify;
         }
 
-        public override IEnumerable<ServiceFactory> Services {
-            get { yield break; }
+        public bool Verify {
+            get { return verify; }
+            set { verify = value; }
         }
 
-        public override IEnumerable<DeviceFactory> Devices {
-            get { yield break; }
+        public abstract ServiceType Type { get; }
+        protected abstract Service CreateServiceCore (Client client, string deviceId, IEnumerable<string> locations);
+        protected abstract Service CreateServiceCore (Device device, XmlReader reader, WebHeaderCollection headers);
+
+        internal Service CreateService (Client client, string deviceId, IEnumerable<string> locations)
+        {
+            Service service = CreateServiceCore (client, deviceId, locations);
+            if (verify) {
+                service.VerifyContract ();
+            }
+            return service;
+        }
+
+        internal Service CreateService (Device device, XmlReader reader, WebHeaderCollection headers)
+        {
+            Service service = CreateServiceCore (device, reader, headers);
+            if (verify) {
+                service.VerifyContract ();
+            }
+            return service;
         }
     }
 }

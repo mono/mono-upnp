@@ -1,5 +1,5 @@
 ﻿//
-// AllowedValueRange.cs
+// UpnpDeserializationException.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -26,31 +26,20 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Upnp.Server
+using System;
+
+namespace Mono.Upnp
 {
-	public class AllowedValueRange
+	public class UpnpDeserializationException : Exception
 	{
-        private readonly object max_value;
-        private readonly object min_value;
-        private readonly object steps;
-
-        public AllowedValueRange (object maxValue, object minValue, object steps)
+        public UpnpDeserializationException (string message)
+            : base (message)
         {
-            max_value = maxValue;
-            min_value = minValue;
-            this.steps = steps;
         }
 
-        public object MaxValue {
-            get { return max_value; }
-        }
-
-        public object MinValue {
-            get { return min_value; }
-        }
-
-        public object Steps {
-            get { return steps; }
+        public UpnpDeserializationException (string message, Exception innerException)
+            : base (message, innerException)
+        {
         }
 	}
 }

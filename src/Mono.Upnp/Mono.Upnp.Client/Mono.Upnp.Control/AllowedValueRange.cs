@@ -55,6 +55,28 @@ namespace Mono.Upnp.Control
             get { return step; }
         }
 
+        #region Overrides
+
+        public override string ToString ()
+        {
+            return String.Format ("AllowedValueRange {{ {0}-{1}, {2} }}", minimum, maximum, step);
+        }
+
+        public override bool Equals (object obj)
+        {
+            AllowedValueRange range = obj as AllowedValueRange;
+            return range != null && range.minimum == minimum && range.maximum == maximum && range.step == step;
+        }
+
+        public override int GetHashCode ()
+        {
+            return minimum.GetHashCode () ^
+                maximum.GetHashCode () ^
+                (step == null ? 0 : step.GetHashCode ());
+        }
+
+        #endregion
+
         #region Deserialization
 
         private void Deserialize (XmlReader reader)
@@ -68,7 +90,7 @@ namespace Mono.Upnp.Control
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deserializing an allowed value range.", e);
             }
-            Verify ();
+            VerifyDeserialization ();
         }
 
         private void Deserialize (XmlReader reader, string element)
@@ -91,13 +113,13 @@ namespace Mono.Upnp.Control
             reader.Close ();
         }
 
-        private void Verify ()
+        private void VerifyDeserialization ()
         {
             if (maximum == null) {
-                throw new UpnpDeserializationException ("The allowed value range does not specify a maximum.");
+                throw new UpnpDeserializationException ("The allowed value range does not specify a maximum value.");
             }
             if (minimum == null) {
-                throw new UpnpDeserializationException ("The allowed value range does not specify a minimum.");
+                throw new UpnpDeserializationException ("The allowed value range does not specify a minimum value.");
             }
         }
 

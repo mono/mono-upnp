@@ -36,12 +36,25 @@ namespace Mono.Upnp
 {
 	public class Icon
 	{
-        internal Icon (Device device)
+        protected internal Icon (Device device, XmlReader reader, WebHeaderCollection headers)
         {
+            if (device == null) {
+                throw new ArgumentNullException ("device");
+            }
             this.device = device;
+            Deserialize (reader, headers);
         }
 
+        #region Data
+
         private Device device;
+        public Device Device {
+            get { return device; }
+        }
+
+        public bool Disposed {
+            get { return device.Disposed; }
+        }
 
         private string mime_type;
         public string MimeType {
@@ -72,6 +85,7 @@ namespace Mono.Upnp
         public byte[] Data {
             get {
                 if (data == null) {
+                    CheckDisposed ();
                     WebRequest request = WebRequest.Create (Url);
                     WebResponse response =  request.GetResponse ();
                     data = new byte[response.ContentLength];
@@ -82,9 +96,64 @@ namespace Mono.Upnp
             }
         }
 
+        #endregion
+
+        #region Methods
+
+        protected void CheckDisposed ()
+        {
+            if (Disposed) {
+                throw new ObjectDisposedException (ToString (),
+                    "This icon is longer available because its device has gone off the network.");
+            }
+        }
+
+        #region Overrides
+
+        public override string ToString ()
+        {
+            return String.Format ("Icon {{ {0}, {1}x{2}x{3}, {4} }}", mime_type, Width, Height, Depth, url);
+        }
+
+        public override bool Equals (object obj)
+        {
+            Icon icon = obj as Icon;
+            return icon != null &&
+                icon.device.Equals (device) &&
+                icon.mime_type == mime_type &&
+                icon.width == width &&
+                icon.height == height &&
+                icon.depth == depth &&
+                icon.url == url;
+        }
+
+        public override int GetHashCode ()
+        {
+            return
+                device.GetHashCode () ^
+                mime_type.GetHashCode () ^
+                Width ^
+                Height ^
+                Depth ^
+                url.GetHashCode ();
+        }
+
+        #endregion
+
         #region Deserialize
 
-        internal void Deserialize (XmlReader reader)
+        private void Deserialize (XmlReader reader, WebHeaderCollection headers)
+        {
+            Deserialize (headers);
+            Deserialize (reader);
+            VerifyDeserialization ();
+        }
+
+        protected virtual void Deserialize (WebHeaderCollection headers)
+        {
+        }
+
+        protected virtual void Deserialize (XmlReader reader)
         {
             try {
                 reader.Read ();
@@ -97,7 +166,7 @@ namespace Mono.Upnp
             }
         }
 
-        private void Deserialize (XmlReader reader, string element)
+        protected virtual void Deserialize (XmlReader reader, string element)
         {
             reader.Read ();
             switch (element) {
@@ -126,7 +195,7 @@ namespace Mono.Upnp
             reader.Close ();
         }
 
-        private void Verify ()
+        protected virtual void VerifyDeserialization ()
         {
             if (mime_type == null) {
                 throw new UpnpDeserializationException ("The icon has no mime-type.");
@@ -145,7 +214,13 @@ namespace Mono.Upnp
             }
         }
 
+        protected internal virtual void VerifyContract ()
+        {
+        }
+
         #endregion
 
-	}
+        #endregion
+
+    }
 }

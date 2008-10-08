@@ -1,5 +1,5 @@
 ﻿//
-// AllowedValueRange.cs
+// IconServer.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -26,31 +26,34 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Upnp.Server
+using System;
+using System.IO;
+using System.Net;
+
+namespace Mono.Upnp.Server.Internal
 {
-	public class AllowedValueRange
+	internal class IconServer : UpnpServer
 	{
-        private readonly object max_value;
-        private readonly object min_value;
-        private readonly object steps;
+        private readonly Device device;
+        private readonly Uri baseUrl;
 
-        public AllowedValueRange (object maxValue, object minValue, object steps)
+        public IconServer (Device device, Uri url)
+            : base (url.ToString ())
         {
-            max_value = maxValue;
-            min_value = minValue;
-            this.steps = steps;
+            this.device = device;
+            this.baseUrl = url;
         }
 
-        public object MaxValue {
-            get { return max_value; }
-        }
-
-        public object MinValue {
-            get { return min_value; }
-        }
-
-        public object Steps {
-            get { return steps; }
+        protected override void HandleContext (HttpListenerContext context)
+        {
+            string id = baseUrl.MakeRelativeUri (context.Request.Url).ToString ().Trim ('/');
+            Icon icon = device.Icons[int.Parse (id)];
+            context.Response.ContentType = icon.MimeType;
+            Stream stream = context.Response.OutputStream;
+            byte[] data = icon.Data;
+            context.Response.ContentLength64 = data.Length;
+            stream.Write (data, 0, data.Length);
+            stream.Close ();
         }
 	}
 }

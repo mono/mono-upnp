@@ -33,8 +33,8 @@ using Mono.Upnp.Internal;
 
 namespace Mono.Upnp
 {
-	public abstract class TypeInfo
-	{
+    public abstract class TypeInfo
+    {
         internal TypeInfo (string typeDescription)
         {
             try {
@@ -90,7 +90,7 @@ namespace Mono.Upnp
 
         public override int GetHashCode ()
         {
-            return DomainName.GetHashCode () ^ Type.GetHashCode () ^ Version.GetHashCode ();
+            return domain_name.GetHashCode () ^ type.GetHashCode () ^ version.GetHashCode ();
         }
 
         public static bool operator == (TypeInfo type1, TypeInfo type2)
@@ -100,9 +100,9 @@ namespace Mono.Upnp
             } else if (Object.ReferenceEquals (type1, null) || Object.ReferenceEquals (type2, null)) {
                 return false;
             }
-            return type1.DomainName == type2.DomainName &&
-                type1.Type == type2.Type &&
-                type1.Version == type2.Version &&
+            return type1.domain_name == type2.domain_name &&
+                type1.type == type2.type &&
+                type1.version == type2.version &&
                 type1.Kind == type2.Kind;
         }
 
@@ -113,9 +113,9 @@ namespace Mono.Upnp
             } else if (Object.ReferenceEquals (type1, null) || Object.ReferenceEquals (type2, null)) {
                 return true;
             }
-            return type1.DomainName != type2.DomainName ||
-                type1.Type != type2.Type ||
-                type1.Version != type2.Version ||
+            return type1.domain_name != type2.domain_name ||
+                type1.type != type2.type ||
+                type1.version != type2.version ||
                 type1.Kind != type2.Kind;
         }
 

@@ -49,24 +49,42 @@ namespace Mono.Upnp
         protected internal Device (Client client, string udn, IEnumerable<string> locations, DeviceType type)
             : this (client)
         {
-            this.type = type;
+            if (udn == null) {
+                throw new ArgumentNullException ("udn");
+            } else if (type == null) {
+                throw new ArgumentNullException ("type");
+            }
+
             this.udn = udn;
+            this.type = type;
             SetLocations (locations);
         }
 
-        protected internal Device (Client client, Root root, WebHeaderCollection headers, XmlReader reader)
+        protected Device (DeviceFactory factory, Client client, Root root, XmlReader reader)
+            : this (factory, client, root, reader, null)
+        {
+        }
+
+        protected internal Device (DeviceFactory factory, Client client, Root root, XmlReader reader, WebHeaderCollection headers)
             : this (client)
         {
+            this.factory = factory;
             this.root = root;
-            Deserialize (headers, reader);
+            Deserialize (reader, headers);
         }
 
         #endregion
 
         #region Data
 
+        private DeviceFactory factory;
         private Client client;
         private bool device_description_loaded;
+
+        private bool disposed;
+        public bool Disposed {
+            get { return disposed; }
+        }
 
         private Dictionary<string, string> locations = new Dictionary<string, string> ();
         internal IEnumerable<string> Locations {
@@ -83,7 +101,7 @@ namespace Mono.Upnp
         }
 
         private Root root;
-        internal Root Root {
+        public Root Root {
             get { return GetDescriptionField (ref root);  }
         }
 
@@ -166,6 +184,36 @@ namespace Mono.Upnp
             get { return GetDescriptionField (ref devices); }
         }
 
+        #endregion
+
+        #region Methods
+
+        #region Internal and Protected
+
+        public event EventHandler Disposing;
+
+        internal void Dispose ()
+        {
+            if (!disposed) {
+                foreach (Service service in services) {
+                    service.Dispose ();
+                }
+                foreach (Device device in devices) {
+                    device.Dispose ();
+                }
+                OnDisposing ();
+                disposed = true;
+            }
+        }
+
+        protected virtual void OnDisposing ()
+        {
+            EventHandler handler = Disposing;
+            if (handler != null) {
+                handler (this, EventArgs.Empty);
+            }
+        }
+
         protected T GetDescriptionField<T> (ref T field) where T : class
         {
             if (field == null && !device_description_loaded) {
@@ -196,39 +244,32 @@ namespace Mono.Upnp
             return null;
         }
 
+        protected void CheckDisposed ()
+        {
+            if (disposed) {
+                throw new ObjectDisposedException (ToString (),
+                    "The device has gone off the network and is no longer available.");
+            }
+        }
+
         #endregion
 
-        #region Equality
+        #region Overrides
+
+        public override string ToString ()
+        {
+            return String.Format ("Device {{ uuid:{0}::{1} }}", udn, type);
+        }
 
         public override bool Equals (object obj)
         {
             Device device = obj as Device;
-            return device != null && this == device;
+            return device != null && device.udn == udn && device.type == type;
         }
 
         public override int GetHashCode ()
         {
-            return udn.GetHashCode () ^ type.GetHashCode ();
-        }
-
-        public static bool operator == (Device device1, Device device2)
-        {
-            if (Object.ReferenceEquals (device1, null) && Object.ReferenceEquals (device2, null)) {
-                return true;
-            } else if (Object.ReferenceEquals (device1, null) || Object.ReferenceEquals (device2, null)) {
-                return false;
-            }
-            return device1.udn == device2.udn && device1.type == device2.type;
-        }
-
-        public static bool operator != (Device device1, Device device2)
-        {
-            if (Object.ReferenceEquals (device1, null) && Object.ReferenceEquals (device2, null)) {
-                return false;
-            } else if (Object.ReferenceEquals (device1, null) || Object.ReferenceEquals (device2, null)) {
-                return true;
-            }
-            return device1.udn != device2.udn || device1.type != device2.type;
+            return (udn == null ? 0 : udn.GetHashCode ()) ^ (type == null ? 0 : type.GetHashCode ());
         }
 
         #endregion
@@ -237,7 +278,7 @@ namespace Mono.Upnp
 
         private WebHeaderCollection headers;
 
-        private void Deserialize (WebHeaderCollection headers, XmlReader reader)
+        private void Deserialize (XmlReader reader, WebHeaderCollection headers)
         {
             this.headers = headers;
             device_list = new List<Device> ();
@@ -249,6 +290,7 @@ namespace Mono.Upnp
 
             Deserialize (headers);
             Deserialize (reader);
+            VerifyDeserialization ();
 
             this.headers = null;
             device_description_loaded = true;
@@ -272,7 +314,6 @@ namespace Mono.Upnp
                     : String.Format ("There was a problem deserializing the device {0}.", udn);
                 throw new UpnpDeserializationException (message, e);
             }
-            Verify ();
         }
 
         protected virtual void Deserialize (XmlReader reader, string element)
@@ -331,14 +372,22 @@ namespace Mono.Upnp
             reader.Close ();
         }
 
-        private void DeserializeIcons (XmlReader reader)
+        protected virtual void DeserializeIcons (XmlReader reader)
         {
             while (reader.ReadToFollowing ("icon") && reader.NodeType == XmlNodeType.Element) {
-                Icon icon = new Icon (this);
-                icon.Deserialize (reader.ReadSubtree ());
-                icon_list.Add (icon);
+                DeserializeIcon (reader.ReadSubtree ());
             }
             reader.Close ();
+        }
+
+        protected virtual void DeserializeIcon (XmlReader reader)
+        {
+            AddIcon (new Icon (this, reader, headers));
+        }
+
+        protected void AddIcon (Icon icon)
+        {
+            icon_list.Add (icon);
         }
 
         private void DeserializeServices (XmlReader reader)
@@ -367,17 +416,32 @@ namespace Mono.Upnp
             ServiceType type = new ServiceType (reader.ReadString ());
             reader.Close ();
 
-            IServiceFactory factory = client.ServiceFactories.ContainsKey (type)
-                ? client.ServiceFactories[type]
-                : client.DefaultServiceFactory;
+            ServiceFactory factory = null;
 
-            return factory.CreateService (this, headers, XmlReader.Create (new StringReader (xml)));
+            if (this.factory != null) {
+                foreach (ServiceFactory service_factory in this.factory.Services) {
+                    if (service_factory.Type == type) {
+                        factory = service_factory;
+                        break;
+                    }
+                }
+            }
+
+            try {
+                return factory.CreateService (this, XmlReader.Create (new StringReader (xml)), headers);
+            } catch {
+                try {
+                    return client.ServiceFactories[type].CreateService (this, XmlReader.Create (new StringReader (xml)), headers);
+                } catch {
+                    return client.DefaultServiceFactory.CreateService (this, XmlReader.Create (new StringReader (xml)), headers);
+                }
+            }
         }
 
         private void DeserializeDevices (XmlReader reader)
         {
             while (reader.ReadToFollowing ("device") && reader.NodeType == XmlNodeType.Element) {
-                Device device = Helper.DeserializeDevice (client, root, headers, reader);
+                Device device = Helper.DeserializeDevice (factory, client, root, reader, headers);
                 if (client.Devices.ContainsKey (device.udn) && client.Devices[device.udn].ContainsKey (device.type)) {
                     client.Devices[device.udn][device.type].CopyFrom (device);
                     device = client.Devices[device.udn][device.type];
@@ -387,7 +451,7 @@ namespace Mono.Upnp
             reader.Close ();
         }
 
-        protected virtual void Verify ()
+        protected virtual void VerifyDeserialization ()
         {
             if (string.IsNullOrEmpty (udn)) {
                 throw new UpnpDeserializationException ("The device has no UDN.");
@@ -435,13 +499,31 @@ namespace Mono.Upnp
             }
         }
 
+        protected internal virtual void VerifyContract ()
+        {
+            foreach (Device device in devices) {
+                device.VerifyContract ();
+            }
+            foreach (Service service in services) {
+                service.VerifyContract ();
+            }
+            foreach (Icon icon in icons) {
+                icon.VerifyContract ();
+            }
+        }
+
         protected internal virtual void CopyFrom (Device device)
         {
+            if (udn != device.udn) {
+                throw new UpnpDeserializationException ("The deserialized device has a different UDN.");
+            } else if (type != device.type) {
+                throw new UpnpDeserializationException ("The deserialized device is of a different type.");
+            }
+            factory = device.factory;
             device_description_loaded = device.device_description_loaded;
             client = device.client;
             root = device.root;
             presentation_url = device.presentation_url;
-            type = device.type;
             friendly_name = device.friendly_name;
             manufacturer = device.manufacturer;
             manufacturer_url = device.manufacturer_url;
@@ -450,12 +532,13 @@ namespace Mono.Upnp
             model_number = device.model_number;
             model_url = device.model_url;
             serial_number = device.serial_number;
-            udn = device.udn;
             upc = device.upc;
             icons = device.icons;
             services = device.services;
             devices = device.devices;
         }
+
+        #endregion
 
         #endregion
 

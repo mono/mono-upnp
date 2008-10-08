@@ -41,8 +41,10 @@
     <Compile Include="Mono.Upnp.Server.Internal\ActionServer.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\DescriptionServer.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\EventServer.cs" />
+    <Compile Include="Mono.Upnp.Server.Internal\IconServer.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\Protocol.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\TimeoutDispatcher.cs" />
+    <Compile Include="Mono.Upnp.Server\UpnpControlException.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\UpnpServer.cs" />
     <Compile Include="Mono.Upnp.Server\Action.cs" />
     <Compile Include="Mono.Upnp.Server\AllowedValueRange.cs" />
@@ -51,7 +53,6 @@
     <Compile Include="Mono.Upnp.Server\Icon.cs" />
     <Compile Include="Mono.Upnp.Server\Server.cs" />
     <Compile Include="Mono.Upnp.Server\StateVariable.cs" />
-    <Compile Include="Mono.Upnp.Server.Internal\Subscriber.cs" />
     <Compile Include="Mono.Upnp.Server\Device.cs" />
     <Compile Include="Mono.Upnp.Server\DeviceType.cs" />
     <Compile Include="Mono.Upnp.Server\ServiceType.cs" />
@@ -62,7 +63,7 @@
     <Compile Include="Mono.Upnp.Server\UpnpArgumentAttribute.cs" />
     <Compile Include="Mono.Upnp.Server\Service.cs" />
     <Compile Include="Mono.Upnp.Server\UpnpStateVariableAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server\UpnpException.cs" />
+    <Compile Include="Mono.Upnp.Server\UpnpServerException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mono-upnp-server.snk" />

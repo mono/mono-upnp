@@ -42,13 +42,13 @@ namespace Mono.Ssdp.Internal
         
         public SsdpSocket (bool multicast) : base (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
         {
+            SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             if (multicast) {
                 SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                 SetSocketOption (SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, Protocol.SocketTtl);
-                SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 SetSocketOption (SocketOptionLevel.IP, SocketOptionName.AddMembership,
                     new MulticastOption (Protocol.IPAddress, 0));
-            }
+            } 
         }
         
         public IAsyncResult BeginSendTo (byte [] data, AsyncCallback callback)

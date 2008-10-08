@@ -117,7 +117,7 @@ namespace Mono.Upnp.Internal
             writer.WriteEndDocument ();
         }
 
-        public static Device DeserializeDevice (Client client, Root root, WebHeaderCollection headers, XmlReader reader)
+        public static Device DeserializeDevice (DeviceFactory parentFactory, Client client, Root root, XmlReader reader, WebHeaderCollection headers)
         {
             // Life would be much easier if the device type were an attribute in the device node.
             string xml = reader.ReadOuterXml ();
@@ -127,11 +127,26 @@ namespace Mono.Upnp.Internal
             DeviceType type = new DeviceType (reader.ReadString ());
             reader.Close ();
 
-            IDeviceFactory factory = client.DeviceFactories.ContainsKey (type)
-                ? client.DeviceFactories[type]
-                : client.DefaultDeviceFactory;
+            DeviceFactory factory = null;
 
-            return factory.CreateDevice (client, root, headers, XmlReader.Create (new StringReader (xml)));
+            if (parentFactory != null) {
+                foreach (DeviceFactory device_factory in parentFactory.Devices) {
+                    if (device_factory.Type == type) {
+                        factory = device_factory;
+                        break;
+                    }
+                }
+            }
+
+            try {
+                return factory.CreateDevice (client, root, XmlReader.Create (new StringReader (xml)), headers);
+            } catch {
+                try {
+                    return client.DeviceFactories[type].CreateDevice (client, root, XmlReader.Create (new StringReader (xml)), headers);
+                } catch {
+                    return client.DefaultDeviceFactory.CreateDevice (client, root, XmlReader.Create (new StringReader (xml)), headers);
+                }
+            }
         }
 	}
 }

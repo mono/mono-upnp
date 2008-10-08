@@ -1,4 +1,32 @@
-﻿using System;
+﻿//
+// Server.cs
+//
+// Author:
+//   Scott Peterson <lunchtimemama@gmail.com>
+//
+// Copyright (C) 2008 S&S Black Ltd.
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -14,7 +42,7 @@ namespace Mono.Upnp.Server
         private readonly object mutex = new object ();
         private Device root_device;
         private DescriptionServer description_server;
-        private SsdpServer server;
+        private SsdpServer ssdp_server;
         private bool started;
 
         public Server (Device rootDevice)
@@ -43,11 +71,10 @@ namespace Mono.Upnp.Server
 
                 if (description_server == null) {
                     Initialize ();
-                    Announce ();
                 }
                 root_device.Start ();
                 description_server.Start ();
-                server.Start ();
+                ssdp_server.Start ();
                 started = true;
             }
         }
@@ -58,12 +85,11 @@ namespace Mono.Upnp.Server
                 if (!started) {
                     return;
                 }
-                server.Stop ();
+                ssdp_server.Stop ();
                 root_device.Stop ();
                 description_server.Stop ();
                 started = false;
             }
-
         }
 
         protected virtual void Initialize ()
@@ -71,36 +97,37 @@ namespace Mono.Upnp.Server
             Uri url = MakeUrl ();
             root_device.Initialize (url);
             description_server = new DescriptionServer (Serialize, new Uri (url, String.Format ("{0}/{1}/", root_device.Type.ToUrlString (), root_device.Id)));
+            Announce ();
         }
 
-        protected virtual void Announce ()
+        private void Announce ()
         {
-            server = new SsdpServer (description_server.Url.ToString ());
-            server.Announce ("upnp:rootdevice", root_device.Id + "::upnp:rootdevice", false);
+            ssdp_server = new SsdpServer (description_server.Url.ToString ());
+            ssdp_server.Announce ("upnp:rootdevice", root_device.Udn + "::upnp:rootdevice", false);
             AnnounceDevice (root_device);
-            if (root_device.Devices != null) {
-                foreach (Device device in root_device.Devices) {
-                    AnnounceDevice (device);
-                }
-            }
         }
 
         private void AnnounceDevice (Device device)
         {
-            server.Announce (device.Id, device.Id, false);
-            server.Announce (root_device.Type.ToString (), String.Format ("{0}::{1}", root_device.Id, root_device.Type), false);
-            Dictionary<ServiceType, ServiceType> service_types = new Dictionary<ServiceType, ServiceType> ();
-            foreach (Service service in device.Services) {
-                if (!service_types.ContainsKey (service.Type)) {
-                    AnnounceService (service, device);
-                    service_types.Add (service.Type, service.Type);
+            ssdp_server.Announce (device.Udn, device.Udn, false);
+            ssdp_server.Announce (device.Type.ToString (), String.Format ("{0}::{1}", device.Udn, device.Type), false);
+
+            if (device.Devices != null) {
+                foreach (Device d in device.Devices) {
+                    AnnounceDevice (d);
+                }
+            }
+
+            if (device.Services != null) {
+                foreach (Service service in device.Services) {
+                    AnnounceService (device, service);
                 }
             }
         }
 
-        private void AnnounceService (Service service, Device device)
+        private void AnnounceService (Device device, Service service)
         {
-            server.Announce (service.Type.ToString (), String.Format ("{0}::{1}", device.Id, service.Type), false);
+            ssdp_server.Announce (service.Type.ToString (), String.Format ("{0}::{1}", device.Udn,service.Type), false);
         }
 
         protected virtual void Serialize (XmlWriter writer)
@@ -111,18 +138,30 @@ namespace Mono.Upnp.Server
             writer.WriteEndElement ();
         }
 
-        private bool conserve_memory;
-        public bool ConserveMemory {
-            get { return conserve_memory; }
-            set { conserve_memory = value; }
+        private static readonly Random random = new Random ();
+
+        private readonly int port = random.Next (1024, 5000);
+
+        private static IPAddress host;
+        private static IPAddress Host {
+            get {
+                if (host == null) {
+                    foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
+                        if (address.AddressFamily == AddressFamily.InterNetwork) {
+                            host = address;
+                            break;
+                        }
+                    }
+                }
+                return host;
+            }
         }
 
-        private static readonly Random random = new Random ();
-        private static Uri MakeUrl ()
+        private Uri MakeUrl ()
         {
             foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
                 if (address.AddressFamily == AddressFamily.InterNetwork) {
-                    return new Uri (String.Format ("http://{0}:{1}/upnp/", address, random.Next (1024, 5000)));
+                    return new Uri (String.Format ("http://{0}:{1}/upnp/", Host, port));
                 }
             }
             return null;
@@ -131,8 +170,10 @@ namespace Mono.Upnp.Server
         public void Dispose ()
         {
             lock (mutex) {
-                Dispose (true);
-                GC.SuppressFinalize (this);
+                if (root_device != null) {
+                    Dispose (true);
+                    GC.SuppressFinalize (this);
+                }
             }
         }
 
@@ -140,10 +181,11 @@ namespace Mono.Upnp.Server
         {
             if (disposing) {
                 Stop ();
+                root_device.Dispose ();
                 root_device = null;
                 if (description_server != null) {
                     description_server.Dispose ();
-                    description_server = null;
+                    ssdp_server.Dispose ();
                 }
             }
         }

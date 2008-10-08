@@ -39,16 +39,34 @@ using Mono.Upnp.Internal;
 namespace Mono.Upnp.Control
 {
 	public class Action
-	{
-        protected internal Action (Service service, WebHeaderCollection headers, XmlReader reader)
+    {
+        #region Constructors
+
+        protected Action (Service service, XmlReader reader)
+            : this (service, reader, null)
         {
-            this.service = service;
-            Deserialize (headers, reader);
         }
 
+        protected internal Action (Service service, XmlReader reader, WebHeaderCollection headers)
+        {
+            if (service == null) {
+                throw new ArgumentNullException ("service");
+            }
+            this.service = service;
+            Deserialize (reader, headers);
+        }
+
+        #endregion
+
+        #region Data
+
         private Service service;
-        internal Service Service {
+        public Service Service {
             get { return service; }
+        }
+
+        public bool Disposed {
+            get { return service.Disposed; }
         }
 
         private string name;
@@ -81,10 +99,50 @@ namespace Mono.Upnp.Control
             set { retry = value; }
         }
 
-        public virtual void Execute ()
+        #endregion
+
+        #region Methods
+
+        public virtual void Invoke ()
         {
-            service.SoapAdapter.Invoke (this);
+            CheckDisposed ();
+            service.Invoke (this);
         }
+
+        protected void CheckDisposed ()
+        {
+            if (Disposed) {
+                throw new ObjectDisposedException (ToString (),
+                    "This action is no longer available because its service has gone off the network.");
+            }
+        }
+
+        #region Overrides
+
+        public override string ToString ()
+        {
+            return String.Format ("Action {{ {0}, {1} }}", service, name);
+        }
+
+        public override bool Equals (object obj)
+        {
+            Action action = obj as Action;
+            return action != null &&
+                action.service.Equals (service) &&
+                action.name == name &&
+                action.in_arguments.Equals (in_arguments) &&
+                action.out_arguments.Equals (out_arguments);
+        }
+
+        public override int GetHashCode ()
+        {
+            return service.GetHashCode () ^
+                (name == null ? 0 : name.GetHashCode ()) ^
+                in_arguments.GetHashCode () ^
+                out_arguments.GetHashCode ();
+        }
+
+        #endregion
 
         #region Deserialization
 
@@ -133,8 +191,11 @@ namespace Mono.Upnp.Control
             throw new UpnpControlException (XmlReader.Create (response.GetResponseStream ()));
         }
 
-        private void Deserialize (WebHeaderCollection headers, XmlReader reader)
+        private WebHeaderCollection headers;
+
+        private void Deserialize (XmlReader reader, WebHeaderCollection headers)
         {
+            this.headers = headers;
             in_argument_dict = new Dictionary<string, Argument> ();
             in_arguments = new ReadOnlyDictionary<string,Argument> (in_argument_dict);
             out_argument_dict = new Dictionary<string, Argument> ();
@@ -142,7 +203,9 @@ namespace Mono.Upnp.Control
 
             Deserialize (headers);
             Deserialize (reader);
-            Verify ();
+            VerifyDeserialization ();
+
+            this.headers = null;
         }
 
         protected virtual void Deserialize (WebHeaderCollection headers)
@@ -173,7 +236,7 @@ namespace Mono.Upnp.Control
                 name = reader.ReadString ();
                 break;
             case "argumentList":
-                DeserializeArgumentList (reader.ReadSubtree ());
+                DeserializeArguments (reader.ReadSubtree ());
                 break;
             default: // This is a workaround for Mono bug 334752
                 reader.Skip ();
@@ -182,40 +245,64 @@ namespace Mono.Upnp.Control
             reader.Close ();
         }
 
-        private void DeserializeArgumentList (XmlReader reader)
+        protected virtual void DeserializeArguments (XmlReader reader)
         {
             while (reader.ReadToFollowing ("argument") && reader.NodeType == XmlNodeType.Element) {
-                Argument argument = new Argument (this, reader.ReadSubtree ());
-                if (argument.Direction == ArgumentDirection.In) {
-                    in_argument_dict.Add (argument.Name, argument);
-                } else {
-                    if (argument.IsReturnValue && !bypass_return_argument) {
-                        if (return_argument == null) {
-                            return_argument = argument;
-                        } else {
-                            string message = String.IsNullOrEmpty (name)
-                                ? "An action has multiple return values."
-                                : String.Format ("The action {0} has multiple return values.", name);
-                            Log.Exception (new UpnpDeserializationException (message));
-                            out_argument_dict.Add (return_argument.Name, return_argument);
-                            out_argument_dict.Add (argument.Name, argument);
-                            return_argument = null;
-                            bypass_return_argument = true;
-                        }
-                    } else {
-                        out_argument_dict.Add (argument.Name, argument);
-                    }
-                }
+                DeserializeArgument (reader.ReadSubtree ());
             }
             reader.Close ();
         }
 
-        protected virtual void Verify ()
+        protected virtual void DeserializeArgument (XmlReader reader)
+        {
+            AddArgument (new Argument (this, reader, headers));
+        }
+
+        protected void AddArgument (Argument argument)
+        {
+            if (argument.Direction == ArgumentDirection.In) {
+                in_argument_dict.Add (argument.Name, argument);
+            } else {
+                if (argument.IsReturnValue && !bypass_return_argument) {
+                    if (return_argument == null) {
+                        return_argument = argument;
+                    } else {
+                        string message = String.IsNullOrEmpty (name)
+                            ? "An action has multiple return values."
+                            : String.Format ("The action {0} has multiple return values.", name);
+                        Log.Exception (new UpnpDeserializationException (message));
+                        out_argument_dict.Add (return_argument.Name, return_argument);
+                        out_argument_dict.Add (argument.Name, argument);
+                        return_argument = null;
+                        bypass_return_argument = true;
+                    }
+                } else {
+                    out_argument_dict.Add (argument.Name, argument);
+                }
+            }
+        }
+
+        protected virtual void VerifyDeserialization ()
         {
             if (String.IsNullOrEmpty (name)) {
                 throw new UpnpDeserializationException ("The action has no name.");
             }
         }
+
+        protected internal virtual void VerifyContract ()
+        {
+            foreach (Argument argument in in_arguments.Values) {
+                argument.VerifyContract ();
+            }
+            foreach (Argument argument in out_arguments.Values) {
+                argument.VerifyContract ();
+            }
+            if (return_argument != null) {
+                return_argument.VerifyContract ();
+            }
+        }
+
+        #endregion
 
         #endregion
 

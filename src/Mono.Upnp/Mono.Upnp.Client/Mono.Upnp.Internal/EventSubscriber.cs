@@ -50,6 +50,8 @@ namespace Mono.Upnp.Internal
         private string delivery_url;
         private string subscription_uuid;
 
+        public event EventHandler Timeout;
+
         public EventSubscriber (Service service)
         {
             this.service = service;
@@ -134,6 +136,7 @@ namespace Mono.Upnp.Internal
                     Stop ();
                     // TODO retry
                     Log.Exception (new UpnpException ("Failed to subscribe or renew. The server did not respond in 30 seconds."));
+                    Timeout (this, EventArgs.Empty);
                 }
                 return false;
             }
@@ -148,10 +151,11 @@ namespace Mono.Upnp.Internal
                 WebRequest request = (WebRequest)asyncResult.AsyncState;
                 try {
                     HttpWebResponse response = (HttpWebResponse)request.EndGetResponse (asyncResult);
-                    if (response.StatusCode != HttpStatusCode.OK) {
+                    if (response.StatusCode == HttpStatusCode.GatewayTimeout) {
+                        throw new WebException ("", WebExceptionStatus.Timeout);
+                    } else if (response.StatusCode != HttpStatusCode.OK) {
                         throw new WebException ();
-                    }
-                    if (!started) {
+                    } else if (!started) {
                         response.Close ();
                         return;
                     }
@@ -169,6 +173,9 @@ namespace Mono.Upnp.Internal
                     Stop ();
                     // TODO more info
                     Log.Exception (new UpnpException ("Failed to subscribe or renew.", e));
+                    if (e.Status == WebExceptionStatus.Timeout) {
+                        Timeout (this, EventArgs.Empty);
+                    }
                 }
             }
         }

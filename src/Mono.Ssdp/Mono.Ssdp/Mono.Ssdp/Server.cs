@@ -29,6 +29,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 
 using Mono.Ssdp.Internal;
 
@@ -38,6 +39,8 @@ namespace Mono.Ssdp
 	{
         private readonly object mutex = new object ();
         private readonly string default_location;
+
+        private bool disposed;
 
         private RequestListener request_listener;
         private Dictionary<string, Announcer> announcers;
@@ -52,12 +55,6 @@ namespace Mono.Ssdp
             get { return dispatcher; }
         }
 
-        private int active_announcer_count;
-        internal int ActiveAnnouncerCount {
-            get { lock (mutex) { return active_announcer_count; } }
-            set { lock (mutex) { active_announcer_count = value; } }
-        }
-
         private SsdpSocket announceSocket;
         internal SsdpSocket AnnounceSocket {
             get { return announceSocket; }
@@ -67,8 +64,6 @@ namespace Mono.Ssdp
         internal SsdpSocket RespondSocket {
             get { return respondSocket; }
         }
-
-        public event EventHandler Stopped;
 
         public Server ()
         {
@@ -102,6 +97,16 @@ namespace Mono.Ssdp
             lock (mutex) {
                 CheckDisposed ();
 
+                if (type == null) {
+                    throw new ArgumentNullException ("type");
+                }
+                if (name == null) {
+                    throw new ArgumentNullException ("name");
+                }
+                if (location == null) {
+                    throw new ArgumentNullException ("location");
+                }
+
                 Announcer announcer;
                 if (announcers.TryGetValue (name, out announcer)) {
                     if (!announcer.Started && autoStart) {
@@ -131,14 +136,16 @@ namespace Mono.Ssdp
             lock (mutex) {
                 CheckDisposed ();
 
-                if (Started) {
+                if (started) {
                     throw new InvalidOperationException ("The Server is already started.");
                 }
 
                 started = true;
                 request_listener.Start ();
                 announceSocket = new SsdpSocket ();
+                announceSocket.Bind (new IPEndPoint (IPAddress.Any, 0));
                 respondSocket = new SsdpSocket (false);
+                respondSocket.Bind (new IPEndPoint (IPAddress.Any, Protocol.Port));
 
                 if (startAnnouncers) {
                     foreach (Announcer announcer in announcers.Values) {
@@ -155,43 +162,23 @@ namespace Mono.Ssdp
             lock (mutex) {
                 CheckDisposed ();
 
-                if (ActiveAnnouncerCount == 0) {
-                    HardStop ();
-                } else {
-                    foreach (Announcer announcer in announcers.Values) {
-                        announcer.Stopped += AnnouncerStopped;
-                        announcer.Stop ();
-                    }
+                if (!started) {
+                    return;
                 }
-            }
-        }
 
-        private void AnnouncerStopped (object sender, EventArgs args)
-        {
-            lock (mutex) {
-                ((Announcer)sender).Stopped -= AnnouncerStopped;
-                if (ActiveAnnouncerCount == 0) {
-                    HardStop ();
+                WaitHandle[] handles = new WaitHandle[announcers.Count];
+                int i = 0;
+                foreach (Announcer announcer in announcers.Values) {
+                    handles[i++] = announcer.StopAsync ();
                 }
-            }
-        }
 
-        private void HardStop ()
-        {
-            announceSocket.Close ();
-            announceSocket = null;
-            respondSocket.Close ();
-            respondSocket = null;
-            started = false;
-
-            OnStopped ();
-        }
-
-        protected virtual void OnStopped ()
-        {
-            EventHandler stopped = Stopped;
-            if (stopped != null) {
-                stopped (this, EventArgs.Empty);
+                request_listener.Stop ();
+                respondSocket.Close ();
+                respondSocket = null;
+                WaitHandle.WaitAll (handles);
+                announceSocket.Close ();
+                announceSocket = null;
+                started = false;
             }
         }
 
@@ -230,14 +217,23 @@ namespace Mono.Ssdp
 
         private void CheckDisposed ()
         {
-            //if (disposed) {
-            //    throw new ObjectDisposedException ("Browser has been Disposed");
-            //}
+            if (disposed) {
+                throw new ObjectDisposedException ("Browser has been Disposed");
+            }
         }
 
         public void Dispose ()
         {
-            throw new NotImplementedException ();
+            lock (mutex) {
+                if (disposed) {
+                    return;
+                }
+
+                Stop ();
+                request_listener.Dispose ();
+                dispatcher.Dispose ();
+                disposed = true;
+            }
         }
     }
 }

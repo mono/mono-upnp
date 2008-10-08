@@ -32,13 +32,12 @@ using System.Threading;
 
 namespace Mono.Upnp.Internal
 {
-    // TODO share this code with Mono.Ssdp
     internal delegate bool TimeoutHandler (object state, ref TimeSpan interval);
 
     internal class TimeoutDispatcher : IDisposable
     {
         private static uint timeout_ids = 1;
-        
+
         private struct TimeoutItem : IComparable<TimeoutItem>
         {
             public uint Id;
@@ -46,12 +45,12 @@ namespace Mono.Upnp.Internal
             public DateTime Trigger;
             public TimeoutHandler Handler;
             public object State;
-            
+
             public int CompareTo (TimeoutItem item)
             {
                 return Trigger.CompareTo (item.Trigger);
             }
-            
+
             public override string ToString ()
             {
                 return String.Format ("{0} ({1})", Id, Trigger);
@@ -62,27 +61,27 @@ namespace Mono.Upnp.Internal
         private AutoResetEvent wait = new AutoResetEvent (false);
 
         private List<TimeoutItem> timeouts = new List<TimeoutItem> ();
-        
+
         public uint Add (uint timeoutMs, TimeoutHandler handler)
         {
             return Add (timeoutMs, handler, null);
         }
-        
+
         public uint Add (TimeSpan timeout, TimeoutHandler handler)
         {
             return Add (timeout, handler, null);
         }
-        
+
         public uint Add (uint timeoutMs, TimeoutHandler handler, object state)
         {
             return Add (TimeSpan.FromMilliseconds (timeoutMs), handler, state);
         }
-        
+
         public uint Add (DateTime timeout, TimeoutHandler handler, object state)
         {
             return Add (timeout - DateTime.Now, handler, state);
         }
-        
+
         public uint Add (TimeSpan timeout, TimeoutHandler handler, object state)
         {
             lock (this) {
@@ -93,30 +92,30 @@ namespace Mono.Upnp.Internal
                 item.Trigger = DateTime.Now + timeout;
                 item.Handler = handler;
                 item.State = state;
-                
+
                 Add (ref item);
-                
+
                 if (timeouts.Count == 1) {
                     Start ();
                 }
-                
+
                 return item.Id;
             }
         }
-        
+
         private void Add (ref TimeoutItem item)
         {
             lock (timeouts) {
                 int index = timeouts.BinarySearch (item);
                 index = index >= 0 ? index : ~index;
                 timeouts.Insert (index, item);
-                
+
                 if (index == 0 && timeouts.Count > 1) {
                     wait.Set ();
                 }
             }
         }
-        
+
         public void Remove (uint id)
         {
             lock (timeouts) {
@@ -133,13 +132,13 @@ namespace Mono.Upnp.Internal
                 }
             }
         }
-        
+
         private void Start ()
         {
             wait.Reset ();
             ThreadPool.QueueUserWorkItem (TimerThread);
         }
-        
+
         private void TimerThread (object state)
         {
             while (true) {
@@ -150,17 +149,20 @@ namespace Mono.Upnp.Internal
                     }
                     item = timeouts[0];
                 }
-                
+
                 TimeSpan interval = item.Trigger - DateTime.Now;
                 if (interval < TimeSpan.Zero) {
                     interval = TimeSpan.Zero;
                 }
-                
+
                 if (!wait.WaitOne (interval, false)) {
-                    Remove (item.Id);
-                    if (item.Handler (item.State, ref item.Timeout)) {
-                        item.Trigger += item.Timeout;
-                        Add (ref item);
+                    bool requeue = item.Handler (item.State, ref item.Timeout);
+                    lock (timeouts) {
+                        Remove (item.Id);
+                        if (requeue) {
+                            item.Trigger += item.Timeout;
+                            Add (ref item);
+                        }
                     }
                 }
             }
@@ -187,6 +189,7 @@ namespace Mono.Upnp.Internal
                 return;
             }
             Clear ();
+            wait.Close ();
             disposed = true;
         }
     }

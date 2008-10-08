@@ -42,7 +42,7 @@ namespace Mono.Upnp
         // happens over the very light-weight UDP-based SSDP. SSDP announcements are very sparse in
         // their information; they basically just tell you that some device or some service exists.
         // If you want more information about that device or service, you request an XML description
-        // which is sent over HTTP. The user is given a reference to services and devices when they
+        // which is sent over HTTP. We give the user a reference to services and devices when they
         // are first "discovered!" over SSDP but we delay fetching the XML description until the user
         // interacts with the service or device in a way that requires it.
         //
@@ -77,27 +77,27 @@ namespace Mono.Upnp
         // of the objects which we've already given to the user. Sigh. I said this would be brief.
         // Sorry.
 
-        private IDeviceFactory default_device_factory = new DefaultDeviceFactory ();
-        public IDeviceFactory DefaultDeviceFactory
+        private DeviceFactory default_device_factory = new DefaultDeviceFactory ();
+        public DeviceFactory DefaultDeviceFactory
         {
             get { return default_device_factory; }
             set { default_device_factory = value; }
         }
 
-        private IServiceFactory default_service_factory = new DefaultServiceFactory ();
-        public IServiceFactory DefaultServiceFactory {
+        private ServiceFactory default_service_factory = new DefaultServiceFactory ();
+        public ServiceFactory DefaultServiceFactory {
             get { return default_service_factory; }
             set { default_service_factory = value; }
         }
 
-        private Dictionary<DeviceType, IDeviceFactory> device_factories = new Dictionary<DeviceType, IDeviceFactory> ();
-        internal IDictionary<DeviceType, IDeviceFactory> DeviceFactories
+        private Dictionary<DeviceType, DeviceFactory> device_factories = new Dictionary<DeviceType, DeviceFactory> ();
+        internal IDictionary<DeviceType, DeviceFactory> DeviceFactories
         {
             get { return device_factories; }
         }
 
-        private Dictionary<ServiceType, IServiceFactory> service_factories = new Dictionary<ServiceType, IServiceFactory> ();
-        internal Dictionary<ServiceType, IServiceFactory> ServiceFactories {
+        private Dictionary<ServiceType, ServiceFactory> service_factories = new Dictionary<ServiceType, ServiceFactory> ();
+        internal Dictionary<ServiceType, ServiceFactory> ServiceFactories {
             get { return service_factories; }
         }
 
@@ -149,7 +149,7 @@ namespace Mono.Upnp
             } else if (args.Usn.Contains (":service:")) {
                 ServiceType type = new ServiceType (args.Service.ServiceType);
                 if (!services[uuid].ContainsKey (type)) {
-                    Service service = CreateService (type, args.Service.Locations);
+                    Service service = CreateService (type, uuid, args.Service.Locations);
                     services[uuid].Add (type, service);
                     OnServiceAdded (service);
                 }
@@ -167,12 +167,12 @@ namespace Mono.Upnp
             }
         }
 
-        private Service CreateService (ServiceType type, IEnumerable<string> locations)
+        private Service CreateService (ServiceType type, string udn, IEnumerable<string> locations)
         {
             if (service_factories.ContainsKey (type)) {
-                return service_factories[type].CreateService (this, locations);
+                return service_factories[type].CreateService (this, udn, locations);
             } else {
-                Service service = DefaultServiceFactory.CreateService (this, locations);
+                Service service = DefaultServiceFactory.CreateService (this, udn, locations);
                 service.Type = type;
                 return service;
             }
@@ -180,6 +180,38 @@ namespace Mono.Upnp
 
         private void ClientServiceRemoved (object sender, Mono.Ssdp.ServiceArgs args)
         {
+            // All USNs should start with "uuid:"
+            if (!args.Usn.StartsWith ("uuid:")) {
+                return;
+            }
+
+            int colon = args.Usn.IndexOf (':', 5);
+            string uuid = colon == -1 ? args.Usn : args.Usn.Substring (0, colon);
+
+            if (devices.ContainsKey (uuid)) {
+                if (args.Usn.Contains (":device:")) {
+                    DeviceType type = new DeviceType (args.Service.ServiceType);
+                    foreach (Device device in devices[uuid].Values) {
+                        if (device.Type == type) {
+                            device.Dispose ();
+                            break;
+                        }
+                    }
+                } else if (args.Usn.Contains (":service")) {
+                    ServiceType type = new ServiceType (args.Service.ServiceType);
+                    foreach (Device device in devices[uuid].Values) {
+                        foreach (Service service in device.Services) {
+                            if (service.Type == type) {
+                                service.Dispose ();
+                            }
+                        }
+                    }
+                } else {
+                    foreach (Device device in devices[uuid].Values) {
+                        device.Dispose ();
+                    }
+                }
+            }
         }
 
         protected virtual void OnDeviceAdded (Device device)
@@ -203,17 +235,85 @@ namespace Mono.Upnp
             client.BrowseAll ();
         }
 
+        internal void CheckDeviceDescription (Device device)
+        {
+            try {
+                GetDeviceDescription (device.Locations, false);
+            } catch (WebException e) {
+                if (e.Status == WebExceptionStatus.Timeout) {
+                    device.Dispose ();
+                    throw new ObjectDisposedException (
+                        "The device has gone off the network and is no longer available.", e);
+                } else {
+                    throw e;
+                }
+            }
+        }
+
         internal void LoadDeviceDescription (Device device)
         {
-            LoadDeviceDescription (device.Locations);
+            try {
+                GetDeviceDescription (device.Locations, true);
+            } catch (WebException e) {
+                if (e.Status == WebExceptionStatus.Timeout) {
+                    device.Dispose ();
+                    throw new ObjectDisposedException (
+                        "The device has gone off the network and is no longer available.", e);
+                } else {
+                    throw e;
+                }
+            }
         }
 
         internal void LoadDeviceDescription (Service service)
         {
-            LoadDeviceDescription (GetLocations (service));
+            try {
+                GetDeviceDescription (GetLocations (service), true);
+            } catch (WebException e) {
+                if (e.Status == WebExceptionStatus.Timeout) {
+                    service.Dispose ();
+                    // If a service has gone off the network, we check any matching devices.
+                    if (service.DeviceId != null && devices.ContainsKey (service.DeviceId)) {
+                        bool loaded = false;
+                        foreach (Device device in devices[service.DeviceId].Values) {
+                            try {
+                                // If the device has gone offline too, this should throw.
+                                LoadDeviceDescription (device);
+                                // If it doesn't throw, and the device contains this service, then we're OK.
+                                if (HasService (device, service)) {
+                                    loaded = true;
+                                }
+                            } catch {
+                            }
+                        }
+                        if (loaded) {
+                            return;
+                        }
+                    }
+                    throw new ObjectDisposedException (
+                        "The service has gone off the network and is no longer available.", e);
+                } else {
+                    throw e;
+                }
+            }
         }
 
-        private void LoadDeviceDescription (IEnumerable<string> locations)
+        private bool HasService (Device device, Service service)
+        {
+            foreach (Service s in device.Services) {
+                if (s == service) {
+                    return true;
+                }
+            }
+            foreach (Device d in device.Devices) {
+                if (HasService (d, service)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void GetDeviceDescription (IEnumerable<string> locations, bool load)
         {
             Exception exception = null;
             foreach (string location in locations) {
@@ -221,9 +321,8 @@ namespace Mono.Upnp
                     continue;
                 }
                 try {
-                    LoadDeviceDescription (new Uri (location));
+                    GetDeviceDescription (new Uri (location), load);
                     exception = null;
-                    break;
                 } catch (Exception e) {
                     exception = e;
                 }
@@ -235,13 +334,18 @@ namespace Mono.Upnp
             }
         }
 
-        private void LoadDeviceDescription (Uri location)
+        private void GetDeviceDescription (Uri location, bool load)
         {
             // TODO handle ACCEPT-LANGUAGE
             WebResponse response = Helper.GetResponse (location);
-            Root root = new Root (this, location, response.Headers, XmlReader.Create (response.GetResponseStream ()));
-            LogDevice (root.Device);
-            response.Close ();
+            try {
+                if (load) {
+                    Root root = new Root (this, location, response.Headers, XmlReader.Create (response.GetResponseStream ()));
+                    LogDevice (root.Device);
+                }
+            } finally {
+                response.Close ();
+            }
         }
 
         private void LogDevice (Device device)
@@ -284,27 +388,27 @@ namespace Mono.Upnp
             }
         }
 
-        private void RegisterFactory (IDeviceFactory factory)
+        private void RegisterFactory (DeviceFactory factory)
         {
             if (!DeviceFactories.ContainsKey (factory.Type)) {
                 DeviceFactories.Add (factory.Type, factory);
             }
-            foreach (IDeviceFactory device_factory in factory.Devices) {
+            foreach (DeviceFactory device_factory in factory.Devices) {
                 RegisterFactory (device_factory);
             }
-            foreach (IServiceFactory service_factory in factory.Services) {
+            foreach (ServiceFactory service_factory in factory.Services) {
                 RegisterFactory (service_factory);
             }
         }
 
-        private void RegisterFactory (IServiceFactory factory)
+        private void RegisterFactory (ServiceFactory factory)
         {
             if (!ServiceFactories.ContainsKey (factory.Type)) {
                 ServiceFactories.Add (factory.Type, factory);
             }
         }
 
-        public void Browse<T> (IDeviceFactory factory, EventHandler<DeviceArgs<T>> handler) where T : Device
+        public void Browse<T> (DeviceFactory factory, EventHandler<DeviceArgs<T>> handler) where T : Device
         {
             if (factory == null) {
                 throw new ArgumentNullException ("factory");
@@ -325,7 +429,7 @@ namespace Mono.Upnp
             client.Browse (factory.Type.ToString ());
         }
 
-        public void Browse<T> (IServiceFactory factory, EventHandler<ServiceArgs<T>> handler) where T : Service
+        public void Browse<T> (ServiceFactory factory, EventHandler<ServiceArgs<T>> handler) where T : Service
         {
             if (factory == null) {
                 throw new ArgumentNullException ("factory");

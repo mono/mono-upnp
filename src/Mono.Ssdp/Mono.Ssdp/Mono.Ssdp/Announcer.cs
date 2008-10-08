@@ -29,16 +29,15 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 
 using Mono.Ssdp.Internal;
 
 namespace Mono.Ssdp
 {
-    public class Announcer : IDisposable
+    public class Announcer
     {
         private static readonly Random random = new Random ();
-
-        public event EventHandler Stopped;
 
         private bool disposed;
         private readonly object mutex = new object ();
@@ -67,7 +66,7 @@ namespace Mono.Ssdp
             set { max_age = Math.Max (Protocol.DefaultMaxAge, value); }
         }
 
-        private uint announcement_timeout_id;
+        private volatile uint announcement_timeout_id;
 
         private TimeSpan GetInterval ()
         {
@@ -88,14 +87,6 @@ namespace Mono.Ssdp
         private volatile bool started;
         public bool Started {
             get { return started; }
-            private set {
-                started = value;
-                if (started) {
-                    server.ActiveAnnouncerCount++;
-                } else {
-                    server.ActiveAnnouncerCount--;
-                }
-            }
         }
 
         internal Announcer (Server server, string name, string type, string location)
@@ -111,14 +102,8 @@ namespace Mono.Ssdp
             lock (mutex) {
                 CheckDisposed ();
 
-                if (Started) {
+                if (started) {
                     throw new InvalidOperationException ("The announcer is already running. Cancel it first.");
-                } else if (String.IsNullOrEmpty (type)) {
-                    throw new ArgumentNullException ("NotificationType");
-                } else if (String.IsNullOrEmpty (location)) {
-                    throw new ArgumentNullException ("Location");
-                } else if (String.IsNullOrEmpty (name)) {
-                    throw new ArgumentNullException ("Usn");
                 }
 
                 if (!server.Started) {
@@ -128,7 +113,7 @@ namespace Mono.Ssdp
                 AnnounceAlive ();
 
                 announcement_timeout_id = server.Dispatcher.Add (GetInterval (), OnAnnounceTimeout);
-                Started = true;
+                started = true;
             }
         }
 
@@ -136,22 +121,41 @@ namespace Mono.Ssdp
         {
             lock (mutex) {
                 CheckDisposed ();
-                if (!Started) {
+
+                if (announcement_timeout_id == 0) {
                     return;
+                }
+
+                WaitHandle handle = StopAsync ();
+                handle.WaitOne ();
+            }
+        }
+
+        internal WaitHandle StopAsync ()
+        {
+            lock (mutex) {
+                if (announcement_timeout_id == 0) {
+                    return new ManualResetEvent (true);
                 }
 
                 server.Dispatcher.Remove (announcement_timeout_id);
                 announcement_timeout_id = 0;
-                server.AnnounceSocket.BeginSendTo (Protocol.CreateByeByeNotify (Type, Name), OnByeByeFinished);
+                return server.AnnounceSocket.BeginSendTo (Protocol.CreateByeByeNotify (Type, Name), OnByeBye).AsyncWaitHandle;
             }
         }
 
-        protected virtual void OnStopped ()
+        private void OnByeBye (IAsyncResult asyncResult)
         {
-            EventHandler stopped = Stopped;
-            if (stopped != null) {
-                stopped (this, EventArgs.Empty);
+            SsdpSocket socket = (SsdpSocket)asyncResult.AsyncState;
+            try {
+                socket.EndSendTo (asyncResult);
+            } catch {
             }
+            started = false;
+        }
+
+        internal void Stop (WaitHandle wait)
+        {
         }
 
         private bool OnAnnounceTimeout (object state, ref TimeSpan interval)
@@ -171,7 +175,6 @@ namespace Mono.Ssdp
         internal void Respond (IPEndPoint endPoint, ushort mx)
         {
             TimeSpan interval = GetInterval (mx);
-            // TODO respond more than once
             server.Dispatcher.Add (interval, OnRespondTimeout, endPoint);
         }
 
@@ -191,28 +194,11 @@ namespace Mono.Ssdp
             socket.EndSendTo (asyncResult);
         }
 
-        private void OnByeByeFinished (IAsyncResult asyncResult)
-        {
-            SsdpSocket socket = (SsdpSocket)asyncResult.AsyncState;
-            socket.EndSendTo (asyncResult);
-
-            Started = false;
-            OnStopped ();
-        }
-
         private void CheckDisposed ()
         {
             if (disposed) {
                 throw new ObjectDisposedException ("Announcer has been Disposed");
             }
-        }
-
-        public void Dispose ()
-        {
-            Stop ();
-            //server.RemoveAnnouncer (this);
-            server = null;
-            disposed = true;
         }
     }
 }

@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Net;
 using System.Xml;
 
 using Mono.Upnp.Internal;
@@ -35,14 +36,32 @@ using Mono.Upnp.Internal;
 namespace Mono.Upnp.Control
 {
 	public class Argument
-	{
-        internal Argument (Action action, XmlReader reader)
+    {
+        #region Constructors
+
+        protected Argument (Action action, XmlReader reader)
+            : this (action, reader, null)
         {
-            this.action = action;
-            Deserialize (reader);
         }
 
+        protected internal Argument (Action action, XmlReader reader, WebHeaderCollection headers)
+        {
+            if (action == null) {
+                throw new ArgumentNullException ("action");
+            }
+
+            this.action = action;
+            Deserialize (reader, headers);
+        }
+
+        #endregion
+
+        #region Data
+
         private Action action;
+        public Action Action {
+            get { return action; }
+        }
 
         private string name;
         public string Name {
@@ -108,14 +127,53 @@ namespace Mono.Upnp.Control
             }
         }
 
+        #endregion
+
+        #region Overrides
+
         public override string ToString ()
         {
-            return String.Format ("{0} {{{1}}}", name, value);
+            return String.Format (@"Argument {{ {0}, {1} }}",
+                name,
+                Type == typeof (string) ? String.Format (@"""{0}""", value) : value);
         }
+
+        public override bool Equals (object obj)
+        {
+            Argument argument = obj as Argument;
+            return argument != null &&
+                argument.action.Equals (action) &&
+                argument.name == name &&
+                argument.direction == direction &&
+                Object.Equals (argument.RelatedStateVariable, RelatedStateVariable) &&
+                argument.is_return_value == is_return_value;
+        }
+
+        public override int GetHashCode ()
+        {
+            return action.GetHashCode () ^
+                (name == null ? 0 : name.GetHashCode ()) ^
+                (direction.Value == ArgumentDirection.Out ? 0 : 1) ^
+                (RelatedStateVariable == null ? 0 : RelatedStateVariable.GetHashCode ()) ^
+                (is_return_value ? 2 : 3);
+        }
+
+        #endregion
 
         #region Deserialization
 
-        private void Deserialize (XmlReader reader)
+        private void Deserialize (XmlReader reader, WebHeaderCollection headers)
+        {
+            Deserialize (headers);
+            Deserialize (reader);
+            VerifyDeserialization ();
+        }
+
+        protected virtual void Deserialize (WebHeaderCollection headers)
+        {
+        }
+
+        protected virtual void Deserialize (XmlReader reader)
         {
             try {
                 reader.Read ();
@@ -129,10 +187,9 @@ namespace Mono.Upnp.Control
                     : String.Format ("There was a problem deserializing the argument {0}.", name);
                 throw new UpnpDeserializationException (message, e);
             }
-            Verify ();
         }
 
-        private void Deserialize (XmlReader reader, string element)
+        protected virtual void Deserialize (XmlReader reader, string element)
         {
             reader.Read ();
             switch (element) {
@@ -155,7 +212,7 @@ namespace Mono.Upnp.Control
             reader.Close ();
         }
 
-        private void Verify ()
+        protected virtual void VerifyDeserialization ()
         {
             if (String.IsNullOrEmpty (name)) {
                 throw new UpnpDeserializationException ("The argument has no name.");
@@ -168,6 +225,10 @@ namespace Mono.Upnp.Control
                 throw new UpnpDeserializationException (String.Format (
                     "The argument {0} has no related state variable.", name));
             }
+        }
+
+        protected internal virtual void VerifyContract ()
+        {
         }
 
         #endregion

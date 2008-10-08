@@ -1,3 +1,67 @@
+2008-10-09  Scott Peterson  <lunchtimemama@gmail.com>
+
+	Added licenses to a lot of files.
+
+	* src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.Internal/Protocol.cs:
+	Tweaked HTTP headers.
+	
+	* src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.Internal/SsdpSocket.cs:
+	Tweaked constructor.
+	
+	* src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp/Announcer.cs: No longer
+	impliments IDisposable (because it has no unmanaged resources).
+	Also changed Stopping. The public Stop() method is synchronous
+	so that it blocks on sending the "bye-bye" message. There is
+	also an internal StopAsync() method which returns a WaitHandle.
+	That way the sever can stop all of its announcers concurrently
+	and then WaitHandle.WaitAll on all of their handles.
+	
+	* src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp/Server.cs: Changed how
+	stopping is accomplished. Stop() now blocks on all announcers
+	having sent "bye-bye" messages (though the announcers send
+	their messages concurrently).
+
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.MediaServer/*:
+	Stubbed out the MediaServer 1.0 protocol using auto-generated
+	source files made with Sharpener.
+
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Mono.Upnp.Dcp.Sharpener/ClientRunner.cs:
+	Updated to reflect API changes. Also added contract verification
+	generation.
+
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Mono.Upnp.Dcp.Sharpener/CodeMonkey.cs:
+	Added WriteLine override to take params object [].
+	
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Mono.Upnp.Dcp.Sharpener/OfflineAction.cs:
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Mono.Upnp.Dcp.Sharpener/OfflineStateVariable.cs:
+	Added special subclasses of Action and StateVariable to look for
+	the "Optional" XML element.
+	
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Mono.Upnp.Dcp.Sharpener/OfflineService.cs:
+	Use the new OfflineAction and OfflineStateVariable classes.
+	
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Mono.Upnp.Dcp.Sharpener/Runner.cs:
+	Moved camel casing code in from ServerRunner. Also added enumeration
+	name simplification logic.
+	
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Mono.Upnp.Dcp.Sharpener/ServerRunner.cs:
+	Removed camel casing code and other fixes.
+	
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/Mono.Upnp.Dcp.Sharpener/Sharpener.cs:
+	Changes for testing.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/Action.cs:
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/StateVariable.cs:
+	Refactored constructors, added dispose logic, overrided
+	some object methods, and refactored verification.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/AllowedValueRange.cs:
+	Refactored verification and overrided some object methods.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/Argument.cs:
+	Refactored constructors, overrided some object methods, and
+	refactored verification.
+
 2008-10-04  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.Sharpener/ServerRunner.cs:
@@ -31,6 +95,102 @@
 	
 	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/StateVariable.cs:
 	Fixed event delegate registration.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Internal/DefaultDeviceFactory.cs:
+	Updated to reflect change from IDeviceFactory to DeviceFactory.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Internal/DefaultServiceFactory.cs:
+	Updated to reflect change from IServiceFactory to ServiceFactory.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Internal/EventSubscriber.cs
+	If we timeout while trying to connect to the eventing server, it
+	might be because the UPnP service fell off the network, so we add
+	the ability to check that.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Internal/Helper.cs:
+	Better factory selection when instantiating devices.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Internal/UpnpDeserializationException.cs:
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/UpnpDeserializationException.cs:
+	Moved and made public.
+
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Client.cs:
+	Added support for disposing of devices and services both
+	when they announce their departure and when they silently
+	fall off the network. This needs testing.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Device.cs:
+	Refactored constructors and verification, overrided some
+	object methods, added disposal logic, and better factory
+	selection when instantiating services.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/IDeviceFactory.cs:
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/DeviceFactory.cs:
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/IServiceFactory.cs:
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/ServiceFactory.cs:
+	Renamed. These are now an abstract class so that we can include
+	conditional contract verification. Factories can be used to
+	instantiate services and devices, but to verify that the devices
+	and services actually impliment all of the required members of
+	their type, it is nessisary to make an HTTP request. We let the
+	user descide if they want HTTP requests automatically made to
+	verify the completeness of a server or device.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Icon.cs: Refactored
+	constructor and verification logic, added disposal checks and
+	object method overrides.
+
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/ReadOnlyDictionary.cs:
+	Added object method overrides.
+
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Root.cs: Minor
+	refactoring.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Service.cs: Refactoring
+	of constructors, verification logics, and more. Added disposal
+	logic and object method overrides.
+	 
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/TypeInfo.cs: Style fixes.
+
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server.Internal/ActionServer.cs:
+	Added fault logic.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server.Internal/IconServer.cs:
+	Added server for device icons.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server.Internal/Subscriber.cs:
+	Got rid of this vistigial class from API designs past.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server.Internal/UpnpServer.cs:
+	Added new constructor and protection against ill-behavied clients.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/Device.cs:
+	Added checks to make sure things aren't changed after the device
+	is live, added icon server, and not longer impliments IDisposable.
+
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/Icon.cs:
+	Filled in icon class. It take metadata and either a byte array
+	or a file name. Delays reading from disk until there is a request.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/Server.cs:
+	Refactoring dispose patter and some other stuff.
+
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/Service.cs:
+	Refactored Dispose, Start, and Stop methods.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/DeviceType.cs:
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/ServiceType.cs:
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/TypeInfo.cs:
+	Added constructor.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/UpnpControlException.cs:
+	New exception type for control problems.
+	
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/UpnpException.cs:
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server/UpnpServerException.cs:
+	Renamed to avoid confusion with new UpnpControlException.
+
+
 
 2008-10-04  Scott Peterson  <lunchtimemama@gmail.com>
 

@@ -1,5 +1,5 @@
 ﻿//
-// UpnpDeserializationException.cs
+// OfflineStateVariable.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -26,20 +26,33 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
+using System.Xml;
 
-namespace Mono.Upnp.Internal
+using Mono.Upnp.Control;
+
+namespace Mono.Upnp.Dcp.Sharpener
 {
-	internal class UpnpDeserializationException : Exception
+	public class OfflineStateVariable : StateVariable
 	{
-        public UpnpDeserializationException (string message)
-            : base (message)
+        public OfflineStateVariable (Service service, XmlReader reader)
+            : base (service, reader)
         {
         }
 
-        public UpnpDeserializationException (string message, Exception innerException)
-            : base (message, innerException)
+        private bool optional;
+        public bool IsOptional
         {
+            get { return optional; }
+        }
+
+        protected override void Deserialize (XmlReader reader, string element)
+        {
+            if (element.ToLower () == "optional") {
+                optional = true;
+                reader.Close ();
+            } else {
+                base.Deserialize (reader, element);
+            }
         }
 	}
 }

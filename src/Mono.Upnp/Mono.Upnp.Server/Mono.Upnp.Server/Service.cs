@@ -1,4 +1,32 @@
-﻿using System;
+﻿//
+// Service.cs
+//
+// Author:
+//   Scott Peterson <lunchtimemama@gmail.com>
+//
+// Copyright (C) 2008 S&S Black Ltd.
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
@@ -7,14 +35,12 @@ using Mono.Upnp.Server.Internal;
 
 namespace Mono.Upnp.Server
 {
-	public abstract class Service : IDisposable
+	public abstract class Service
 	{
-        private readonly object mutex = new object ();
         private readonly string id;
         private ActionServer action_server;
         private EventServer event_server;
         private DescriptionServer description_server;
-        private bool started;
 
         protected Service (ServiceType type, string id)
         {
@@ -58,33 +84,18 @@ namespace Mono.Upnp.Server
             ProcessStateVariables ();
         }
 
-        public virtual void Start ()
+        protected internal virtual void Start ()
         {
-            lock (mutex) {
-                if (started) {
-                    throw new InvalidOperationException ("The service is already started.");
-                }
-                if (description_server == null) {
-                    throw new InvalidOperationException ("The service has not been initialized or has been disposed.");
-                }
-                action_server.Start ();
-                event_server.Start ();
-                description_server.Start ();
-                started = true;
-            }
+            action_server.Start ();
+            event_server.Start ();
+            description_server.Start ();
         }
 
-        public virtual void Stop ()
+        protected internal virtual void Stop ()
         {
-            lock (mutex) {
-                if (!started) {
-                    return;
-                }
-                action_server.Stop ();
-                event_server.Stop ();
-                description_server.Stop ();
-                started = false;
-            }
+            action_server.Stop ();
+            event_server.Stop ();
+            description_server.Stop ();
         }
 
         protected virtual void ProcessActions ()
@@ -125,7 +136,7 @@ namespace Mono.Upnp.Server
                 foreach (object attribute in @event.GetCustomAttributes (true)) {
                     UpnpStateVariableAttribute state_variable_attribute = attribute as UpnpStateVariableAttribute;
                     if (state_variable_attribute != null) {
-                        throw new UpnpException ("State variable events must be public.");
+                        throw new UpnpServerException ("State variable events must be public.");
                     }
                 }
             }
@@ -153,7 +164,7 @@ namespace Mono.Upnp.Server
         {
             if (actions.ContainsKey (action.Name)) {
                 // TODO add service type name
-                throw new UpnpException (String.Format ("The service already contains an action named '{0}'.", action.Name));
+                throw new UpnpServerException (String.Format ("The service already contains an action named '{0}'.", action.Name));
             }
             actions.Add (action.Name, action);
         }
@@ -162,7 +173,7 @@ namespace Mono.Upnp.Server
         {
             if (state_variables.ContainsKey (stateVariable.Name)) {
                 // TODO add service type name
-                throw new UpnpException (String.Format ("The service already contains an state variable named '{0}'.", stateVariable.Name));
+                throw new UpnpServerException (String.Format ("The service already contains an state variable named '{0}'.", stateVariable.Name));
             }
             state_variables.Add (stateVariable.Name, stateVariable);
         }
@@ -211,12 +222,10 @@ namespace Mono.Upnp.Server
             writer.WriteEndElement ();
         }
 
-        public void Dispose ()
+        internal void Dispose ()
         {
-            lock (mutex) {
-                Dispose (true);
-                GC.SuppressFinalize (this);
-            }
+            Dispose (true);
+            GC.SuppressFinalize (this);
         }
 
         protected virtual void Dispose (bool disposing)

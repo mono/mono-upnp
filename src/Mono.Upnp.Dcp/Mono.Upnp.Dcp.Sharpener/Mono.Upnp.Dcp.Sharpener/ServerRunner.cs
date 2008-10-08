@@ -1,4 +1,32 @@
-﻿using System;
+﻿//
+// ServerRunner.cs
+//
+// Author:
+//   Scott Peterson <lunchtimemama@gmail.com>
+//
+// Copyright (C) 2008 S&S Black Ltd.
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -40,6 +68,8 @@ namespace Mono.Upnp.Dcp.Sharpener
         {
             monkey.Write ("// {0}.cs auto-generated at {1} by Sharpener", Context.ClassName, DateTime.Now);
             monkey.WriteLine ();
+            monkey.WriteUsing ("System");
+            monkey.WriteLine ();
             if (!Context.Namespace.StartsWith ("Mono.Upnp")) {
                 monkey.WriteUsing ("Mono.Upnp");
             }
@@ -47,6 +77,12 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.WriteLine ();
             monkey.StartWriteBlock ("namespace {0}", Context.Namespace);
             monkey.StartWriteBlock ("public abstract class {0} : Service", Context.ClassName);
+            monkey.WriteLine ("protected {0} (string id)", Context.ClassName);
+            ServiceType type = new ServiceType (Context.Type);
+            monkey.WriteLine (@"{0}: base (new ServiceType (""{1}"", ""{2}"", new Version ({3}, {4})), id)",
+                monkey.Indentation, type.DomainName, type.Type, type.Version.Major, type.Version.Minor);
+            monkey.WriteLine ("{");
+            monkey.WriteLine ("}");
         }
 
         private void WriteMethods (CodeMonkey monkey, Service service)
@@ -185,62 +221,6 @@ namespace Mono.Upnp.Dcp.Sharpener
         {
             monkey.EndWriteBlock ();
             monkey.EndWriteBlock ();
-        }
-
-        private static string ToCamelCase (string s)
-        {
-            if (IsCamelCase (s)) {
-                return s;
-            }
-            StringBuilder builder = new StringBuilder (s.Length);
-            builder.Append (ToLower (s[0]));
-            for (int i = 1; i < s.Length; i++) {
-                bool replaced = false;
-                foreach (char delimiter in delimiters) {
-                    if (s[i] == delimiter) {
-                        builder.Append (ToUpper (s[i + 1]));
-                        i++;
-                        replaced = true;
-                        break;
-                    }
-                }
-                if (!replaced) {
-                    builder.Append (s[i]);
-                }
-            }
-            return builder.ToString ();
-        }
-
-        private static char ToUpper (char c)
-        {
-            return (char)(IsUpper (c) ? c : c - 32);
-        }
-
-        private static char ToLower (char c)
-        {
-            return (char)(IsUpper (c) ? c + 32 : c);
-        }
-
-        private static bool IsUpper (char c)
-        {
-            return c >= 'A' && c <= 'Z';
-        }
-
-        private readonly static char[] delimiters = { '_', '-', ' ' };
-
-        private static bool IsCamelCase (string s)
-        {
-            return !IsUpper (s[0]) && s.IndexOfAny (delimiters) == -1;
-        }
-
-        private static IEnumerable<T> Concat<T> (IEnumerable<T> enumerable1, IEnumerable<T> enumerable2)
-        {
-            foreach (T value in enumerable1) {
-                yield return value;
-            }
-            foreach (T value in enumerable2) {
-                yield return value;
-            }
         }
 	}
 }

@@ -41,12 +41,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\BrowseFlag.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ConnectionStatus.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\Direction.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\TransferStatus.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ConnectionManager1.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ConnectionManager1Factory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ContentDirectory1.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ContentDirectory1Factory.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\MediaServer1.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\MediaServer1Factory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

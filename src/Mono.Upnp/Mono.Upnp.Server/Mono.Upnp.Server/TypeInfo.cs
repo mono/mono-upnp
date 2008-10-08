@@ -35,6 +35,11 @@ namespace Mono.Upnp.Server
 {
 	public abstract class TypeInfo
 	{
+        internal TypeInfo (string type, Version version)
+            : this ("schemas-upnp-org", type, version)
+        {
+        }
+
         internal TypeInfo (string domainName, string type, Version version)
         {
             if (domainName == null) {

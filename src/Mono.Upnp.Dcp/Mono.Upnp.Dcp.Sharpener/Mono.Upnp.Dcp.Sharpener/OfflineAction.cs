@@ -1,5 +1,5 @@
 ﻿//
-// AllowedValueRange.cs
+// OfflineAction.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -26,31 +26,32 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Upnp.Server
+using System.Xml;
+
+using Mono.Upnp.Control;
+
+namespace Mono.Upnp.Dcp.Sharpener
 {
-	public class AllowedValueRange
+	public class OfflineAction : Action
 	{
-        private readonly object max_value;
-        private readonly object min_value;
-        private readonly object steps;
-
-        public AllowedValueRange (object maxValue, object minValue, object steps)
+        public OfflineAction (Service service, XmlReader reader)
+            : base (service, reader)
         {
-            max_value = maxValue;
-            min_value = minValue;
-            this.steps = steps;
         }
 
-        public object MaxValue {
-            get { return max_value; }
+        private bool optional;
+        public bool IsOptional {
+            get { return optional; }
         }
 
-        public object MinValue {
-            get { return min_value; }
-        }
-
-        public object Steps {
-            get { return steps; }
+        protected override void Deserialize (XmlReader reader, string element)
+        {
+            if (element.ToLower () == "optional") {
+                optional = true;
+                reader.Close ();
+            } else {
+                base.Deserialize (reader, element);
+            }
         }
 	}
 }

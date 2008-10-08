@@ -2,7 +2,7 @@
 
 using Mono.Upnp;
 using Mono.Upnp.Control;
-using Mono.Upnp.Dcp.MediaServer1;
+//using Mono.Upnp.Dcp.MediaServer1;
 
 namespace Mono.Upnp.ConsoleClient
 {
@@ -28,7 +28,7 @@ namespace Mono.Upnp.ConsoleClient
             if (e.Service.Type.DomainName == "mono") {
                 var action = e.Service.Actions["ReturnsValue"];
                 action.InArguments["value"].Value = "true";
-                action.Execute ();
+                action.Invoke ();
                 Console.WriteLine (action.ReturnArgument.Value);
                 e.Service.StateVariables["Message"].Changed += Program_Changed;
             }

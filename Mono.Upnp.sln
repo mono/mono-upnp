@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Server", "src\Mon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.ConsoleServer", "src\Mono.Upnp\Mono.Upnp.ConsoleServer\Mono.Upnp.ConsoleServer.csproj", "{7995FFEC-A1ED-4696-99F7-062484533766}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Server", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer\Mono.Upnp.Dcp.MediaServer1.Server\Mono.Upnp.Dcp.MediaServer1.Server.csproj", "{612068A0-1BE2-43F2-9402-5884EC0AFC57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,10 @@ Global
 		{7995FFEC-A1ED-4696-99F7-062484533766}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7995FFEC-A1ED-4696-99F7-062484533766}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7995FFEC-A1ED-4696-99F7-062484533766}.Release|Any CPU.Build.0 = Release|Any CPU
+		{612068A0-1BE2-43F2-9402-5884EC0AFC57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{612068A0-1BE2-43F2-9402-5884EC0AFC57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{612068A0-1BE2-43F2-9402-5884EC0AFC57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{612068A0-1BE2-43F2-9402-5884EC0AFC57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,5 +89,6 @@ Global
 		{9A808AE1-F0B3-49E7-9F03-A54954C230A1} = {19359AA2-5A96-4745-A30F-D09882179BF5}
 		{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1} = {19359AA2-5A96-4745-A30F-D09882179BF5}
 		{70A00793-C96D-4626-98FF-0784E425A6F8} = {9A808AE1-F0B3-49E7-9F03-A54954C230A1}
+		{612068A0-1BE2-43F2-9402-5884EC0AFC57} = {9A808AE1-F0B3-49E7-9F03-A54954C230A1}
 	EndGlobalSection
 EndGlobal

@@ -158,10 +158,10 @@ namespace Mono.Upnp.Server.Internal
                 if (!wait.WaitOne (interval, false)) {
                     bool requeue = item.Handler (item.State, ref item.Timeout);
                     lock (timeouts) {
-                        Remove(item.Id);
+                        Remove (item.Id);
                         if (requeue) {
                             item.Trigger += item.Timeout;
-                            Add(ref item);
+                            Add (ref item);
                         }
                     }
                 }

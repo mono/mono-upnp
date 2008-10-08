@@ -92,7 +92,7 @@ namespace Mono.Upnp
                 if (device != null) {
                     throw new UpnpDeserializationException ("There are multiple root devices.");
                 }
-                device = Helper.DeserializeDevice (client, this, headers, reader);
+                device = Helper.DeserializeDevice (null, client, this, reader, headers);
                 if (client.Devices.ContainsKey (device.Udn) && client.Devices[device.Udn].ContainsKey (device.Type)) {
                     client.Devices[device.Udn][device.Type].CopyFrom (device);
                     device = client.Devices[device.Udn][device.Type];

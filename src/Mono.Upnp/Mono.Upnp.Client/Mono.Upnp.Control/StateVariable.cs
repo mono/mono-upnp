@@ -37,14 +37,35 @@ using Mono.Upnp.Internal;
 namespace Mono.Upnp.Control
 {
 	public class StateVariable
-	{
-        protected internal StateVariable (Service service, WebHeaderCollection headers, XmlReader reader)
+    {
+        #region Constructors
+
+        protected StateVariable (Service service, XmlReader reader)
+            : this (service, reader, null)
         {
-            this.service = service;
-            Deserialize (headers, reader);
         }
 
+        protected internal StateVariable (Service service, XmlReader reader, WebHeaderCollection headers)
+        {
+            if (service == null) {
+                throw new ArgumentNullException ("service");
+            }
+            this.service = service;
+            Deserialize (reader, headers);
+        }
+
+        #endregion
+
+        #region Data
+
         private Service service;
+        public Service Service {
+            get { return service; }
+        }
+
+        public bool Disposed {
+            get { return service.Disposed; }
+        }
 
         private bool send_events;
         public bool SendEvents {
@@ -79,9 +100,14 @@ namespace Mono.Upnp.Control
             get { return allowed_value_range; }
         }
 
+        #endregion
+
+        #region Methods
+
         private event EventHandler<StateVariableChangedArgs<string>> changed;
         public event EventHandler<StateVariableChangedArgs<string>> Changed {
             add {
+                CheckDisposed ();
                 if (!send_events) {
                     throw new InvalidOperationException ("This state variable does not send events.");
                 } else if (value == null) {
@@ -91,6 +117,7 @@ namespace Mono.Upnp.Control
                 changed += value;
             }
             remove {
+                CheckDisposed ();
                 if (!send_events) {
                     throw new InvalidOperationException ("This state variable does not send events.");
                 } else if (value == null) {
@@ -109,18 +136,54 @@ namespace Mono.Upnp.Control
             }
         }
 
-        private int retry = 1;
-        public int Retry {
-            get { return retry; }
+        protected void CheckDisposed ()
+        {
+            if (Disposed) {
+                throw new ObjectDisposedException (ToString (),
+                    "This state variable is no longer available because its service has gone off the network.");
+            }
         }
+
+        #region Overrides
+
+        public override string ToString ()
+        {
+            return String.Format ("StateVariable {{ {0}, {1} }}", service, name);
+        }
+
+        public override bool Equals (object obj)
+        {
+            StateVariable variable = obj as StateVariable;
+            return variable != null &&
+                variable.service.Equals (service) &&
+                variable.send_events == send_events &&
+                variable.name == name &&
+                variable.type == type &&
+                variable.default_value == default_value &&
+                Object.Equals (variable.allowed_values, allowed_values) &&
+                Object.Equals (variable.allowed_value_range, allowed_value_range);
+        }
+
+        public override int GetHashCode ()
+        {
+            return service.GetHashCode () ^
+                (send_events ? 1 : 0) ^
+                (name == null ? 0 : name.GetHashCode ()) ^
+                (type == null ? 0 : type.GetHashCode ()) ^
+                (default_value == null ? 0 : default_value.GetHashCode ()) ^
+                (allowed_values == null ? 0 : allowed_values.GetHashCode ()) ^
+                (allowed_value_range == null ? 0 : allowed_value_range.GetHashCode ());
+        }
+
+        #endregion
 
         #region Deserialization
 
-        private void Deserialize (WebHeaderCollection headers, XmlReader reader)
+        private void Deserialize (XmlReader reader, WebHeaderCollection headers)
         {
             Deserialize (headers);
             Deserialize (reader);
-            Verify ();
+            VerifyDeserialization ();
         }
 
         protected virtual void Deserialize (WebHeaderCollection headers)
@@ -241,7 +304,7 @@ namespace Mono.Upnp.Control
             reader.Close ();
         }
 
-        protected virtual void Verify ()
+        protected virtual void VerifyDeserialization ()
         {
             if (String.IsNullOrEmpty (name)) {
                 throw new UpnpDeserializationException ("The state variable has no name.");
@@ -260,6 +323,12 @@ namespace Mono.Upnp.Control
             //        "The state variable {0} has allowedValueRange, but is of type {2}.", name, type));
             //}
         }
+
+        protected internal virtual void VerifyContract ()
+        {
+        }
+
+        #endregion
 
         #endregion
 

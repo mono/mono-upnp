@@ -123,5 +123,15 @@ namespace Mono.Upnp
         {
             return GetEnumerator ();
         }
+
+        public override bool Equals (object obj)
+        {
+            return (obj is ReadOnlyDictionary<TKey, TValue>) && dictionary.Equals (obj);
+        }
+
+        public override int GetHashCode ()
+        {
+            return dictionary.GetHashCode ();
+        }
     }
 }
