@@ -254,7 +254,7 @@ namespace Mono.Upnp.Control
             if (String.IsNullOrEmpty (name)) {
                 throw new UpnpDeserializationException ("The state variable has no name.");
             }
-            if (type == null) {
+            if (data_type == null) {
                 throw new UpnpDeserializationException (String.Format (
                     "The state variable {0} has no type.", name));
             }

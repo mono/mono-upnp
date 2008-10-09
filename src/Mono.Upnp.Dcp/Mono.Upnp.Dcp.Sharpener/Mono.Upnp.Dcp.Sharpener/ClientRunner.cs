@@ -238,12 +238,12 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.WriteLine ("base.VerifyContract ();");
             foreach (OfflineAction action in service.Actions.Values) {
                 if (!action.IsOptional) {
-                    monkey.WriteLine (@"if (!Actions.ContainsKey (""{0}"")) throw new UpnpDeserializationException (String.Format (""The service {{0}} claims to be of type {{1}} but it does not have the required action {0}."", Id, Type));", action.Name);
+                    monkey.WriteLine (@"if (!Actions.ContainsKey (""{0}"")) throw new UpnpDeserializationException (String.Format (""The service {{0}} claims to be of type {1} but it does not have the required action {0}."", Id));", action.Name, Context.Type);
                 }
             }
             foreach (OfflineStateVariable state_variable in service.StateVariables.Values) {
                 if (state_variable.SendEvents && state_variable.IsOptional) {
-                    monkey.WriteLine (@"if (!StateVariables.ContainsKey (""{0}"")) throw new UpnpDeserializationException (String.Format (""The service {{0}} claims to be of type {{1}} but it does not have the required state variable {0}."", Id, Type));", state_variable.Name);
+                    monkey.WriteLine (@"if (!StateVariables.ContainsKey (""{0}"")) throw new UpnpDeserializationException (String.Format (""The service {{0}} claims to be of type {1} but it does not have the required state variable {0}."", Id));", state_variable.Name, Context.Type);
                 }
             }
             monkey.EndWriteBlock ();
