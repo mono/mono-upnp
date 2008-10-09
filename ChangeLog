@@ -8,10 +8,10 @@
 	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/Argument.cs:
 	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Device.cs:
 	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Icon.cs:
-	Added immutability checks and simplified Equals and GetHashCodes.
+	Added immutability checks and simplified Equals and GetHashCode.
 	
 	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/StateVariable.cs:
-	Added immutability checks, simplified Equals and GetHashCodes,
+	Added immutability checks, simplified Equals and GetHashCode,
 	delayed type determination, and moved type deserialization logic
 	to the service.
 	
