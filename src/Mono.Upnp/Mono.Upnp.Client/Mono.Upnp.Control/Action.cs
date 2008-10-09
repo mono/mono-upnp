@@ -54,13 +54,16 @@ namespace Mono.Upnp.Control
             }
             this.service = service;
             Deserialize (reader, headers);
+            loaded = true;
         }
 
         #endregion
 
         #region Data
 
-        private Service service;
+        private readonly bool loaded;
+
+        private readonly Service service;
         public Service Service {
             get { return service; }
         }
@@ -117,6 +120,13 @@ namespace Mono.Upnp.Control
             }
         }
 
+        private void CheckLoaded ()
+        {
+            if (loaded) {
+                throw new InvalidOperationException ("The action has already been deserialized.");
+            }
+        }
+
         #region Overrides
 
         public override string ToString ()
@@ -127,19 +137,12 @@ namespace Mono.Upnp.Control
         public override bool Equals (object obj)
         {
             Action action = obj as Action;
-            return action != null &&
-                action.service.Equals (service) &&
-                action.name == name &&
-                action.in_arguments.Equals (in_arguments) &&
-                action.out_arguments.Equals (out_arguments);
+            return action != null && action.service.Equals (service) && action.name == name;
         }
 
         public override int GetHashCode ()
         {
-            return service.GetHashCode () ^
-                (name == null ? 0 : name.GetHashCode ()) ^
-                in_arguments.GetHashCode () ^
-                out_arguments.GetHashCode ();
+            return service.GetHashCode () ^ (name == null ? 0 : name.GetHashCode ());
         }
 
         #endregion
@@ -230,6 +233,7 @@ namespace Mono.Upnp.Control
 
         protected virtual void Deserialize (XmlReader reader, string element)
         {
+            CheckLoaded ();
             reader.Read ();
             switch (element) {
             case "name":
@@ -260,6 +264,7 @@ namespace Mono.Upnp.Control
 
         protected void AddArgument (Argument argument)
         {
+            CheckLoaded ();
             if (argument.Direction == ArgumentDirection.In) {
                 in_argument_dict.Add (argument.Name, argument);
             } else {

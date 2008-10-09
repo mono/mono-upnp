@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 using Mono.Upnp.Control;
@@ -198,6 +199,12 @@ namespace Mono.Upnp.Dcp.MediaServer1
                 if (!HasContainerUpdateIDs) throw new NotImplementedException ();
                 StateVariables["ContainerUpdateIDs"].Changed -= value;
             }
+        }
+
+        protected override Type DeserializeDataType (string dataType)
+        {
+            //if (Regex.Matches (dataType, "string
+            return base.DeserializeDataType (dataType);
         }
 
         protected override void VerifyContract ()

@@ -71,6 +71,7 @@ namespace Mono.Upnp
             this.factory = factory;
             this.root = root;
             Deserialize (reader, headers);
+            loaded = true;
         }
 
         #endregion
@@ -79,7 +80,7 @@ namespace Mono.Upnp
 
         private DeviceFactory factory;
         private Client client;
-        private bool device_description_loaded;
+        private bool loaded;
 
         private bool disposed;
         public bool Disposed {
@@ -216,7 +217,7 @@ namespace Mono.Upnp
 
         protected T GetDescriptionField<T> (ref T field) where T : class
         {
-            if (field == null && !device_description_loaded) {
+            if (field == null && !loaded) {
                 client.LoadDeviceDescription (this);
             }
             return field;
@@ -249,6 +250,13 @@ namespace Mono.Upnp
             if (disposed) {
                 throw new ObjectDisposedException (ToString (),
                     "The device has gone off the network and is no longer available.");
+            }
+        }
+
+        private void CheckLoaded ()
+        {
+            if (loaded) {
+                throw new InvalidOperationException ("The device has already been deserialized.");
             }
         }
 
@@ -293,7 +301,6 @@ namespace Mono.Upnp
             VerifyDeserialization ();
 
             this.headers = null;
-            device_description_loaded = true;
         }
 
         protected virtual void Deserialize (WebHeaderCollection headers)
@@ -318,6 +325,7 @@ namespace Mono.Upnp
 
         protected virtual void Deserialize (XmlReader reader, string element)
         {
+            CheckLoaded ();
             reader.Read ();
             switch (element) {
             case "deviceType":
@@ -387,6 +395,7 @@ namespace Mono.Upnp
 
         protected void AddIcon (Icon icon)
         {
+            CheckLoaded ();
             icon_list.Add (icon);
         }
 
@@ -520,7 +529,7 @@ namespace Mono.Upnp
                 throw new UpnpDeserializationException ("The deserialized device is of a different type.");
             }
             factory = device.factory;
-            device_description_loaded = device.device_description_loaded;
+            loaded = device.loaded;
             client = device.client;
             root = device.root;
             presentation_url = device.presentation_url;

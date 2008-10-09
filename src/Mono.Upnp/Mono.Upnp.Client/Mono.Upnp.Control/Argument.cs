@@ -52,13 +52,16 @@ namespace Mono.Upnp.Control
 
             this.action = action;
             Deserialize (reader, headers);
+            loaded = true;
         }
 
         #endregion
 
         #region Data
 
-        private Action action;
+        private readonly bool loaded;
+
+        private readonly Action action;
         public Action Action {
             get { return action; }
         }
@@ -141,21 +144,12 @@ namespace Mono.Upnp.Control
         public override bool Equals (object obj)
         {
             Argument argument = obj as Argument;
-            return argument != null &&
-                argument.action.Equals (action) &&
-                argument.name == name &&
-                argument.direction == direction &&
-                Object.Equals (argument.RelatedStateVariable, RelatedStateVariable) &&
-                argument.is_return_value == is_return_value;
+            return argument != null && argument.action.Equals (action) && argument.name == name;
         }
 
         public override int GetHashCode ()
         {
-            return action.GetHashCode () ^
-                (name == null ? 0 : name.GetHashCode ()) ^
-                (direction.Value == ArgumentDirection.Out ? 0 : 1) ^
-                (RelatedStateVariable == null ? 0 : RelatedStateVariable.GetHashCode ()) ^
-                (is_return_value ? 2 : 3);
+            return action.GetHashCode () ^ (name == null ? 0 : name.GetHashCode ());
         }
 
         #endregion
@@ -191,6 +185,9 @@ namespace Mono.Upnp.Control
 
         protected virtual void Deserialize (XmlReader reader, string element)
         {
+            if (loaded) {
+                throw new InvalidOperationException ("The argument has already been deserialized.");
+            }
             reader.Read ();
             switch (element) {
             case "name":

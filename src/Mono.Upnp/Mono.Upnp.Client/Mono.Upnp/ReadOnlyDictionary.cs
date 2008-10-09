@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Mono.Upnp
@@ -34,7 +35,7 @@ namespace Mono.Upnp
 	public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
         private const string error = "Dictionary is read-only.";
-        private IDictionary<TKey, TValue> dictionary;
+        private readonly IDictionary<TKey, TValue> dictionary;
 
         public ReadOnlyDictionary (IDictionary<TKey, TValue> dictionary)
         {
@@ -119,14 +120,15 @@ namespace Mono.Upnp
             return dictionary.GetEnumerator ();
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+        IEnumerator IEnumerable.GetEnumerator ()
         {
             return GetEnumerator ();
         }
 
         public override bool Equals (object obj)
         {
-            return (obj is ReadOnlyDictionary<TKey, TValue>) && dictionary.Equals (obj);
+            ReadOnlyDictionary<TKey, TValue> dict = obj as ReadOnlyDictionary<TKey, TValue>;
+            return dict != null && dict.dictionary.Equals (dictionary);
         }
 
         public override int GetHashCode ()

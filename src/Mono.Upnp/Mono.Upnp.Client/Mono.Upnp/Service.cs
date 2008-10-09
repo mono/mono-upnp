@@ -431,6 +431,40 @@ namespace Mono.Upnp
             }
         }
 
+        protected internal virtual Type DeserializeDataType (string dataType)
+        {
+            // I'd love to do a switch here, but some UPnP services define
+            // custom data types that begin with a legal data type. That
+            // would probably only ever happen with strings, but why risk
+            // the exception.
+
+            if (dataType.StartsWith ("ui1")) return typeof (byte);
+            else if (dataType.StartsWith ("ui2")) return typeof (ushort);
+            else if (dataType.StartsWith ("ui4")) return typeof (uint);
+            else if (dataType.StartsWith ("i1")) return typeof (sbyte);
+            else if (dataType.StartsWith ("i2")) return typeof (short);
+            else if (dataType.StartsWith ("i4")) return typeof (int);
+            else if (dataType.StartsWith ("int")) return typeof (long); // Is this right? The UPnP docs are vague
+            else if (dataType.StartsWith ("r4")) return typeof (float);
+            else if (
+                dataType.StartsWith ("r8") ||
+                dataType.StartsWith ("number") ||
+                dataType.StartsWith ("fixed.14.4") ||
+                dataType.StartsWith ("float")) return typeof (double);
+            else if (dataType.StartsWith ("char")) return typeof (char);
+            else if (dataType.StartsWith ("string")) return typeof (string);
+            else if ( // TODO handle all of the variations
+                dataType.StartsWith ("date") ||
+                dataType.StartsWith ("time")) return typeof (DateTime);
+            else if (dataType.StartsWith ("boolean"))  return typeof (bool);
+            else if (dataType.StartsWith ("bin")) return typeof (byte[]);
+            else if (
+                dataType.StartsWith ("uri") ||
+                dataType.StartsWith ("uuid")) return typeof (Uri);
+            else throw new UpnpDeserializationException (String.Format (
+                "Could not deserialize data type {0}", dataType));
+        }
+
         protected virtual void VerifyDeserialization ()
         {
             if (String.IsNullOrEmpty (id)) {

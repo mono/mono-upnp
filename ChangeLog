@@ -1,3 +1,31 @@
+2008-10-10  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.MediaServer/Mono.Upnp.Dcp.MediaServer1.Client/*:
+	Stubbed out some stuff for the MediaServer API.
+
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/Action.cs:
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/AllowedValueRange.cs:
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/Argument.cs:
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Device.cs:
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Icon.cs:
+	Added immutability checks and simplified Equals and GetHashCodes.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp.Control/StateVariable.cs:
+	Added immutability checks, simplified Equals and GetHashCodes,
+	delayed type determination, and moved type deserialization logic
+	to the service.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/Service.cs:
+	Moved in state variable type deserialization logic and changed
+	to pretty switch statement to an ugly if/else mess to ensure
+	grace under fire.
+	
+	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/ReadOnlyDictionary.cs:
+	Made dictionary readonly and fixed Equals.
+
+	* src/Mono.Upnp/Mono.Upnp.Server/Mono.Upnp.Server.Internal/UpnpServer.cs:
+	Got rid of unnessisary Expect100Continue assignment.
+
 2008-10-09  Scott Peterson  <lunchtimemama@gmail.com>
 
 	Added licenses to a lot of files.
@@ -94,7 +122,7 @@
 	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/DeviceFactory.cs:
 	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/IServiceFactory.cs:
 	* src/Mono.Upnp/Mono.Upnp.Client/Mono.Upnp/ServiceFactory.cs:
-	Renamed. These are now an abstract class so that we can include
+	Renamed. These are now abstract classes so that we can include
 	conditional contract verification. Factories can be used to
 	instantiate services and devices, but to verify that the devices
 	and services actually impliment all of the required members of

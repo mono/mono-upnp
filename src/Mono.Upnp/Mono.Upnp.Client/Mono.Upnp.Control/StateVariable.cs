@@ -52,13 +52,16 @@ namespace Mono.Upnp.Control
             }
             this.service = service;
             Deserialize (reader, headers);
+            loaded = true;
         }
 
         #endregion
 
         #region Data
 
-        private Service service;
+        private readonly bool loaded;
+
+        private readonly Service service;
         public Service Service {
             get { return service; }
         }
@@ -81,7 +84,12 @@ namespace Mono.Upnp.Control
 
         private Type type;
         public Type Type {
-            get { return type; }
+            get {
+                if (type == null) {
+                    type = service.DeserializeDataType (data_type);
+                }
+                return type;
+            }
         }
 
         // FIXME is string the proper type for this?
@@ -144,6 +152,13 @@ namespace Mono.Upnp.Control
             }
         }
 
+        private void CheckLoaded ()
+        {
+            if (loaded) {
+                throw new InvalidOperationException ("The state variable has already been deserialized.");
+            }
+        }
+
         #region Overrides
 
         public override string ToString ()
@@ -154,25 +169,12 @@ namespace Mono.Upnp.Control
         public override bool Equals (object obj)
         {
             StateVariable variable = obj as StateVariable;
-            return variable != null &&
-                variable.service.Equals (service) &&
-                variable.send_events == send_events &&
-                variable.name == name &&
-                variable.type == type &&
-                variable.default_value == default_value &&
-                Object.Equals (variable.allowed_values, allowed_values) &&
-                Object.Equals (variable.allowed_value_range, allowed_value_range);
+            return variable != null && variable.service.Equals (service) && variable.name == name;
         }
 
         public override int GetHashCode ()
         {
-            return service.GetHashCode () ^
-                (send_events ? 1 : 0) ^
-                (name == null ? 0 : name.GetHashCode ()) ^
-                (type == null ? 0 : type.GetHashCode ()) ^
-                (default_value == null ? 0 : default_value.GetHashCode ()) ^
-                (allowed_values == null ? 0 : allowed_values.GetHashCode ()) ^
-                (allowed_value_range == null ? 0 : allowed_value_range.GetHashCode ());
+            return service.GetHashCode () ^ (name == null ? 0 : name.GetHashCode ());
         }
 
         #endregion
@@ -209,6 +211,7 @@ namespace Mono.Upnp.Control
 
         protected virtual void Deserialize (XmlReader reader, string element)
         {
+            CheckLoaded ();
             reader.Read ();
             switch (element) {
             case "name":
@@ -216,64 +219,6 @@ namespace Mono.Upnp.Control
                 break;
             case "dataType":
                 data_type = reader.ReadString ().Trim ();
-                switch (data_type) {
-                case "ui1":
-                    type = typeof (byte);
-                    break;
-                case "ui2":
-                    type = typeof (ushort);
-                    break;
-                case "ui4":
-                    type = typeof (uint);
-                    break;
-                case "i1":
-                    type = typeof (sbyte);
-                    break;
-                case "i2":
-                    type = typeof (short);
-                    break;
-                case "i4":
-                    type = typeof (int);
-                    break;
-                case "int":
-                    type = typeof (long); // Is this right? The UPnP docs are vague
-                    break;
-                case "r4":
-                    type = typeof (float);
-                    break;
-                case "r8":
-                case "number":
-                case "fixed.14.4":
-                case "float":
-                    type = typeof (double);
-                    break;
-                case "char":
-                    type = typeof (char);
-                    break;
-                case "string":
-                    type = typeof (string);
-                    break;
-                // TODO handle these better
-                case "date":
-                case "dateTime":
-                case "dateTime.tz":
-                case "time":
-                case "time.tz":
-                    type = typeof (DateTime);
-                    break;
-                case "boolean":
-                    type = typeof (bool);
-                    break;
-                case "bin.base64":
-                case "bin.hex":
-                    type = typeof (byte[]);
-                    break;
-                // TODO handle uuids with care
-                case "uri":
-                case "uuid":
-                    type = typeof (Uri);
-                    break;
-                }
                 break;
             case "defaultValue":
                 default_value = reader.ReadString ();
@@ -313,7 +258,7 @@ namespace Mono.Upnp.Control
                 throw new UpnpDeserializationException (String.Format (
                     "The state variable {0} has no type.", name));
             }
-            if (allowed_values != null && Type != typeof (string)) {
+            if (allowed_values != null && data_type != "string") {
                 throw new UpnpDeserializationException (String.Format (
                     "The state variable {0} has allowedValues, but is of type {1}.", name, type));
             }

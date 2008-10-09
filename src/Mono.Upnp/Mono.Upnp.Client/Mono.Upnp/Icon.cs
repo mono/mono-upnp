@@ -43,11 +43,14 @@ namespace Mono.Upnp
             }
             this.device = device;
             Deserialize (reader, headers);
+            loaded = true;
         }
 
         #region Data
 
-        private Device device;
+        private readonly bool loaded;
+
+        private readonly Device device;
         public Device Device {
             get { return device; }
         }
@@ -127,15 +130,20 @@ namespace Mono.Upnp
                 icon.url == url;
         }
 
+        private int hash;
+        private bool computed_hash;
         public override int GetHashCode ()
         {
-            return
-                device.GetHashCode () ^
-                mime_type.GetHashCode () ^
-                Width ^
-                Height ^
-                Depth ^
-                url.GetHashCode ();
+            if (!computed_hash) {
+                hash = device.GetHashCode () ^
+                    (mime_type == null ? 0 : mime_type.GetHashCode ()) ^
+                    (width.HasValue ? width.Value : 0) ^
+                    (height.HasValue ? (height.Value << 8 | height.Value >> 24) : 0) ^
+                    (depth.HasValue ? (depth.Value << 16 | depth.Value >> 16) : 0) ^
+                    (url == null ? 0 : url.GetHashCode ());
+                computed_hash = true;
+            }
+            return hash;
         }
 
         #endregion
@@ -168,6 +176,10 @@ namespace Mono.Upnp
 
         protected virtual void Deserialize (XmlReader reader, string element)
         {
+            if (loaded) {
+                throw new InvalidOperationException ("The icon has already been deserialized.");
+            }
+
             reader.Read ();
             switch (element) {
             case "mimetype":

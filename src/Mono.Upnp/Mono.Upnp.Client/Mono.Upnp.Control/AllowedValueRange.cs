@@ -70,9 +70,7 @@ namespace Mono.Upnp.Control
 
         public override int GetHashCode ()
         {
-            return minimum.GetHashCode () ^
-                maximum.GetHashCode () ^
-                (step == null ? 0 : step.GetHashCode ());
+            return minimum.GetHashCode () ^ maximum.GetHashCode () ^ (step == null ? 0 : step.GetHashCode ());
         }
 
         #endregion

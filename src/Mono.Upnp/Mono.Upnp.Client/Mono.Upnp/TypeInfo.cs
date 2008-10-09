@@ -57,22 +57,22 @@ namespace Mono.Upnp
 
         protected abstract string Kind { get; }
 
-        private string domain_name;
+        private readonly string domain_name;
         public string DomainName {
             get { return domain_name; }
         }
 
-        private string type;
+        private readonly string type;
         public string Type {
             get { return type; }
         }
 
-        private Version version;
+        private readonly Version version;
         public Version Version {
             get { return version; }
         }
 
-        #region Equality
+        #region Overrides
 
         public override string ToString ()
         {
@@ -90,7 +90,7 @@ namespace Mono.Upnp
 
         public override int GetHashCode ()
         {
-            return domain_name.GetHashCode () ^ type.GetHashCode () ^ version.GetHashCode ();
+            return domain_name.GetHashCode () ^ type.GetHashCode () ^ version.GetHashCode () ^ Kind.GetHashCode ();
         }
 
         public static bool operator == (TypeInfo type1, TypeInfo type2)

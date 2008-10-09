@@ -35,7 +35,6 @@ namespace Mono.Upnp.Server.Internal
 	{
         static UpnpServer ()
         {
-            ServicePointManager.Expect100Continue = false;
         }
 
         private readonly HttpListener listener;
