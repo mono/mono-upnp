@@ -97,41 +97,7 @@ namespace Mono.Upnp
         private byte[] data;
         public byte[] GetData ()
         {
-            bool wait = false;
-
-            lock (loading_mutex) {
-                if (data != null) {
-                    return data;
-                } else {
-                    CheckDisposed ();
-                    if (loading) {
-                        wait = true;
-                    } else {
-                        loading = true;
-                    }
-                }
-            }
-
-            if (wait) {
-                loading_wait.WaitOne ();
-                if (data == null && exception != null) {
-                    throw exception;
-                }
-                return data;
-            }
-
-            try {
-                FetchData ();
-                return data;
-            } catch (Exception e) {
-                exception = e;
-                throw e;
-            } finally {
-                lock (loading_mutex) {
-                    loading = false;
-                    loading_wait.Set ();
-                }
-            }
+            return EndGetData (BeginGetData (null, null));
         }
 
         public IAsyncResult BeginGetData (object state, AsyncCallback callback)
@@ -166,6 +132,7 @@ namespace Mono.Upnp
             if (result == null) {
                 throw new ArgumentException ("The provided asyncResult did not come from a call to BeginGetData.");
             }
+            result.AsyncWaitHandle.WaitOne ();
             if (result.Exception != null) {
                 throw result.Exception;
             }
