@@ -132,7 +132,9 @@ namespace Mono.Upnp
             if (result == null) {
                 throw new ArgumentException ("The provided asyncResult did not come from a call to BeginGetData.");
             }
-            result.AsyncWaitHandle.WaitOne ();
+            if (!result.IsCompleted) {
+                result.AsyncWaitHandle.WaitOne ();
+            }
             if (result.Exception != null) {
                 throw result.Exception;
             }
