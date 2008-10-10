@@ -28,6 +28,7 @@
 
 using System;
 using System.Net;
+using System.Threading;
 using System.Xml;
 
 using Mono.Upnp.Internal;
@@ -49,53 +50,167 @@ namespace Mono.Upnp
         #region Data
 
         private readonly bool loaded;
+        private bool loading;
+        private readonly object loading_mutex = new object ();
+        private AutoResetEvent loading_wait = new AutoResetEvent (false);
 
         private readonly Device device;
         public Device Device {
             get { return device; }
         }
 
-        public bool Disposed {
-            get { return device.Disposed; }
+        public bool IsDisposed {
+            get { return device.IsDisposed; }
         }
 
         private string mime_type;
         public string MimeType {
             get { return mime_type; }
+            protected set { SetField (ref mime_type, value); }
         }
 
         private int? width;
         public int Width {
             get { return width.Value; }
+            protected set { SetField (ref width, value); }
         }
 
         private int? height;
         public int Height {
             get { return height.Value; }
+            protected set { SetField (ref height, value); }
         }
 
         private int? depth;
         public int Depth {
             get { return depth.Value; }
+            protected set { SetField (ref depth, value); }
         }
 
         private Uri url;
         public Uri Url {
             get { return url; }
+            protected set { SetField (ref url, value); }
         }
 
+        private Exception exception;
         private byte[] data;
-        public byte[] Data {
-            get {
-                if (data == null) {
+        public byte[] GetData ()
+        {
+            bool wait = false;
+
+            lock (loading_mutex) {
+                if (data != null) {
+                    return data;
+                } else {
                     CheckDisposed ();
-                    WebRequest request = WebRequest.Create (Url);
-                    WebResponse response =  request.GetResponse ();
-                    data = new byte[response.ContentLength];
-                    response.GetResponseStream ().Read (data, 0, (int)response.ContentLength);
-                    response.Close ();
+                    if (loading) {
+                        wait = true;
+                    } else {
+                        loading = true;
+                    }
+                }
+            }
+
+            if (wait) {
+                loading_wait.WaitOne ();
+                if (data == null && exception != null) {
+                    throw exception;
                 }
                 return data;
+            }
+
+            try {
+                FetchData ();
+                return data;
+            } catch (Exception e) {
+                exception = e;
+                throw e;
+            } finally {
+                lock (loading_mutex) {
+                    loading = false;
+                    loading_wait.Set ();
+                }
+            }
+        }
+
+        public IAsyncResult BeginGetData (object state, AsyncCallback callback)
+        {
+            AsyncResult result = new AsyncResult (state, callback);
+
+            lock (loading_mutex) {
+                if (data != null) {
+                    result.CompletedNormally (true);
+                    return result;
+                } else {
+                    CheckDisposed ();
+                    if (loading) {
+                        ThreadPool.RegisterWaitForSingleObject (loading_wait, ResumeGetData, result, -1, true);
+                    } else {
+                        loading = true;
+                    }
+                }
+            }
+
+            ThreadPool.QueueUserWorkItem (GetDataAsync);
+
+            return result;
+        }
+
+        public byte[] EndGetData (IAsyncResult asyncResult)
+        {
+            if (asyncResult == null) {
+                throw new ArgumentNullException ("asyncResult");
+            }
+            AsyncResult result = asyncResult as AsyncResult;
+            if (result == null) {
+                throw new ArgumentException ("The provided asyncResult did not come from a call to BeginGetData.");
+            }
+            if (result.Exception != null) {
+                throw result.Exception;
+            }
+            return data;
+        }
+
+        private void GetDataAsync (object state)
+        {
+            AsyncResult result = (AsyncResult)state;
+            try {
+                FetchData ();
+                result.CompletedNormally (false);
+            } catch (Exception e) {
+                exception = e;
+                result.CompletedExceptionally (false, e);
+            }
+            lock (loading_mutex) {
+                loading = false;
+                loading_wait.Set ();
+            }
+        }
+
+        private void ResumeGetData (object state, bool timeout)
+        {
+            AsyncResult<byte[]> result = (AsyncResult<byte[]>)state;
+            if (data != null || exception == null) {
+                result.CompletedNormally (false);
+            } else {
+                result.CompletedExceptionally (false, exception);
+            }
+        }
+
+        private void FetchData ()
+        {
+            try {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create (url);
+                HttpWebResponse response = Helper.GetResponse (request);
+                data = new byte[response.ContentLength];
+                response.GetResponseStream ().Read (data, 0, (int)response.ContentLength);
+                response.Close ();
+            } catch (WebException e) {
+                if (e.Status == WebExceptionStatus.Timeout) {
+                    device.CheckNetworkPresence ();
+                }
+                throw e;
             }
         }
 
@@ -105,10 +220,29 @@ namespace Mono.Upnp
 
         protected void CheckDisposed ()
         {
-            if (Disposed) {
+            if (IsDisposed) {
                 throw new ObjectDisposedException (ToString (),
                     "This icon is longer available because its device has gone off the network.");
             }
+        }
+
+        private void CheckLoaded ()
+        {
+            if (loaded) {
+                throw new InvalidOperationException ("The icon has already been deserialized.");
+            }
+        }
+
+        private void SetField<T> (ref T field, T value)
+        {
+            CheckLoaded ();
+            field = value;
+        }
+
+        private void SetField<T> (ref T? field, T value) where T : struct
+        {
+            CheckLoaded ();
+            field = value;
         }
 
         #region Overrides
@@ -121,29 +255,12 @@ namespace Mono.Upnp
         public override bool Equals (object obj)
         {
             Icon icon = obj as Icon;
-            return icon != null &&
-                icon.device.Equals (device) &&
-                icon.mime_type == mime_type &&
-                icon.width == width &&
-                icon.height == height &&
-                icon.depth == depth &&
-                icon.url == url;
+            return icon != null && icon.url == url;
         }
 
-        private int hash;
-        private bool computed_hash;
         public override int GetHashCode ()
         {
-            if (!computed_hash) {
-                hash = device.GetHashCode () ^
-                    (mime_type == null ? 0 : mime_type.GetHashCode ()) ^
-                    (width.HasValue ? width.Value : 0) ^
-                    (height.HasValue ? (height.Value << 8 | height.Value >> 24) : 0) ^
-                    (depth.HasValue ? (depth.Value << 16 | depth.Value >> 16) : 0) ^
-                    (url == null ? 0 : url.GetHashCode ());
-                computed_hash = true;
-            }
-            return hash;
+            return url.GetHashCode ();
         }
 
         #endregion
@@ -154,7 +271,7 @@ namespace Mono.Upnp
         {
             Deserialize (headers);
             Deserialize (reader);
-            VerifyDeserialization ();
+            Verify ();
         }
 
         protected virtual void Deserialize (WebHeaderCollection headers)
@@ -176,10 +293,7 @@ namespace Mono.Upnp
 
         protected virtual void Deserialize (XmlReader reader, string element)
         {
-            if (loaded) {
-                throw new InvalidOperationException ("The icon has already been deserialized.");
-            }
-
+            CheckLoaded ();
             reader.Read ();
             switch (element) {
             case "mimetype":
@@ -198,7 +312,7 @@ namespace Mono.Upnp
                 depth = reader.ReadContentAsInt ();
                 break;
             case "url":
-                url = device.Root.DeserializeUrl (reader.ReadSubtree ());
+                url = device.GetRoot ().DeserializeUrl (reader.ReadSubtree ());
                 break;
             default: // This is a workaround for Mono bug 334752
                 reader.Skip ();
@@ -207,7 +321,7 @@ namespace Mono.Upnp
             reader.Close ();
         }
 
-        protected virtual void VerifyDeserialization ()
+        private void Verify ()
         {
             if (mime_type == null) {
                 throw new UpnpDeserializationException ("The icon has no mime-type.");
@@ -224,6 +338,11 @@ namespace Mono.Upnp
             if (url == null) {
                 throw new UpnpDeserializationException ("The icon has no URL.");
             }
+            VerifyDeserialization ();
+        }
+
+        protected virtual void VerifyDeserialization ()
+        {
         }
 
         protected internal virtual void VerifyContract ()
