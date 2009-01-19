@@ -1,10 +1,10 @@
 ﻿//
-// DefaultDeviceFactory.cs
+// DisposedEventArgs.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
 //
-// Copyright (C) 2008 S&S Black Ltd.
+// Copyright (C) 2009 S&S Black Ltd.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,34 +26,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Collections.Generic;
-using System.Net;
-using System.Xml;
+using System;
 
-namespace Mono.Upnp.Internal
+namespace Mono.Upnp
 {
-	internal class DefaultDeviceFactory : DeviceFactory
+	public class DisposedEventArgs : EventArgs
 	{
-        public override DeviceType Type {
-            get { return null; }
-        }
-
-        protected override Device CreateDeviceCore (Client client, string udn, IEnumerable<string> locations)
-        {
-            return new Device (client, udn, locations, null);
-        }
-
-        protected override Device CreateDeviceCore (DeviceFactory factory, Client client, Root root, XmlReader reader, WebHeaderCollection headers)
-        {
-            return new Device (factory, client, root, reader, headers);
-        }
-
-        public override IEnumerable<ServiceFactory> Services {
-            get { yield break; }
-        }
-
-        public override IEnumerable<DeviceFactory> Devices {
-            get { yield break; }
-        }
-    }
+        public readonly static new DisposedEventArgs Empty = new DisposedEventArgs ();
+	}
 }

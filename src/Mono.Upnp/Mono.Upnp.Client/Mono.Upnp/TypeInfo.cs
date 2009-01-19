@@ -72,8 +72,6 @@ namespace Mono.Upnp
             get { return version; }
         }
 
-        #region Overrides
-
         public override string ToString ()
         {
             string version = this.version.Minor == 0
@@ -85,7 +83,7 @@ namespace Mono.Upnp
         public override bool Equals (object obj)
         {
             TypeInfo type_info = obj as TypeInfo;
-            return type_info != null && this == type_info;
+            return type_info == this;
         }
 
         public override int GetHashCode ()
@@ -95,12 +93,11 @@ namespace Mono.Upnp
 
         public static bool operator == (TypeInfo type1, TypeInfo type2)
         {
-            if (Object.ReferenceEquals (type1, null) && Object.ReferenceEquals (type2, null)) {
-                return true;
-            } else if (Object.ReferenceEquals (type1, null) || Object.ReferenceEquals (type2, null)) {
-                return false;
+            if (ReferenceEquals (type1, null)) {
+                return ReferenceEquals (type2, null);
             }
-            return type1.domain_name == type2.domain_name &&
+            return !ReferenceEquals (type2, null) &&
+                type1.domain_name == type2.domain_name &&
                 type1.type == type2.type &&
                 type1.version == type2.version &&
                 type1.Kind == type2.Kind;
@@ -108,18 +105,7 @@ namespace Mono.Upnp
 
         public static bool operator != (TypeInfo type1, TypeInfo type2)
         {
-            if (Object.ReferenceEquals (type1, null) && Object.ReferenceEquals (type2, null)) {
-                return false;
-            } else if (Object.ReferenceEquals (type1, null) || Object.ReferenceEquals (type2, null)) {
-                return true;
-            }
-            return type1.domain_name != type2.domain_name ||
-                type1.type != type2.type ||
-                type1.version != type2.version ||
-                type1.Kind != type2.Kind;
+            return !(type1 == type2);
         }
-
-        #endregion
-
     }
 }

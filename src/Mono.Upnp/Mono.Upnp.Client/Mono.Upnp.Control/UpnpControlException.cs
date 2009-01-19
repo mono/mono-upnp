@@ -71,15 +71,15 @@ namespace Mono.Upnp.Control
         private static void Deserialize(XmlReader reader, string element, ref FaultCode code)
         {
             reader.Read ();
-            switch (element) {
-            case "errorCode":
+            switch (element.ToLower ()) {
+            case "errorcode":
                 reader.Read ();
                 int value = reader.ReadContentAsInt ();
                 code.Status = Enum.IsDefined (typeof(UpnpControlExceptionStatus), value)
                     ? (UpnpControlExceptionStatus)value
                     : UpnpControlExceptionStatus.Unknown;
                 break;
-            case "errorDescription":
+            case "errordescription":
                 code.Message = reader.ReadString ();
                 break;
             default:

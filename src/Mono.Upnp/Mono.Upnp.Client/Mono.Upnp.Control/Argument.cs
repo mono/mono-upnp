@@ -37,170 +37,113 @@ namespace Mono.Upnp.Control
 {
 	public class Argument
     {
-        #region Constructors
+        readonly Action action;
+        string name;
+        ArgumentDirection? direction;
+        string related_state_variable_name;
+        StateVariable related_state_variable;
+        bool is_return_value;
+        bool loaded;
 
-        protected Argument (Action action, XmlReader reader)
-            : this (action, reader, null)
+        protected internal Argument (Action action)
         {
-        }
-
-        protected internal Argument (Action action, XmlReader reader, WebHeaderCollection headers)
-        {
-            if (action == null) {
-                throw new ArgumentNullException ("action");
-            }
+            if (action == null) throw new ArgumentNullException ("action");
 
             this.action = action;
-            Deserialize (reader, headers);
-            loaded = true;
         }
 
-        #endregion
-
-        #region Data
-
-        private readonly bool loaded;
-
-        private readonly Action action;
         public Action Action {
             get { return action; }
         }
 
-        private string name;
         public string Name {
             get { return name; }
+            protected set { SetField (ref name, value);  }
         }
 
-        private ArgumentDirection? direction;
         public ArgumentDirection Direction {
             get { return direction.Value; }
+            protected set {
+                CheckLoaded ();
+                direction = value;
+            }
         }
 
-        private string related_state_variable_name;
+        public string RelatedStateVariableName {
+            get { return related_state_variable_name; }
+            set { SetField (ref related_state_variable_name, value);  }
+        }
 
-        private StateVariable related_state_variable;
         public StateVariable RelatedStateVariable {
             get {
                 if (related_state_variable == null) {
-                    action.Service.StateVariables.TryGetValue (related_state_variable_name, out related_state_variable);
+                    action.Controller.StateVariables.TryGetValue (related_state_variable_name, out related_state_variable);
                 }
                 return related_state_variable;
             }
         }
 
-        public Type Type {
-            get { return RelatedStateVariable.Type; }
-        }
-
-        public ReadOnlyCollection<string> AllowedValues {
-            get { return RelatedStateVariable.AllowedValues; }
-        }
-
-        public AllowedValueRange AllowedValueRange {
-            get { return RelatedStateVariable.AllowedValueRange; }
-        }
-
-        public string DefaultValue {
-            get { return RelatedStateVariable.DefaultValue; }
-        }
-
-        private bool is_return_value;
-        internal bool IsReturnValue {
+        public bool IsReturnValue {
             get { return is_return_value; }
+            protected set { SetField (ref is_return_value, value); }
         }
 
-        private string value;
-        public string Value {
-            get { return value; }
-            set {
-                if (value == null) {
-                    throw new ArgumentNullException ("value");
-                }
-                if (AllowedValues != null && !AllowedValues.Contains(value)) {
-                    throw new ArgumentException ("The value is not among the allowed values", "value");
-                }
-                // TODO this
-                //if (AllowedValueRange != null) {
-                //    double v = (double)value;
-                //    if (v < AllowedValueRange.Minimum || v > AllowedValueRange.Maximum) {
-                //        throw new ArgumentOutOfRangeException ("value");
-                //    }
-                //}
-                this.value = value;
-            }
-        }
-
-        #endregion
-
-        #region Overrides
-
-        public override string ToString ()
-        {
-            return String.Format (@"Argument {{ {0}, {1} }}",
-                name,
-                Type == typeof (string) ? String.Format (@"""{0}""", value) : value);
-        }
-
-        public override bool Equals (object obj)
-        {
-            Argument argument = obj as Argument;
-            return argument != null && argument.action.Equals (action) && argument.name == name;
-        }
-
-        public override int GetHashCode ()
-        {
-            return action.GetHashCode () ^ (name == null ? 0 : name.GetHashCode ());
-        }
-
-        #endregion
-
-        #region Deserialization
-
-        private void Deserialize (XmlReader reader, WebHeaderCollection headers)
-        {
-            Deserialize (headers);
-            Deserialize (reader);
-            VerifyDeserialization ();
-        }
-
-        protected virtual void Deserialize (WebHeaderCollection headers)
-        {
-        }
-
-        protected virtual void Deserialize (XmlReader reader)
-        {
-            try {
-                reader.Read ();
-                while (Helper.ReadToNextElement (reader)) {
-                    Deserialize (reader.ReadSubtree (), reader.Name);
-                }
-                reader.Close ();
-            } catch (Exception e) {
-                string message = String.IsNullOrEmpty (name)
-                    ? "There was a problem deserializing an argument."
-                    : String.Format ("There was a problem deserializing the argument {0}.", name);
-                throw new UpnpDeserializationException (message, e);
-            }
-        }
-
-        protected virtual void Deserialize (XmlReader reader, string element)
+        void CheckLoaded ()
         {
             if (loaded) {
                 throw new InvalidOperationException ("The argument has already been deserialized.");
             }
+        }
+
+        void SetField<T> (ref T field, T value)
+        {
+            CheckLoaded ();
+            field = value;
+        }
+
+        public void Deserialize (XmlReader reader)
+        {
+            DeserializeCore (reader);
+            VerifyDeserialization ();
+            loaded = true;
+        }
+
+        protected virtual void DeserializeCore (XmlReader reader)
+        {
+            if (reader == null) throw new ArgumentNullException ("reader");
+
+            try {
+                reader.ReadToFollowing ("argument");
+                while (Helper.ReadToNextElement (reader)) {
+                    try {
+                        DeserializeCore (reader.ReadSubtree (), reader.Name);
+                    } catch (Exception e) {
+                        Log.Exception ("There was a problem deserializing one of the argument description elements.", e);
+                    }
+                }
+                reader.Close ();
+            } catch (Exception e) {
+                throw new UpnpDeserializationException (string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+            }
+        }
+
+        protected virtual void DeserializeCore (XmlReader reader, string element)
+        {
+            if (reader == null) throw new ArgumentNullException ("reader");
+
             reader.Read ();
-            switch (element) {
+            switch (element.ToLower ()) {
             case "name":
-                name = reader.ReadString ().Trim ();
+                Name = reader.ReadString ().Trim ();
                 break;
             case "direction":
-                direction = reader.ReadString ().Trim () == "in" ? ArgumentDirection.In : ArgumentDirection.Out;
+                Direction = reader.ReadString ().Trim () == "in" ? ArgumentDirection.In : ArgumentDirection.Out;
                 break;
             case "retval":
-                is_return_value = true;
+                IsReturnValue = true;
                 break;
-            case "relatedStateVariable":
-                related_state_variable_name = reader.ReadString ().Trim ();
+            case "relatedstatevariable":
+                RelatedStateVariableName = reader.ReadString ().Trim ();
                 break;
             default: // This is a workaround for Mono bug 334752
                 reader.Skip ();
@@ -209,26 +152,30 @@ namespace Mono.Upnp.Control
             reader.Close ();
         }
 
-        protected virtual void VerifyDeserialization ()
+        void VerifyDeserialization ()
         {
-            if (String.IsNullOrEmpty (name)) {
-                throw new UpnpDeserializationException ("The argument has no name.");
+            if (name == null) {
+                throw new UpnpDeserializationException (string.Format (
+                    "An argument on {0} has no name.", action));
             }
-            if (direction == null) {
-                throw new UpnpDeserializationException (String.Format (
-                    "The argument {0} has no direction.", name));
+            if (name.Length == 0) {
+                Log.Exception (new UpnpDeserializationException (string.Format (
+                    "An argument on {0} has an empty name.", action)));
             }
             if (related_state_variable_name == null) {
-                throw new UpnpDeserializationException (String.Format (
-                    "The argument {0} has no related state variable.", name));
+                throw new UpnpDeserializationException (string.Format (
+                    "{0} has no related state variable.", ToString ()));
+            }
+            if (direction == null) {
+                Log.Exception (new UpnpDeserializationException (string.Format (
+                    "{0} has no direction, defaulting to 'in'.", ToString ())));
+                direction = ArgumentDirection.In;
             }
         }
 
-        protected internal virtual void VerifyContract ()
+        public override string ToString ()
         {
+            return string.Format (@"Argument {{ {0}, {1} }}", action, name);
         }
-
-        #endregion
-
     }
 }

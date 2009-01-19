@@ -1,10 +1,10 @@
 ﻿//
-// OfflineStateVariable.cs
+// DeserializationException.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
 //
-// Copyright (C) 2008 S&S Black Ltd.
+// Copyright (C) 2009 S&S Black Ltd.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,33 +26,20 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Xml;
+using System;
 
-using Mono.Upnp.Control;
-
-namespace Mono.Upnp.Dcp.Sharpener
+namespace Mono.Upnp
 {
-	public class OfflineStateVariable : StateVariable
-	{
-        public OfflineStateVariable (ServiceController service)
-            : base (service)
+    public class DeserializationException : Exception
+    {
+        public DeserializationException (string message)
+            : base (message)
         {
         }
 
-        private bool optional;
-        public bool IsOptional
+        public DeserializationException (string message, Exception innerException)
+            : base (message, innerException)
         {
-            get { return optional; }
         }
-
-        protected override void DeserializeCore (XmlReader reader, string element)
-        {
-            if (element.ToLower () == "optional") {
-                optional = true;
-                reader.Close ();
-            } else {
-                base.DeserializeCore (reader, element);
-            }
-        }
-	}
+    }
 }

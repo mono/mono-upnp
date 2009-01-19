@@ -1,10 +1,10 @@
 ﻿//
-// OfflineService.cs
+// IDisposer.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
 //
-// Copyright (C) 2008 S&S Black Ltd.
+// Copyright (C) 200 S&S Black Ltd.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,31 +26,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Xml;
-
-using Mono.Upnp;
-
-namespace Mono.Upnp.Dcp.Sharpener
+namespace Mono.Upnp.Description
 {
-	internal class OfflineService : Service
+	public interface IDisposer
 	{
-        public OfflineService (XmlReader reader)
-            : base (null, reader)
-        {
-        }
-
-        protected override void VerifyDeserialization ()
-        {
-        }
-
-        protected override void DeserializeAction (XmlReader reader)
-        {
-            AddAction (new OfflineAction (this, reader));
-        }
-
-        protected override void DeserializeStateVariable (XmlReader reader)
-        {
-            AddStateVariable (new OfflineStateVariable (this, reader));
-        }
+        void TryDispose (ServiceDescription service);
+        void TryDispose (DeviceDescription device);
 	}
 }

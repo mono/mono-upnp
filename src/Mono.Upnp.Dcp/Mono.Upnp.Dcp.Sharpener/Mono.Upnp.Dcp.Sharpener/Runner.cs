@@ -66,7 +66,28 @@ namespace Mono.Upnp.Dcp.Sharpener
             get { return enumeration_names; }
         }
 
-        protected void WriteEnums (Service service)
+        protected void WriteHelpers ()
+        {
+            CodeMonkey monkey = new CodeMonkey ("DiscoveryEventArgs.cs");
+            monkey.Write ("// {0}.cs auto-generated at {1} by Sharpener", Context.ClassName, DateTime.Now);
+            monkey.WriteLine ();
+            monkey.WriteUsing ("System");
+            monkey.WriteLine ();
+            monkey.StartWriteBlock ("namespace {0}", Context.Namespace);
+            monkey.StartWriteBlock ("public class DiscoveryEventArgs<T> : EventArgs");
+            monkey.WriteLine ("readonly T item;");
+            monkey.StartWriteBlock ("internal DiscoveryEventArgs (T item)");
+            monkey.WriteLine ("this.item = item;");
+            monkey.EndWriteBlock ();
+            monkey.StartWriteBlock ("public T Item", false);
+            monkey.WriteLine ("get { return item; }");
+            monkey.EndWriteBlock ();
+            monkey.EndWriteBlock ();
+            monkey.EndWriteBlock ();
+            monkey.Close ();
+        }
+
+        protected void WriteEnums (ServiceController service)
         {
             foreach (StateVariable variable in service.StateVariables.Values) {
                 if (variable.AllowedValues != null) {

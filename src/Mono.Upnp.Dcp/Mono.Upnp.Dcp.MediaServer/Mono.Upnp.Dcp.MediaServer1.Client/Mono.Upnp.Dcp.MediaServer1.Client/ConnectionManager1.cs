@@ -1,100 +1,102 @@
-// ConnectionManager1.cs auto-generated at 10/9/2008 2:49:26 AM by Sharpener
+// ConnectionManager1.cs auto-generated at 1/18/2009 9:31:12 PM by Sharpener
 
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Xml;
 
+using Mono.Upnp.Discovery;
+using Mono.Upnp.Description;
 using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Dcp.MediaServer1
 {
-    public class ConnectionManager1 : Service
+    public class ConnectionManager1
     {
-        internal ConnectionManager1 (Client client, string deviceId, IEnumerable<string> locations)
-            : base (client, deviceId, locations, ConnectionManager1Factory.ServiceType)
+        public static readonly ServiceType ServiceType = new ServiceType ("urn:schemas-upnp-org:service:ConnectionManager:1");
+        readonly ServiceController controller;
+        public ConnectionManager1 (ServiceAnnouncement announcement)
         {
-        }
-
-        internal ConnectionManager1 (Device device, XmlReader reader, WebHeaderCollection headers)
-            : base (device, reader, headers)
-        {
+            if (announcement == null) throw new ArgumentNullException ("announcement");
+            controller = announcement.GetDescription ().GetController ();
+            Verify ();
         }
 
         public void GetProtocolInfo (out string source, out string sink)
         {
-            Action action = Actions["GetProtocolInfo"];
-            action.Invoke ();
-            source = action.OutArguments["Source"].Value;
-            sink = action.OutArguments["Sink"].Value;
+            ActionResult action_result = controller.Actions["GetProtocolInfo"].Invoke ();
+            source = action_result.OutValues["Source"];
+            sink = action_result.OutValues["Sink"];
         }
 
-        public bool CanPrepareForConnection { get { return Actions.ContainsKey("PrepareForConnection"); } }
+        public bool CanPrepareForConnection { get { return controller.Actions.ContainsKey ("PrepareForConnection"); } }
         public void PrepareForConnection (string remoteProtocolInfo, string peerConnectionManager, int peerConnectionID, Direction direction, out string connectionID, out string aVTransportID, out string rcsID)
         {
             if (!CanPrepareForConnection) throw new NotImplementedException ();
-            Action action = Actions["PrepareForConnection"];
-            action.InArguments["RemoteProtocolInfo"].Value = remoteProtocolInfo;
-            action.InArguments["PeerConnectionManager"].Value = peerConnectionManager;
-            action.InArguments["PeerConnectionID"].Value = peerConnectionID.ToString ();
-            action.InArguments["Direction"].Value = direction.ToString ();
-            action.Invoke ();
-            connectionID = action.OutArguments["ConnectionID"].Value;
-            aVTransportID = action.OutArguments["AVTransportID"].Value;
-            rcsID = action.OutArguments["RcsID"].Value;
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (4);
+            in_arguments.Add ("RemoteProtocolInfo", remoteProtocolInfo);
+            in_arguments.Add ("PeerConnectionManager", peerConnectionManager);
+            in_arguments.Add ("PeerConnectionID", peerConnectionID.ToString ());
+            in_arguments.Add ("Direction", direction.ToString ());
+            ActionResult action_result = controller.Actions["PrepareForConnection"].Invoke (in_arguments);
+            connectionID = action_result.OutValues["ConnectionID"];
+            aVTransportID = action_result.OutValues["AVTransportID"];
+            rcsID = action_result.OutValues["RcsID"];
         }
 
-        public bool CanConnectionComplete { get { return Actions.ContainsKey("ConnectionComplete"); } }
+        public bool CanConnectionComplete { get { return controller.Actions.ContainsKey ("ConnectionComplete"); } }
         public void ConnectionComplete (int connectionID)
         {
             if (!CanConnectionComplete) throw new NotImplementedException ();
-            Action action = Actions["ConnectionComplete"];
-            action.InArguments["ConnectionID"].Value = connectionID.ToString ();
-            action.Invoke ();
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
+            in_arguments.Add ("ConnectionID", connectionID.ToString ());
+            ActionResult action_result = controller.Actions["ConnectionComplete"].Invoke (in_arguments);
         }
 
         public string GetCurrentConnectionIDs ()
         {
-            Action action = Actions["GetCurrentConnectionIDs"];
-            action.Invoke ();
-            return action.OutArguments["ConnectionIDs"].Value;
+            ActionResult action_result = controller.Actions["GetCurrentConnectionIDs"].Invoke ();
+            return action_result.OutValues["ConnectionIDs"];
         }
 
         public void GetCurrentConnectionInfo (int connectionID, out string rcsID, out string aVTransportID, out string protocolInfo, out string peerConnectionManager, out string peerConnectionID, out string direction, out string status)
         {
-            Action action = Actions["GetCurrentConnectionInfo"];
-            action.InArguments["ConnectionID"].Value = connectionID.ToString ();
-            action.Invoke ();
-            rcsID = action.OutArguments["RcsID"].Value;
-            aVTransportID = action.OutArguments["AVTransportID"].Value;
-            protocolInfo = action.OutArguments["ProtocolInfo"].Value;
-            peerConnectionManager = action.OutArguments["PeerConnectionManager"].Value;
-            peerConnectionID = action.OutArguments["PeerConnectionID"].Value;
-            direction = action.OutArguments["Direction"].Value;
-            status = action.OutArguments["Status"].Value;
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
+            in_arguments.Add ("ConnectionID", connectionID.ToString ());
+            ActionResult action_result = controller.Actions["GetCurrentConnectionInfo"].Invoke (in_arguments);
+            rcsID = action_result.OutValues["RcsID"];
+            aVTransportID = action_result.OutValues["AVTransportID"];
+            protocolInfo = action_result.OutValues["ProtocolInfo"];
+            peerConnectionManager = action_result.OutValues["PeerConnectionManager"];
+            peerConnectionID = action_result.OutValues["PeerConnectionID"];
+            direction = action_result.OutValues["Direction"];
+            status = action_result.OutValues["Status"];
         }
 
-        public event EventHandler<StateVariableChangedArgs<string>> SourceProtocolInfoChanged {
-            add { StateVariables["SourceProtocolInfo"].Changed += value; }
-            remove { StateVariables["SourceProtocolInfo"].Changed -= value; }
-        }
-
-        public event EventHandler<StateVariableChangedArgs<string>> SinkProtocolInfoChanged {
-            add { StateVariables["SinkProtocolInfo"].Changed += value; }
-            remove { StateVariables["SinkProtocolInfo"].Changed -= value; }
-        }
-
-        public event EventHandler<StateVariableChangedArgs<string>> CurrentConnectionIDsChanged {
-            add { StateVariables["CurrentConnectionIDs"].Changed += value; }
-            remove { StateVariables["CurrentConnectionIDs"].Changed -= value; }
-        }
-
-        protected override void VerifyContract ()
+        public event EventHandler<StateVariableChangedArgs<string>> SourceProtocolInfoChanged
         {
-            base.VerifyContract ();
-            if (!Actions.ContainsKey ("GetProtocolInfo")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type {1} but it does not have the required action GetProtocolInfo.", Id, Type));
-            if (!Actions.ContainsKey ("GetCurrentConnectionIDs")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type {1} but it does not have the required action GetCurrentConnectionIDs.", Id, Type));
-            if (!Actions.ContainsKey ("GetCurrentConnectionInfo")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type {1} but it does not have the required action GetCurrentConnectionInfo.", Id, Type));
+            add { controller.StateVariables["SourceProtocolInfo"].Changed += value; }
+            remove { controller.StateVariables["SourceProtocolInfo"].Changed -= value; }
+        }
+
+        public event EventHandler<StateVariableChangedArgs<string>> SinkProtocolInfoChanged
+        {
+            add { controller.StateVariables["SinkProtocolInfo"].Changed += value; }
+            remove { controller.StateVariables["SinkProtocolInfo"].Changed -= value; }
+        }
+
+        public event EventHandler<StateVariableChangedArgs<string>> CurrentConnectionIDsChanged
+        {
+            add { controller.StateVariables["CurrentConnectionIDs"].Changed += value; }
+            remove { controller.StateVariables["CurrentConnectionIDs"].Changed -= value; }
+        }
+
+        void Verify ()
+        {
+            if (!controller.Actions.ContainsKey ("GetProtocolInfo")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ConnectionManager:1 but it does not have the required action GetProtocolInfo.", controller.Description.Id));
+            if (!controller.Actions.ContainsKey ("GetCurrentConnectionIDs")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ConnectionManager:1 but it does not have the required action GetCurrentConnectionIDs.", controller.Description.Id));
+            if (!controller.Actions.ContainsKey ("GetCurrentConnectionInfo")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ConnectionManager:1 but it does not have the required action GetCurrentConnectionInfo.", controller.Description.Id));
+            if (!controller.StateVariables.ContainsKey ("SourceProtocolInfo")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ConnectionManager:1 but it does not have the required state variable SourceProtocolInfo.", controller.Description.Id));
+            if (!controller.StateVariables.ContainsKey ("SinkProtocolInfo")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ConnectionManager:1 but it does not have the required state variable SinkProtocolInfo.", controller.Description.Id));
+            if (!controller.StateVariables.ContainsKey ("CurrentConnectionIDs")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ConnectionManager:1 but it does not have the required state variable CurrentConnectionIDs.", controller.Description.Id));
         }
     }
 }

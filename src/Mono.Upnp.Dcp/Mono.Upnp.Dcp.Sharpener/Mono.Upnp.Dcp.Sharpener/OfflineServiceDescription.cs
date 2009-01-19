@@ -1,10 +1,10 @@
 ﻿//
-// OfflineStateVariable.cs
+// OfflineServiceDescription.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
 //
-// Copyright (C) 2008 S&S Black Ltd.
+// Copyright (C) 200 S&S Black Ltd.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,33 +26,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Xml;
-
-using Mono.Upnp.Control;
+using Mono.Upnp.Description;
 
 namespace Mono.Upnp.Dcp.Sharpener
 {
-	public class OfflineStateVariable : StateVariable
+	class OfflineServiceDescription : ServiceDescription
 	{
-        public OfflineStateVariable (ServiceController service)
-            : base (service)
+        public OfflineServiceDescription ()
+            : base (OfflineDisposer.Instance)
         {
         }
 
-        private bool optional;
-        public bool IsOptional
-        {
-            get { return optional; }
-        }
-
-        protected override void DeserializeCore (XmlReader reader, string element)
-        {
-            if (element.ToLower () == "optional") {
-                optional = true;
-                reader.Close ();
-            } else {
-                base.DeserializeCore (reader, element);
-            }
-        }
+        public static OfflineServiceDescription Instance = new OfflineServiceDescription ();
 	}
 }

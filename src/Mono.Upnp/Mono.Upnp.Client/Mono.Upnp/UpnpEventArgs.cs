@@ -1,5 +1,5 @@
 ﻿//
-// ServiceFactory.cs
+// UpnpEventArgs.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -26,51 +26,54 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Collections.Generic;
-using System.Net;
-using System.Xml;
+using System;
+using Mono.Upnp.Discovery;
 
 namespace Mono.Upnp
 {
-    public abstract class ServiceFactory
+    public enum UpnpOperation
     {
-        private bool verify;
+        Added,
+        Removed
+    }
 
-        protected ServiceFactory ()
-            : this (true)
+	public class DeviceEventArgs : EventArgs
+	{
+        readonly DeviceAnnouncement device;
+        readonly UpnpOperation operation;
+
+        internal DeviceEventArgs (DeviceAnnouncement device, UpnpOperation operation)
         {
+            this.device = device;
+            this.operation = operation;
         }
 
-        protected ServiceFactory (bool verify)
-        {
-            this.verify = verify;
+        public DeviceAnnouncement Device {
+            get { return device; }
         }
 
-        public bool Verify {
-            get { return verify; }
-            set { verify = value; }
+        public UpnpOperation Operation {
+            get { return operation; }
+        }
+	}
+
+    public class ServiceEventArgs : EventArgs
+    {
+        readonly ServiceAnnouncement service;
+        readonly UpnpOperation operation;
+
+        public ServiceEventArgs (ServiceAnnouncement service, UpnpOperation operation)
+        {
+            this.service = service;
+            this.operation = operation;
         }
 
-        public abstract ServiceType Type { get; }
-        protected abstract Service CreateServiceCore (Client client, string deviceId, IEnumerable<string> locations);
-        protected abstract Service CreateServiceCore (Device device, XmlReader reader, WebHeaderCollection headers);
-
-        internal Service CreateService (Client client, string deviceId, IEnumerable<string> locations)
-        {
-            Service service = CreateServiceCore (client, deviceId, locations);
-            if (verify) {
-                service.VerifyContract ();
-            }
-            return service;
+        public ServiceAnnouncement Service {
+            get { return service; }
         }
 
-        internal Service CreateService (Device device, XmlReader reader, WebHeaderCollection headers)
-        {
-            Service service = CreateServiceCore (device, reader, headers);
-            if (verify) {
-                service.VerifyContract ();
-            }
-            return service;
+        public UpnpOperation Operation {
+            get { return operation; }
         }
     }
 }

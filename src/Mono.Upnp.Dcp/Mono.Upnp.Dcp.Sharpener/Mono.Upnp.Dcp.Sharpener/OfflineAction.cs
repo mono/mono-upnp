@@ -34,8 +34,8 @@ namespace Mono.Upnp.Dcp.Sharpener
 {
 	public class OfflineAction : Action
 	{
-        public OfflineAction (Service service, XmlReader reader)
-            : base (service, reader)
+        public OfflineAction (ServiceController service)
+            : base (service)
         {
         }
 
@@ -44,13 +44,13 @@ namespace Mono.Upnp.Dcp.Sharpener
             get { return optional; }
         }
 
-        protected override void Deserialize (XmlReader reader, string element)
+        protected override void DeserializeCore (XmlReader reader, string element)
         {
             if (element.ToLower () == "optional") {
                 optional = true;
                 reader.Close ();
             } else {
-                base.Deserialize (reader, element);
+                base.DeserializeCore (reader, element);
             }
         }
 	}

@@ -1,10 +1,10 @@
 ﻿//
-// DefaultServiceFactory.cs
+// IDeserializerFactory.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
 //
-// Copyright (C) 2008 S&S Black Ltd.
+// Copyright (C) 200 S&S Black Ltd.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,26 +26,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Collections.Generic;
-using System.Net;
-using System.Xml;
-
-namespace Mono.Upnp.Internal
+namespace Mono.Upnp.Description
 {
-    internal class DefaultServiceFactory : ServiceFactory
-    {
-        public override ServiceType Type {
-            get { return null; }
-        }
-
-        protected override Service CreateServiceCore (Client client, string deviceId, IEnumerable<string> locations)
-        {
-            return new Service (client, deviceId, locations, null);
-        }
-
-        protected override Service CreateServiceCore (Device device, XmlReader reader, WebHeaderCollection headers)
-        {
-            return new Service (device, reader, headers);
-        }
-    }
+	public interface IDeserializerFactory
+	{
+        IDeserializer CreateDeserializer ();
+	}
 }

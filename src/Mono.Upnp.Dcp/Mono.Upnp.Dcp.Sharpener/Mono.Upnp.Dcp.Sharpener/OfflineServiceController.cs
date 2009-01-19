@@ -1,5 +1,5 @@
 ﻿//
-// OfflineDevice.cs
+// OfflineServiceController.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -28,20 +28,25 @@
 
 using System.Xml;
 
+using Mono.Upnp.Control;
+
 namespace Mono.Upnp.Dcp.Sharpener
 {
-	internal class OfflineDevice : Device
+	class OfflineServiceController : ServiceController
 	{
-        public OfflineDevice (XmlReader reader)
-            : base (null, null, null, reader)
+        public OfflineServiceController ()
+            : base (OfflineServiceDescription.Instance)
         {
         }
 
-        protected override void Deserialize (XmlReader reader, string element)
+        protected override Action CreateAction ()
         {
-            if (element == "deviceType") {
-                base.Deserialize (reader, element);
-            }
+            return new OfflineAction (this);
+        }
+
+        protected override StateVariable CreateStateVariable ()
+        {
+            return new OfflineStateVariable (this);
         }
 	}
 }

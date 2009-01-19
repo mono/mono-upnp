@@ -31,37 +31,37 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 
+using Mono.Upnp.Control;
+
 namespace Mono.Upnp.Internal
 {
 	internal class EventSubscriber : IDisposable
 	{
-        private static int id;
+        static int id;
 
-        private readonly object mutex = new object ();
-        private Service service;
-        private TimeoutDispatcher dispatcher = new TimeoutDispatcher();
-        private bool started;
-        private bool confidently_subscribed;
-        private uint expire_timeout_id;
-        private uint renew_timeout_id;
-        private HttpListener listener;
-        private string prefix;
+        readonly object mutex = new object ();
+        ServiceController controller;
+        TimeoutDispatcher dispatcher = new TimeoutDispatcher();
+        bool started;
+        bool confidently_subscribed;
+        uint expire_timeout_id;
+        uint renew_timeout_id;
+        HttpListener listener;
+        string prefix;
 
-        private string delivery_url;
-        private string subscription_uuid;
+        string delivery_url;
+        string subscription_uuid;
 
-        public event EventHandler Timeout;
-
-        public EventSubscriber (Service service)
+        public EventSubscriber (ServiceController serviceDescription)
         {
-            this.service = service;
+            controller = serviceDescription;
             // TODO relocate this stuff?
             prefix = GeneratePrefix ();
             delivery_url = String.Format ("<{0}>", prefix);
         }
 
-        private static readonly Random random = new Random ();
-        private string GeneratePrefix ()
+        static readonly Random random = new Random ();
+        string GeneratePrefix ()
         {
             foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
                 if (address.AddressFamily == AddressFamily.InterNetwork) {
@@ -85,7 +85,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private void StartListening ()
+        void StartListening ()
         {
             if (listener == null) {
                 listener = new HttpListener ();
@@ -95,12 +95,12 @@ namespace Mono.Upnp.Internal
             listener.BeginGetContext (OnGotContext, listener);
         }
 
-        private void OnGotContext (IAsyncResult asyncResult)
+        void OnGotContext (IAsyncResult asyncResult)
         {
             HttpListener listener = (HttpListener)asyncResult.AsyncState;
             HttpListenerContext context = listener.EndGetContext (asyncResult);
             try {
-                service.DeserializeEvents (context.Request);
+                controller.DeserializeEvents (context.Request);
             } catch {
                 // TODO log
             }
@@ -108,15 +108,15 @@ namespace Mono.Upnp.Internal
             listener.BeginGetContext (OnGotContext, listener);
         }
 
-        private void StopListening ()
+        void StopListening ()
         {
             listener.Stop ();
         }
 
-        private void Subscribe ()
+        void Subscribe ()
         {
             lock (mutex) {
-                WebRequest request = WebRequest.Create (service.EventUrl);
+                WebRequest request = WebRequest.Create (controller.Description.EventUrl);
                 request.Method = "SUBSCRIBE";
                 request.Headers.Add ("CALLBACK", delivery_url);
                 request.Headers.Add ("NT", "upnp:event");
@@ -126,7 +126,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private bool OnSubscribeTimeout (object state, ref TimeSpan interval)
+        bool OnSubscribeTimeout (object state, ref TimeSpan interval)
         {
             lock (mutex) {
                 expire_timeout_id = 0;
@@ -136,13 +136,13 @@ namespace Mono.Upnp.Internal
                     Stop ();
                     // TODO retry
                     Log.Exception (new UpnpException ("Failed to subscribe or renew. The server did not respond in 30 seconds."));
-                    Timeout (this, EventArgs.Empty);
+                    controller.Description.CheckDisposed ();
                 }
                 return false;
             }
         }
 
-        private void OnSubscribeResponse (IAsyncResult asyncResult)
+        void OnSubscribeResponse (IAsyncResult asyncResult)
         {
             lock (mutex) {
                 if (expire_timeout_id != 0) {
@@ -174,13 +174,13 @@ namespace Mono.Upnp.Internal
                     // TODO more info
                     Log.Exception (new UpnpException ("Failed to subscribe or renew.", e));
                     if (e.Status == WebExceptionStatus.Timeout) {
-                        Timeout (this, EventArgs.Empty);
+                        controller.Description.CheckDisposed ();
                     }
                 }
             }
         }
 
-        private bool OnRenewTimeout (object state, ref TimeSpan interval)
+        bool OnRenewTimeout (object state, ref TimeSpan interval)
         {
             lock (mutex) {
                 if (started) {
@@ -191,10 +191,10 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private void Renew ()
+        void Renew ()
         {
             lock (mutex) {
-                WebRequest request = WebRequest.Create (service.EventUrl);
+                WebRequest request = WebRequest.Create (controller.Description.EventUrl);
                 request.Method = "SUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
                 request.BeginGetResponse (OnSubscribeResponse, request);
@@ -203,10 +203,10 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private void Unsubscribe ()
+        void Unsubscribe ()
         {
             lock (mutex) {
-                WebRequest request = WebRequest.Create (service.EventUrl);
+                WebRequest request = WebRequest.Create (controller.Description.EventUrl);
                 request.Method = "UNSUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
                 request.BeginGetResponse (OnUnsubscribeResponse, request);
@@ -214,7 +214,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private void OnUnsubscribeResponse (IAsyncResult asyncResult)
+        void OnUnsubscribeResponse (IAsyncResult asyncResult)
         {
             try {
                 WebResponse response = ((WebRequest)asyncResult).EndGetResponse (asyncResult);

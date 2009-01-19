@@ -111,12 +111,11 @@ namespace Mono.Upnp.Server
 
         public static bool operator == (TypeInfo type1, TypeInfo type2)
         {
-            if (Object.ReferenceEquals (type1, null) && Object.ReferenceEquals (type2, null)) {
-                return true;
-            } else if (Object.ReferenceEquals (type1, null) || Object.ReferenceEquals (type2, null)) {
-                return false;
+            if (ReferenceEquals (type1, null)) {
+                return ReferenceEquals (type2, null);
             }
-            return type1.DomainName == type2.DomainName &&
+            return !ReferenceEquals (type2, null) &&
+                type1.DomainName == type2.DomainName &&
                 type1.Type == type2.Type &&
                 type1.Version == type2.Version &&
                 type1.Kind == type2.Kind;
@@ -124,12 +123,11 @@ namespace Mono.Upnp.Server
 
         public static bool operator != (TypeInfo type1, TypeInfo type2)
         {
-            if (Object.ReferenceEquals (type1, null) && Object.ReferenceEquals (type2, null)) {
-                return false;
-            } else if (Object.ReferenceEquals (type1, null) || Object.ReferenceEquals (type2, null)) {
-                return true;
+            if (ReferenceEquals (type1, null)) {
+                return !ReferenceEquals (type2, null);
             }
-            return type1.DomainName != type2.DomainName ||
+            return ReferenceEquals (type2, null) ||
+                type1.DomainName != type2.DomainName ||
                 type1.Type != type2.Type ||
                 type1.Version != type2.Version ||
                 type1.Kind != type2.Kind;

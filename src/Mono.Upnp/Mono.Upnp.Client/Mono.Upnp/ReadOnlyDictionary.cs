@@ -34,14 +34,12 @@ namespace Mono.Upnp
 {
 	public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
-        private const string error = "Dictionary is read-only.";
-        private readonly IDictionary<TKey, TValue> dictionary;
+        const string error = "Dictionary is read-only.";
+        readonly IDictionary<TKey, TValue> dictionary;
 
         public ReadOnlyDictionary (IDictionary<TKey, TValue> dictionary)
         {
-            if (dictionary == null) {
-                throw new ArgumentNullException ("dictionary");
-            }
+            if (dictionary == null) throw new ArgumentNullException ("dictionary");
             this.dictionary = dictionary;
         }
 

@@ -1,5 +1,5 @@
 ﻿//
-// SoapAdapter.cs
+// SoapInvoker.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -37,83 +37,100 @@ using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Internal
 {
-	internal class SoapAdapter
+	class SoapInvoker
 	{
         // The UPnP spec defines a fallback scheme for the SOAP requests. Also, SOME PEOPLE *cough*Rhapsody*cough*
         // have decided that they know better than the rest of us and only accept ASCII requests despite the fact
         // that the spec VERY EXPLICTLY calls for UTF-8 encoding ONLY. Ug. Anyway, we do fallback for all of this
         // shit and we remember what we do on a per-host basis so that we do it right the first time the next time.
-        private class FallbackInfo
+        class FallbackInfo
         {
             public bool OmitMan = true;
             public bool Chuncked = true;
             public bool UseUtf8 = true;
+            public FallbackInfo Clone ()
+            {
+                FallbackInfo fallback = new FallbackInfo ();
+                fallback.OmitMan = OmitMan;
+                fallback.Chuncked = Chuncked;
+                fallback.UseUtf8 = UseUtf8;
+                return fallback;
+            }
         }
 
-        static Dictionary<string, FallbackInfo> fallbacks = new Dictionary<string, FallbackInfo> ();
+        readonly static Dictionary<string, FallbackInfo> fallbacks = new Dictionary<string, FallbackInfo> ();
 
-        static SoapAdapter ()
+        static SoapInvoker ()
         {
             ServicePointManager.Expect100Continue = false;
         }
 
-        private delegate HttpWebRequest RequestProvider (Action action, WebHeaderCollection headers);
-        private delegate HttpWebResponse RequestHandler (HttpWebRequest request, Action action, Stream stream);
+        delegate HttpWebRequest RequestProvider (Action action, WebHeaderCollection headers);
+        delegate HttpWebResponse RequestHandler (HttpWebRequest request, Action action, Stream stream);
 
-        private Uri location;
-        private FallbackInfo fallback;
+        Uri location;
+        FallbackInfo fallback;
 
-        public SoapAdapter (Uri location)
+        public SoapInvoker (Uri location)
         {
             this.location = location;
             if (fallbacks.ContainsKey (location.Host)) {
-                fallback = fallbacks[location.Host];
+                fallback = fallbacks[location.Host].Clone ();
+                fallbacks[location.Host] = fallback;
             } else {
                 fallback = new FallbackInfo ();
                 fallbacks.Add (location.Host, fallback);
             }
         }
 
-        public void Invoke (Action action)
+        public ActionResult Invoke (Action action, IDictionary<string, string> arguments)
         {
             Encoding encoding = fallback.UseUtf8 ? Encoding.UTF8 : Encoding.ASCII;
             Encoding fallbackEncoding = fallback.UseUtf8 ? Encoding.ASCII : Encoding.UTF8;
-            if (!Invoke (action, encoding, false)) {
+            ActionResult result;
+            if (!Invoke (action, arguments, encoding, false, out result)) {
                 fallback.UseUtf8 = !fallback.UseUtf8;
-                Invoke (action, fallbackEncoding, true);
+                Invoke (action, arguments, fallbackEncoding, true, out result);
             }
+            return result;
         }
 
-        private bool Invoke (Action action, Encoding encoding, bool isFallback)
+        private bool Invoke (Action action, IDictionary<string, string> arguments, Encoding encoding, bool isFallback, out ActionResult result)
         {
-            WebHeaderCollection headers = new WebHeaderCollection ();
+            // Because we may do several fallbacks, we serialize to a memory stream and copy that
+            // to the network stream. That way we only have to serialize once (unless we have to
+            // try a different encoding scheme).
             Stream stream = new MemoryStream ();
+            WebHeaderCollection headers = new WebHeaderCollection ();
 
             try {
                 XmlWriterSettings settings = new XmlWriterSettings ();
                 settings.Encoding = encoding;
                 XmlWriter writer = XmlWriter.Create (stream, settings);
-                action.SerializeRequest (headers, writer);
+                action.SerializeRequest (arguments, headers, writer);
                 writer.Close ();
 
                 HttpWebResponse response = GetResponse (action, headers, stream);
                 try {
                     if (response.StatusCode == HttpStatusCode.OK) {
-                        action.DeserializeResponse (response);
+                        result = action.DeserializeResponse (response);
                         return true;
                     } else if (response.StatusCode == HttpStatusCode.InternalServerError) {
                         if (isFallback) {
-                            action.DeserializeResponseFault (response);
-                            return true;
+                            throw action.DeserializeResponseFault (response);
                         } else {
+                            result = null;
                             return false;
                         }
                     } else {
-                        return true;
+                        throw new UpnpException (String.Format (
+                            "There was an unknown error while invoking the action: the service returned status code {0}.", response.StatusCode));
                     }
                 } finally {
                     response.Close ();
                 }
+            } catch (Exception e) {
+                throw new UpnpException ("There was an unknown error while invoking the action.", e);
             } finally {
                 stream.Close ();
             }
@@ -153,7 +170,7 @@ namespace Mono.Upnp.Internal
             fallback.OmitMan = true;
             HttpWebRequest request = CreateRequest (headers);
             request.Method = "POST";
-            request.Headers.Add ("SOAPACTION", String.Format (@"""{0}#{1}""", action.Service.Type, action.Name));
+            request.Headers.Add ("SOAPACTION", String.Format (@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
             return request;
         }
 
@@ -163,7 +180,7 @@ namespace Mono.Upnp.Internal
             HttpWebRequest request = CreateRequest (headers);
             request.Method = "M-POST";
             request.Headers.Add ("MAN", String.Format (@"""{0}""; ns=01", Protocol.SoapEnvelopeSchema));
-            request.Headers.Add ("01-SOAPACTION", String.Format (@"""{0}#{1}""", action.Service.Type, action.Name));
+            request.Headers.Add ("01-SOAPACTION", String.Format (@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
             return request;
         }
 

@@ -77,7 +77,17 @@ namespace Mono.Upnp.Internal
 
         public static HttpWebResponse GetResponse (Uri location)
         {
-            return GetResponse ((HttpWebRequest)WebRequest.Create (location), 1);
+            return GetResponse ((HttpWebRequest)WebRequest.Create (location));
+        }
+
+        public static HttpWebResponse GetResponse (Uri location, int retry)
+        {
+            return GetResponse ((HttpWebRequest)WebRequest.Create (location), retry);
+        }
+
+        public static HttpWebResponse GetResponse (HttpWebRequest request)
+        {
+            return GetResponse (request, 1);
         }
 
         public static HttpWebResponse GetResponse (HttpWebRequest request, int retry)
@@ -115,38 +125,6 @@ namespace Mono.Upnp.Internal
             writer.WriteEndElement ();
             writer.WriteEndElement ();
             writer.WriteEndDocument ();
-        }
-
-        public static Device DeserializeDevice (DeviceFactory parentFactory, Client client, Root root, XmlReader reader, WebHeaderCollection headers)
-        {
-            // Life would be much easier if the device type were an attribute in the device node.
-            string xml = reader.ReadOuterXml ();
-
-            reader = XmlReader.Create (new StringReader (xml));
-            reader.ReadToFollowing ("deviceType");
-            DeviceType type = new DeviceType (reader.ReadString ());
-            reader.Close ();
-
-            DeviceFactory factory = null;
-
-            if (parentFactory != null) {
-                foreach (DeviceFactory device_factory in parentFactory.Devices) {
-                    if (device_factory.Type == type) {
-                        factory = device_factory;
-                        break;
-                    }
-                }
-            }
-
-            try {
-                return factory.CreateDevice (client, root, XmlReader.Create (new StringReader (xml)), headers);
-            } catch {
-                try {
-                    return client.DeviceFactories[type].CreateDevice (client, root, XmlReader.Create (new StringReader (xml)), headers);
-                } catch {
-                    return client.DefaultDeviceFactory.CreateDevice (client, root, XmlReader.Create (new StringReader (xml)), headers);
-                }
-            }
         }
 	}
 }

@@ -49,12 +49,13 @@ namespace Mono.Upnp.Dcp.Sharpener
 
         protected override void RunService ()
         {
-            Service service = new OfflineService (Context.Reader);
+            ServiceController service = new OfflineServiceController ();
+            service.Deserialize (Context.Reader);
             WriteEnums (service);
             WriteService (service);
         }
 
-        private void WriteService (Service service)
+        private void WriteService (ServiceController service)
         {
             CodeMonkey monkey = new CodeMonkey (Context.ClassName + ".cs");
             StartWriteService (monkey, service);
@@ -64,7 +65,7 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.Close ();
         }
 
-        private void StartWriteService (CodeMonkey monkey, Service service)
+        private void StartWriteService (CodeMonkey monkey, ServiceController service)
         {
             monkey.Write ("// {0}.cs auto-generated at {1} by Sharpener", Context.ClassName, DateTime.Now);
             monkey.WriteLine ();
@@ -85,7 +86,7 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.WriteLine ("}");
         }
 
-        private void WriteMethods (CodeMonkey monkey, Service service)
+        private void WriteMethods (CodeMonkey monkey, ServiceController service)
         {
             foreach (Action action in service.Actions.Values) {
                 WriteMethod (monkey, action);
@@ -111,7 +112,7 @@ namespace Mono.Upnp.Dcp.Sharpener
         private void WriteMethodSig (CodeMonkey monkey, Action action, string modifiers, string name, bool includeAttributes)
         {
             monkey.WriteLine (modifiers);
-            monkey.Write (action.ReturnArgument != null ? GetTypeName (action.ReturnArgument.Type) : "void");
+            monkey.Write (action.ReturnArgument != null ? GetTypeName (action.ReturnArgument.RelatedStateVariable.Type) : "void");
             monkey.Write (" {0} (", name);
             WriteMethodParameters (monkey, action, true, includeAttributes);
             monkey.Write (")");
@@ -143,27 +144,27 @@ namespace Mono.Upnp.Dcp.Sharpener
                 return;
             }
             bool writen = false;
-            if (argument.DefaultValue != null) {
+            if (argument.RelatedStateVariable.DefaultValue != null) {
                 string value;
-                if (argument.Type == typeof (string)) {
-                    if (argument.AllowedValues != null) {
-                        value = String.Format (@"""{0}""", argument.DefaultValue);
+                if (argument.RelatedStateVariable.Type == typeof (string)) {
+                    if (argument.RelatedStateVariable.AllowedValues != null) {
+                        value = String.Format (@"""{0}""", argument.RelatedStateVariable.DefaultValue);
                     } else {
-                        value = String.Format ("{0}.{1}", argument.RelatedStateVariable.Name + "AllowedValues", argument.DefaultValue);
+                        value = String.Format ("{0}.{1}", argument.RelatedStateVariable.Name + "AllowedValues", argument.RelatedStateVariable.DefaultValue);
                     }
                 } else {
-                    value = argument.DefaultValue;
+                    value = argument.RelatedStateVariable.DefaultValue;
                 }
                 monkey.Write ("[UpnpArgument (DefaultValue = {0}", value);
                 writen = true;
             }
-            if (argument.AllowedValueRange != null) {
+            if (argument.RelatedStateVariable.AllowedValueRange != null) {
                 if (!writen) {
                     monkey.Write ("[UpnpArgument (");
                 } else {
                     monkey.Write (", ");
                 }
-                monkey.Write ("AllowedValueRange = new AllowedValueRange ({0}, {1}, {2})", argument.AllowedValueRange.Minimum, argument.AllowedValueRange.Maximum, argument.AllowedValueRange.Step);
+                monkey.Write ("AllowedValueRange = new AllowedValueRange ({0}, {1}, {2})", argument.RelatedStateVariable.AllowedValueRange.Minimum, argument.RelatedStateVariable.AllowedValueRange.Maximum, argument.RelatedStateVariable.AllowedValueRange.Step);
                 writen = true;
             }
             if (!IsCamelCase (argument.Name)) {
@@ -183,14 +184,14 @@ namespace Mono.Upnp.Dcp.Sharpener
             if (argument.Direction == ArgumentDirection.Out) {
                 monkey.Write ("out ");
             }
-            if (argument.AllowedValues != null) {
+            if (argument.RelatedStateVariable.AllowedValues != null) {
                 monkey.Write ("{0}AllowedValues {1}", argument.RelatedStateVariable.Name, ToCamelCase (argument.Name));
             } else {
-                monkey.Write ("{0} {1}", GetTypeName (argument.Type), ToCamelCase (argument.Name));
+                monkey.Write ("{0} {1}", GetTypeName (argument.RelatedStateVariable.Type), ToCamelCase (argument.Name));
             }
         }
 
-        private void WriteStateVariables (CodeMonkey monkey, Service service)
+        private void WriteStateVariables (CodeMonkey monkey, ServiceController service)
         {
             foreach (StateVariable state_variable in service.StateVariables.Values) {
                 if (state_variable.SendEvents) {
@@ -217,7 +218,7 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.WriteLine ();
         }
 
-        private void EndWriteService (CodeMonkey monkey, Service service)
+        private void EndWriteService (CodeMonkey monkey, ServiceController service)
         {
             monkey.EndWriteBlock ();
             monkey.EndWriteBlock ();

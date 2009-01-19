@@ -1,221 +1,210 @@
-// ContentDirectory1.cs auto-generated at 10/9/2008 2:49:26 AM by Sharpener
+// ContentDirectory1.cs auto-generated at 1/18/2009 9:31:12 PM by Sharpener
 
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Xml;
 
+using Mono.Upnp.Discovery;
+using Mono.Upnp.Description;
 using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Dcp.MediaServer1
 {
-    public class ContentDirectory1 : Service
+    public class ContentDirectory1
     {
-        internal ContentDirectory1 (Client client, string deviceId, IEnumerable<string> locations)
-            : base (client, deviceId, locations, ContentDirectory1Factory.ServiceType)
+        public static readonly ServiceType ServiceType = new ServiceType ("urn:schemas-upnp-org:service:ContentDirectory:1");
+        readonly ServiceController controller;
+        public ContentDirectory1 (ServiceAnnouncement announcement)
         {
-        }
-
-        internal ContentDirectory1 (Device device, XmlReader reader, WebHeaderCollection headers)
-            : base (device, reader, headers)
-        {
+            if (announcement == null) throw new ArgumentNullException ("announcement");
+            ServiceDescription description = announcement.GetDescription ();
+            controller = description.GetController ();
+            if (controller == null) throw new UpnpDeserializationException (string.Format ("{0} has no controller.", description));
+            Verify ();
         }
 
         public string GetSearchCapabilities ()
         {
-            Action action = Actions["GetSearchCapabilities"];
-            action.Invoke ();
-            return action.OutArguments["SearchCaps"].Value;
+            ActionResult action_result = controller.Actions["GetSearchCapabilities"].Invoke ();
+            return action_result.OutValues["SearchCaps"];
         }
 
         public string GetSortCapabilities ()
         {
-            Action action = Actions["GetSortCapabilities"];
-            action.Invoke ();
-            return action.OutArguments["SortCaps"].Value;
+            ActionResult action_result = controller.Actions["GetSortCapabilities"].Invoke ();
+            return action_result.OutValues["SortCaps"];
         }
 
         public string GetSystemUpdateID ()
         {
-            Action action = Actions["GetSystemUpdateID"];
-            action.Invoke ();
-            return action.OutArguments["Id"].Value;
+            ActionResult action_result = controller.Actions["GetSystemUpdateID"].Invoke ();
+            return action_result.OutValues["Id"];
         }
 
         public void Browse (string objectID, BrowseFlag browseFlag, string filter, uint startingIndex, uint requestedCount, string sortCriteria, out string result, out string numberReturned, out string totalMatches, out string updateID)
         {
-            Action action = Actions["Browse"];
-            action.InArguments["ObjectID"].Value = objectID;
-            action.InArguments["BrowseFlag"].Value = browseFlag.ToString ();
-            action.InArguments["Filter"].Value = filter;
-            action.InArguments["StartingIndex"].Value = startingIndex.ToString ();
-            action.InArguments["RequestedCount"].Value = requestedCount.ToString ();
-            action.InArguments["SortCriteria"].Value = sortCriteria;
-            action.Invoke ();
-            result = action.OutArguments["Result"].Value;
-            numberReturned = action.OutArguments["NumberReturned"].Value;
-            totalMatches = action.OutArguments["TotalMatches"].Value;
-            updateID = action.OutArguments["UpdateID"].Value;
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (6);
+            in_arguments.Add ("ObjectID", objectID);
+            in_arguments.Add ("BrowseFlag", browseFlag.ToString ());
+            in_arguments.Add ("Filter", filter);
+            in_arguments.Add ("StartingIndex", startingIndex.ToString ());
+            in_arguments.Add ("RequestedCount", requestedCount.ToString ());
+            in_arguments.Add ("SortCriteria", sortCriteria);
+            ActionResult action_result = controller.Actions["Browse"].Invoke (in_arguments);
+            result = action_result.OutValues["Result"];
+            numberReturned = action_result.OutValues["NumberReturned"];
+            totalMatches = action_result.OutValues["TotalMatches"];
+            updateID = action_result.OutValues["UpdateID"];
         }
 
-        public bool CanSearch { get { return Actions.ContainsKey("Search"); } }
+        public bool CanSearch { get { return controller.Actions.ContainsKey ("Search"); } }
         public void Search (string containerID, string searchCriteria, string filter, uint startingIndex, uint requestedCount, string sortCriteria, out string result, out string numberReturned, out string totalMatches, out string updateID)
         {
             if (!CanSearch) throw new NotImplementedException ();
-            Action action = Actions["Search"];
-            action.InArguments["ContainerID"].Value = containerID;
-            action.InArguments["SearchCriteria"].Value = searchCriteria;
-            action.InArguments["Filter"].Value = filter;
-            action.InArguments["StartingIndex"].Value = startingIndex.ToString ();
-            action.InArguments["RequestedCount"].Value = requestedCount.ToString ();
-            action.InArguments["SortCriteria"].Value = sortCriteria;
-            action.Invoke ();
-            result = action.OutArguments["Result"].Value;
-            numberReturned = action.OutArguments["NumberReturned"].Value;
-            totalMatches = action.OutArguments["TotalMatches"].Value;
-            updateID = action.OutArguments["UpdateID"].Value;
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (6);
+            in_arguments.Add ("ContainerID", containerID);
+            in_arguments.Add ("SearchCriteria", searchCriteria);
+            in_arguments.Add ("Filter", filter);
+            in_arguments.Add ("StartingIndex", startingIndex.ToString ());
+            in_arguments.Add ("RequestedCount", requestedCount.ToString ());
+            in_arguments.Add ("SortCriteria", sortCriteria);
+            ActionResult action_result = controller.Actions["Search"].Invoke (in_arguments);
+            result = action_result.OutValues["Result"];
+            numberReturned = action_result.OutValues["NumberReturned"];
+            totalMatches = action_result.OutValues["TotalMatches"];
+            updateID = action_result.OutValues["UpdateID"];
         }
 
-        public bool CanCreateObject { get { return Actions.ContainsKey("CreateObject"); } }
+        public bool CanCreateObject { get { return controller.Actions.ContainsKey ("CreateObject"); } }
         public void CreateObject (string containerID, string elements, out string objectID, out string result)
         {
             if (!CanCreateObject) throw new NotImplementedException ();
-            Action action = Actions["CreateObject"];
-            action.InArguments["ContainerID"].Value = containerID;
-            action.InArguments["Elements"].Value = elements;
-            action.Invoke ();
-            objectID = action.OutArguments["ObjectID"].Value;
-            result = action.OutArguments["Result"].Value;
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
+            in_arguments.Add ("ContainerID", containerID);
+            in_arguments.Add ("Elements", elements);
+            ActionResult action_result = controller.Actions["CreateObject"].Invoke (in_arguments);
+            objectID = action_result.OutValues["ObjectID"];
+            result = action_result.OutValues["Result"];
         }
 
-        public bool CanDestroyObject { get { return Actions.ContainsKey("DestroyObject"); } }
+        public bool CanDestroyObject { get { return controller.Actions.ContainsKey ("DestroyObject"); } }
         public void DestroyObject (string objectID)
         {
             if (!CanDestroyObject) throw new NotImplementedException ();
-            Action action = Actions["DestroyObject"];
-            action.InArguments["ObjectID"].Value = objectID;
-            action.Invoke ();
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
+            in_arguments.Add ("ObjectID", objectID);
+            ActionResult action_result = controller.Actions["DestroyObject"].Invoke (in_arguments);
         }
 
-        public bool CanUpdateObject { get { return Actions.ContainsKey("UpdateObject"); } }
+        public bool CanUpdateObject { get { return controller.Actions.ContainsKey ("UpdateObject"); } }
         public void UpdateObject (string objectID, string currentTagValue, string newTagValue)
         {
             if (!CanUpdateObject) throw new NotImplementedException ();
-            Action action = Actions["UpdateObject"];
-            action.InArguments["ObjectID"].Value = objectID;
-            action.InArguments["CurrentTagValue"].Value = currentTagValue;
-            action.InArguments["NewTagValue"].Value = newTagValue;
-            action.Invoke ();
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (3);
+            in_arguments.Add ("ObjectID", objectID);
+            in_arguments.Add ("CurrentTagValue", currentTagValue);
+            in_arguments.Add ("NewTagValue", newTagValue);
+            ActionResult action_result = controller.Actions["UpdateObject"].Invoke (in_arguments);
         }
 
-        public bool CanImportResource { get { return Actions.ContainsKey("ImportResource"); } }
+        public bool CanImportResource { get { return controller.Actions.ContainsKey ("ImportResource"); } }
         public string ImportResource (Uri sourceURI, Uri destinationURI)
         {
             if (!CanImportResource) throw new NotImplementedException ();
-            Action action = Actions["ImportResource"];
-            action.InArguments["SourceURI"].Value = sourceURI.ToString ();
-            action.InArguments["DestinationURI"].Value = destinationURI.ToString ();
-            action.Invoke ();
-            return action.OutArguments["TransferID"].Value;
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
+            in_arguments.Add ("SourceURI", sourceURI.ToString ());
+            in_arguments.Add ("DestinationURI", destinationURI.ToString ());
+            ActionResult action_result = controller.Actions["ImportResource"].Invoke (in_arguments);
+            return action_result.OutValues["TransferID"];
         }
 
-        public bool CanExportResource { get { return Actions.ContainsKey("ExportResource"); } }
+        public bool CanExportResource { get { return controller.Actions.ContainsKey ("ExportResource"); } }
         public string ExportResource (Uri sourceURI, Uri destinationURI)
         {
             if (!CanExportResource) throw new NotImplementedException ();
-            Action action = Actions["ExportResource"];
-            action.InArguments["SourceURI"].Value = sourceURI.ToString ();
-            action.InArguments["DestinationURI"].Value = destinationURI.ToString ();
-            action.Invoke ();
-            return action.OutArguments["TransferID"].Value;
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
+            in_arguments.Add ("SourceURI", sourceURI.ToString ());
+            in_arguments.Add ("DestinationURI", destinationURI.ToString ());
+            ActionResult action_result = controller.Actions["ExportResource"].Invoke (in_arguments);
+            return action_result.OutValues["TransferID"];
         }
 
-        public bool CanStopTransferResource { get { return Actions.ContainsKey("StopTransferResource"); } }
+        public bool CanStopTransferResource { get { return controller.Actions.ContainsKey ("StopTransferResource"); } }
         public void StopTransferResource (uint transferID)
         {
             if (!CanStopTransferResource) throw new NotImplementedException ();
-            Action action = Actions["StopTransferResource"];
-            action.InArguments["TransferID"].Value = transferID.ToString ();
-            action.Invoke ();
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
+            in_arguments.Add ("TransferID", transferID.ToString ());
+            ActionResult action_result = controller.Actions["StopTransferResource"].Invoke (in_arguments);
         }
 
-        public bool CanGetTransferProgress { get { return Actions.ContainsKey("GetTransferProgress"); } }
+        public bool CanGetTransferProgress { get { return controller.Actions.ContainsKey ("GetTransferProgress"); } }
         public void GetTransferProgress (uint transferID, out string transferStatus, out string transferLength, out string transferTotal)
         {
             if (!CanGetTransferProgress) throw new NotImplementedException ();
-            Action action = Actions["GetTransferProgress"];
-            action.InArguments["TransferID"].Value = transferID.ToString ();
-            action.Invoke ();
-            transferStatus = action.OutArguments["TransferStatus"].Value;
-            transferLength = action.OutArguments["TransferLength"].Value;
-            transferTotal = action.OutArguments["TransferTotal"].Value;
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
+            in_arguments.Add ("TransferID", transferID.ToString ());
+            ActionResult action_result = controller.Actions["GetTransferProgress"].Invoke (in_arguments);
+            transferStatus = action_result.OutValues["TransferStatus"];
+            transferLength = action_result.OutValues["TransferLength"];
+            transferTotal = action_result.OutValues["TransferTotal"];
         }
 
-        public bool CanDeleteResource { get { return Actions.ContainsKey("DeleteResource"); } }
+        public bool CanDeleteResource { get { return controller.Actions.ContainsKey ("DeleteResource"); } }
         public void DeleteResource (Uri resourceURI)
         {
             if (!CanDeleteResource) throw new NotImplementedException ();
-            Action action = Actions["DeleteResource"];
-            action.InArguments["ResourceURI"].Value = resourceURI.ToString ();
-            action.Invoke ();
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
+            in_arguments.Add ("ResourceURI", resourceURI.ToString ());
+            ActionResult action_result = controller.Actions["DeleteResource"].Invoke (in_arguments);
         }
 
-        public bool CanCreateReference { get { return Actions.ContainsKey("CreateReference"); } }
+        public bool CanCreateReference { get { return controller.Actions.ContainsKey ("CreateReference"); } }
         public string CreateReference (string containerID, string objectID)
         {
             if (!CanCreateReference) throw new NotImplementedException ();
-            Action action = Actions["CreateReference"];
-            action.InArguments["ContainerID"].Value = containerID;
-            action.InArguments["ObjectID"].Value = objectID;
-            action.Invoke ();
-            return action.OutArguments["NewID"].Value;
+            Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
+            in_arguments.Add ("ContainerID", containerID);
+            in_arguments.Add ("ObjectID", objectID);
+            ActionResult action_result = controller.Actions["CreateReference"].Invoke (in_arguments);
+            return action_result.OutValues["NewID"];
         }
 
-        public bool HasTransferIDs { get { return StateVariables.ContainsKey ("TransferIDs"); } }
+        public bool HasTransferIDs { get { return controller.StateVariables.ContainsKey ("TransferIDs"); } }
         public event EventHandler<StateVariableChangedArgs<string>> TransferIDsChanged {
             add {
-                if (!HasTransferIDs) throw new NotImplementedException ();
-                StateVariables["TransferIDs"].Changed += value;
+                if (!HasTransferIDs) return;
+                controller.StateVariables["TransferIDs"].Changed += value;
             }
             remove {
-                if (!HasTransferIDs) throw new NotImplementedException ();
-                StateVariables["TransferIDs"].Changed -= value;
+                if (!HasTransferIDs) return;
+                controller.StateVariables["TransferIDs"].Changed -= value;
             }
         }
 
         public event EventHandler<StateVariableChangedArgs<string>> SystemUpdateIDChanged {
-            add { StateVariables["SystemUpdateID"].Changed += value; }
-            remove { StateVariables["SystemUpdateID"].Changed -= value; }
+            add { controller.StateVariables["SystemUpdateID"].Changed += value; }
+            remove { controller.StateVariables["SystemUpdateID"].Changed -= value; }
         }
 
-        public bool HasContainerUpdateIDs { get { return StateVariables.ContainsKey ("ContainerUpdateIDs"); } }
+        public bool HasContainerUpdateIDs { get { return controller.StateVariables.ContainsKey ("ContainerUpdateIDs"); } }
         public event EventHandler<StateVariableChangedArgs<string>> ContainerUpdateIDsChanged {
             add {
-                if (!HasContainerUpdateIDs) throw new NotImplementedException ();
-                StateVariables["ContainerUpdateIDs"].Changed += value;
+                if (!HasContainerUpdateIDs) return;
+                controller.StateVariables["ContainerUpdateIDs"].Changed += value;
             }
             remove {
-                if (!HasContainerUpdateIDs) throw new NotImplementedException ();
-                StateVariables["ContainerUpdateIDs"].Changed -= value;
+                if (!HasContainerUpdateIDs) return;
+                controller.StateVariables["ContainerUpdateIDs"].Changed -= value;
             }
         }
 
-        protected override Type DeserializeDataType (string dataType)
+        void Verify ()
         {
-            //if (Regex.Matches (dataType, "string
-            return base.DeserializeDataType (dataType);
-        }
-
-        protected override void VerifyContract ()
-        {
-            base.VerifyContract ();
-            if (!Actions.ContainsKey ("GetSearchCapabilities")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type {1} but it does not have the required action GetSearchCapabilities.", Id, Type));
-            if (!Actions.ContainsKey ("GetSortCapabilities")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type {1} but it does not have the required action GetSortCapabilities.", Id, Type));
-            if (!Actions.ContainsKey ("GetSystemUpdateID")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type {1} but it does not have the required action GetSystemUpdateID.", Id, Type));
-            if (!Actions.ContainsKey ("Browse")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type {1} but it does not have the required action Browse.", Id, Type));
-            if (!StateVariables.ContainsKey ("TransferIDs")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type {1} but it does not have the required state variable TransferIDs.", Id, Type));
-            if (!StateVariables.ContainsKey ("ContainerUpdateIDs")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type {1} but it does not have the required state variable ContainerUpdateIDs.", Id, Type));
+            if (!controller.Actions.ContainsKey ("GetSearchCapabilities")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSearchCapabilities.", controller.Description.Id));
+            if (!controller.Actions.ContainsKey ("GetSortCapabilities")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSortCapabilities.", controller.Description.Id));
+            if (!controller.Actions.ContainsKey ("GetSystemUpdateID")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSystemUpdateID.", controller.Description.Id));
+            if (!controller.Actions.ContainsKey ("Browse")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action Browse.", controller.Description.Id));
+            if (!controller.StateVariables.ContainsKey ("SystemUpdateID")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required state variable SystemUpdateID.", controller.Description.Id));
         }
     }
 }

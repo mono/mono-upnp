@@ -43,16 +43,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\BrowseFlag.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\Container.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ConnectionManager1.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ConnectionManager1Client.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ConnectionStatus.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\Container.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ContentDirectory1.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ContentDirectory1Client.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\DeserializationException.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\Direction.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\DiscoveryEventArgs.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\Item.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\Object.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\TransferStatus.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ConnectionManager1.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ConnectionManager1Factory.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ContentDirectory1.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\ContentDirectory1Factory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Client\WriteStatus.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

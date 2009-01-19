@@ -30,7 +30,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
@@ -44,10 +43,11 @@
   <ItemGroup>
     <Compile Include="Mono.Upnp.Dcp.Sharpener\CodeMonkey.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\OfflineAction.cs" />
+    <Compile Include="Mono.Upnp.Dcp.Sharpener\OfflineDisposer.cs" />
+    <Compile Include="Mono.Upnp.Dcp.Sharpener\OfflineServiceDescription.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\OfflineStateVariable.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\Sharpener.cs" />
-    <Compile Include="Mono.Upnp.Dcp.Sharpener\OfflineDevice.cs" />
-    <Compile Include="Mono.Upnp.Dcp.Sharpener\OfflineService.cs" />
+    <Compile Include="Mono.Upnp.Dcp.Sharpener\OfflineServiceController.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\ClientRunner.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\Runner.cs" />
     <Compile Include="Mono.Upnp.Dcp.Sharpener\RunnerContext.cs" />

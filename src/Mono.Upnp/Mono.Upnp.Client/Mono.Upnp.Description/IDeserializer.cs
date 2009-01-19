@@ -1,10 +1,10 @@
 ﻿//
-// OfflineStateVariable.cs
+// IDeserializer.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
 //
-// Copyright (C) 2008 S&S Black Ltd.
+// Copyright (C) 200 S&S Black Ltd.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,33 +26,19 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using System;
 using System.Xml;
 
 using Mono.Upnp.Control;
 
-namespace Mono.Upnp.Dcp.Sharpener
+namespace Mono.Upnp.Description
 {
-	public class OfflineStateVariable : StateVariable
+	public interface IDeserializer
 	{
-        public OfflineStateVariable (ServiceController service)
-            : base (service)
-        {
-        }
-
-        private bool optional;
-        public bool IsOptional
-        {
-            get { return optional; }
-        }
-
-        protected override void DeserializeCore (XmlReader reader, string element)
-        {
-            if (element.ToLower () == "optional") {
-                optional = true;
-                reader.Close ();
-            } else {
-                base.DeserializeCore (reader, element);
-            }
-        }
+        DeviceDescription DeserializeDescription (Uri url);
+        DeviceDescription DeserializeDevice (XmlReader reader);
+        ServiceDescription DeserializeService (XmlReader reader);
+        ServiceController DeserializeController (ServiceDescription service);
+        Uri DeserializeUrl (XmlReader reader);
 	}
 }
