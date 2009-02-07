@@ -38,20 +38,15 @@ namespace Mono.Upnp.Description
 	public class Icon
 	{
         readonly DeviceDescription device;
-        string mime_type;
         int? width;
         int? height;
         int? depth;
-        Uri url;
         byte[] data;
         IDeserializer deserializer;
-        bool loaded;
 
         protected internal Icon (DeviceDescription device)
         {
-            if (device == null) {
-                throw new ArgumentNullException ("device");
-            }
+            if (device == null) throw new ArgumentNullException ("device");
             this.device = device;
         }
 
@@ -63,39 +58,24 @@ namespace Mono.Upnp.Description
             get { return device.IsDisposed; }
         }
 
-        public string MimeType {
-            get { return mime_type; }
-            protected set { SetField (ref mime_type, value); }
-        }
+        public string MimeType { get; private set; }
 
-        public int Width {
-            get { return width.Value; }
-            protected set { SetField (ref width, value); }
-        }
+        public int Width { get { return width.Value; } }
 
-        public int Height {
-            get { return height.Value; }
-            protected set { SetField (ref height, value); }
-        }
+        public int Height { get { return height.Value; } }
 
-        public int Depth {
-            get { return depth.Value; }
-            protected set { SetField (ref depth, value); }
-        }
+        public int Depth { get { return depth.Value; } }
 
-        public Uri Url {
-            get { return url; }
-            protected set { SetField (ref url, value); }
-        }
+        public Uri Url { get; private set; }
 
         public byte[] GetData ()
         {
             if (data == null) {
                 try {
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create (url);
-                    using (HttpWebResponse response = Helper.GetResponse (request)) {
+                    var request = (HttpWebRequest)WebRequest.Create (Url);
+                    using (var response = Helper.GetResponse (request)) {
                         data = new byte[response.ContentLength];
-                        using (Stream stream = response.GetResponseStream ()) {
+                        using (var stream = response.GetResponseStream ()) {
                             stream.Read (data, 0, (int)response.ContentLength);
                         }
                     }
@@ -106,44 +86,25 @@ namespace Mono.Upnp.Description
                     throw e;
                 }
             }
-            byte[] copy = new byte [data.Length];
+            var copy = new byte [data.Length];
             Array.Copy (data, copy, data.Length);
             return copy;
         }
 
-        void SetField<T> (ref T field, T value)
-        {
-            CheckLoaded ();
-            field = value;
-        }
-
-        void SetField<T> (ref T? field, T value) where T : struct
-        {
-            CheckLoaded ();
-            field = value;
-        }
-
-        void CheckLoaded ()
-        {
-            if (loaded) {
-                throw new InvalidOperationException ("The icon has already been deserialized.");
-            }
-        }
-
         public override string ToString ()
         {
-            return String.Format ("Icon {{ {0}, {1}x{2}x{3}, {4} }}", mime_type, width, height, depth, url);
+            return string.Format ("Icon {{ {0}, {1}x{2}x{3}, {4} }}", MimeType, width, height, depth, Url);
         }
 
         public override bool Equals (object obj)
         {
-            Icon icon = obj as Icon;
-            return icon != null && icon.url == url;
+            var icon = obj as Icon;
+            return icon != null && icon.Url == Url;
         }
 
         public override int GetHashCode ()
         {
-            return ~url.GetHashCode ();
+            return ~Url.GetHashCode ();
         }
 
         public void Deserialize (IDeserializer deserializer, XmlReader reader)
@@ -153,9 +114,7 @@ namespace Mono.Upnp.Description
             this.deserializer = deserializer;
             DeserializeCore (reader);
             Verify ();
-
             this.deserializer = null;
-            loaded = true;
         }
 
         protected virtual void DeserializeCore (XmlReader reader)
@@ -163,17 +122,19 @@ namespace Mono.Upnp.Description
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.ReadToFollowing ("icon");
-                while (Helper.ReadToNextElement (reader)) {
+                reader.Read ();
+                while (reader.ReadToNextElement ()) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing one of the icon description elements.", e);
+                        Log.Exception (
+                            "There was a problem deserializing one of the icon description elements.", e);
                     }
                 }
-                reader.Close ();
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deserializing an icon.", e);
+            } finally {
+                reader.Close ();
             }
         }
 
@@ -181,39 +142,40 @@ namespace Mono.Upnp.Description
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            reader.Read ();
-            switch (element.ToLower ()) {
-            case "mimetype":
-                MimeType = reader.ReadString ();
-                break;
-            case "width":
+            using (reader) {
                 reader.Read ();
-                Width = reader.ReadContentAsInt ();
-                break;
-            case "height":
-                reader.Read ();
-                Height = reader.ReadContentAsInt ();
-                break;
-            case "depth":
-                reader.Read ();
-                Depth = reader.ReadContentAsInt ();
-                break;
-            case "url":
-                Url = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
+                switch (element.ToLower ()) {
+                case "mimetype":
+                    MimeType = reader.ReadString ();
+                    break;
+                case "width":
+                    reader.Read ();
+                    width = reader.ReadContentAsInt ();
+                    break;
+                case "height":
+                    reader.Read ();
+                    height = reader.ReadContentAsInt ();
+                    break;
+                case "depth":
+                    reader.Read ();
+                    depth = reader.ReadContentAsInt ();
+                    break;
+                case "url":
+                    Url = deserializer.DeserializeUrl (reader.ReadSubtree ());
+                    break;
+                default: // This is a workaround for Mono bug 334752
+                    reader.Skip ();
+                    break;
+                }
             }
-            reader.Close ();
         }
 
         void Verify ()
         {
-            if (url == null) {
+            if (Url == null) {
                 throw new UpnpDeserializationException ("The icon has no URL.");
             }
-            if (mime_type == null) {
+            if (MimeType == null) {
                 Log.Exception (new UpnpDeserializationException ("The icon has no mime-type."));
             }
             if (width == null) {

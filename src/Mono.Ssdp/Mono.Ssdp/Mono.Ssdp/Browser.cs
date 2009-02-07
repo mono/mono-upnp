@@ -47,7 +47,7 @@ namespace Mono.Ssdp
         private ushort mx = Protocol.DefaultMx;
         public ushort MX {
             get { return mx; }
-            set { mx = Math.Min (value, Protocol.MaxMX); }
+            set { mx = System.Math.Min (value, Protocol.MaxMX); }
         }
         
         private string service_type;

@@ -39,7 +39,7 @@ namespace Mono.Upnp.Dcp.Sharpener
         {
         }
 
-        protected override Action CreateAction ()
+        protected override ServiceAction CreateAction ()
         {
             return new OfflineAction (this);
         }

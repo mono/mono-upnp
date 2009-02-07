@@ -34,7 +34,7 @@ using System.Xml;
 
 namespace Mono.Upnp.Internal
 {
-	internal class Helper
+	internal static class Helper
 	{
         //public static string HostAddress
         //{
@@ -65,7 +65,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        public static bool ReadToNextElement (XmlReader reader)
+        public static bool ReadToNextElement (this XmlReader reader)
         {
             while (reader.Read ()) {
                 if (reader.NodeType == XmlNodeType.Element) {

@@ -1,0 +1,9 @@
+2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* ChangeLog:
+	* Mono.Upnp.Dcp.MediaServer1.Client.csproj: 
+
+	* Mono.Upnp.Dcp.MediaServer1.Client/ContentDirectory1.cs:
+	* Mono.Upnp.Dcp.MediaServer1.Client/ConnectionManager1.cs: Got
+	rid of Mono.Upnp.Discovery namespace
+

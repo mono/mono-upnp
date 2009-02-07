@@ -38,42 +38,20 @@ namespace Mono.Upnp.Description
 {
 	public class Deserializer : IDeserializer
 	{
-        Uri url_base;
-        Version spec_version;
-        DeviceDescription root_device;
         Disposer disposer;
+        DeviceDescription root_device;
 
-        protected Uri UrlBase {
-            get { return url_base; }
-            set {
-                if (value == null) throw new ArgumentNullException ("value");
-                url_base = value;
-            }
-        }
-
-        protected Version SpecVersion {
-            get { return spec_version; }
-            set { spec_version = value; }
-        }
-
-        protected DeviceDescription RootDevice {
-            get { return root_device; }
-            set {
-                if (root_device != null) {
-                    throw new UpnpDeserializationException ("There are multiple root devices.");
-                }
-
-                root_device = value;
-                disposer.SetRootDevice (value);
-            }
-        }
+        protected Version SpecVersion { get; private set; }
+        protected Uri UrlBase { get; private set; }
 
         public DeviceDescription DeserializeDescription (Uri url)
         {
             if (url == null) throw new ArgumentNullException ("url");
+			if (disposer != null) throw new InvalidOperationException (
+				"Deserializers can only deserialize one device description.");
 
             disposer = new Disposer (url);
-            url_base = url;
+            UrlBase = url;
             return DeserializeDescriptionCore (url);
         }
 
@@ -82,8 +60,8 @@ namespace Mono.Upnp.Description
             if (url == null) throw new ArgumentNullException ("url");
 
             // TODO handle ACCEPT-LANGUAGE
-            using (WebResponse response = Helper.GetResponse (url)) {
-                using (Stream stream = response.GetResponseStream ()) {
+            using (var response = Helper.GetResponse (url)) {
+                using (var stream = response.GetResponseStream ()) {
                     return DeserializeDescriptionCore (XmlReader.Create (stream));
                 }
             }
@@ -94,17 +72,19 @@ namespace Mono.Upnp.Description
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.ReadToFollowing ("root");
-                while (Helper.ReadToNextElement (reader)) {
+                reader.Read ();
+                while (reader.ReadToNextElement ()) {
                     try {
                         DeserializeDescriptionCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing one of the root description elements.", e);
+                        Log.Exception (
+                            "There was a problem deserializing one of the root description elements.", e);
                     }
                 }
-                reader.Close ();
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deserializing a root XML file.", e);
+            } finally {
+                reader.Close ();
             }
 
             return root_device;
@@ -114,22 +94,24 @@ namespace Mono.Upnp.Description
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            reader.Read ();
-            switch (element.ToLower ()) {
-            case "specversion":
-                SpecVersion = Helper.DeserializeSpecVersion (reader.ReadSubtree ());
-                break;
-            case "urlbase":
-                UrlBase = new Uri (reader.ReadString ());
-                break;
-            case "device":
-                RootDevice = DeserializeDevice (reader.ReadSubtree ());
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
-            }
-            reader.Close ();
+			using (reader) {
+	            reader.Read ();
+	            switch (element.ToLower ()) {
+	            case "specversion":
+	                SpecVersion = Helper.DeserializeSpecVersion (reader.ReadSubtree ());
+	                break;
+	            case "urlbase":
+	                UrlBase = new Uri (reader.ReadString ());
+	                break;
+	            case "device":
+	                root_device = DeserializeDevice (reader.ReadSubtree ());
+                    disposer.SetRootDevice (root_device);
+	                break;
+	            default: // This is a workaround for Mono bug 334752
+	                reader.Skip ();
+	                break;
+	            }
+			}
         }
 
         public ServiceController DeserializeController (ServiceDescription service)
@@ -139,11 +121,13 @@ namespace Mono.Upnp.Description
 
         protected virtual ServiceController DeserializeControllerCore (ServiceDescription service)
         {
-            if (service == null) throw new ArgumentNullException ("service");
-            if (service.ScpdUrl == null) throw new ArgumentException ("The services does not have an SCPDURL.", "service");
+            if (service == null)
+                throw new ArgumentNullException ("service");
+            if (service.ScpdUrl == null)
+                throw new ArgumentException ("The services does not have an SCPDURL.", "service");
 
-            using (WebResponse response = Helper.GetResponse (service.ScpdUrl)) {
-                using (Stream stream = response.GetResponseStream ()) {
+            using (var response = Helper.GetResponse (service.ScpdUrl)) {
+                using (var stream = response.GetResponseStream ()) {
                     return DeserializeControllerCore (service, XmlReader.Create (stream));
                 }
             }
@@ -151,9 +135,16 @@ namespace Mono.Upnp.Description
 
         protected virtual ServiceController DeserializeControllerCore (ServiceDescription service, XmlReader reader)
         {
-            ServiceController controller = CreateController (service);
-            controller.Deserialize (reader);
-            return controller;
+			try {
+	            var controller = CreateController (service);
+				if (controller != null) {
+	            	controller.Deserialize (reader);
+				}
+	            return controller;
+			} catch (Exception e) {
+				Log.Exception ("There was a problem deserializing a service control description.", e);
+                return null;
+			}
         }
 
         protected virtual ServiceController CreateController (ServiceDescription service)
@@ -169,8 +160,10 @@ namespace Mono.Upnp.Description
         protected virtual DeviceDescription DeserializeDeviceCore (IDisposer disposer, XmlReader reader)
         {
             try {
-                DeviceDescription device = CreateDevice (disposer);
-                device.Deserialize (this, reader);
+                var device = CreateDevice (disposer);
+				if (device != null) {
+                	device.Deserialize (this, reader);
+				}
                 return device;
             } catch (Exception e) {
                 Log.Exception ("There was a problem deserializing a device.", e);
@@ -191,8 +184,10 @@ namespace Mono.Upnp.Description
         protected virtual ServiceDescription DeserializeServiceCore (IDisposer disposer, XmlReader reader)
         {
             try {
-                ServiceDescription service = CreateService (disposer);
-                service.Deserialize (this, reader);
+                var service = CreateService (disposer);
+				if (service != null) {
+                	service.Deserialize (this, reader);
+				}
                 return service;
             } catch (Exception e) {
                 Log.Exception ("There was a problem deserializing a service.", e);
@@ -216,12 +211,13 @@ namespace Mono.Upnp.Description
 
             try {
                 reader.Read ();
-                string url = reader.ReadString ();
-                Uri uri = Uri.IsWellFormedUriString (url, UriKind.Absolute) ? new Uri (url) : new Uri (url_base, url);
-                reader.Close ();
-                return uri;
+                var url = reader.ReadString ();
+                return Uri.IsWellFormedUriString (url, UriKind.Absolute)
+                    ? new Uri (url) : new Uri (UrlBase, url);
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deserializing a URL.", e);
+            } finally {
+                reader.Close ();
             }
         }
 	}

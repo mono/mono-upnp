@@ -39,14 +39,6 @@ namespace Mono.Upnp.Control
 	public class StateVariable
     {
         readonly ServiceController controller;
-        bool send_events;
-        string name;
-        string data_type;
-        Type type;
-        string default_value; // FIXME is string the proper type for this?
-        ReadOnlyCollection<string> allowed_values;
-        AllowedValueRange allowed_value_range;
-        bool loaded;
         event EventHandler<StateVariableChangedArgs<string>> changed;
 
         protected internal StateVariable (ServiceController service)
@@ -59,44 +51,20 @@ namespace Mono.Upnp.Control
         public ServiceController Controller {
             get { return controller; }
         }
+        
+        public string Name { get; private set; }
 
-        public bool SendEvents {
-            get { return send_events; }
-            protected set { SetField (ref send_events, value); }
-        }
+        public string DataType { get; private set; }
 
-        public string Name {
-            get { return name; }
-            protected set { SetField (ref name, value); }
-        }
+        public Type Type { get; private set; }
+        
+        public bool SendEvents { get; private set; }
 
-        public string DataType {
-            get { return data_type; }
-            set {
-                CheckLoaded ();
-                data_type = value;
-                type = controller.DeserializeDataType (value);
-            }
-        }
+        public string DefaultValue { get; private set; }
 
-        public Type Type {
-            get { return type; }
-        }
+        public ReadOnlyCollection<string> AllowedValues { get; private set; }
 
-        public string DefaultValue {
-            get { return default_value; }
-            protected set { SetField (ref default_value, value); }
-        }
-
-        public ReadOnlyCollection<string> AllowedValues {
-            get { return allowed_values; }
-            protected set { SetField (ref allowed_values, value); }
-        }
-
-        public AllowedValueRange AllowedValueRange {
-            get { return allowed_value_range; }
-            protected set { SetField (ref allowed_value_range, value); }
-        }
+        public AllowedValueRange AllowedValueRange { get; private set; }
 
         public bool IsDisposed {
             get { return controller.IsDisposed; }
@@ -105,7 +73,7 @@ namespace Mono.Upnp.Control
         public event EventHandler<StateVariableChangedArgs<string>> Changed {
             add {
                 CheckDisposed ();
-                if (!send_events) {
+                if (!SendEvents) {
                     throw new InvalidOperationException ("This state variable does not send events.");
                 } else if (value == null) {
                     return;
@@ -115,7 +83,7 @@ namespace Mono.Upnp.Control
             }
             remove {
                 CheckDisposed ();
-                if (!send_events) {
+                if (!SendEvents) {
                     throw new InvalidOperationException ("This state variable does not send events.");
                 } else if (value == null) {
                     return;
@@ -124,12 +92,17 @@ namespace Mono.Upnp.Control
                 changed -= value;
             }
         }
-
-        protected internal virtual void OnChanged (string newValue)
+        
+        internal void OnChanged (string newValue)
         {
-            EventHandler<StateVariableChangedArgs<string>> changed = this.changed;
+            OnChanged (new StateVariableChangedArgs<string> (newValue));
+        }
+
+        protected virtual void OnChanged (StateVariableChangedArgs<string> args)
+        {
+            var changed = this.changed;
             if (changed != null) {
-                changed (this, new StateVariableChangedArgs<string> (newValue));
+                changed (this, args);
             }
         }
 
@@ -141,24 +114,10 @@ namespace Mono.Upnp.Control
             }
         }
 
-        void CheckLoaded ()
-        {
-            if (loaded) {
-                throw new InvalidOperationException ("The state variable has already been deserialized.");
-            }
-        }
-
-        private void SetField<T> (ref T field, T value)
-        {
-            CheckLoaded ();
-            field = value;
-        }
-
         public void Deserialize (XmlReader reader)
         {
             DeserializeCore (reader);
             VerifyDeserialization ();
-            loaded = true;
         }
 
         protected virtual void DeserializeCore (XmlReader reader)
@@ -166,18 +125,19 @@ namespace Mono.Upnp.Control
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.ReadToFollowing ("stateVariable");
-                send_events = reader["sendEvents"] != "no";
-                while (Helper.ReadToNextElement (reader)) {
+                reader.Read ();
+                SendEvents = reader["sendEvents"] != "no";
+                while (reader.ReadToNextElement ()) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
                         Log.Exception ("There was a problem deserializing one of the state variable description elements.", e);
                     }
                 }
-                reader.Close ();
             } catch (Exception e) {
                 throw new UpnpDeserializationException (string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+            } finally {
+                reader.Close ();
             }
         }
 
@@ -185,64 +145,70 @@ namespace Mono.Upnp.Control
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            reader.Read ();
-            switch (element.ToLower ()) {
-            case "name":
-                Name = reader.ReadString ().Trim ();
-                break;
-            case "datatype":
-                DataType = reader.ReadString ().Trim ();
-                break;
-            case "defaultvalue":
-                DefaultValue = reader.ReadString ();
-                break;
-            case "allowedvaluelist":
-                DeserializeAllowedValues (reader.ReadSubtree ());
-                break;
-            case "allowedvaluerange":
-                AllowedValueRange = new AllowedValueRange (Type, reader.ReadSubtree ());
-                break;
-            case "sendeventsattribute":
-                SendEvents = reader.ReadString ().Trim () != "no";
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
+            using (reader) {
+                switch (element.ToLower ()) {
+                case "name":
+                    Name = reader.ReadString ().Trim ();
+                    break;
+                case "datatype":
+                    DataType = reader.ReadString ().Trim ();
+                    Type = controller.DeserializeDataType (DataType);
+                    break;
+                case "defaultvalue":
+                    DefaultValue = reader.ReadString ();
+                    break;
+                case "allowedvaluelist":
+                    DeserializeAllowedValues (reader.ReadSubtree ());
+                    break;
+                case "allowedvaluerange":
+                    AllowedValueRange = new AllowedValueRange (Type, reader.ReadSubtree ());
+                    break;
+                case "sendeventsattribute":
+                    SendEvents = reader.ReadString ().Trim () != "no";
+                    break;
+                default: // This is a workaround for Mono bug 334752
+                    reader.Skip ();
+                    break;
+                }
             }
-            reader.Close ();
         }
 
         void DeserializeAllowedValues (XmlReader reader)
         {
-            List<string> allowed_value_list = new List<string> ();
-            while (reader.ReadToFollowing ("allowedValue") && reader.NodeType == XmlNodeType.Element) {
-                allowed_value_list.Add (reader.ReadString ());
+            using (reader) {
+                var allowed_value_list = new List<string> ();
+                while (reader.ReadToFollowing ("allowedValue") && reader.NodeType == XmlNodeType.Element) {
+                    allowed_value_list.Add (reader.ReadString ());
+                }
+                AllowedValues = allowed_value_list.AsReadOnly ();
             }
-            allowed_values = allowed_value_list.AsReadOnly ();
-            reader.Close ();
         }
 
         void VerifyDeserialization ()
         {
-            if (name == null) {
-                throw new UpnpDeserializationException (string.Format ("A state variable on {0} has no name.", controller));
+            if (Name == null) {
+                throw new UpnpDeserializationException (
+                    string.Format ("A state variable on {0} has no name.", controller));
             }
-            if (name.Length == 0) {
-                Log.Exception (new UpnpDeserializationException (string.Format ("A state variable on {0} has an empty name.", controller)));
+            if (Name.Length == 0) {
+                Log.Exception (new UpnpDeserializationException (
+                    string.Format ("A state variable on {0} has an empty name.", controller)));
             }
-            if (data_type == null) {
-                throw new UpnpDeserializationException (string.Format ("{0} has no type.", ToString ()));
+            if (DataType == null) {
+                throw new UpnpDeserializationException (
+                    string.Format ("{0} has no type.", ToString ()));
             }
-            if (type == null) {
-                Log.Exception (new UpnpDeserializationException (string.Format ("Unable to deserialize data type {0}.", data_type)));
+            if (Type == null) {
+                Log.Exception (new UpnpDeserializationException (
+                    string.Format ("Unable to deserialize data type {0}.", DataType)));
             }
-            if (allowed_values != null && type != typeof (string)) {
-                Log.Exception (new UpnpDeserializationException (string.Format (
-                    "{0} has allowedValues, but is of type {1}.", ToString (), type)));
+            if (AllowedValues != null && Type != typeof (string)) {
+                Log.Exception (new UpnpDeserializationException (
+                    string.Format ("{0} has allowedValues, but is of type {1}.", ToString (), Type)));
             }
-            if (allowed_value_range != null && !(type is IComparable)) {
-                Log.Exception (new UpnpDeserializationException (string.Format (
-                    "{0} has allowedValueRange, but is of type {1}.", ToString (), type)));
+            if (AllowedValueRange != null && !(Type is IComparable)) {
+                Log.Exception (new UpnpDeserializationException (
+                    string.Format ("{0} has allowedValueRange, but is of type {1}.", ToString (), Type)));
             }
             // TODO something here
             //if (allowed_value_range != null && !typeof (double).IsAssignableFrom (type)) {
@@ -253,7 +219,7 @@ namespace Mono.Upnp.Control
 
         public override string ToString ()
         {
-            return String.Format ("StateVariable {{ {0}, {1} ({2}) }}", controller, name, data_type);
+            return String.Format ("StateVariable {{ {0}, {1} ({2}) }}", controller, Name, DataType);
         }
     }
 }

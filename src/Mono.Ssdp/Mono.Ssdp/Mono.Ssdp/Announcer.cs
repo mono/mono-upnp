@@ -63,7 +63,7 @@ namespace Mono.Ssdp
         private ushort max_age = Protocol.DefaultMaxAge;
         public ushort MaxAge {
             get { return max_age; }
-            set { max_age = Math.Max (Protocol.DefaultMaxAge, value); }
+            set { max_age = System.Math.Max (Protocol.DefaultMaxAge, value); }
         }
 
         private volatile uint announcement_timeout_id;
@@ -76,7 +76,7 @@ namespace Mono.Ssdp
         private static TimeSpan GetInterval (ushort mx)
         {
             // FIXME lame
-            return TimeSpan.FromMilliseconds (random.Next (Math.Min (Protocol.MaxMX * 1000, mx * 1000)));
+            return TimeSpan.FromMilliseconds (random.Next (System.Math.Min (Protocol.MaxMX * 1000, mx * 1000)));
         }
 
         private Server server;

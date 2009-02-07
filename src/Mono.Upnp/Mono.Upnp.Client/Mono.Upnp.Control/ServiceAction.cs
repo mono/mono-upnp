@@ -1,5 +1,5 @@
 ﻿//
-// Action.cs
+// ServiceAction.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -40,45 +40,32 @@ using Mono.Upnp.Internal;
 
 namespace Mono.Upnp.Control
 {
-	public class Action
+	public class ServiceAction
     {
         readonly static Dictionary<string, string> emptyArguments = new Dictionary<string, string> ();
         readonly ServiceController controller;
-        string name;
-        Argument return_argument;
         readonly Dictionary<string, Argument> in_argument_dict = new Dictionary<string,Argument> ();
         readonly ReadOnlyDictionary<string, Argument> in_arguments;
         readonly Dictionary<string, Argument> out_argument_dict = new Dictionary<string,Argument> ();
         readonly ReadOnlyDictionary<string, Argument> out_arguments;
         bool bypass_return_argument;
-        bool loaded;
-        int retry;
 
-        protected internal Action (ServiceController service)
+        protected internal ServiceAction (ServiceController serviceController)
         {
-            if (service == null) throw new ArgumentNullException ("service");
+            if (serviceController == null) throw new ArgumentNullException ("serviceController");
 
+            controller = serviceController;
             in_arguments = new ReadOnlyDictionary<string, Argument> (in_argument_dict);
             out_arguments = new ReadOnlyDictionary<string, Argument> (out_argument_dict);
-
-            this.controller = service;
         }
 
         public ServiceController Controller {
             get { return controller; }
         }
 
-        public string Name {
-            get { return name; }
-            protected set {
-                CheckLoaded ();
-                name = value;
-            }
-        }
+        public string Name { get; private set; }
         
-        public Argument ReturnArgument {
-            get { return return_argument; }
-        }
+        public Argument ReturnArgument { get; private set; }
 
         public ReadOnlyDictionary<string, Argument> InArguments {
             get { return in_arguments; }
@@ -88,10 +75,7 @@ namespace Mono.Upnp.Control
             get { return out_arguments; }
         }
 
-        public int Retry {
-            get { return retry; }
-            set { retry = value; }
-        }
+        public int Retry { get; set; }
 
         public bool IsDisposed {
             get { return controller.IsDisposed; }
@@ -100,11 +84,6 @@ namespace Mono.Upnp.Control
         public ActionResult Invoke ()
         {
             return Invoke (emptyArguments);
-        }
-
-        public ActionResult Invoke (params string[] arguments)
-        {
-            return Invoke (DictionarifyArguments (arguments));
         }
 
         public ActionResult Invoke (IDictionary<string, string> arguments)
@@ -117,31 +96,13 @@ namespace Mono.Upnp.Control
         protected virtual ActionResult InvokeCore (IDictionary<string, string> arguments)
         {
             if (arguments == null) throw new ArgumentNullException ("arguments");
+            
             return controller.Invoke (this, arguments);
-        }
-
-        IDictionary<string, string> DictionarifyArguments (string[] arguments)
-        {
-            if (arguments == null) {
-                return new Dictionary<string, string> (0);
-            }
-            if (arguments.Length % 2 != 0) {
-                throw new ArgumentException ("There are an uneven number of keys and values in the arguments list.");
-            }
-            Dictionary<string, string> args = new Dictionary<string, string> (arguments.Length << 1);
-            for (int i = 0; i < arguments.Length; i += 2) {
-                if (args.ContainsKey (arguments[i])) {
-                    throw new ArgumentException (String.Format (
-                        "All arguments must have a unique name. {0} appears more than once.", arguments[i]));
-                }
-                args.Add (arguments[i], arguments[i + 1]);
-            }
-            return args;
         }
 
         void VerifyArguments (IDictionary<string, string> arguments)
         {
-            foreach (KeyValuePair<string, string> pair in arguments) {
+            foreach (var pair in arguments) {
                 if (!in_arguments.ContainsKey (pair.Key)) {
                     throw new ArgumentException ("This action does not have an in argument called {0}.", pair.Key);
                 }
@@ -154,16 +115,18 @@ namespace Mono.Upnp.Control
             if (argument.RelatedStateVariable == null) {
                 return;
             }
-            Type type = argument.RelatedStateVariable.Type;
-            ReadOnlyCollection<string> values = argument.RelatedStateVariable.AllowedValues;
+            
+            var type = argument.RelatedStateVariable.Type;
+            var values = argument.RelatedStateVariable.AllowedValues;
             if (values != null && type == typeof (string) && !values.Contains (value)) {
                 throw new ArgumentException (
                     string.Format ("The value {0} is not allowed for the argument {1}.", value, argument.Name));
             }
-            AllowedValueRange range = argument.RelatedStateVariable.AllowedValueRange;
+            
+            var range = argument.RelatedStateVariable.AllowedValueRange;
             if (range != null && type is IComparable) {
-                MethodInfo parse = type.GetMethod ("Parse", BindingFlags.Public | BindingFlags.Static);
-                object arg = parse.Invoke (null, new object[] { value });
+                var parse = type.GetMethod ("Parse", BindingFlags.Public | BindingFlags.Static);
+                var arg = parse.Invoke (null, new object[] { value });
                 if (range.Min == null) {
                     range.Min = (IComparable)parse.Invoke (null, new object[] { range.Minimum });
                     range.Max = (IComparable)parse.Invoke (null, new object[] { range.Maximum });
@@ -185,59 +148,68 @@ namespace Mono.Upnp.Control
                     "This action is no longer available because its service has gone off the network.");
             }
         }
-
-        void CheckLoaded ()
+        
+        internal void SerializeRequest (IDictionary<string, string> arguments,
+                                         WebHeaderCollection headers, XmlWriter writer)
         {
-            if (loaded) {
-                throw new InvalidOperationException ("The action has already been deserialized.");
-            }
+            SerializeRequestCore (arguments, headers, writer);
         }
 
-        protected internal virtual void SerializeRequest (IDictionary<string, string> arguments, WebHeaderCollection headers, XmlWriter writer)
+        protected virtual void SerializeRequestCore (IDictionary<string, string> arguments,
+                                                       WebHeaderCollection headers, XmlWriter writer)
         {
             Helper.WriteStartSoapBody (writer);
-            SerializeRequestSoapBody (arguments, writer);
+            SerializeRequestCore (arguments, writer);
             Helper.WriteEndSoapBody (writer);
         }
 
-        protected virtual void SerializeRequestSoapBody (IDictionary<string, string> arguments, XmlWriter writer)
+        protected virtual void SerializeRequestCore (IDictionary<string, string> arguments, XmlWriter writer)
         {
-            writer.WriteStartElement ("u", name, controller.Description.Type.ToString ());
-            foreach (KeyValuePair<string, string> argument in arguments) {
+            writer.WriteStartElement ("u", Name, controller.Description.Type.ToString ());
+            foreach (var argument in arguments) {
                 writer.WriteStartElement (argument.Key);
                 writer.WriteValue (argument.Value ?? "");
                 writer.WriteEndElement ();
             }
             writer.WriteEndElement ();
         }
-
-        protected internal virtual ActionResult DeserializeResponse (HttpWebResponse response)
+        
+        internal ActionResult DeserializeResponse (HttpWebResponse response)
         {
-            XmlReader reader = XmlReader.Create (response.GetResponseStream ());
-            reader.ReadToFollowing (name + "Response", controller.Description.Type.ToString ());
-            string return_value = null;
-            Dictionary<string, string> out_args = new Dictionary<string, string> ();
-            while (Helper.ReadToNextElement (reader)) {
-                if (return_argument != null && return_argument.Name == reader.Name) {
-                    return_value = reader.ReadString ();
-                } else if (out_arguments.ContainsKey (reader.Name)) {
-                    out_args.Add (reader.Name, reader.ReadString ());
-                }
-            }
-            reader.Close ();
-            return new ActionResult (return_value, out_args);
+            return DeserializeResponseCore (response);
         }
 
-        protected internal virtual Exception DeserializeResponseFault (HttpWebResponse response)
+        protected virtual ActionResult DeserializeResponseCore (HttpWebResponse response)
         {
-            return new UpnpControlException (XmlReader.Create (response.GetResponseStream ()));
+            using (var reader = XmlReader.Create (response.GetResponseStream ())) {
+                reader.ReadToFollowing (Name + "Response", controller.Description.Type.ToString ());
+                var out_args = new Dictionary<string, string> ();
+                string return_value = null;
+                while (reader.ReadToNextElement ()) {
+                    if (ReturnArgument != null && ReturnArgument.Name == reader.Name) {
+                        return_value = reader.ReadString ();
+                    } else {
+                        out_args [reader.Name] = reader.ReadString ();
+                    }
+                }
+                return new ActionResult (return_value, out_args);
+            }
+        }
+        
+        internal void DeserializeResponseFault (HttpWebResponse response)
+        {
+            DeserializeResponseFaultCore (response);
+        }
+
+        protected virtual void DeserializeResponseFaultCore (HttpWebResponse response)
+        {
+            throw new UpnpControlException (XmlReader.Create (response.GetResponseStream ()));
         }
 
         public void Deserialize (XmlReader reader)
         {
             DeserializeCore (reader);
             VerifyDeserialization ();
-            loaded = true;
         }
 
         protected virtual void DeserializeCore (XmlReader reader)
@@ -245,17 +217,20 @@ namespace Mono.Upnp.Control
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.ReadToFollowing ("action");
-                while (Helper.ReadToNextElement (reader)) {
+                reader.Read ();
+                while (reader.ReadToNextElement ()) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing one of the action description elements.", e);
+                        Log.Exception (
+                            "There was a problem deserializing one of the action description elements.", e);
                     }
                 }
-                reader.Close ();
             } catch (Exception e) {
-                throw new UpnpDeserializationException (string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+                throw new UpnpDeserializationException (
+                    string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+            } finally {
+                reader.Close ();
             }
         }
 
@@ -263,40 +238,44 @@ namespace Mono.Upnp.Control
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            reader.Read ();
-            switch (element.ToLower ()) {
-            case "name":
-                Name = reader.ReadString ();
-                break;
-            case "argumentlist":
-                DeserializeArguments (reader.ReadSubtree ());
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
+            using (reader) {
+                reader.Read ();
+                switch (element.ToLower ()) {
+                case "name":
+                    Name = reader.ReadString ();
+                    break;
+                case "argumentlist":
+                    DeserializeArguments (reader.ReadSubtree ());
+                    break;
+                default: // This is a workaround for Mono bug 334752
+                    reader.Skip ();
+                    break;
+                }
             }
-            reader.Close ();
         }
 
         protected virtual void DeserializeArguments (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            while (reader.ReadToFollowing ("argument")) {
-                try {
-                    DeserializeArgument (reader.ReadSubtree ());
-                } catch (Exception e) {
-                    Log.Exception ("There was a problem deserializing an argument list element.", e);
+            using (reader) {
+                while (reader.ReadToFollowing ("argument")) {
+                    try {
+                        DeserializeArgument (reader.ReadSubtree ());
+                    } catch (Exception e) {
+                        Log.Exception ("There was a problem deserializing an argument list element.", e);
+                    }
                 }
             }
-            reader.Close ();
         }
 
         protected virtual void DeserializeArgument (XmlReader reader)
         {
-            Argument argument = CreateArgument ();
-            argument.Deserialize (reader);
-            AddArgument (argument);
+            var argument = CreateArgument ();
+            if (argument != null) {
+                argument.Deserialize (reader);
+                AddArgument (argument);
+            }
         }
 
         protected virtual Argument CreateArgument ()
@@ -306,40 +285,43 @@ namespace Mono.Upnp.Control
 
         protected void AddArgument (Argument argument)
         {
-            CheckLoaded ();
+            if (argument == null) throw new ArgumentNullException ("argument");
+            
             if (argument.Direction == ArgumentDirection.In) {
-                in_argument_dict.Add (argument.Name, argument);
+                in_argument_dict [argument.Name] = argument;
             } else {
                 if (argument.IsReturnValue && !bypass_return_argument) {
-                    if (return_argument == null) {
-                        return_argument = argument;
+                    if (ReturnArgument == null) {
+                        ReturnArgument = argument;
                     } else {
+                        out_argument_dict [ReturnArgument.Name] = ReturnArgument;
+                        out_argument_dict [argument.Name] = argument;
+                        ReturnArgument = null;
+                        bypass_return_argument = true;
                         Log.Exception (new UpnpDeserializationException (
                             string.Format ("{0} has multiple return values.", ToString ())));
-                        out_argument_dict.Add (return_argument.Name, return_argument);
-                        out_argument_dict.Add (argument.Name, argument);
-                        return_argument = null;
-                        bypass_return_argument = true;
                     }
                 } else {
-                    out_argument_dict.Add (argument.Name, argument);
+                    out_argument_dict [argument.Name] = argument;
                 }
             }
         }
 
         void VerifyDeserialization ()
         {
-            if (name == null) {
-                throw new UpnpDeserializationException (string.Format ("The action on {0} has no name.", controller));
+            if (Name == null) {
+                throw new UpnpDeserializationException (
+                    string.Format ("The action on {0} has no name.", controller));
             }
-            if (name.Length == 0) {
-                Log.Exception (new UpnpDeserializationException (string.Format ("The action on {0} has an empty name.", controller)));
+            if (Name.Length == 0) {
+                Log.Exception (new UpnpDeserializationException (
+                    string.Format ("The action on {0} has an empty name.", controller)));
             }
         }
 
         public override string ToString ()
         {
-            return String.Format ("Action {{ {0}, {1} }}", controller, name);
+            return String.Format ("Action {{ {0}, {1} }}", controller, Name);
         }
     }
 }

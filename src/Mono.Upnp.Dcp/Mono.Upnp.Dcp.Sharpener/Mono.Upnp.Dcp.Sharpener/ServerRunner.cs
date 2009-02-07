@@ -88,12 +88,12 @@ namespace Mono.Upnp.Dcp.Sharpener
 
         private void WriteMethods (CodeMonkey monkey, ServiceController service)
         {
-            foreach (Action action in service.Actions.Values) {
+            foreach (var action in service.Actions.Values) {
                 WriteMethod (monkey, action);
             }
         }
 
-        private void WriteMethod (CodeMonkey monkey, Action action)
+        private void WriteMethod (CodeMonkey monkey, ServiceAction action)
         {
             monkey.WriteLine ("[UpnpAction]");
             WriteArgumentAttribute (monkey, action.ReturnArgument);
@@ -109,7 +109,7 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.WriteLine ();
         }
 
-        private void WriteMethodSig (CodeMonkey monkey, Action action, string modifiers, string name, bool includeAttributes)
+        private void WriteMethodSig (CodeMonkey monkey, ServiceAction action, string modifiers, string name, bool includeAttributes)
         {
             monkey.WriteLine (modifiers);
             monkey.Write (action.ReturnArgument != null ? GetTypeName (action.ReturnArgument.RelatedStateVariable.Type) : "void");
@@ -118,7 +118,7 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.Write (")");
         }
 
-        private void WriteMethodParameters (CodeMonkey monkey, Action action, bool definition, bool includeAttributes)
+        private void WriteMethodParameters (CodeMonkey monkey, ServiceAction action, bool definition, bool includeAttributes)
         {
             bool first = true;
             foreach (Argument argument in Concat (action.InArguments.Values, action.OutArguments.Values)) {

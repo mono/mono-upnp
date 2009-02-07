@@ -125,7 +125,7 @@ namespace Mono.Upnp
 
         public override bool Equals (object obj)
         {
-            ReadOnlyDictionary<TKey, TValue> dict = obj as ReadOnlyDictionary<TKey, TValue>;
+            var dict = obj as ReadOnlyDictionary<TKey, TValue>;
             return dict != null && dict.dictionary.Equals (dictionary);
         }
 

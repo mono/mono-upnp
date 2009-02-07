@@ -37,17 +37,8 @@ namespace Mono.Upnp.Description
 	public class ServiceDescription
 	{
         readonly IDisposer disposer;
-        ServiceController controller;
-        ServiceType type;
-        string id;
-        Uri scpd_url;
-        Uri control_url;
-        Uri event_url;
         IDeserializer deserializer;
-        bool loaded;
-        bool is_disposed;
-
-        public event EventHandler<DisposedEventArgs> Disposed;
+        ServiceController controller;
 
         protected internal ServiceDescription (IDisposer disposer)
         {
@@ -55,58 +46,32 @@ namespace Mono.Upnp.Description
 
             this.disposer = disposer;
         }
+        
+        public event EventHandler<DisposedEventArgs> Disposed;
 
-        public ServiceType Type {
-            get { return type; }
-            protected set { SetField (ref type, value); }
-        }
-
-        public string Id {
-            get { return id; }
-            protected set { SetField (ref id, value); }
-        }
-
-        public Uri ScpdUrl {
-            get { return scpd_url; }
-            protected set { SetField (ref scpd_url, value); }
-        }
-
-        public Uri ControlUrl {
-            get { return control_url; }
-            protected set { SetField (ref control_url, value); }
-        }
-
-        public Uri EventUrl {
-            get { return event_url; }
-            protected set { SetField (ref event_url, value); }
-        }
-
-        void SetField<T> (ref T field, T value)
-        {
-            if (loaded) throw new InvalidOperationException ("The service description has already been deserialized.");
-            field = value;
-        }
-
-        public bool IsDisposed {
-            get { return is_disposed; }
-        }
+        public ServiceType Type { get; private set; }
+        public string Id { get; private set; }
+        public Uri ScpdUrl { get; private set; }
+        public Uri ControlUrl { get; private set; }
+        public Uri EventUrl { get; private set; }
+        public bool IsDisposed { get; private set; }
 
         protected internal void CheckDisposed ()
         {
             disposer.TryDispose (this);
-            if (is_disposed) {
+            if (IsDisposed) {
                 throw new ObjectDisposedException (ToString (), "The service has gone off the network.");
             }
         }
 
         protected internal void Dispose ()
         {
-            if (is_disposed) {
+            if (IsDisposed) {
                 return;
             }
 
-            is_disposed = true;
-            OnDispose ();
+            IsDisposed = true;
+            OnDispose (DisposedEventArgs.Empty);
 
             if (controller != null) {
                 controller.Dispose ();
@@ -114,25 +79,23 @@ namespace Mono.Upnp.Description
             }
         }
 
-        protected virtual void OnDispose ()
+        protected virtual void OnDispose (DisposedEventArgs args)
         {
-            EventHandler<DisposedEventArgs> handler = Disposed;
+            var handler = Disposed;
             if (handler != null) {
-                handler (this, DisposedEventArgs.Empty);
+                handler (this, args);
             }
         }
 
         public ServiceController GetController ()
         {
-            if (controller == null) {
-                if (is_disposed) {
+            if (controller == null && deserializer != null) {
+                if (IsDisposed) {
                     throw new ObjectDisposedException (ToString (), "The service has gone off the network.");
                 }
-                if (deserializer == null) {
-                    throw new InvalidOperationException ("The service description has not been deserialized.");
-                }
-                if (scpd_url == null) {
-                    throw new InvalidOperationException ("Attempting to get a controller from a services with no SCPDURL.");
+                if (ScpdUrl == null) {
+                    throw new InvalidOperationException (
+                        "Attempting to get a controller from a services with no SCPDURL.");
                 }
                 controller = deserializer.DeserializeController (this);
                 deserializer = null;
@@ -147,8 +110,6 @@ namespace Mono.Upnp.Description
             this.deserializer = deserializer;
             DeserializeCore (reader);
             VerifyDeserialization ();
-
-            loaded = true;
         }
 
         protected virtual void DeserializeCore (XmlReader reader)
@@ -156,74 +117,78 @@ namespace Mono.Upnp.Description
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.ReadToFollowing ("service");
-                while (Helper.ReadToNextElement (reader)) {
+                reader.Read ();
+                while (reader.ReadToNextElement ()) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing one of the service description elements.", e);
+                        Log.Exception (
+                            "There was a problem deserializing one of the service description elements.", e);
                     }
                 }
-                reader.Close ();
             } catch (Exception e) {
-                throw new UpnpDeserializationException (string.Format ("There was a problem deserializing {0}.", ToString ()), e);
-            }
+                throw new UpnpDeserializationException (
+                    string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+            } finally {
+				reader.Close ();
+			}
         }
 
         protected virtual void DeserializeCore (XmlReader reader, string element)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            reader.Read ();
-            switch (element.ToLower ()) {
-            case "servicetype":
-                Type = new ServiceType (reader.ReadString ());
-                break;
-            case "serviceid":
-                // TODO better handling of this complex string
-                Id = reader.ReadString ().Trim ();
-                break;
-            case "scpdurl":
-                ScpdUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                break;
-            case "controlurl":
-                ControlUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                break;
-            case "eventsuburl":
-                EventUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
+            using (reader) {
+                reader.Read ();
+                switch (element.ToLower ()) {
+                case "servicetype":
+                    Type = new ServiceType (reader.ReadString ());
+                    break;
+                case "serviceid":
+                    // TODO better handling of this complex string
+                    Id = reader.ReadString ().Trim ();
+                    break;
+                case "scpdurl":
+                    ScpdUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
+                    break;
+                case "controlurl":
+                    ControlUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
+                    break;
+                case "eventsuburl":
+                    EventUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
+                    break;
+                default: // This is a workaround for Mono bug 334752
+                    reader.Skip ();
+                    break;
+                }
             }
-            reader.Close ();
         }
 
         void VerifyDeserialization ()
         {
-            if (id == null) {
-                string message = type == null
-                    ? string.Format ("A service has no ID or type.")
-                    : string.Format ("A service of type {0} has no id.", type);
+            if (Id == null) {
+                var message = Type == null
+                    ? string.Format ("The service has no ID or type.")
+                    : string.Format ("The service of type {0} has no id.", Type);
                 throw new UpnpDeserializationException (message);
             }
-            if (type == null) {
-                throw new UpnpDeserializationException (string.Format ("The service {0} has no type.", id));
+            if (Type == null) {
+                throw new UpnpDeserializationException (string.Format ("The service {0} has no type.", Id));
             }
-            if (scpd_url == null) {
+            if (ScpdUrl == null) {
                 Log.Exception (new UpnpDeserializationException (string.Format ("{0} has no SCPD URL.", ToString ())));
             }
-            if (control_url == null) {
+            if (ControlUrl == null) {
                 Log.Exception (new UpnpDeserializationException (string.Format ("{0} has no control URL.", ToString ())));
             }
-            if (event_url == null) {
+            if (EventUrl == null) {
                 Log.Exception (new UpnpDeserializationException (string.Format ("{0} has no event URL.", ToString ())));
             }
         }
 
         public override string ToString ()
         {
-            return String.Format ("ServiceDescription {{ {0}, {1} }}", id, type);
+            return string.Format ("ServiceDescription {{ {0}, {1} }}", Id, Type);
         }
 	}
 }

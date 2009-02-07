@@ -35,58 +35,61 @@ namespace Mono.Upnp.Control
 {
 	public class UpnpControlException : Exception
 	{
-        private struct FaultCode
+        struct FaultCode
         {
             public string Message;
             public UpnpControlExceptionStatus Status;
         }
+		
+		readonly UpnpControlExceptionStatus status;
 
         public UpnpControlException (XmlReader reader)
             : this (Deserialize(reader))
         {
         }
 
-        private UpnpControlException (FaultCode code)
+        UpnpControlException (FaultCode code)
             : base (code.Message)
         {
             this.status = code.Status;
         }
 
-        private UpnpControlExceptionStatus status;
         public UpnpControlExceptionStatus Status {
             get { return status; }
         }
 
         private static FaultCode Deserialize (XmlReader reader)
         {
-            FaultCode code = new FaultCode ();
-            reader.ReadToFollowing ("UPnPError", "urn:schemas-upnp-org:control-1-0");
-            while (Helper.ReadToNextElement (reader)) {
-                Deserialize (reader.ReadSubtree (), reader.Name, ref code);
-            }
-            reader.Close ();
-            return code;
+			using (reader) {
+	            var code = new FaultCode ();
+	            reader.ReadToFollowing ("UPnPError", "urn:schemas-upnp-org:control-1-0");
+	            while (reader.ReadToNextElement ()) {
+	                Deserialize (reader.ReadSubtree (), reader.Name, ref code);
+	            }
+	            return code;
+			}
         }
 
         private static void Deserialize(XmlReader reader, string element, ref FaultCode code)
         {
-            reader.Read ();
-            switch (element.ToLower ()) {
-            case "errorcode":
-                reader.Read ();
-                int value = reader.ReadContentAsInt ();
-                code.Status = Enum.IsDefined (typeof(UpnpControlExceptionStatus), value)
-                    ? (UpnpControlExceptionStatus)value
-                    : UpnpControlExceptionStatus.Unknown;
-                break;
-            case "errordescription":
-                code.Message = reader.ReadString ();
-                break;
-            default:
-                reader.Skip (); // This is a workaround for Mono bug 334752
-                break;
-            }
-            reader.Close ();
+			using (reader) {
+	            reader.Read ();
+	            switch (element.ToLower ()) {
+	            case "errorcode":
+	                reader.Read ();
+	                var value = reader.ReadContentAsInt ();
+	                code.Status = Enum.IsDefined (typeof(UpnpControlExceptionStatus), value)
+	                    ? (UpnpControlExceptionStatus)value
+	                    : UpnpControlExceptionStatus.Unknown;
+	                break;
+	            case "errordescription":
+	                code.Message = reader.ReadString ();
+	                break;
+	            default: // This is a workaround for Mono bug 334752
+	                reader.Skip ();
+	                break;
+	            }
+			}
         }
 	}
 }

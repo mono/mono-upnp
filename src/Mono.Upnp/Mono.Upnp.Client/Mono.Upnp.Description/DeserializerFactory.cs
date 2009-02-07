@@ -28,12 +28,10 @@
 
 namespace Mono.Upnp.Description
 {
-    public sealed class DeserializerFactory : DeserializerFactory<Deserializer>
-    {
-    }
 
 	public class DeserializerFactory<T> : IDeserializerFactory where T : IDeserializer, new ()
 	{
+        public static readonly DeserializerFactory<T> Instance = new DeserializerFactory<T> ();
         public IDeserializer CreateDeserializer ()
         {
             return new T ();

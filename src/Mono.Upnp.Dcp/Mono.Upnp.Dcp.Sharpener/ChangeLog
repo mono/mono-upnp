@@ -1,0 +1,11 @@
+2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* ChangeLog:
+	* Mono.Upnp.Dcp.Sharpener.csproj:
+	* Mono.Upnp.Dcp.Sharpener/OfflineAction.cs: 
+
+	* Mono.Upnp.Dcp.Sharpener/ServerRunner.cs:
+	* Mono.Upnp.Dcp.Sharpener/OfflineServiceController.cs: Renamed
+	Action to ServiceAction so it doesn't conflict with the
+	delegate type in System.Core.dll
+

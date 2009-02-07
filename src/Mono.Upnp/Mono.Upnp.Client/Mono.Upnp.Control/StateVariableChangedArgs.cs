@@ -32,7 +32,7 @@ namespace Mono.Upnp.Control
 {
 	public class StateVariableChangedArgs<T> : EventArgs
 	{
-        private T new_value;
+        readonly T new_value;
 
         public StateVariableChangedArgs (T newValue)
         {

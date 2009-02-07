@@ -37,75 +37,45 @@ namespace Mono.Upnp.Control
 {
 	public class Argument
     {
-        readonly Action action;
-        string name;
+        readonly ServiceAction action;
         ArgumentDirection? direction;
-        string related_state_variable_name;
         StateVariable related_state_variable;
-        bool is_return_value;
-        bool loaded;
 
-        protected internal Argument (Action action)
+        protected internal Argument (ServiceAction action)
         {
             if (action == null) throw new ArgumentNullException ("action");
 
             this.action = action;
         }
 
-        public Action Action {
+        public ServiceAction Action {
             get { return action; }
         }
 
-        public string Name {
-            get { return name; }
-            protected set { SetField (ref name, value);  }
-        }
+        public string Name { get; private set; }
+        
+        public string RelatedStateVariableName { get; private set; }
+        
+        public bool IsReturnValue { get; private set; }
 
         public ArgumentDirection Direction {
             get { return direction.Value; }
-            protected set {
-                CheckLoaded ();
-                direction = value;
-            }
-        }
-
-        public string RelatedStateVariableName {
-            get { return related_state_variable_name; }
-            set { SetField (ref related_state_variable_name, value);  }
+            protected set { direction = value; }
         }
 
         public StateVariable RelatedStateVariable {
             get {
-                if (related_state_variable == null) {
-                    action.Controller.StateVariables.TryGetValue (related_state_variable_name, out related_state_variable);
+                if (RelatedStateVariableName == null) {
+                    action.Controller.StateVariables.TryGetValue (RelatedStateVariableName, out related_state_variable);
                 }
                 return related_state_variable;
             }
-        }
-
-        public bool IsReturnValue {
-            get { return is_return_value; }
-            protected set { SetField (ref is_return_value, value); }
-        }
-
-        void CheckLoaded ()
-        {
-            if (loaded) {
-                throw new InvalidOperationException ("The argument has already been deserialized.");
-            }
-        }
-
-        void SetField<T> (ref T field, T value)
-        {
-            CheckLoaded ();
-            field = value;
         }
 
         public void Deserialize (XmlReader reader)
         {
             DeserializeCore (reader);
             VerifyDeserialization ();
-            loaded = true;
         }
 
         protected virtual void DeserializeCore (XmlReader reader)
@@ -113,17 +83,20 @@ namespace Mono.Upnp.Control
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.ReadToFollowing ("argument");
-                while (Helper.ReadToNextElement (reader)) {
+                reader.Read ();
+                while (reader.ReadToNextElement ()) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing one of the argument description elements.", e);
+                        Log.Exception (
+                            "There was a problem deserializing one of the argument description elements.", e);
                     }
                 }
-                reader.Close ();
             } catch (Exception e) {
-                throw new UpnpDeserializationException (string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+                throw new UpnpDeserializationException (
+                    string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+            } finally {
+                reader.Close ();
             }
         }
 
@@ -131,38 +104,39 @@ namespace Mono.Upnp.Control
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            reader.Read ();
-            switch (element.ToLower ()) {
-            case "name":
-                Name = reader.ReadString ().Trim ();
-                break;
-            case "direction":
-                Direction = reader.ReadString ().Trim () == "in" ? ArgumentDirection.In : ArgumentDirection.Out;
-                break;
-            case "retval":
-                IsReturnValue = true;
-                break;
-            case "relatedstatevariable":
-                RelatedStateVariableName = reader.ReadString ().Trim ();
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
+            using (reader) {
+                reader.Read ();
+                switch (element.ToLower ()) {
+                case "name":
+                    Name = reader.ReadString ().Trim ();
+                    break;
+                case "direction":
+                    Direction = reader.ReadString ().Trim () == "in" ? ArgumentDirection.In : ArgumentDirection.Out;
+                    break;
+                case "retval":
+                    IsReturnValue = true;
+                    break;
+                case "relatedstatevariable":
+                    RelatedStateVariableName = reader.ReadString ().Trim ();
+                    break;
+                default: // This is a workaround for Mono bug 334752
+                    reader.Skip ();
+                    break;
+                }
             }
-            reader.Close ();
         }
 
         void VerifyDeserialization ()
         {
-            if (name == null) {
+            if (Name == null) {
                 throw new UpnpDeserializationException (string.Format (
                     "An argument on {0} has no name.", action));
             }
-            if (name.Length == 0) {
+            if (Name.Length == 0) {
                 Log.Exception (new UpnpDeserializationException (string.Format (
                     "An argument on {0} has an empty name.", action)));
             }
-            if (related_state_variable_name == null) {
+            if (RelatedStateVariableName == null) {
                 throw new UpnpDeserializationException (string.Format (
                     "{0} has no related state variable.", ToString ()));
             }
@@ -175,7 +149,7 @@ namespace Mono.Upnp.Control
 
         public override string ToString ()
         {
-            return string.Format (@"Argument {{ {0}, {1} }}", action, name);
+            return string.Format (@"Argument {{ {0}, {1} }}", action, Name);
         }
     }
 }

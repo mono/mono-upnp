@@ -28,7 +28,7 @@
 
 using System;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.Description
 {
 	public class DisposedEventArgs : EventArgs
 	{

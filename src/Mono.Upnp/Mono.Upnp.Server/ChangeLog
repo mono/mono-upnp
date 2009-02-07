@@ -1,0 +1,9 @@
+2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* ChangeLog:
+	* Mono.Upnp.Server.csproj: 
+
+	* Mono.Upnp.Server.Internal/Helper.cs:
+	* Mono.Upnp.Server.Internal/ActionServer.cs: Made
+	Helper.ReadToNextElement an extension method
+

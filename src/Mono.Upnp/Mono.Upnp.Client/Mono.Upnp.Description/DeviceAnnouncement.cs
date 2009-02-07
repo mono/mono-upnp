@@ -1,5 +1,5 @@
 ﻿//
-// ServiceAnnouncement.cs
+// DeviceAnnouncement.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -29,46 +29,45 @@
 using System;
 using System.Collections.Generic;
 
-using Mono.Upnp.Description;
-
-namespace Mono.Upnp.Discovery
+namespace Mono.Upnp.Description
 {
-	public sealed class ServiceAnnouncement
+	public sealed class DeviceAnnouncement
 	{
         readonly UpnpClient client;
-        readonly ServiceType type;
-        readonly string deviceUdn;
+        readonly DeviceType type;
+        readonly string udn;
         readonly IEnumerable<string> locations;
-        ServiceDescription description;
-        bool is_disposed;
+        DeviceDescription description;
 
-        public event EventHandler<DisposedEventArgs> Disposed;
-
-        internal ServiceAnnouncement (UpnpClient client, ServiceType type, string deviceUdn, IEnumerable<string> locations)
+        internal DeviceAnnouncement (UpnpClient client, DeviceType type, string udn, IEnumerable<string> locations)
         {
             this.client = client;
             this.type = type;
-            this.deviceUdn = deviceUdn;
+            this.udn = udn;
             this.locations = locations;
         }
+        
+        public event EventHandler<DisposedEventArgs> Disposed;
+        
+        public bool IsDisposed { get; private set; }
 
-        public ServiceType Type {
+        public DeviceType Type {
             get { return type; }
         }
 
-        public string DeviceUdn {
-            get { return deviceUdn; }
+        public string Udn {
+            get { return udn; }
         }
 
         public IEnumerable<string> Locations {
             get { return locations; }
         }
 
-        public ServiceDescription GetDescription ()
+        public DeviceDescription GetDescription ()
         {
             if (description == null) {
-                if (is_disposed) {
-                    throw new ObjectDisposedException (ToString (), "The services has gone off the network.");
+                if (IsDisposed) {
+                    throw new ObjectDisposedException (ToString (), "The device has gone off the network.");
                 }
                 description = client.GetDescription (this);
             }
@@ -77,12 +76,12 @@ namespace Mono.Upnp.Discovery
 
         internal void Dispose ()
         {
-            if (is_disposed) {
+            if (IsDisposed) {
                 return;
             }
 
-            is_disposed = true;
-            OnDispose ();
+            IsDisposed = true;
+            OnDispose (DisposedEventArgs.Empty);
 
             if (description != null) {
                 description.Dispose ();
@@ -90,30 +89,30 @@ namespace Mono.Upnp.Discovery
             }
         }
 
-        void OnDispose ()
+        void OnDispose (DisposedEventArgs args)
         {
-            EventHandler<DisposedEventArgs> handler = Disposed;
+            var handler = Disposed;
             if (handler != null) {
-                handler (this, DisposedEventArgs.Empty);
+                handler (this, args);
             }
         }
 
         public override bool Equals (object obj)
         {
-            ServiceAnnouncement announcement = obj as ServiceAnnouncement;
+            var announcement = obj as DeviceAnnouncement;
             return announcement != null &&
-                announcement.type == type &&
-                announcement.deviceUdn == deviceUdn;
+                announcement.type == type && 
+                announcement.udn == udn;
         }
 
         public override int GetHashCode ()
         {
-            return type.GetHashCode () ^ deviceUdn.GetHashCode ();
+            return type.GetHashCode () ^ udn.GetHashCode ();
         }
 
         public override string ToString ()
         {
-            return string.Format ("ServiceAnnouncement {{ uuid:{0}::{1} }}", deviceUdn, type);
+            return string.Format ("DeviceAnnouncement {{ uuid:{0}::{1} }}", udn, type);
         }
 	}
 }

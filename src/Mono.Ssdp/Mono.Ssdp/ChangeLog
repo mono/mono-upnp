@@ -1,0 +1,9 @@
+2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* ChangeLog:
+	* Mono.Ssdp.csproj: 
+
+	* Mono.Ssdp/Browser.cs:
+	* Mono.Ssdp/Announcer.cs: Qualified System.Math because gmcs
+	was bitching about it. Have to ask marek about that.
+

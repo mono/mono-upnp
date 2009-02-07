@@ -1,3 +1,10 @@
+2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.sln: 
+
+	* HACKING: Started a HACKING file for writing down general
+	stuff
+
 2008-10-10  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.MediaServer/Mono.Upnp.Dcp.MediaServer1.Client/*:

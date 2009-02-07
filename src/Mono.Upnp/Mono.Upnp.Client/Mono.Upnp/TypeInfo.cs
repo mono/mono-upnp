@@ -27,29 +27,27 @@
 //
 
 using System;
-using System.Xml;
-
-using Mono.Upnp.Internal;
 
 namespace Mono.Upnp
 {
     public abstract class TypeInfo
     {
+		readonly string domain_name;
+		readonly string type;
+		readonly Version version;
+		
         internal TypeInfo (string typeDescription)
         {
             try {
-                typeDescription = typeDescription.Trim ();
-                string[] sections = typeDescription.Split (':');
-                Version version;
-                string[] versions = sections[4].Split ('.');
+                var sections = typeDescription.Trim ().Split (':');
+                var versions = sections[4].Split ('.');
                 if (versions.Length == 1) {
-                    version = new Version (Int32.Parse (versions[0]), 0);
+                    version = new Version (int.Parse (versions[0]), 0);
                 } else {
-                    version = new Version (Int32.Parse (versions[0]), Int32.Parse (versions[1]));
+                    version = new Version (int.Parse (versions[0]), int.Parse (versions[1]));
                 }
                 domain_name = sections[1];
                 type = sections[3];
-                this.version = version;
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deseriailizing a type description.", e);
             }
@@ -57,32 +55,29 @@ namespace Mono.Upnp
 
         protected abstract string Kind { get; }
 
-        private readonly string domain_name;
         public string DomainName {
             get { return domain_name; }
         }
 
-        private readonly string type;
         public string Type {
             get { return type; }
         }
 
-        private readonly Version version;
         public Version Version {
             get { return version; }
         }
 
         public override string ToString ()
         {
-            string version = this.version.Minor == 0
+            var version = this.version.Minor == 0
                 ? this.version.Major.ToString ()
-                : String.Format ("{0}.{1}", this.version.Major, this.version.Minor);
-            return String.Format ("urn:{0}:{1}:{2}:{3}", domain_name, Kind, type, version);
+                : string.Format ("{0}.{1}", this.version.Major, this.version.Minor);
+            return string.Format ("urn:{0}:{1}:{2}:{3}", domain_name, Kind, type, version);
         }
 
         public override bool Equals (object obj)
         {
-            TypeInfo type_info = obj as TypeInfo;
+            var type_info = obj as TypeInfo;
             return type_info == this;
         }
 

@@ -50,26 +50,23 @@ namespace Mono.Upnp.Internal
             public bool UseUtf8 = true;
             public FallbackInfo Clone ()
             {
-                FallbackInfo fallback = new FallbackInfo ();
-                fallback.OmitMan = OmitMan;
-                fallback.Chuncked = Chuncked;
-                fallback.UseUtf8 = UseUtf8;
-                return fallback;
+                return new FallbackInfo {
+                    OmitMan = OmitMan,
+                    Chuncked = Chuncked,
+                    UseUtf8 = UseUtf8
+                };
             }
         }
-
-        readonly static Dictionary<string, FallbackInfo> fallbacks = new Dictionary<string, FallbackInfo> ();
-
+        
         static SoapInvoker ()
         {
             ServicePointManager.Expect100Continue = false;
         }
 
-        delegate HttpWebRequest RequestProvider (Action action, WebHeaderCollection headers);
-        delegate HttpWebResponse RequestHandler (HttpWebRequest request, Action action, Stream stream);
+        readonly static Dictionary<string, FallbackInfo> fallbacks = new Dictionary<string, FallbackInfo> ();
 
-        Uri location;
-        FallbackInfo fallback;
+        readonly Uri location;
+        readonly FallbackInfo fallback;
 
         public SoapInvoker (Uri location)
         {
@@ -83,62 +80,55 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        public ActionResult Invoke (Action action, IDictionary<string, string> arguments)
+        public ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments)
         {
-            Encoding encoding = fallback.UseUtf8 ? Encoding.UTF8 : Encoding.ASCII;
-            Encoding fallbackEncoding = fallback.UseUtf8 ? Encoding.ASCII : Encoding.UTF8;
-            ActionResult result;
-            if (!Invoke (action, arguments, encoding, false, out result)) {
+            var encoding = fallback.UseUtf8 ? Encoding.UTF8 : Encoding.ASCII;
+            var fallbackEncoding = fallback.UseUtf8 ? Encoding.ASCII : Encoding.UTF8;
+            var result = Invoke (action, arguments, encoding, false);
+            if (result == null) {
                 fallback.UseUtf8 = !fallback.UseUtf8;
-                Invoke (action, arguments, fallbackEncoding, true, out result);
+                result = Invoke (action, arguments, fallbackEncoding, true);
             }
             return result;
         }
 
-        private bool Invoke (Action action, IDictionary<string, string> arguments, Encoding encoding, bool isFallback, out ActionResult result)
+        private ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments,
+                             Encoding encoding, bool isFallback)
         {
             // Because we may do several fallbacks, we serialize to a memory stream and copy that
             // to the network stream. That way we only have to serialize once (unless we have to
             // try a different encoding scheme).
-            Stream stream = new MemoryStream ();
-            WebHeaderCollection headers = new WebHeaderCollection ();
+            using (var stream = new MemoryStream ()) {
+                var headers = new WebHeaderCollection ();
 
-            try {
-                XmlWriterSettings settings = new XmlWriterSettings ();
-                settings.Encoding = encoding;
-                XmlWriter writer = XmlWriter.Create (stream, settings);
-                action.SerializeRequest (arguments, headers, writer);
-                writer.Close ();
-
-                HttpWebResponse response = GetResponse (action, headers, stream);
                 try {
-                    if (response.StatusCode == HttpStatusCode.OK) {
-                        result = action.DeserializeResponse (response);
-                        return true;
-                    } else if (response.StatusCode == HttpStatusCode.InternalServerError) {
-                        if (isFallback) {
-                            throw action.DeserializeResponseFault (response);
-                        } else {
-                            result = null;
-                            return false;
-                        }
-                    } else {
-                        throw new UpnpException (String.Format (
-                            "There was an unknown error while invoking the action: the service returned status code {0}.", response.StatusCode));
+                    var settings = new XmlWriterSettings { Encoding = encoding };
+                    using (var writer = XmlWriter.Create (stream, settings)) {
+                        action.SerializeRequest (arguments, headers, writer);
                     }
-                } finally {
-                    response.Close ();
+    
+                    using (var response = GetResponse (action, headers, stream)) {
+                        if (response.StatusCode == HttpStatusCode.OK) {
+                            return action.DeserializeResponse (response);
+                        } else if (response.StatusCode == HttpStatusCode.InternalServerError) {
+                            if (isFallback) {
+                                action.DeserializeResponseFault (response);
+                            }
+                            return null;
+                        } else {
+                            throw new UpnpException (String.Format (
+                                "There was an unknown error while invoking the action: the service returned status code {0}.", response.StatusCode));
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new UpnpException ("There was an unknown error while invoking the action.", e);
                 }
-            } catch (Exception e) {
-                throw new UpnpException ("There was an unknown error while invoking the action.", e);
-            } finally {
-                stream.Close ();
             }
         }
 
-        private HttpWebResponse GetResponse (Action action, WebHeaderCollection headers, Stream stream)
+        private HttpWebResponse GetResponse (ServiceAction action, WebHeaderCollection headers, Stream stream)
         {
-            HttpWebResponse response = Stage1 (action, headers, stream);
+            var response = Stage1 (action, headers, stream);
             if (response.StatusCode == HttpStatusCode.NotImplemented || response.StatusDescription == "Not Extended") {
                 // FIXME is this the right exception type?
                 throw new UpnpException ("The SOAP request failed.");
@@ -147,7 +137,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse Stage1 (Action action, WebHeaderCollection headers, Stream stream)
+        private HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, Stream stream)
         {
             if (fallback.OmitMan) {
                 return Stage1 (action, headers, stream, CreateRequestWithoutMan, CreateRequestWithMan);
@@ -156,37 +146,39 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse Stage1 (Action action, WebHeaderCollection headers, Stream stream, RequestProvider provider1, RequestProvider provider2)
+        private HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, Stream stream,
+                                        Func<ServiceAction, WebHeaderCollection, HttpWebRequest> requestProvider1,
+                                        Func<ServiceAction, WebHeaderCollection, HttpWebRequest> requestProvider2)
         {
-            HttpWebResponse response = Stage2 (provider1, action, headers, stream);
+            var response = Stage2 (requestProvider1, action, headers, stream);
             if (response.StatusCode == HttpStatusCode.MethodNotAllowed) {
-                response = Stage2 (provider2, action, headers, stream);
+                response = Stage2 (requestProvider2, action, headers, stream);
             }
             return response;
         }
 
-        private HttpWebRequest CreateRequestWithoutMan (Action action, WebHeaderCollection headers)
+        private HttpWebRequest CreateRequestWithoutMan (ServiceAction action, WebHeaderCollection headers)
         {
             fallback.OmitMan = true;
-            HttpWebRequest request = CreateRequest (headers);
+            var request = CreateRequest (headers);
             request.Method = "POST";
-            request.Headers.Add ("SOAPACTION", String.Format (@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
+            request.Headers.Add ("SOAPACTION", string.Format (@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
             return request;
         }
 
-        private HttpWebRequest CreateRequestWithMan (Action action, WebHeaderCollection headers)
+        private HttpWebRequest CreateRequestWithMan (ServiceAction action, WebHeaderCollection headers)
         {
             fallback.OmitMan = false;
-            HttpWebRequest request = CreateRequest (headers);
+            var request = CreateRequest (headers);
             request.Method = "M-POST";
-            request.Headers.Add ("MAN", String.Format (@"""{0}""; ns=01", Protocol.SoapEnvelopeSchema));
+            request.Headers.Add ("MAN", string.Format (@"""{0}""; ns=01", Protocol.SoapEnvelopeSchema));
             request.Headers.Add ("01-SOAPACTION", String.Format (@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
             return request;
         }
 
         private HttpWebRequest CreateRequest (WebHeaderCollection headers)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create (location);
+            var request = (HttpWebRequest)WebRequest.Create (location);
             request.ContentType = @"text/xml; charset=""utf-8""";
             foreach (string header in headers.Keys) {
                 request.Headers.Add (header, headers[header]);
@@ -194,9 +186,10 @@ namespace Mono.Upnp.Internal
             return request;
         }
 
-        private HttpWebResponse Stage2 (RequestProvider provider, Action action, WebHeaderCollection headers, Stream stream)
+        private HttpWebResponse Stage2 (Func<ServiceAction, WebHeaderCollection, HttpWebRequest> requestProvider,
+                                        ServiceAction action, WebHeaderCollection headers, Stream stream)
         {
-            HttpWebRequest request = provider (action, headers);
+            var request = requestProvider (action, headers);
             if (fallback.Chuncked) {
                 return Stage2 (request, action, stream, Stage3Chuncked, Stage3Unchunked);
             } else {
@@ -204,20 +197,22 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse Stage2 (HttpWebRequest request, Action action, Stream stream, RequestHandler handler1, RequestHandler handler2)
+        private HttpWebResponse Stage2 (HttpWebRequest request, ServiceAction action, Stream stream,
+                                        Func<HttpWebRequest, ServiceAction, Stream, HttpWebResponse> requestHandler1,
+                                        Func<HttpWebRequest, ServiceAction, Stream, HttpWebResponse> requestHandler2)
         {
             try {
-                HttpWebResponse response = handler1 (request, action, stream);
+                var response = requestHandler1 (request, action, stream);
                 if (response.StatusCode == HttpStatusCode.HttpVersionNotSupported) {
                     throw new ProtocolViolationException ();
                 }
                 return response;
             } catch (ProtocolViolationException) {
-                return handler2 (request, action, stream);
+                return requestHandler2 (request, action, stream);
             }
         }
 
-        private HttpWebResponse Stage3Chuncked (HttpWebRequest request, Action action, Stream stream)
+        private HttpWebResponse Stage3Chuncked (HttpWebRequest request, ServiceAction action, Stream stream)
         {
             fallback.Chuncked = true;
             request.ProtocolVersion = new Version (1, 1);
@@ -225,7 +220,7 @@ namespace Mono.Upnp.Internal
             return Final (request, action, stream);
         }
 
-        private HttpWebResponse Stage3Unchunked (HttpWebRequest request, Action action, Stream stream)
+        private HttpWebResponse Stage3Unchunked (HttpWebRequest request, ServiceAction action, Stream stream)
         {
             fallback.Chuncked = false;
             request.ProtocolVersion = new Version (1, 0);
@@ -233,12 +228,12 @@ namespace Mono.Upnp.Internal
             return Final (request, action, stream);
         }
 
-        private HttpWebResponse Final (HttpWebRequest request, Action action, Stream stream)
+        private HttpWebResponse Final (HttpWebRequest request, ServiceAction action, Stream stream)
         {
             stream.Seek (0, SeekOrigin.Begin);
             request.ContentLength = stream.Length;
-            Stream output = request.GetRequestStream ();
-            byte[] buffer = new byte[1024];
+            var output = request.GetRequestStream ();
+            var buffer = new byte[1024];
             int count;
             while ((count = stream.Read (buffer, 0, 1024)) > 0) {
                 output.Write (buffer, 0, count);

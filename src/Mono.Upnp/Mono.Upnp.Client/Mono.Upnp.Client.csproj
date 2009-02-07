@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Mono.Upnp.Client</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>mono-upnp-client.snk</AssemblyOriginatorKeyFile>
@@ -18,33 +18,38 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>./</OutputPath>
+    <OutputPath>.</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <StartupObject />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>.\</OutputPath>
+    <OutputPath>.</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj">
       <Project>{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}</Project>
-      <Name>Mono.Ssdp %28Mono.Ssdp\Mono.Ssdp%29</Name>
+      <Name>Mono.Ssdp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mono.Upnp.Control\Action.cs" />
+    <Compile Include="Mono.Upnp.Control\ServiceAction.cs" />
     <Compile Include="Mono.Upnp.Control\ActionResult.cs" />
     <Compile Include="Mono.Upnp.Control\AllowedValueRange.cs" />
     <Compile Include="Mono.Upnp.Control\Argument.cs" />
@@ -61,16 +66,12 @@
     <Compile Include="Mono.Upnp.Internal\Helper.cs" />
     <Compile Include="Mono.Upnp.Internal\Log.cs" />
     <Compile Include="Mono.Upnp.Internal\Protocol.cs" />
-    <Compile Include="Mono.Upnp.Discovery\DeviceAnnouncement.cs" />
     <Compile Include="Mono.Upnp.Description\DeviceDescription.cs" />
     <Compile Include="Mono.Upnp.Description\Deserializer.cs" />
-    <Compile Include="Mono.Upnp.Discovery\ServiceAnnouncement.cs" />
     <Compile Include="Mono.Upnp.Control\ServiceController.cs" />
     <Compile Include="Mono.Upnp.Description\ServiceDescription.cs" />
     <Compile Include="Mono.Upnp.Internal\TimeoutDispatcher.cs" />
-    <Compile Include="Mono.Upnp.Description\UpnpDeserializationException.cs" />
     <Compile Include="Mono.Upnp.Internal\SoapInvoker.cs" />
-    <Compile Include="Mono.Upnp\DisposedEventArgs.cs" />
     <Compile Include="Mono.Upnp\UpnpClient.cs" />
     <Compile Include="Mono.Upnp\DeviceType.cs" />
     <Compile Include="Mono.Upnp\ReadOnlyDictionary.cs" />
@@ -80,6 +81,10 @@
     <Compile Include="Mono.Upnp.Description\Icon.cs" />
     <Compile Include="Mono.Upnp\TypeInfo.cs" />
     <Compile Include="Mono.Upnp\UpnpException.cs" />
+    <Compile Include="Mono.Upnp.Description\DeviceAnnouncement.cs" />
+    <Compile Include="Mono.Upnp.Description\ServiceAnnouncement.cs" />
+    <Compile Include="Mono.Upnp\UpnpDeserializationException.cs" />
+    <Compile Include="Mono.Upnp.Description\DisposedEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mono-upnp-client.snk" />

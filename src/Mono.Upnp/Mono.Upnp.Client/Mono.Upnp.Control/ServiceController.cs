@@ -39,33 +39,33 @@ namespace Mono.Upnp.Control
 	public class ServiceController
 	{
         readonly ServiceDescription service_description;
-        readonly Dictionary<string, Action> action_dict = new Dictionary<string, Action> ();
-        readonly ReadOnlyDictionary<string, Action> actions;
+        readonly Dictionary<string, ServiceAction> action_dict = new Dictionary<string, ServiceAction> ();
+        readonly ReadOnlyDictionary<string, ServiceAction> actions;
         readonly Dictionary<string, StateVariable> state_variable_dict = new Dictionary<string, StateVariable> ();
         readonly ReadOnlyDictionary<string, StateVariable> state_variables;
-        bool loaded;
         SoapInvoker soap_adapter;
         EventSubscriber subscriber;
         int events_ref_count;
-        bool is_disposed;
-
-        public event EventHandler<DisposedEventArgs> Disposed;
 
         protected internal ServiceController (ServiceDescription service)
         {
             if (service == null) throw new ArgumentNullException ("service");
 
-            actions = new ReadOnlyDictionary<string, Action> (action_dict);
+            actions = new ReadOnlyDictionary<string, ServiceAction> (action_dict);
             state_variables = new ReadOnlyDictionary<string, StateVariable> (state_variable_dict);
 
             this.service_description = service;
         }
+        
+        public event EventHandler<DisposedEventArgs> Disposed;
+        
+        public bool IsDisposed { get; private set; }
 
         public ServiceDescription Description {
             get { return service_description; }
         }
 
-        public ReadOnlyDictionary<string, Action> Actions {
+        public ReadOnlyDictionary<string, ServiceAction> Actions {
             get { return actions; }
         }
 
@@ -73,54 +73,42 @@ namespace Mono.Upnp.Control
             get { return state_variables; }
         }
 
-        protected void AddAction (Action action)
+        protected void AddAction (ServiceAction action)
         {
-            CheckLoaded ();
             if (action == null) throw new ArgumentNullException ("action");
-            action_dict.Add (action.Name, action);
+            action_dict [action.Name] = action;
         }
 
         protected void AddStateVariable (StateVariable stateVariable)
         {
-            CheckLoaded ();
             if (stateVariable == null) throw new ArgumentNullException ("stateVariable");
-            state_variable_dict.Add (stateVariable.Name, stateVariable);
-        }
-
-        void CheckLoaded ()
-        {
-            if (loaded) {
-                throw new InvalidOperationException ("The service controller has already been deserialized.");
-            }
-        }
-
-        public bool IsDisposed {
-            get { return is_disposed; }
+            state_variable_dict [stateVariable.Name] = stateVariable;
         }
 
         protected internal void Dispose ()
         {
-            if (is_disposed) {
+            if (IsDisposed) {
                 return;
             }
 
-            is_disposed = true;
-            OnDisposed ();
+            IsDisposed = true;
+            OnDisposed (DisposedEventArgs.Empty);
         }
 
-        protected virtual void OnDisposed ()
+        protected virtual void OnDisposed (DisposedEventArgs args)
         {
-            EventHandler<DisposedEventArgs> handler = Disposed;
+            var handler = Disposed;
             if (handler != null) {
-                handler (this, DisposedEventArgs.Empty);
+                handler (this, args);
             }
         }
 
-        internal ActionResult Invoke (Action action, IDictionary<string, string> arguments)
+        internal ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments)
         {
             if (soap_adapter == null) {
                 if (service_description.ControlUrl == null) {
-                    throw new InvalidOperationException (string.Format ("{0} does not have a control URL.", service_description));
+                    throw new InvalidOperationException (
+                        string.Format ("{0} does not have a control URL.", service_description));
                 }
                 soap_adapter = new SoapInvoker (service_description.ControlUrl);
             }
@@ -142,7 +130,8 @@ namespace Mono.Upnp.Control
                 }
                 if (service_description.EventUrl == null) {
                     // We log this because it's a no-no to throw in event registration
-                    Log.Exception (new InvalidOperationException ("Attempting to subscribe to events for a service with no event URL."));
+                    Log.Exception (new InvalidOperationException (
+                        "Attempting to subscribe to events for a service with no event URL."));
                 } else {
                     subscriber.Start ();
                 }
@@ -162,7 +151,6 @@ namespace Mono.Upnp.Control
         {
             DeserializeCore (reader);
             VerifyDeserialization ();
-            loaded = true;
         }
 
         protected virtual void DeserializeCore (XmlReader reader)
@@ -170,17 +158,20 @@ namespace Mono.Upnp.Control
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.ReadToFollowing ("scpd");
-                while (Helper.ReadToNextElement (reader)) {
+                reader.Read ();
+                while (reader.ReadToNextElement ()) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing one of the controller description elements.", e);
+                        Log.Exception (
+                            "There was a problem deserializing one of the controller description elements.", e);
                     }
                 }
-                reader.Close ();
             } catch (Exception e) {
-                throw new UpnpDeserializationException (string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+                throw new UpnpDeserializationException (
+                    string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+            } finally {
+                reader.Close ();
             }
         }
 
@@ -188,66 +179,73 @@ namespace Mono.Upnp.Control
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            reader.Read ();
-            switch (element.ToLower ()) {
-            case "actionlist":
-                DeserializeActions (reader.ReadSubtree ());
-                break;
-            case "servicestatetable":
-                DeserializeStateVariables (reader.ReadSubtree ());
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
+            using (reader) {
+                reader.Read ();
+                switch (element.ToLower ()) {
+                case "actionlist":
+                    DeserializeActions (reader.ReadSubtree ());
+                    break;
+                case "servicestatetable":
+                    DeserializeStateVariables (reader.ReadSubtree ());
+                    break;
+                default: // This is a workaround for Mono bug 334752
+                    reader.Skip ();
+                    break;
+                }
             }
-            reader.Close ();
         }
 
         protected virtual void DeserializeActions (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            while (reader.ReadToFollowing ("action")) {
-                try {
-                    DeserializeAction (reader.ReadSubtree ());
-                } catch (Exception e) {
-                    Log.Exception ("There was a problem deserializing an action list element.", e);
+            using (reader) {
+                while (reader.ReadToFollowing ("action")) {
+                    try {
+                        DeserializeAction (reader.ReadSubtree ());
+                    } catch (Exception e) {
+                        Log.Exception ("There was a problem deserializing an action list element.", e);
+                    }
                 }
             }
-            reader.Close ();
         }
 
         protected virtual void DeserializeAction (XmlReader reader)
         {
-            Action action = CreateAction ();
-            action.Deserialize (reader);
-            AddAction (action);
+            var action = CreateAction ();
+            if (action != null) {
+                action.Deserialize (reader);
+                AddAction (action);
+            }
         }
 
-        protected virtual Action CreateAction ()
+        protected virtual ServiceAction CreateAction ()
         {
-            return new Action (this);
+            return new ServiceAction (this);
         }
 
         protected virtual void DeserializeStateVariables (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            while (reader.ReadToFollowing ("stateVariable")) {
-                try {
-                    DeserializeStateVariable (reader.ReadSubtree ());
-                } catch (Exception e) {
-                    Log.Exception ("There was a problem deserializing a state variable list element.", e);
+            using (reader) {
+                while (reader.ReadToFollowing ("stateVariable")) {
+                    try {
+                        DeserializeStateVariable (reader.ReadSubtree ());
+                    } catch (Exception e) {
+                        Log.Exception ("There was a problem deserializing a state variable list element.", e);
+                    }
                 }
             }
-            reader.Close ();
         }
 
         protected virtual void DeserializeStateVariable (XmlReader reader)
         {
-            StateVariable state_variable = CreateStateVariable ();
-            state_variable.Deserialize (reader);
-            AddStateVariable (state_variable);
+            var state_variable = CreateStateVariable ();
+            if (state_variable != null) {
+                state_variable.Deserialize (reader);
+                AddStateVariable (state_variable);
+            }
         }
 
         protected virtual StateVariable CreateStateVariable ()
@@ -257,11 +255,11 @@ namespace Mono.Upnp.Control
 
         void VerifyDeserialization ()
         {
-            foreach (Action action in actions.Values) {
-                foreach (Argument argument in action.InArguments.Values) {
+            foreach (var action in actions.Values) {
+                foreach (var argument in action.InArguments.Values) {
                     VerifyRelatedStateVariable (argument);
                 }
-                foreach (Argument argument in action.OutArguments.Values) {
+                foreach (var argument in action.OutArguments.Values) {
                     VerifyRelatedStateVariable (argument);
                 }
                 VerifyRelatedStateVariable (action.ReturnArgument);
@@ -276,16 +274,25 @@ namespace Mono.Upnp.Control
             }
         }
 
-        protected internal virtual void DeserializeEvents (HttpListenerRequest response)
+        internal virtual void DeserializeEvents (HttpListenerRequest response)
         {
-            DeserializeEvents (XmlReader.Create (response.InputStream));
+            DeserializeEventsCore (response);
+        }
+        
+        protected virtual void DeserializeEventsCore (HttpListenerRequest response)
+        {
+            DeserializeEventsCore (XmlReader.Create (response.InputStream));
         }
 
-        protected virtual void DeserializeEvents (XmlReader reader)
+        protected virtual void DeserializeEventsCore (XmlReader reader)
         {
-            while (reader.ReadToFollowing ("property", Protocol.EventUrn)) {
-                if (Helper.ReadToNextElement (reader)) {
-                    StateVariables[reader.Name].OnChanged (reader.ReadString ());
+            if (reader == null) throw new ArgumentNullException ("reader");
+            
+            using (reader) {
+                while (reader.ReadToFollowing ("property", Protocol.EventUrn)) {
+                    if (reader.ReadToNextElement () && StateVariables.ContainsKey (reader.Name)) {
+                        StateVariables[reader.Name].OnChanged (reader.ReadString ());
+                    }
                 }
             }
         }

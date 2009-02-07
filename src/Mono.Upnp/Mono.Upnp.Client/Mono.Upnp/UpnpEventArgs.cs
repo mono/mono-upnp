@@ -27,7 +27,7 @@
 //
 
 using System;
-using Mono.Upnp.Discovery;
+using Mono.Upnp.Description;
 
 namespace Mono.Upnp
 {

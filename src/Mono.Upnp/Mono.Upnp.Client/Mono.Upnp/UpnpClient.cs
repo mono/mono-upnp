@@ -30,7 +30,6 @@ using System;
 using System.Collections.Generic;
 
 using Mono.Ssdp;
-using Mono.Upnp.Discovery;
 using Mono.Upnp.Description;
 using Mono.Upnp.Internal;
 
@@ -38,41 +37,37 @@ namespace Mono.Upnp
 {
 	public class UpnpClient
 	{
-        delegate void DeviceEventHandler (DeviceAnnouncement device);
-        delegate void ServiceEventHandler (ServiceAnnouncement service);
-
-        readonly Dictionary<string, DeviceDescription> descriptions = new Dictionary<string, DeviceDescription> ();
-        readonly Dictionary<DeviceAnnouncement, DeviceAnnouncement> devices = new Dictionary<DeviceAnnouncement, DeviceAnnouncement> ();
-        readonly Dictionary<ServiceAnnouncement, ServiceAnnouncement> services = new Dictionary<ServiceAnnouncement, ServiceAnnouncement> ();
+        readonly Dictionary<string, DeviceDescription> descriptions =
+            new Dictionary<string, DeviceDescription> ();
+        readonly Dictionary<DeviceAnnouncement, DeviceAnnouncement> devices =
+            new Dictionary<DeviceAnnouncement, DeviceAnnouncement> ();
+        readonly Dictionary<ServiceAnnouncement, ServiceAnnouncement> services =
+            new Dictionary<ServiceAnnouncement, ServiceAnnouncement> ();
 
         readonly Mono.Ssdp.Client client = new Mono.Ssdp.Client ();
 
         IDeserializerFactory deserializer_factory;
 
-        public event EventHandler<DeviceEventArgs> DeviceAdded;
-        public event EventHandler<DeviceEventArgs> DeviceRemoved;
-        public event EventHandler<ServiceEventArgs> ServiceAdded;
-        public event EventHandler<ServiceEventArgs> ServiceRemoved;
-
-        public UpnpClient () : this (new DeserializerFactory ())
+        public UpnpClient ()
+            : this (null)
         {
         }
 
         public UpnpClient (IDeserializerFactory deserializerFactory)
         {
-            if (deserializerFactory == null) throw new ArgumentNullException ("deserializerFactory");
-
-            this.deserializer_factory = deserializerFactory;
+            DeserializerFactory = deserializerFactory;
             client.ServiceAdded += ClientServiceAdded;
             client.ServiceRemoved += ClientServiceRemoved;
         }
+        
+        public event EventHandler<DeviceEventArgs> DeviceAdded;
+        public event EventHandler<DeviceEventArgs> DeviceRemoved;
+        public event EventHandler<ServiceEventArgs> ServiceAdded;
+        public event EventHandler<ServiceEventArgs> ServiceRemoved;
 
         public IDeserializerFactory DeserializerFactory {
             get { return deserializer_factory; }
-            set {
-                if (value == null) throw new ArgumentNullException ("value");
-                deserializer_factory = value;
-            }
+            set { deserializer_factory = value ?? DeserializerFactory<Deserializer>.Instance; }
         }
 
         public void BrowseAll ()
@@ -88,15 +83,15 @@ namespace Mono.Upnp
         void ClientServiceAdded (object sender, Mono.Ssdp.ServiceArgs args)
         {
             ClientServiceEvent (args,
-                delegate (DeviceAnnouncement device) {
+                (device) => {
                     if (!devices.ContainsKey (device)) {
-                        OnDeviceAdded (device);
+                        OnDeviceAdded (new DeviceEventArgs (device, UpnpOperation.Added));
                         devices.Add (device, device);
                     }
                 },
-                delegate (ServiceAnnouncement service) {
+                (service) => {
                     if (!services.ContainsKey (service)) {
-                        OnServiceAdded (service);
+                        OnServiceAdded (new ServiceEventArgs (service, UpnpOperation.Added));
                         services.Add (service, service);
                     }
                 }
@@ -106,87 +101,84 @@ namespace Mono.Upnp
         void ClientServiceRemoved (object sender, Mono.Ssdp.ServiceArgs args)
         {
             ClientServiceEvent (args,
-                delegate (DeviceAnnouncement device) {
+                (device) => {
                     if (devices.ContainsKey (device)) {
-                        OnDeviceRemoved (device);
+						device.Dispose ();
+                        OnDeviceRemoved (new DeviceEventArgs (device, UpnpOperation.Removed));
                         devices.Remove (device);
                     }
                 },
-                delegate (ServiceAnnouncement service) {
+                (service) => {
                     if (services.ContainsKey (service)) {
-                        OnServiceRemoved (service);
+                        service.Dispose ();
+                        OnServiceRemoved (new ServiceEventArgs (service, UpnpOperation.Removed));
                         services.Remove (service);
                     }
                 }
             );
         }
 
-        void ClientServiceEvent (Mono.Ssdp.ServiceArgs args, DeviceEventHandler deviceHandler, ServiceEventHandler serviceHandler)
+        void ClientServiceEvent (Mono.Ssdp.ServiceArgs args,
+                                 Action<DeviceAnnouncement> deviceHandler,
+                                 Action<ServiceAnnouncement> serviceHandler)
         {
             if (!args.Usn.StartsWith ("uuid:")) {
                 return;
             }
 
-            int colon = args.Usn.IndexOf (':', 5);
-            string usn = colon == -1 ? args.Usn : args.Usn.Substring (0, colon);
+            var colon = args.Usn.IndexOf (':', 5);
+            var usn = colon == -1 ? args.Usn : args.Usn.Substring (0, colon);
 
             if (args.Usn.Contains (":device:")) {
-                DeviceType type = new DeviceType (args.Service.ServiceType);
-                DeviceAnnouncement device = new DeviceAnnouncement (this, type, usn, args.Service.Locations);
+                var type = new DeviceType (args.Service.ServiceType);
+                var device = new DeviceAnnouncement (this, type, usn, args.Service.Locations);
                 deviceHandler (device);
             } else if (args.Usn.Contains (":service:")) {
-                ServiceType type = new ServiceType (args.Service.ServiceType);
-                ServiceAnnouncement service = new ServiceAnnouncement (this, type, usn, args.Service.Locations);
+                var type = new ServiceType (args.Service.ServiceType);
+                var service = new ServiceAnnouncement (this, type, usn, args.Service.Locations);
                 serviceHandler (service);
             }
         }
+		
+		protected virtual void OnDeviceAdded (DeviceEventArgs args)
+		{
+            OnEvent (DeviceAdded, args);
+		}
 
-        void OnDeviceAdded (DeviceAnnouncement device)
+        protected virtual void OnServiceAdded (ServiceEventArgs args)
         {
-            EventHandler<DeviceEventArgs> handler = DeviceAdded;
-            if (handler != null) {
-                handler (this, new DeviceEventArgs (device, UpnpOperation.Added));
-            }
+            OnEvent (ServiceAdded, args);
         }
 
-        void OnServiceAdded (ServiceAnnouncement service)
+        protected virtual void OnDeviceRemoved (DeviceEventArgs args)
         {
-            EventHandler<ServiceEventArgs> handler = ServiceAdded;
-            if (handler != null) {
-                handler (this, new ServiceEventArgs (service, UpnpOperation.Added));
-            }
+            OnEvent (DeviceRemoved, args);
         }
 
-        void OnDeviceRemoved (DeviceAnnouncement device)
+        protected virtual void OnServiceRemoved (ServiceEventArgs args)
         {
-            device.Dispose ();
-            EventHandler<DeviceEventArgs> handler = DeviceAdded;
-            if (handler != null) {
-                handler (this, new DeviceEventArgs (device, UpnpOperation.Removed));
-            }
+            OnEvent (ServiceRemoved, args);
         }
-
-        void OnServiceRemoved (ServiceAnnouncement service)
+        
+        void OnEvent<T> (EventHandler<T> handler, T args) where T : EventArgs
         {
-            service.Dispose ();
-            EventHandler<ServiceEventArgs> handler = ServiceAdded;
             if (handler != null) {
-                handler (this, new ServiceEventArgs (service, UpnpOperation.Removed));
+                handler (this, args);
             }
         }
 
         internal ServiceDescription GetDescription (ServiceAnnouncement announcement)
         {
-            foreach (string uri in announcement.Locations) {
+            foreach (var uri in announcement.Locations) {
                 if (descriptions.ContainsKey (uri)) {
-                    ServiceDescription description = GetDescription (announcement, descriptions[uri]);
+                    var description = GetDescription (announcement, descriptions[uri]);
                     if (description != null && !description.IsDisposed) {
                         return description;
                     }
                 }
                 try {
-                    IDeserializer deserializer = deserializer_factory.CreateDeserializer ();
-                    DeviceDescription rootDevice = deserializer.DeserializeDescription (new Uri (uri));
+                    var deserializer = deserializer_factory.CreateDeserializer ();
+                    var rootDevice = deserializer.DeserializeDescription (new Uri (uri));
                     if (rootDevice == null) {
                         continue;
                     }
@@ -201,16 +193,16 @@ namespace Mono.Upnp
 
         internal DeviceDescription GetDescription (DeviceAnnouncement announcement)
         {
-            foreach (string uri in announcement.Locations) {
+            foreach (var uri in announcement.Locations) {
                 if (descriptions.ContainsKey (uri)) {
-                    DeviceDescription description = GetDescription (announcement, descriptions[uri]);
+                    var description = GetDescription (announcement, descriptions[uri]);
                     if (description != null && !description.IsDisposed) {
                         return description;
                     }
                 }
                 try {
-                    IDeserializer deserializer = deserializer_factory.CreateDeserializer ();
-                    DeviceDescription rootDevice = deserializer.DeserializeDescription (new Uri (uri));
+                    var deserializer = deserializer_factory.CreateDeserializer ();
+                    var rootDevice = deserializer.DeserializeDescription (new Uri (uri));
                     if (rootDevice == null) {
                         continue;
                     }
@@ -225,13 +217,13 @@ namespace Mono.Upnp
 
         ServiceDescription GetDescription (ServiceAnnouncement announcement, DeviceDescription device)
         {
-            foreach (ServiceDescription description in device.Services) {
+            foreach (var description in device.Services) {
                 if (device.Udn == announcement.DeviceUdn && announcement.Type == description.Type) {
                     return description;
                 }
             }
-            foreach (DeviceDescription childDevice in device.Devices) {
-                ServiceDescription description = GetDescription (announcement, childDevice);
+            foreach (var childDevice in device.Devices) {
+                var description = GetDescription (announcement, childDevice);
                 if (description != null) {
                     return description;
                 }
@@ -244,8 +236,8 @@ namespace Mono.Upnp
             if (device.Type == announcement.Type && device.Udn == announcement.Udn) {
                 return device;
             }
-            foreach (DeviceDescription childDevice in device.Devices) {
-                DeviceDescription description = GetDescription (announcement, childDevice);
+            foreach (var childDevice in device.Devices) {
+                var description = GetDescription (announcement, childDevice);
                 if (description != null) {
                     return description;
                 }

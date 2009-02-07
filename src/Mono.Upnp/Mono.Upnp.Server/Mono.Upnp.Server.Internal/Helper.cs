@@ -74,7 +74,7 @@ namespace Mono.Upnp.Server.Internal
             }
         }
 
-        public static bool ReadToNextElement (XmlReader reader)
+        public static bool ReadToNextElement (this XmlReader reader)
         {
             while (reader.Read ()) {
                 if (reader.NodeType == XmlNodeType.Element) {

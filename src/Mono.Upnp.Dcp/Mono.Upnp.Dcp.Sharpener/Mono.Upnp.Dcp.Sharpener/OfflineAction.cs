@@ -32,7 +32,7 @@ using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Dcp.Sharpener
 {
-	public class OfflineAction : Action
+	public class OfflineAction : ServiceAction
 	{
         public OfflineAction (ServiceController service)
             : base (service)

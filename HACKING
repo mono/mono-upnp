@@ -1,0 +1,10 @@
+One of the implementation goals of Mono.Upnp is to eliminate all
+NullReferenceExceptions. If you dereference an argument in a method which can be
+called from client code (this includes protected methods), you should check the
+argument for null at the start of the method and throw ArgumentNullException.
+If you derefernce an object returned from potentially external code, you need
+to null-check the object and either throw an exception or not dereference.
+Ideally, the only exception types to come out of the Mono.Upnp library are
+ArgumentException, ArgumentOutOfRangeException, ArgumentNullException,
+InvalidOperationException, ObjectDisposedException or an exception type we
+define.

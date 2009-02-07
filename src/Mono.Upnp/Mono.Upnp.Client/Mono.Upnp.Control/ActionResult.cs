@@ -1,4 +1,3 @@
-﻿// TODO fix the equality shit
 
 using System;
 using System.Collections.Generic;
@@ -12,9 +11,8 @@ namespace Mono.Upnp.Control
 
         public ActionResult (string returnValue, IDictionary<string, string> outArguments)
         {
-            if (outArguments == null) {
-                throw new ArgumentNullException ();
-            }
+            if (outArguments == null) throw new ArgumentNullException ();
+            
             return_value = returnValue;
             out_arguments = new ReadOnlyDictionary<string,string> (outArguments);
         }

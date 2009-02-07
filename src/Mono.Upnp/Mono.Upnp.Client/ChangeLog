@@ -1,0 +1,83 @@
+2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp/DisposedEventArgs.cs:
+	* Mono.Upnp.Discovery/DeviceAnnouncement.cs:
+	* Mono.Upnp.Description/DisposedEventArgs.cs:
+	* Mono.Upnp.Discovery/ServiceAnnouncement.cs: Moved to
+	Mono.Upnp.Description namespace
+
+	* Mono.Upnp.Internal/Helper.cs: Made class static and made
+	ReadToNextElement an extension method
+
+	* Mono.Upnp.Internal/SoapInvoker.cs: Moved to C# 3, fixed some
+	styling, changed Action to ServiceAction, and generally
+	cleaned some stuff up.
+
+	* ChangeLog:
+	* Mono.Upnp.Client.csproj: 
+
+	* Mono.Upnp.Control/ActionResult.cs: Minor syntax fixes
+
+	* Mono.Upnp.Control/Action.cs: Renamed to ServiceAction so it
+	doesn't conflict with the delegate type in System.Core.dll
+
+	* Mono.Upnp.Control/StateVariableChangedArgs.cs: Made field
+	readonly
+
+	* Mono.Upnp.Control/ServiceAction.cs: Moved to C# 3, fixed
+	some styling and cleaned up the deserialization pattern.
+	Renamed so as not to conflict with System.Action delegate in
+	3.5.
+
+	* Mono.Upnp.Description/Icon.cs:
+	* Mono.Upnp.Control/StateVariable.cs:
+	* Mono.Upnp.Description/Deserializer.cs:
+	* Mono.Upnp.Control/AllowedValueRange.cs:
+	* Mono.Upnp.Control/UpnpControlException.cs: Moved to C# 3,
+	fixed some styling and cleaned up the deserialization pattern
+
+	* Mono.Upnp.Control/Argument.cs: Moved to C# 3, fixed some
+	styling and cleaned up the deserialization pattern. Also
+	changed Action to ServiceAction.
+
+	* Mono.Upnp.Control/ServiceController.cs: Moved to C# 3, fixed
+	some styling and cleaned up the deserialization and event
+	patterns. Also changed Action to ServiceAction.
+
+	* Mono.Upnp/TypeInfo.cs: Got rid of unnecessary using
+	directives, moved to C# 3 and cleaned up some style
+
+	* Mono.Upnp/DeviceType.cs:
+	* Mono.Upnp/ServiceType.cs: Got rid of unnecessary using
+	directive
+
+	* Mono.Upnp/UpnpClient.cs: Got rid of unnecessary using
+	directive, moved to C# 3, cleaned up the style and the event
+	pattern
+
+	* Mono.Upnp/UpnpEventArgs.cs: Got rid of Mono.Upnp.Discovery
+	namespace
+
+	* Mono.Upnp/ReadOnlyDictionary.cs: Moved to C# 3
+
+	* Mono.Upnp/UpnpDeserializationException.cs:
+	* Mono.Upnp.Description/UpnpDeserializationException.cs: Moved
+	to Mono.Upnp namespace
+
+	* Mono.Upnp.Description/ServiceAnnouncement.cs: Move to
+	Mono.Upnp.Description namespace, moved to C# 3 and cleaned up
+	the event pattern
+
+	* Mono.Upnp.Description/DeviceDescription.cs:
+	* Mono.Upnp.Description/ServiceDescription.cs: Moved to C# 3,
+	fixed some styling and cleaned up the deserialization and
+	event patterns
+
+	* Mono.Upnp.Description/DeserializerFactory.cs: Got rid of
+	non-generic DeserializerFactory type and added singleton to
+	DeserializerFactory<T>
+
+	* Mono.Upnp.Description/DeviceAnnouncement.cs: Moved to
+	Mono.Upnp.Description namespace, moved to C# 3, and cleaned up
+	event pattern
+

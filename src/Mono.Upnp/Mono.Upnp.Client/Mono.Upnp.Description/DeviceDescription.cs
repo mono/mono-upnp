@@ -29,7 +29,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Net;
 using System.Xml;
 
 using Mono.Upnp.Internal;
@@ -39,29 +38,14 @@ namespace Mono.Upnp.Description
 	public class DeviceDescription
 	{
         readonly IDisposer disposer;
-        DeviceType type;
-        string udn;
-        Uri presentation_url;
-        string friendly_name;
-        string manufacturer;
-        Uri manufacturer_url;
-        string model_description;
-        string model_name;
-        string model_number;
-        Uri model_url;
-        string serial_number;
-        string upc;
         readonly List<ServiceDescription> service_list = new List<ServiceDescription> ();
         readonly ReadOnlyCollection<ServiceDescription> services;
         readonly List<DeviceDescription> device_list = new List<DeviceDescription> ();
         readonly ReadOnlyCollection<DeviceDescription> devices;
         readonly List<Icon> icon_list = new List<Icon> ();
         readonly ReadOnlyCollection<Icon> icons;
+        
         IDeserializer deserializer;
-        bool loaded;
-        bool is_disposed;
-
-        public event EventHandler<DisposedEventArgs> Disposed;
 
         protected internal DeviceDescription (IDisposer disposer)
         {
@@ -72,67 +56,9 @@ namespace Mono.Upnp.Description
             devices = device_list.AsReadOnly ();
             icons = icon_list.AsReadOnly ();
         }
-
-        public DeviceType Type {
-            get { return type; }
-            protected set { SetField (ref type, value); }
-        }
-
-        public string Udn {
-            get { return udn; }
-            protected set { SetField (ref udn, value); }
-        }
         
-        public Uri PresentationUrl {
-            get { return presentation_url; }
-            protected set { SetField (ref presentation_url, value); }
-        }
+        public event EventHandler<DisposedEventArgs> Disposed;
         
-        public string FriendlyName {
-            get { return friendly_name; }
-            protected set { SetField (ref friendly_name, value); }
-        }
-        
-        public string Manufacturer {
-            get { return manufacturer; }
-            protected set { SetField (ref manufacturer, value); }
-        }
-        
-        public Uri ManufacturerUrl {
-            get { return manufacturer_url; }
-            protected set { SetField (ref manufacturer_url, value); }
-        }
-        
-        public string ModelDescription {
-            get { return model_description; }
-            protected set { SetField (ref model_description, value); }
-        }
-        
-        public string ModelName {
-            get { return model_name; }
-            protected set { SetField (ref model_name, value); }
-        }
-        
-        public string ModelNumber {
-            get { return model_number; }
-            protected set { SetField (ref model_number, value); }
-        }
-        
-        public Uri ModelUrl {
-            get { return model_url; }
-            protected set { SetField (ref model_url, value); }
-        }
-        
-        public string SerialNumber {
-            get { return serial_number; }
-            protected set { SetField (ref serial_number, value); }
-        }
-        
-        public string Upc {
-            get { return upc; }
-            protected set { SetField (ref upc, value); }
-        }
-
         public ReadOnlyCollection<ServiceDescription> Services {
             get { return services; }
         }
@@ -141,71 +67,65 @@ namespace Mono.Upnp.Description
             get { return devices; }
         }
 
-        void SetField<T> (ref T field, T value)
-        {
-            CheckLoaded ();
-            field = value;
-        }
-
-        void CheckLoaded ()
-        {
-            if (loaded) {
-                throw new InvalidOperationException ("The device description has already been deserialized.");
-            }
-        }
-
-        public bool IsDisposed {
-            get { return is_disposed; }
-        }
+        public DeviceType Type { get; private set; }
+        public string Udn { get; private set; }
+        public Uri PresentationUrl { get; private set; }
+        public string FriendlyName { get; private set; }
+        public string Manufacturer { get; private set; }
+        public Uri ManufacturerUrl { get; private set; }
+        public string ModelDescription { get; private set; }
+        public string ModelName { get; private set; }
+        public string ModelNumber { get; private set; }
+        public Uri ModelUrl { get; private set; }
+        public string SerialNumber { get; private set; }
+        public string Upc { get; private set; }
+        public bool IsDisposed { get; private set; }
 
         protected internal void CheckDisposed ()
         {
             disposer.TryDispose (this);
-            if (is_disposed) {
+            if (IsDisposed) {
                 throw new ObjectDisposedException (ToString (), "The device has gone off the network.");
             }
         }
 
         protected internal void Dispose ()
         {
-            if (is_disposed) {
+            if (IsDisposed) {
                 return;
             }
 
-            is_disposed = true;
-            OnDispose ();
+            IsDisposed = true;
+            OnDispose (DisposedEventArgs.Empty);
 
-            foreach (ServiceDescription service in services) {
+            foreach (var service in services) {
                 service.Dispose ();
             }
-            foreach (DeviceDescription device in devices) {
+            foreach (var device in devices) {
                 device.Dispose ();
             }
         }
 
-        protected virtual void OnDispose ()
+        protected virtual void OnDispose (DisposedEventArgs args)
         {
-            EventHandler<DisposedEventArgs> handler = Disposed;
+            var handler = Disposed;
             if (handler != null) {
-                handler (this, DisposedEventArgs.Empty);
+                handler (this, args);
             }
         }
 
         protected void AddService (ServiceDescription service)
         {
-            CheckLoaded ();
             service_list.Add (service);
         }
 
         protected void AddDevice (DeviceDescription device)
         {
-            CheckLoaded ();
             device_list.Add (device);
         }
 
         protected void AddIcon (Icon icon)
         {
-            CheckLoaded ();
             icon_list.Add (icon);
         }
 
@@ -217,7 +137,6 @@ namespace Mono.Upnp.Description
             DeserializeCore (reader);
             VerifyDeserialization ();
             this.deserializer = null;
-            loaded = true;
         }
 
         protected virtual void DeserializeCore (XmlReader reader)
@@ -225,17 +144,20 @@ namespace Mono.Upnp.Description
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.ReadToFollowing ("device");
-                while (Helper.ReadToNextElement (reader)) {
+                reader.Read ();
+                while (reader.ReadToNextElement ()) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing one of the device description elements.", e);
+                        Log.Exception (
+                            "There was a problem deserializing one of the device description elements.", e);
                     }
                 }
-                reader.Close ();
             } catch (Exception e) {
-                throw new UpnpDeserializationException (string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+                throw new UpnpDeserializationException (
+                    string.Format ("There was a problem deserializing {0}.", ToString ()), e);
+            } finally {
+                reader.Close ();
             }
         }
 
@@ -243,79 +165,83 @@ namespace Mono.Upnp.Description
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            reader.Read ();
-            switch (element.ToLower ()) {
-            case "devicetype":
-                type = new DeviceType (reader.ReadString ());
-                break;
-            case "friendlyname":
-                FriendlyName = reader.ReadString ();
-                break;
-            case "manufacturer":
-                Manufacturer = reader.ReadString ();
-                break;
-            case "manufacturerurl":
-                ManufacturerUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                break;
-            case "modeldescription":
-                ModelDescription = reader.ReadString ();
-                break;
-            case "modelname":
-                ModelName = reader.ReadString ();
-                break;
-            case "modelnumber":
-                ModelNumber = reader.ReadString ();
-                break;
-            case "modelurl":
-                ModelUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                break;
-            case "serialnumber":
-                SerialNumber = reader.ReadString ();
-                break;
-            case "udn":
-                udn = reader.ReadString ().Trim ();
-                break;
-            case "upc":
-                Upc = reader.ReadString ();
-                break;
-            case "iconlist":
-                DeserializeIcons (reader.ReadSubtree ());
-                break;
-            case "servicelist":
-                DeserializeServices (reader.ReadSubtree ());
-                break;
-            case "devicelist":
-                DeserializeDevice (reader.ReadSubtree ());
-                break;
-            case "presentationurl":
-                PresentationUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
+            using (reader) {
+                reader.Read ();
+                switch (element.ToLower ()) {
+                case "devicetype":
+                    Type = new DeviceType (reader.ReadString ());
+                    break;
+                case "friendlyname":
+                    FriendlyName = reader.ReadString ();
+                    break;
+                case "manufacturer":
+                    Manufacturer = reader.ReadString ();
+                    break;
+                case "manufacturerurl":
+                    ManufacturerUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
+                    break;
+                case "modeldescription":
+                    ModelDescription = reader.ReadString ();
+                    break;
+                case "modelname":
+                    ModelName = reader.ReadString ();
+                    break;
+                case "modelnumber":
+                    ModelNumber = reader.ReadString ();
+                    break;
+                case "modelurl":
+                    ModelUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
+                    break;
+                case "serialnumber":
+                    SerialNumber = reader.ReadString ();
+                    break;
+                case "udn":
+                    Udn = reader.ReadString ().Trim ();
+                    break;
+                case "upc":
+                    Upc = reader.ReadString ();
+                    break;
+                case "iconlist":
+                    DeserializeIcons (reader.ReadSubtree ());
+                    break;
+                case "servicelist":
+                    DeserializeServices (reader.ReadSubtree ());
+                    break;
+                case "devicelist":
+                    DeserializeDevice (reader.ReadSubtree ());
+                    break;
+                case "presentationurl":
+                    PresentationUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
+                    break;
+                default: // This is a workaround for Mono bug 334752
+                    reader.Skip ();
+                    break;
+                }
             }
-            reader.Close ();
         }
 
         protected virtual void DeserializeIcons (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            while (reader.ReadToFollowing ("icon")) {
-                try {
-                    DeserializeIcon (reader.ReadSubtree ());
-                } catch (Exception e) {
-                    Log.Exception ("There was a problem deserializing an icon list element.", e);
+            using (reader) {
+                while (reader.ReadToFollowing ("icon")) {
+                    try {
+                        DeserializeIcon (reader.ReadSubtree ());
+                    } catch (Exception e) {
+                        Log.Exception ("There was a problem deserializing an icon list element.", e);
+                    }
                 }
             }
-            reader.Close ();
         }
 
         protected virtual void DeserializeIcon (XmlReader reader)
         {
-            Icon icon = CreateIcon ();
-            icon.Deserialize (deserializer, reader);
-            AddIcon (icon);
+            var icon = CreateIcon ();
+            if (icon != null) {
+                icon.Deserialize (deserializer, reader);
+                AddIcon (icon);
+            }
         }
 
         protected virtual Icon CreateIcon ()
@@ -327,14 +253,15 @@ namespace Mono.Upnp.Description
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            while (reader.ReadToFollowing ("service")) {
-                try {
-                    DeserializeService (reader.ReadSubtree ());
-                } catch (Exception e) {
-                    Log.Exception ("There was a problem deserializing a service list element.", e);
+            using (reader) {
+                while (reader.ReadToFollowing ("service")) {
+                    try {
+                        DeserializeService (reader.ReadSubtree ());
+                    } catch (Exception e) {
+                        Log.Exception ("There was a problem deserializing a service list element.", e);
+                    }
                 }
             }
-            reader.Close ();
         }
 
         protected virtual void DeserializeService (XmlReader reader)
@@ -346,14 +273,15 @@ namespace Mono.Upnp.Description
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            while (reader.ReadToFollowing ("device")) {
-                try {
-                    DeserializeDevices (reader.ReadSubtree ());
-                } catch (Exception e) {
-                    Log.Exception ("There was a problem deserializing a device list element.", e);
+            using (reader ) {
+                while (reader.ReadToFollowing ("device")) {
+                    try {
+                        DeserializeDevices (reader.ReadSubtree ());
+                    } catch (Exception e) {
+                        Log.Exception ("There was a problem deserializing a device list element.", e);
+                    }
                 }
             }
-            reader.Close ();
         }
 
         protected virtual void DeserializeDevice (XmlReader reader)
@@ -366,41 +294,41 @@ namespace Mono.Upnp.Description
             // We only throw for critical errors
             // TODO The "critical errors" use to mean things that could cause an NPE in Equals and GetHashCode, but
             // those overrides are no more, so what should throw and what should not? Can we have a "strict" mode?
-            if (udn == null) {
-                string message = type == null
+            if (Udn == null) {
+                var message = Type == null
                     ? "The device has no UDN or type."
-                    : string.Format ("The device of type {0} has no UDN.", type);
+                    : string.Format ("The device of type {0} has no UDN.", Type);
                 throw new UpnpDeserializationException (message);
             }
-            if (type == null) {
+            if (Type == null) {
                 throw new UpnpDeserializationException (string.Format (
-                    "The device {0} has no device type description.", udn));
+                    "The device {0} has no device type description.", Udn));
             }
-            if (udn.Length == 0) {
+            if (Udn.Length == 0) {
                 Log.Exception (new UpnpDeserializationException (string.Format (
-                    "The device {0} has an empty UDN.", udn)));
+                    "The device of type {0} has an empty UDN.", Type)));
             }
-            if (string.IsNullOrEmpty (friendly_name)) {
+            if (string.IsNullOrEmpty (FriendlyName)) {
                 Log.Exception (new UpnpDeserializationException (string.Format (
                     "{0} has no friendly name.", ToString ())));
             }
-            if (string.IsNullOrEmpty (manufacturer)) {
+            if (string.IsNullOrEmpty (Manufacturer)) {
                 Log.Exception (new UpnpDeserializationException (string.Format (
                     "{0} has no manufaturer.", ToString ())));
             }
-            if (string.IsNullOrEmpty (model_name)) {
+            if (string.IsNullOrEmpty (ModelName)) {
                 Log.Exception (new UpnpDeserializationException (string.Format (
                     "{0} has no model name.", ToString ())));
             }
             if (icon_list.Count > 0) {
-                bool png = false;
-                foreach (Icon icon in icon_list) {
+                var has_png = false;
+                foreach (var icon in icon_list) {
                     if (icon.MimeType == "image/png") {
-                        png = true;
+                        has_png = true;
                         break;
                     }
                 }
-                if (!png) {
+                if (!has_png) {
                     Log.Exception (new UpnpDeserializationException (string.Format (
                         "{0} does not have a PNG file in its icon list.", ToString ())));
                 }
@@ -409,7 +337,7 @@ namespace Mono.Upnp.Description
 
         public override string ToString ()
         {
-            return String.Format ("DeviceDescription {{ uuid:{0}::{1} }}", udn, type);
+            return string.Format ("DeviceDescription {{ uuid:{0}::{1} }}", Udn, Type);
         }
 	}
 }

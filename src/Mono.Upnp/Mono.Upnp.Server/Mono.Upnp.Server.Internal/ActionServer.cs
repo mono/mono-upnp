@@ -57,7 +57,7 @@ namespace Mono.Upnp.Server.Internal
         {
             XmlReader reader = XmlReader.Create (context.Request.InputStream);
             reader.ReadToFollowing ("Body", Protocol.SoapEnvelopeSchema);
-            while (Helper.ReadToNextElement (reader)) {
+            while (reader.ReadToNextElement ()) {
                 if (!service.Actions.ContainsKey (reader.LocalName)) {
                     throw UpnpControlException.InvalidAction ();
                 }
@@ -86,7 +86,7 @@ namespace Mono.Upnp.Server.Internal
             foreach (Argument argument in action.Arguments.Values) {
                 argument.Value = argument.RelatedStateVariable.DefaultValue;
             }
-            while (Helper.ReadToNextElement (reader)) {
+            while (reader.ReadToNextElement ()) {
                 if (!action.Arguments.ContainsKey (reader.Name)) {
                     throw UpnpControlException.InvalidArgs ();
                 }

@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 
-using Mono.Upnp.Discovery;
 using Mono.Upnp.Description;
 using Mono.Upnp.Control;
 
