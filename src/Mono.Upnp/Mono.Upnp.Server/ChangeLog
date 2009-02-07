@@ -1,5 +1,10 @@
 2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.Server.pidb: I don't know how this got under
+	version control, but it doesn't belong
+
+2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* ChangeLog:
 	* Mono.Upnp.Server.csproj: 
 
