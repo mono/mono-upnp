@@ -262,13 +262,15 @@ namespace Mono.Upnp.Control
                 foreach (var argument in action.OutArguments.Values) {
                     VerifyRelatedStateVariable (argument);
                 }
-                VerifyRelatedStateVariable (action.ReturnArgument);
+				if (action.ReturnArgument != null) {
+                	VerifyRelatedStateVariable (action.ReturnArgument);
+				}
             }
         }
 
         void VerifyRelatedStateVariable (Argument argument)
         {
-            if (argument != null && argument.RelatedStateVariable == null) {
+            if (argument.RelatedStateVariable == null) {
                 Log.Exception (new UpnpDeserializationException (
                     string.Format ("{0} does not have the related state variable.", argument)));
             }

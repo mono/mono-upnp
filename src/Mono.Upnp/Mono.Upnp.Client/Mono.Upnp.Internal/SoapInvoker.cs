@@ -116,8 +116,9 @@ namespace Mono.Upnp.Internal
                             }
                             return null;
                         } else {
-                            throw new UpnpException (String.Format (
-                                "There was an unknown error while invoking the action: the service returned status code {0}.", response.StatusCode));
+                            throw new UpnpException (string.Format (
+                                "There was an unknown error while invoking the action: " +
+								"the service returned status code {0}.", response.StatusCode));
                         }
                     }
                 } catch (Exception e) {
@@ -162,7 +163,8 @@ namespace Mono.Upnp.Internal
             fallback.OmitMan = true;
             var request = CreateRequest (headers);
             request.Method = "POST";
-            request.Headers.Add ("SOAPACTION", string.Format (@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
+            request.Headers.Add ("SOAPACTION", string.Format (
+				@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
             return request;
         }
 
@@ -172,7 +174,8 @@ namespace Mono.Upnp.Internal
             var request = CreateRequest (headers);
             request.Method = "M-POST";
             request.Headers.Add ("MAN", string.Format (@"""{0}""; ns=01", Protocol.SoapEnvelopeSchema));
-            request.Headers.Add ("01-SOAPACTION", String.Format (@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
+            request.Headers.Add ("01-SOAPACTION", string.Format (
+				@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
             return request;
         }
 

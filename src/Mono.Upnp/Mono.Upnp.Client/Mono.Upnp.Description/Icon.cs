@@ -50,23 +50,13 @@ namespace Mono.Upnp.Description
             this.device = device;
         }
 
-        public DeviceDescription Device {
-            get { return device; }
-        }
-
-        public bool IsDisposed {
-            get { return device.IsDisposed; }
-        }
-
+        public DeviceDescription Device { get { return device; } }
+        public bool IsDisposed { get { return device.IsDisposed; } }
+		public Uri Url { get; private set; }
         public string MimeType { get; private set; }
-
         public int Width { get { return width.Value; } }
-
         public int Height { get { return height.Value; } }
-
         public int Depth { get { return depth.Value; } }
-
-        public Uri Url { get; private set; }
 
         public byte[] GetData ()
         {

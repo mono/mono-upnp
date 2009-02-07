@@ -54,15 +54,16 @@ namespace Mono.Upnp.Internal
                 // We assume the elements appear in this order
                 reader.ReadToFollowing ("major");
                 reader.Read ();
-                int major = reader.ReadContentAsInt ();
+                var major = reader.ReadContentAsInt ();
                 reader.ReadToFollowing ("minor");
                 reader.Read ();
-                int minor = reader.ReadContentAsInt ();
-                reader.Close ();
+                var minor = reader.ReadContentAsInt ();
                 return new Version (major, minor);
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deserializing a spec version.", e);
-            }
+            } finally {
+				reader.Close ();
+			}
         }
 
         public static bool ReadToNextElement (this XmlReader reader)
@@ -95,7 +96,7 @@ namespace Mono.Upnp.Internal
             request.Timeout = 30000;
             while(true) {
                 try {
-                    HttpWebResponse response = (HttpWebResponse)request.GetResponse ();
+                    var response = (HttpWebResponse)request.GetResponse ();
                     if (response.StatusCode == HttpStatusCode.GatewayTimeout) {
                         throw new WebException ("", WebExceptionStatus.Timeout);
                     }

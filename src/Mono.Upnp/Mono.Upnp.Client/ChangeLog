@@ -1,5 +1,20 @@
 2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.Discovery: Got rid of Mono.Upnp.Discovery
+	namespace
+
+	* Mono.Upnp.Description/Icon.cs: Style changes
+
+	* Mono.Upnp.Control/ServiceController.cs: Minor refactor
+
+	* Mono.Upnp.Internal/Helper.cs:
+	* Mono.Upnp.Internal/EventSubscriber.cs: Moved to C# 3 and
+	minor refactoring
+
+	* Mono.Upnp.Internal/SoapInvoker.cs: Minor style changes
+
+2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Upnp/DisposedEventArgs.cs:
 	* Mono.Upnp.Discovery/DeviceAnnouncement.cs:
 	* Mono.Upnp.Description/DisposedEventArgs.cs:

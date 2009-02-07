@@ -28,6 +28,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 
@@ -37,6 +38,7 @@ namespace Mono.Upnp.Internal
 {
 	internal class EventSubscriber : IDisposable
 	{
+		static readonly Random random = new Random ();
         static int id;
 
         readonly object mutex = new object ();
@@ -52,24 +54,23 @@ namespace Mono.Upnp.Internal
         string delivery_url;
         string subscription_uuid;
 
-        public EventSubscriber (ServiceController serviceDescription)
+        public EventSubscriber (ServiceController serviceController)
         {
-            controller = serviceDescription;
+            controller = serviceController;
             // TODO relocate this stuff?
             prefix = GeneratePrefix ();
             delivery_url = String.Format ("<{0}>", prefix);
         }
 
-        static readonly Random random = new Random ();
-        string GeneratePrefix ()
+        static string GeneratePrefix ()
         {
-            foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
-                if (address.AddressFamily == AddressFamily.InterNetwork) {
-                    return String.Format ("http://{0}:{1}/upnp/event-subscriber/{2}/", address, random.Next (1024, 5000), id++);
-                }
-            }
-            // FIXME better way?
-            return null;
+			// TODO handle if we don't find the address
+			var address = (from a in Dns.GetHostAddresses (Dns.GetHostName ())
+						   where a.AddressFamily == AddressFamily.InterNetwork
+						   select a).First ();
+			
+			return string.Format (
+				"http://{0}:{1}/upnp/event-subscriber/{2}/", address, random.Next (1024, 5000), id++);
         }
 
         public void Start ()
@@ -97,8 +98,8 @@ namespace Mono.Upnp.Internal
 
         void OnGotContext (IAsyncResult asyncResult)
         {
-            HttpListener listener = (HttpListener)asyncResult.AsyncState;
-            HttpListenerContext context = listener.EndGetContext (asyncResult);
+            var listener = (HttpListener)asyncResult.AsyncState;
+            var context = listener.EndGetContext (asyncResult);
             try {
                 controller.DeserializeEvents (context.Request);
             } catch {
@@ -116,7 +117,7 @@ namespace Mono.Upnp.Internal
         void Subscribe ()
         {
             lock (mutex) {
-                WebRequest request = WebRequest.Create (controller.Description.EventUrl);
+                var request = WebRequest.Create (controller.Description.EventUrl);
                 request.Method = "SUBSCRIBE";
                 request.Headers.Add ("CALLBACK", delivery_url);
                 request.Headers.Add ("NT", "upnp:event");
@@ -131,7 +132,7 @@ namespace Mono.Upnp.Internal
             lock (mutex) {
                 expire_timeout_id = 0;
                 if (!confidently_subscribed) {
-                    WebRequest request = (WebRequest)state;
+                    var request = (WebRequest)state;
                     request.Abort ();
                     Stop ();
                     // TODO retry
@@ -148,9 +149,9 @@ namespace Mono.Upnp.Internal
                 if (expire_timeout_id != 0) {
                     dispatcher.Remove (expire_timeout_id);
                 }
-                WebRequest request = (WebRequest)asyncResult.AsyncState;
+                var request = (WebRequest)asyncResult.AsyncState;
                 try {
-                    HttpWebResponse response = (HttpWebResponse)request.EndGetResponse (asyncResult);
+                    var response = (HttpWebResponse)request.EndGetResponse (asyncResult);
                     if (response.StatusCode == HttpStatusCode.GatewayTimeout) {
                         throw new WebException ("", WebExceptionStatus.Timeout);
                     } else if (response.StatusCode != HttpStatusCode.OK) {
@@ -160,11 +161,11 @@ namespace Mono.Upnp.Internal
                         return;
                     }
                     subscription_uuid = response.Headers["SID"];
-                    string timeout_header = response.Headers["TIMEOUT"];
+                    var timeout_header = response.Headers["TIMEOUT"];
                     if (timeout_header == "infinate") {
                         return;
                     }
-                    TimeSpan timeout = TimeSpan.FromSeconds (Double.Parse (timeout_header.Substring (7)));
+                    var timeout = TimeSpan.FromSeconds (Double.Parse (timeout_header.Substring (7)));
                     timeout -= TimeSpan.FromMinutes (1);
                     renew_timeout_id = dispatcher.Add (timeout, OnRenewTimeout);
                     confidently_subscribed = true;
@@ -194,7 +195,7 @@ namespace Mono.Upnp.Internal
         void Renew ()
         {
             lock (mutex) {
-                WebRequest request = WebRequest.Create (controller.Description.EventUrl);
+                var request = WebRequest.Create (controller.Description.EventUrl);
                 request.Method = "SUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
                 request.BeginGetResponse (OnSubscribeResponse, request);
@@ -206,7 +207,7 @@ namespace Mono.Upnp.Internal
         void Unsubscribe ()
         {
             lock (mutex) {
-                WebRequest request = WebRequest.Create (controller.Description.EventUrl);
+                var request = WebRequest.Create (controller.Description.EventUrl);
                 request.Method = "UNSUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
                 request.BeginGetResponse (OnUnsubscribeResponse, request);
@@ -217,7 +218,7 @@ namespace Mono.Upnp.Internal
         void OnUnsubscribeResponse (IAsyncResult asyncResult)
         {
             try {
-                WebResponse response = ((WebRequest)asyncResult).EndGetResponse (asyncResult);
+                var response = ((WebRequest)asyncResult).EndGetResponse (asyncResult);
                 response.Close ();
             } catch {
             }
