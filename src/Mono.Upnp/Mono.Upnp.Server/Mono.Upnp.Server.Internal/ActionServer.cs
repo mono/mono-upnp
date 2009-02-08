@@ -86,7 +86,7 @@ namespace Mono.Upnp.Server.Internal
             foreach (Argument argument in action.Arguments.Values) {
                 argument.Value = argument.RelatedStateVariable.DefaultValue;
             }
-            while ((Helper.ReadToNextElement (reader)) {
+            while (Helper.ReadToNextElement (reader)) {
                 if (!action.Arguments.ContainsKey (reader.Name)) {
                     throw UpnpControlException.InvalidArgs ();
                 }

@@ -6,56 +6,26 @@ namespace Mono.Upnp.Dcp.MediaServer1
 {
 	public abstract class Object
 	{
-        string id;
-        string parent_id;
-        string title;
-        string creator;
-        List<Uri> res;
-        string @class;
-        bool? restricted;
-        WriteStatus? write_status;
+        bool has_restricted;
 
-        public string Id {
-            get { return id; }
-        }
-
-        public string ParentId {
-            get { return parent_id; }
-        }
-
-        public string Title {
-            get { return title; }
-        }
-
-        public string Creator {
-            get { return creator; }
-        }
-
-        public IList<Uri> Res {
-            get { return res; }
-        }
-
-        public string Class {
-            get { return @class; }
-        }
-
-        public bool Restricted {
-            get { return restricted.Value; }
-        }
-
-        public WriteStatus? WriteStatus {
-            get { return write_status; }
-        }
+        public string Id { get; private set; }
+        public string ParentId { get; private set; }
+        public string Title { get; private set; }
+        public string Creator { get; private set; }
+        public IList<Uri> Res { get; private set; }
+        public string Class { get; private set; }
+        public bool Restricted { get; private set; }
+        public WriteStatus? WriteStatus { get; private set; }
 
         public override bool Equals (object obj)
         {
             Object @object = obj as Object;
-            return @object != null && @object.id == id;
+            return @object != null && @object.Id == Id;
         }
 
         public override int GetHashCode ()
         {
-            return ~id.GetHashCode ();
+            return ~Id.GetHashCode ();
         }
 
         public void Deseriailize (XmlReader reader)
@@ -66,22 +36,25 @@ namespace Mono.Upnp.Dcp.MediaServer1
 
         protected virtual void DeserializeCore (XmlReader reader)
         {
-            reader.Read ();
-            id = reader["id"];
-            parent_id = reader["parentID"];
-            bool restricted;
-            if (bool.TryParse (reader["restricted"], out restricted)) {
-                this.restricted = restricted;
-            }
+			using (reader) {
+	            reader.Read ();
+	            Id = reader["id"];
+	            ParentId = reader["parentID"];
+	            bool restricted;
+	            if (bool.TryParse (reader["restricted"], out restricted)) {
+	                Restricted = restricted;
+					has_restricted = true;
+	            }
+			}
         }
 
         void Verify ()
         {
-            if (id == null) throw new DeserializationException ("The object does not have an ID.");
-            if (parent_id == null) throw new DeserializationException (string.Format ("The object {0} does not have a parent ID.", id));
-            if (title == null) throw new DeserializationException (string.Format ("The object {0} does not have a title.", id));
-            if (@class == null) throw new DeserializationException (string.Format ("The object {0} does not have a class.", id));
-            if (restricted == null) throw new DeserializationException (string.Format ("The object {0} does not have a restricted value.", id));
+            if (Id == null) throw new DeserializationException ("The object does not have an ID.");
+            if (ParentId == null) throw new DeserializationException (string.Format ("The object {0} does not have a parent ID.", Id));
+            if (Title == null) throw new DeserializationException (string.Format ("The object {0} does not have a title.", Id));
+            if (Class == null) throw new DeserializationException (string.Format ("The object {0} does not have a class.", Id));
+            if (!has_restricted) throw new DeserializationException (string.Format ("The object {0} does not have a restricted value.", Id));
         }
 	}
 }
