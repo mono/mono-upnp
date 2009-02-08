@@ -218,7 +218,7 @@ namespace Mono.Upnp.Control
 
         public override string ToString ()
         {
-            return String.Format ("StateVariable {{ {0}.{1} ({2}) }}", controller.Description.Type, Name, DataType);
+            return String.Format ("StateVariable {{ {0} ({1}) }}", Name, DataType);
         }
     }
 }

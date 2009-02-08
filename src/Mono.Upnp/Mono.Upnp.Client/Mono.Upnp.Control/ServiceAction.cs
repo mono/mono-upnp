@@ -318,7 +318,7 @@ namespace Mono.Upnp.Control
 
         public override string ToString ()
         {
-            return String.Format ("ServiceAction {{ {0}.{1} }}", controller.Description.Type, Name);
+            return String.Format ("ServiceAction {{ {0} }}", Name);
         }
     }
 }
