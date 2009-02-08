@@ -57,6 +57,9 @@ namespace Mono.Upnp.Internal
                 };
             }
         }
+			
+		delegate HttpWebRequest RequestProvider (ServiceAction action, WebHeaderCollection headers);
+		delegate HttpWebResponse RequestHandler (HttpWebRequest request, ServiceAction action, Stream stream);
         
         static SoapInvoker ()
         {
@@ -148,8 +151,7 @@ namespace Mono.Upnp.Internal
         }
 
         private HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, Stream stream,
-                                        Func<ServiceAction, WebHeaderCollection, HttpWebRequest> requestProvider1,
-                                        Func<ServiceAction, WebHeaderCollection, HttpWebRequest> requestProvider2)
+                                        RequestProvider requestProvider1, RequestProvider requestProvider2)
         {
             var response = Stage2 (requestProvider1, action, headers, stream);
             if (response.StatusCode == HttpStatusCode.MethodNotAllowed) {
@@ -189,8 +191,8 @@ namespace Mono.Upnp.Internal
             return request;
         }
 
-        private HttpWebResponse Stage2 (Func<ServiceAction, WebHeaderCollection, HttpWebRequest> requestProvider,
-                                        ServiceAction action, WebHeaderCollection headers, Stream stream)
+        private HttpWebResponse Stage2 (RequestProvider requestProvider, ServiceAction action,
+                                        WebHeaderCollection headers, Stream stream)
         {
             var request = requestProvider (action, headers);
             if (fallback.Chuncked) {
@@ -201,8 +203,7 @@ namespace Mono.Upnp.Internal
         }
 
         private HttpWebResponse Stage2 (HttpWebRequest request, ServiceAction action, Stream stream,
-                                        Func<HttpWebRequest, ServiceAction, Stream, HttpWebResponse> requestHandler1,
-                                        Func<HttpWebRequest, ServiceAction, Stream, HttpWebResponse> requestHandler2)
+                                        RequestHandler requestHandler1, RequestHandler requestHandler2)
         {
             try {
                 var response = requestHandler1 (request, action, stream);

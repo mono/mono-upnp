@@ -118,7 +118,7 @@ namespace Mono.Upnp.Description
 
             try {
                 reader.Read ();
-                while (reader.ReadToNextElement ()) {
+                while (Helper.ReadToNextElement (reader)) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {

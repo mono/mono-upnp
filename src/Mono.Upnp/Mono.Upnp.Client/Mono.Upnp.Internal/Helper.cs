@@ -27,7 +27,6 @@
 //
 
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Xml;
@@ -66,7 +65,7 @@ namespace Mono.Upnp.Internal
 			}
         }
 
-        public static bool ReadToNextElement (this XmlReader reader)
+        public static bool ReadToNextElement (XmlReader reader)
         {
             while (reader.Read ()) {
                 if (reader.NodeType == XmlNodeType.Element) {

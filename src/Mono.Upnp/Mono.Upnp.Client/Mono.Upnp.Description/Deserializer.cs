@@ -27,8 +27,6 @@
 //
 
 using System;
-using System.IO;
-using System.Net;
 using System.Xml;
 
 using Mono.Upnp.Control;
@@ -73,7 +71,7 @@ namespace Mono.Upnp.Description
 
             try {
                 reader.Read ();
-                while (reader.ReadToNextElement ()) {
+                while (Helper.ReadToNextElement (reader)) {
                     try {
                         DeserializeDescriptionCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {

@@ -63,7 +63,7 @@ namespace Mono.Upnp.Control
 			using (reader) {
 	            var code = new FaultCode ();
 	            reader.ReadToFollowing ("UPnPError", "urn:schemas-upnp-org:control-1-0");
-	            while (reader.ReadToNextElement ()) {
+	            while (Helper.ReadToNextElement (reader)) {
 	                Deserialize (reader.ReadSubtree (), reader.Name, ref code);
 	            }
 	            return code;

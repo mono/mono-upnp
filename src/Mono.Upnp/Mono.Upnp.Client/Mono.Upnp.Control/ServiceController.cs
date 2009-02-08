@@ -159,7 +159,7 @@ namespace Mono.Upnp.Control
 
             try {
                 reader.Read ();
-                while (reader.ReadToNextElement ()) {
+                while (Helper.ReadToNextElement (reader)) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
@@ -292,7 +292,7 @@ namespace Mono.Upnp.Control
             
             using (reader) {
                 while (reader.ReadToFollowing ("property", Protocol.EventUrn)) {
-                    if (reader.ReadToNextElement () && StateVariables.ContainsKey (reader.Name)) {
+                    if (Helper.ReadToNextElement (reader) && StateVariables.ContainsKey (reader.Name)) {
                         StateVariables[reader.Name].OnChanged (reader.ReadString ());
                     }
                 }

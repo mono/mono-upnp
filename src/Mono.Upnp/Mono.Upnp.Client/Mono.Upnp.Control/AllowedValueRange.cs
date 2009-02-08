@@ -55,7 +55,7 @@ namespace Mono.Upnp.Control
 
             try {
                 reader.Read ();
-                while (reader.ReadToNextElement ()) {
+                while (Helper.ReadToNextElement (reader)) {
                     try {
                         Deserialize (reader.ReadSubtree (), reader.Name.ToLower ());
                     } catch (Exception e) {

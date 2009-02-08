@@ -28,7 +28,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Net;
 using System.Xml;
 
 using Mono.Upnp.Internal;
@@ -84,7 +83,7 @@ namespace Mono.Upnp.Control
 
             try {
                 reader.Read ();
-                while (reader.ReadToNextElement ()) {
+                while (Helper.ReadToNextElement (reader)) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {

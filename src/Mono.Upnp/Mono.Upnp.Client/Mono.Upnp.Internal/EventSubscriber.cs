@@ -27,8 +27,6 @@
 //
 
 using System;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 
@@ -64,13 +62,14 @@ namespace Mono.Upnp.Internal
 
         static string GeneratePrefix ()
         {
-			// TODO handle if we don't find the address
-			var address = (from a in Dns.GetHostAddresses (Dns.GetHostName ())
-						   where a.AddressFamily == AddressFamily.InterNetwork
-						   select a).First ();
+			foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
+				if (address.AddressFamily == AddressFamily.InterNetwork) {
+					return string.Format (
+						"http://{0}:{1}/upnp/event-subscriber/{2}/", address, random.Next (1024, 5000), id++);
+				}
+			}
 			
-			return string.Format (
-				"http://{0}:{1}/upnp/event-subscriber/{2}/", address, random.Next (1024, 5000), id++);
+			return null;
         }
 
         public void Start ()

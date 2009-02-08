@@ -29,11 +29,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Text;
-using System.Threading;
 using System.Xml;
 
 using Mono.Upnp.Internal;
@@ -185,7 +182,7 @@ namespace Mono.Upnp.Control
                 reader.ReadToFollowing (Name + "Response", controller.Description.Type.ToString ());
                 var out_args = new Dictionary<string, string> ();
                 string return_value = null;
-                while (reader.ReadToNextElement ()) {
+                while (Helper.ReadToNextElement (reader)) {
                     if (ReturnArgument != null && ReturnArgument.Name == reader.Name) {
                         return_value = reader.ReadString ();
                     } else {
@@ -218,7 +215,7 @@ namespace Mono.Upnp.Control
 
             try {
                 reader.Read ();
-                while (reader.ReadToNextElement ()) {
+                while (Helper.ReadToNextElement (reader)) {
                     try {
                         DeserializeCore (reader.ReadSubtree (), reader.Name);
                     } catch (Exception e) {
