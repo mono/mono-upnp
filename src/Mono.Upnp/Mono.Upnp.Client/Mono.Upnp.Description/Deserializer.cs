@@ -205,7 +205,10 @@ namespace Mono.Upnp.Description
 
         protected virtual Uri DeserializeUrlCore (XmlReader reader)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
+            if (reader == null)
+				throw new ArgumentNullException ("reader");
+			if (UrlBase == null)
+				throw new InvalidOperationException ("A description must be deserialized before a URL.");
 
             try {
                 reader.Read ();
