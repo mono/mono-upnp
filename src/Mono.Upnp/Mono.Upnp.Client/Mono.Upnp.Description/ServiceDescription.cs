@@ -79,11 +79,11 @@ namespace Mono.Upnp.Description
             }
         }
 
-        protected virtual void OnDispose (DisposedEventArgs args)
+        protected virtual void OnDispose (DisposedEventArgs e)
         {
             var handler = Disposed;
             if (handler != null) {
-                handler (this, args);
+                handler (this, e);
             }
         }
 

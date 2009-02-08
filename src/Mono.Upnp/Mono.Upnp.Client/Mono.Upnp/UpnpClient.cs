@@ -140,30 +140,30 @@ namespace Mono.Upnp
             }
         }
 		
-		protected virtual void OnDeviceAdded (DeviceEventArgs args)
+		protected virtual void OnDeviceAdded (DeviceEventArgs e)
 		{
-            OnEvent (DeviceAdded, args);
+            OnEvent (DeviceAdded, e);
 		}
 
-        protected virtual void OnServiceAdded (ServiceEventArgs args)
+        protected virtual void OnServiceAdded (ServiceEventArgs e)
         {
-            OnEvent (ServiceAdded, args);
+            OnEvent (ServiceAdded, e);
         }
 
-        protected virtual void OnDeviceRemoved (DeviceEventArgs args)
+        protected virtual void OnDeviceRemoved (DeviceEventArgs e)
         {
-            OnEvent (DeviceRemoved, args);
+            OnEvent (DeviceRemoved, e);
         }
 
-        protected virtual void OnServiceRemoved (ServiceEventArgs args)
+        protected virtual void OnServiceRemoved (ServiceEventArgs e)
         {
-            OnEvent (ServiceRemoved, args);
+            OnEvent (ServiceRemoved, e);
         }
         
-        void OnEvent<T> (EventHandler<T> handler, T args) where T : EventArgs
+        void OnEvent<T> (EventHandler<T> handler, T e) where T : EventArgs
         {
             if (handler != null) {
-                handler (this, args);
+                handler (this, e);
             }
         }
 

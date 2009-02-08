@@ -96,11 +96,11 @@ namespace Mono.Upnp.Control
             OnDisposed (DisposedEventArgs.Empty);
         }
 
-        protected virtual void OnDisposed (DisposedEventArgs args)
+        protected virtual void OnDisposed (DisposedEventArgs e)
         {
             var handler = Disposed;
             if (handler != null) {
-                handler (this, args);
+                handler (this, e);
             }
         }
 

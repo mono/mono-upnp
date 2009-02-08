@@ -89,11 +89,11 @@ namespace Mono.Upnp.Description
             }
         }
 
-        void OnDispose (DisposedEventArgs args)
+        void OnDispose (DisposedEventArgs e)
         {
             var handler = Disposed;
             if (handler != null) {
-                handler (this, args);
+                handler (this, e);
             }
         }
 

@@ -97,11 +97,11 @@ namespace Mono.Upnp.Control
             OnChanged (new StateVariableChangedArgs<string> (newValue));
         }
 
-        protected virtual void OnChanged (StateVariableChangedArgs<string> args)
+        protected virtual void OnChanged (StateVariableChangedArgs<string> e)
         {
             var changed = this.changed;
             if (changed != null) {
-                changed (this, args);
+                changed (this, e);
             }
         }
 
