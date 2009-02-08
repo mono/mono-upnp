@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{48050814-63F9-4264-B2F5-67EBD7047BAE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AssemblyName>Mono.Upnp.DidlLite.Client</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AssemblyName>Mono.Upnp.DidlLite</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mono.Upnp.DidlLite/" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Mono.Upnp.DidlLite\ClassNameAttribute.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Container.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\DeserializationException.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Deserializer.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Item.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Object.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Protocol.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\WriteStatus.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Mono.Upnp\Mono.Upnp.Client\Mono.Upnp.Client.csproj">
+      <Project>{F88B8BD0-B03C-41DD-BA82-86D865E46B43}</Project>
+      <Name>Mono.Upnp.Client</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

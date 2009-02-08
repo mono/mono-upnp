@@ -27,6 +27,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.Sharpener", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.Sharpener\Mono.Upnp.Dcp.Sharpener.csproj", "{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.DidlLite", "Mono.Upnp.DidlLite", "{3A7FD91F-E693-4DB7-A9C7-4DD35B8B5C23}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.DidlLite.Client", "Mono.Upnp.DidlLite.Client", "{41E15D89-AA58-4A99-BCF1-42B38B5A8E98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.DidlLite.Client", "src\Mono.Upnp.DidlLite\Mono.Upnp.DidlLite.Client\Mono.Upnp.DidlLite.Client.csproj", "{48050814-63F9-4264-B2F5-67EBD7047BAE}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Server", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer\Mono.Upnp.Dcp.MediaServer1.Server\Mono.Upnp.Dcp.MediaServer1.Server.csproj", "{612068A0-1BE2-43F2-9402-5884EC0AFC57}"
 EndProject
 Global
@@ -35,6 +41,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{48050814-63F9-4264-B2F5-67EBD7047BAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48050814-63F9-4264-B2F5-67EBD7047BAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48050814-63F9-4264-B2F5-67EBD7047BAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48050814-63F9-4264-B2F5-67EBD7047BAE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{70A00793-C96D-4626-98FF-0784E425A6F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{70A00793-C96D-4626-98FF-0784E425A6F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70A00793-C96D-4626-98FF-0784E425A6F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -85,6 +95,8 @@ Global
 		{9A808AE1-F0B3-49E7-9F03-A54954C230A1} = {19359AA2-5A96-4745-A30F-D09882179BF5}
 		{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1} = {19359AA2-5A96-4745-A30F-D09882179BF5}
 		{70A00793-C96D-4626-98FF-0784E425A6F8} = {9A808AE1-F0B3-49E7-9F03-A54954C230A1}
+		{41E15D89-AA58-4A99-BCF1-42B38B5A8E98} = {3A7FD91F-E693-4DB7-A9C7-4DD35B8B5C23}
+		{48050814-63F9-4264-B2F5-67EBD7047BAE} = {41E15D89-AA58-4A99-BCF1-42B38B5A8E98}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		name = Mono.Upnp

@@ -1,10 +1,10 @@
 ﻿//
-// DeserializationException.cs
+// UpnpDeserializationException.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
 //
-// Copyright (C) 2009 S&S Black Ltd.
+// Copyright (C) 2008 S&S Black Ltd.
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -28,10 +28,10 @@
 
 using System;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.DidlLite
 {
-    public class DeserializationException : Exception
-    {
+	public class DeserializationException : Exception
+	{
         public DeserializationException (string message)
             : base (message)
         {
@@ -41,5 +41,5 @@ namespace Mono.Upnp
             : base (message, innerException)
         {
         }
-    }
+	}
 }

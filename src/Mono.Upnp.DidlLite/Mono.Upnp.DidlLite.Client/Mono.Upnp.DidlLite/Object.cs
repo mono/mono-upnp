@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1
+namespace Mono.Upnp.DidlLite
 {
 	public abstract class Object
 	{
@@ -28,7 +28,7 @@ namespace Mono.Upnp.Dcp.MediaServer1
             return ~Id.GetHashCode ();
         }
 
-        public void Deseriailize (XmlReader reader)
+        internal void Deserialize (XmlReader reader)
         {
             DeserializeCore (reader);
             Verify ();
@@ -55,6 +55,11 @@ namespace Mono.Upnp.Dcp.MediaServer1
             if (Title == null) throw new DeserializationException (string.Format ("The object {0} does not have a title.", Id));
             if (Class == null) throw new DeserializationException (string.Format ("The object {0} does not have a class.", Id));
             if (!has_restricted) throw new DeserializationException (string.Format ("The object {0} does not have a restricted value.", Id));
+			VerifyCore ();
         }
+		
+		protected virtual void VerifyCore ()
+		{
+		}
 	}
 }

@@ -1,5 +1,5 @@
 ﻿
-namespace Mono.Upnp.Dcp.MediaServer1
+namespace Mono.Upnp.DidlLite
 {
 	public enum WriteStatus
 	{

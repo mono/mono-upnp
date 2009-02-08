@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Mono.Upnp.Dcp.MediaServer1
+namespace Mono.Upnp.DidlLite
 {
-	public class Container : Object
+	public abstract class Container : Object
 	{
         private int child_count;
         private string create_class;
