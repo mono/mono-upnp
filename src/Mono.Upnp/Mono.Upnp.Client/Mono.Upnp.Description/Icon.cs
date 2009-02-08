@@ -37,9 +37,9 @@ namespace Mono.Upnp.Description
 	public class Icon
 	{
         readonly DeviceDescription device;
-        int? width;
-        int? height;
-        int? depth;
+		bool has_width;
+		bool has_height;
+		bool has_depth;
         byte[] data;
         IDeserializer deserializer;
 
@@ -53,9 +53,9 @@ namespace Mono.Upnp.Description
         public bool IsDisposed { get { return device.IsDisposed; } }
 		public Uri Url { get; private set; }
         public string MimeType { get; private set; }
-        public int Width { get { return width.Value; } }
-        public int Height { get { return height.Value; } }
-        public int Depth { get { return depth.Value; } }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public int Depth { get; private set; }
 
         public byte[] GetData ()
         {
@@ -82,7 +82,7 @@ namespace Mono.Upnp.Description
 
         public override string ToString ()
         {
-            return string.Format ("Icon {{ {0}, {1}x{2}x{3}, {4} }}", MimeType, width, height, depth, Url);
+            return string.Format ("Icon {{ {0}, {1}x{2}x{3}, {4} }}", MimeType, Width, Height, Depth, Url);
         }
 
         public override bool Equals (object obj)
@@ -139,15 +139,18 @@ namespace Mono.Upnp.Description
                     break;
                 case "width":
                     reader.Read ();
-                    width = reader.ReadContentAsInt ();
+                    Width = reader.ReadContentAsInt ();
+					has_width = true;
                     break;
                 case "height":
                     reader.Read ();
-                    height = reader.ReadContentAsInt ();
+                    Height = reader.ReadContentAsInt ();
+					has_height = true;
                     break;
                 case "depth":
                     reader.Read ();
-                    depth = reader.ReadContentAsInt ();
+                    Depth = reader.ReadContentAsInt ();
+					has_depth = true;
                     break;
                 case "url":
                     Url = deserializer.DeserializeUrl (reader.ReadSubtree ());
@@ -167,17 +170,14 @@ namespace Mono.Upnp.Description
             if (MimeType == null) {
                 Log.Exception (new UpnpDeserializationException ("The icon has no mime-type."));
             }
-            if (width == null) {
+            if (!has_width) {
                 Log.Exception (new UpnpDeserializationException ("The icon has no width."));
-                width = 0;
             }
-            if (height == null) {
+            if (!has_height) {
                 Log.Exception (new UpnpDeserializationException ("The icon has no height."));
-                height = 0;
             }
-            if (depth == null) {
+            if (!has_depth) {
                 Log.Exception (new UpnpDeserializationException ("The icon has no depth."));
-                depth = 0;
             }
         }
     }
