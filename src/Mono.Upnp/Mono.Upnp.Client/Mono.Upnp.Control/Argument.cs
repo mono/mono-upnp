@@ -148,7 +148,7 @@ namespace Mono.Upnp.Control
 
         public override string ToString ()
         {
-            return string.Format (@"Argument {{ {0}, {1} }}", action, Name);
+            return string.Format (@"Argument {{ {1} }}", Name);
         }
     }
 }

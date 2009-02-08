@@ -173,16 +173,20 @@ namespace Mono.Upnp.Description
                 throw new UpnpDeserializationException (message);
             }
             if (Type == null) {
-                throw new UpnpDeserializationException (string.Format ("The service {0} has no type.", Id));
+                throw new UpnpDeserializationException (
+					string.Format ("The service {0} has no type.", Id));
             }
             if (ScpdUrl == null) {
-                Log.Exception (new UpnpDeserializationException (string.Format ("{0} has no SCPD URL.", ToString ())));
+                Log.Exception (new UpnpDeserializationException (
+					string.Format ("{0} has no SCPD URL.", ToString ())));
             }
             if (ControlUrl == null) {
-                Log.Exception (new UpnpDeserializationException (string.Format ("{0} has no control URL.", ToString ())));
+                Log.Exception (new UpnpDeserializationException (
+					string.Format ("{0} has no control URL.", ToString ())));
             }
             if (EventUrl == null) {
-                Log.Exception (new UpnpDeserializationException (string.Format ("{0} has no event URL.", ToString ())));
+                Log.Exception (new UpnpDeserializationException (
+					string.Format ("{0} has no event URL.", ToString ())));
             }
         }
 
