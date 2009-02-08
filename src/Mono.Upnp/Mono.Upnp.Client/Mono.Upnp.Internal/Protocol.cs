@@ -34,5 +34,8 @@ namespace Mono.Upnp.Internal
         public const string EventUrn = "urn:schemas-upnp-org:event-1-0";
         public const string SoapEnvelopeSchema = "http://schemas.xmlsoap.org/soap/envelope/";
         public const string SoapEncodingSchema = "http://schemas.xmlsoap.org/soap/encoding/";
+		// TODO make this better
+		static string os = string.Format ("{0}/{1}", Environment.OSVersion.Platform, Environment.OSVersion.Version);
+        public static string UserAgent = string.Format ("{0} UPnp/1.1 Mono.Upnp/1.0", os);
 	}
 }

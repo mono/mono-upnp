@@ -110,8 +110,10 @@ namespace Mono.Upnp.Internal
         {
 			var request = WebRequest.Create (controller.Description.EventUrl);
             request.Method = "SUBSCRIBE";
+			request.Headers.Add ("USERAGENT", Protocol.UserAgent);
             request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
             request.Headers.Add ("NT", "upnp:event");
+			request.Headers.Add ("TIMEOUT", "Second-1800");
 			
             lock (mutex) {
                 request.BeginGetResponse (OnSubscribeResponse, request);
@@ -160,10 +162,8 @@ namespace Mono.Upnp.Internal
 	                        return;
 	                    }
 	                    var timeout = TimeSpan.FromSeconds (double.Parse (timeout_header.Substring (7)));
-						var five_minutes = TimeSpan.FromMinutes (5);
-	                    timeout -= TimeSpan.FromMinutes (2);
-						if (timeout < five_minutes) {
-							timeout = five_minutes;
+						if (timeout > TimeSpan.FromMinutes (2)) {
+	                    	timeout -= TimeSpan.FromMinutes (2);
 						}
 	                    renew_timeout_id = dispatcher.Add (timeout, OnRenewTimeout);
 					}
@@ -195,6 +195,7 @@ namespace Mono.Upnp.Internal
                 var request = WebRequest.Create (controller.Description.EventUrl);
                 request.Method = "SUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
+				request.Headers.Add ("TIMEOUT", "Second-1800");
                 request.BeginGetResponse (OnSubscribeResponse, request);
                 expire_timeout_id = dispatcher.Add (TimeSpan.FromSeconds (30), OnSubscribeTimeout, request);
                 confidently_subscribed = false;
