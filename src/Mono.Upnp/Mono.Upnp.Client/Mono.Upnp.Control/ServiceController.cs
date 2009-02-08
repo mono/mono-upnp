@@ -44,7 +44,7 @@ namespace Mono.Upnp.Control
         readonly Dictionary<string, StateVariable> state_variable_dict = new Dictionary<string, StateVariable> ();
         readonly ReadOnlyDictionary<string, StateVariable> state_variables;
         SoapInvoker soap_adapter;
-        EventSubscriber subscriber;
+        EventSubscriber event_subscriber;
         int events_ref_count;
 
         protected internal ServiceController (ServiceDescription service)
@@ -91,6 +91,7 @@ namespace Mono.Upnp.Control
                 return;
             }
 
+			event_subscriber.Dispose ();
             IsDisposed = true;
             OnDisposed (DisposedEventArgs.Empty);
         }
@@ -125,15 +126,15 @@ namespace Mono.Upnp.Control
         internal void RefEvents ()
         {
             if (events_ref_count == 0) {
-                if (subscriber == null) {
-                    subscriber = new EventSubscriber (this);
+                if (event_subscriber == null) {
+                    event_subscriber = new EventSubscriber (this);
                 }
                 if (service_description.EventUrl == null) {
                     // We log this because it's a no-no to throw in event registration
                     Log.Exception (new InvalidOperationException (
                         "Attempting to subscribe to events for a service with no event URL."));
                 } else {
-                    subscriber.Start ();
+                    event_subscriber.Start ();
                 }
             }
             events_ref_count++;
@@ -143,7 +144,7 @@ namespace Mono.Upnp.Control
         {
             events_ref_count--;
             if (events_ref_count == 0) {
-                subscriber.Stop ();
+                event_subscriber.Stop ();
             }
         }
 

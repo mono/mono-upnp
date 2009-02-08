@@ -86,12 +86,11 @@ namespace Mono.Upnp.Internal
                 listener.Prefixes.Add (prefix);
             }
             listener.Start ();
-            listener.BeginGetContext (OnGotContext, listener);
+            listener.BeginGetContext (OnGotContext, null);
         }
 
         void OnGotContext (IAsyncResult asyncResult)
         {
-            var listener = (HttpListener)asyncResult.AsyncState;
             var context = listener.EndGetContext (asyncResult);
             try {
                 controller.DeserializeEvents (context.Request);
@@ -99,7 +98,7 @@ namespace Mono.Upnp.Internal
                 // TODO log
             }
             context.Response.Close ();
-            listener.BeginGetContext (OnGotContext, listener);
+            listener.BeginGetContext (OnGotContext, null);
         }
 
         void StopListening ()
@@ -216,8 +215,7 @@ namespace Mono.Upnp.Internal
         void OnUnsubscribeResponse (IAsyncResult asyncResult)
         {
             try {
-                var response = ((WebRequest)asyncResult).EndGetResponse (asyncResult);
-                response.Close ();
+                ((WebRequest)asyncResult).EndGetResponse (asyncResult).Close ();
             } catch {
             }
         }
