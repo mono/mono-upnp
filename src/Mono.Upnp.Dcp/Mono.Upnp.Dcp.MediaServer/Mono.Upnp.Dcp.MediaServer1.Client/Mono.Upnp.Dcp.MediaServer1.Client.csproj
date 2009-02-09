@@ -39,10 +39,6 @@
       <Project>{F88B8BD0-B03C-41DD-BA82-86D865E46B43}</Project>
       <Name>Mono.Upnp.Client</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Mono.Upnp.DidlLite\Mono.Upnp.DidlLite.Client\Mono.Upnp.DidlLite.Client.csproj">
-      <Project>{48050814-63F9-4264-B2F5-67EBD7047BAE}</Project>
-      <Name>Mono.Upnp.DidlLite.Client</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\BrowseFlag.cs" />
@@ -54,30 +50,47 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\Direction.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\DiscoveryEventArgs.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\TransferStatus.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\ImageItem.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\Photo.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\AudioItem.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\MusicTrack.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\AudioBroadcast.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\AudioBook.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\VideoItem.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\Movie.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\VideoBroadcast.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\MusicVideoClip.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\Person.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\MusicArtist.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\PlaylistContainer.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\PlaylistItem.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\TextItem.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\Album.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\MusicAlbum.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\PhotoAlbum.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\Genre.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\MusicGenre.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\MovieGenre.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\StorageSystem.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\StorageVolume.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Av\StorageFolder.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\ClassNameAttribute.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Container.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\DeserializationException.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Item.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Object.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\WriteStatus.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\Album.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\AllOrFirstRunOrRepeat.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\AllowedUse.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\AudioBook.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\AudioBroadcast.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\AudioItem.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\ChannelId.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\FirstRunOrRepeat.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\Genre.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\ImageItem.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\Movie.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\MovieGenre.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\MusicAlbum.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\MusicArtist.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\MusicGenre.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\MusicTrack.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\MusicVideoClip.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\Person.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\Photo.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\PhotoAlbum.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\PlaylistContainer.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\PlaylistItem.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\RadioBand.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\Ratings.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\StorageFolder.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\StorageMedium.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\StorageSystem.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\StorageVolume.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\TextItem.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\VideoBroadcast.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\VideoItem.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\ClassReference.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Deserializer.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Protocol.cs" />
+    <Compile Include="Mono.Upnp.DidlLite.Av\PersonWithRole.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -88,6 +101,7 @@
   </Target>
   -->
   <ItemGroup>
-    <Folder Include="Mono.Upnp.Dcp.MediaServer1.Av/" />
+    <Folder Include="Mono.Upnp.DidlLite/" />
+    <Folder Include="Mono.Upnp.DidlLite.Av/" />
   </ItemGroup>
 </Project>
