@@ -3,35 +3,35 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Ssdp", "Mono.Ssdp", "{74E2D43F-96D6-4CC6-89A0-C7DF1BA3CBCC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp", "src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj", "{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp", "Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj", "{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.ConsoleClient", "src\Mono.Ssdp\Mono.Ssdp.ConsoleClient\Mono.Ssdp.ConsoleClient.csproj", "{A14270F0-4144-48D8-94B9-1272441F5FDC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.ConsoleClient", "Mono.Ssdp\Mono.Ssdp.ConsoleClient\Mono.Ssdp.ConsoleClient.csproj", "{A14270F0-4144-48D8-94B9-1272441F5FDC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.ConsoleServer", "src\Mono.Ssdp\Mono.Ssdp.ConsoleServer\Mono.Ssdp.ConsoleServer.csproj", "{B4294928-E3E8-4481-87B6-F9DC738FAFD9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.ConsoleServer", "Mono.Ssdp\Mono.Ssdp.ConsoleServer\Mono.Ssdp.ConsoleServer.csproj", "{B4294928-E3E8-4481-87B6-F9DC738FAFD9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp", "Mono.Upnp", "{91CCCAC1-23FB-460B-9A7D-F38303E2B289}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.ConsoleClient", "src\Mono.Upnp\Mono.Upnp.ConsoleClient\Mono.Upnp.ConsoleClient.csproj", "{766A0822-B08C-46FB-A933-69CCF42ACCA6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.ConsoleClient", "Mono.Upnp\Mono.Upnp.ConsoleClient\Mono.Upnp.ConsoleClient.csproj", "{766A0822-B08C-46FB-A933-69CCF42ACCA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Client", "src\Mono.Upnp\Mono.Upnp.Client\Mono.Upnp.Client.csproj", "{F88B8BD0-B03C-41DD-BA82-86D865E46B43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Client", "Mono.Upnp\Mono.Upnp.Client\Mono.Upnp.Client.csproj", "{F88B8BD0-B03C-41DD-BA82-86D865E46B43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Server", "src\Mono.Upnp\Mono.Upnp.Server\Mono.Upnp.Server.csproj", "{EBBD8A18-412E-4DC5-BC52-F1BE65116D53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Server", "Mono.Upnp\Mono.Upnp.Server\Mono.Upnp.Server.csproj", "{EBBD8A18-412E-4DC5-BC52-F1BE65116D53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.ConsoleServer", "src\Mono.Upnp\Mono.Upnp.ConsoleServer\Mono.Upnp.ConsoleServer.csproj", "{7995FFEC-A1ED-4696-99F7-062484533766}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.ConsoleServer", "Mono.Upnp\Mono.Upnp.ConsoleServer\Mono.Upnp.ConsoleServer.csproj", "{7995FFEC-A1ED-4696-99F7-062484533766}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.Dcp", "Mono.Upnp.Dcp", "{19359AA2-5A96-4745-A30F-D09882179BF5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.Dcp.MediaServer", "Mono.Upnp.Dcp.MediaServer", "{9A808AE1-F0B3-49E7-9F03-A54954C230A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Client", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer\Mono.Upnp.Dcp.MediaServer1.Client\Mono.Upnp.Dcp.MediaServer1.Client.csproj", "{70A00793-C96D-4626-98FF-0784E425A6F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Client", "Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer\Mono.Upnp.Dcp.MediaServer1.Client\Mono.Upnp.Dcp.MediaServer1.Client.csproj", "{70A00793-C96D-4626-98FF-0784E425A6F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.Sharpener", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.Sharpener\Mono.Upnp.Dcp.Sharpener.csproj", "{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.Sharpener", "Mono.Upnp.Dcp\Mono.Upnp.Dcp.Sharpener\Mono.Upnp.Dcp.Sharpener.csproj", "{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.DidlLite", "Mono.Upnp.DidlLite", "{3A7FD91F-E693-4DB7-A9C7-4DD35B8B5C23}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.DidlLite.Client", "Mono.Upnp.DidlLite.Client", "{41E15D89-AA58-4A99-BCF1-42B38B5A8E98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.DidlLite.Client", "src\Mono.Upnp.DidlLite\Mono.Upnp.DidlLite.Client\Mono.Upnp.DidlLite.Client.csproj", "{48050814-63F9-4264-B2F5-67EBD7047BAE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.DidlLite.Client", "Mono.Upnp.DidlLite\Mono.Upnp.DidlLite.Client\Mono.Upnp.DidlLite.Client.csproj", "{48050814-63F9-4264-B2F5-67EBD7047BAE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Server", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer\Mono.Upnp.Dcp.MediaServer1.Server\Mono.Upnp.Dcp.MediaServer1.Server.csproj", "{612068A0-1BE2-43F2-9402-5884EC0AFC57}"
 EndProject
@@ -99,9 +99,13 @@ Global
 		{48050814-63F9-4264-B2F5-67EBD7047BAE} = {41E15D89-AA58-4A99-BCF1-42B38B5A8E98}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
+		BaseDirectory = src
 		name = Mono.Upnp
 		version = 0.1
 		StartupItem = src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj
+		Policies = $0
+		$0.StandardHeader = $1
+		$1.inheritsSet = MITX11License
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
