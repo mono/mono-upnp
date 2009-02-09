@@ -5,7 +5,7 @@ using Mono.Upnp.DidlLite;
 
 namespace Mono.Upnp.Dcp.MediaServer1.Av
 {
-	public sealed class StorageVolume : Container
+	public class StorageVolume : Container
 	{
 	}
 }
