@@ -99,15 +99,13 @@ namespace Mono.Upnp.DidlLite
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			switch (reader.NamespaceURI){
-			case Protocol.DidlLiteSchema:
-				switch (reader.Name) {
-				case "res":
+			if (reader.NamespaceURI == Protocol.DidlLiteSchema) {
+				if (reader.Name == "res") {
 					resource_list.Add (new Resource (reader));
-					break;
+				} else {
+					reader.Skip (); // This is a workaround for Mono bug 334752
 				}
-				break;
-			case Protocol.UpnpSchema:
+			} else if (reader.NamespaceURI == Protocol.UpnpSchema) {
 				switch (reader.Name) {
 				case "class":
 					Class = new Class (reader);
@@ -116,9 +114,11 @@ namespace Mono.Upnp.DidlLite
 				case "writeStatus":
 					// TODO parse here
 					break;
+				default: // This is a workaround for Mono bug 334752
+					reader.Skip ();
+					break;
 				}
-				break;
-			case Protocol.DublinCoreSchema:
+			} else if (reader.NamespaceURI == Protocol.DublinCoreSchema) {
 				switch (reader.Name) {
 				case "title":
 					Title = reader.ReadString ();
@@ -126,8 +126,12 @@ namespace Mono.Upnp.DidlLite
 				case "creator":
 					Creator = reader.ReadString ();
 					break;
+				default: // This is a workaround for Mono bug 334752
+					reader.Skip ();
+					break;
 				}
-				break;
+			} else { // This is a workaround for Mono bug 334752
+				reader.Skip ();
 			}
 		}
 
@@ -135,17 +139,23 @@ namespace Mono.Upnp.DidlLite
         {
 			VerifyDeserialization ();
 			if (!verified) {
-				throw new DeserializationException ("The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
+				throw new DeserializationException (
+					"The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
 			}
         }
 		
 		protected virtual void VerifyDeserialization ()
 		{
-			if (Id == null) throw new DeserializationException ("The object does not have an ID.");
-            if (ParentId == null) throw new DeserializationException (string.Format ("The object {0} does not have a parent ID.", Id));
-            if (Title == null) throw new DeserializationException (string.Format ("The object {0} does not have a title.", Id));
-            if (!has_class) throw new DeserializationException (string.Format ("The object {0} does not have a class.", Id));
-            if (!has_restricted) throw new DeserializationException (string.Format ("The object {0} does not have a restricted value.", Id));
+			if (Id == null)
+				throw new DeserializationException ("The object does not have an ID.");
+            if (ParentId == null)
+				throw new DeserializationException (string.Format ("The object {0} does not have a parent ID.", Id));
+            if (Title == null)
+				throw new DeserializationException (string.Format ("The object {0} does not have a title.", Id));
+            if (!has_class)
+				throw new DeserializationException (string.Format ("The object {0} does not have a class.", Id));
+            if (!has_restricted)
+				throw new DeserializationException (string.Format ("The object {0} does not have a restricted value.", Id));
 			verified = true;
 		}
 		

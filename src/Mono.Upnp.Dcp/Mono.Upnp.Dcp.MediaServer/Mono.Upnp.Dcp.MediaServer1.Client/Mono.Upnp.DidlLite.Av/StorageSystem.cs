@@ -32,16 +32,15 @@ namespace Mono.Upnp.DidlLite.Av
 {
 	public class StorageSystem : Container
 	{
+		protected StorageSystem ()
+		{
+		}
+		
 		public long StorageTotal { get; private set; }
 		public long StorageUsed { get; private set; }
 		public long StorageFree { get; private set; }
 		public long StorageMaxPartition { get; private set; }
 		public string StorageMedium { get; private set; }
-		
-		IList<StorageVolume> Volumes { get; set; }
-		IList<StorageSystem> Systems { get; set; }
-		IList<StorageFolder> Folders { get; set; }
-		IList<Object> VirtualVolume { get; set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
@@ -73,29 +72,29 @@ namespace Mono.Upnp.DidlLite.Av
 			}
 		}
 		
-		protected override void VerifyDeserialization ()
-		{
-			if (StorageTotal == null)
-				throw new DeserializationException ("The storage system does not have a total value.");
-			if (StorageUsed == null)
-				throw new DeserializationException ("The storage system does not have a used value.");
-			if (StorageFree == null)
-				throw new DeserializationException ("The storage system does not have a free value.");
-			if (StorageMaxPartition == null)
-				throw new DeserializationException ("The storage system does not have a max partition value.");
-			if (StorageMedium == null)
-				throw new DeserializationException ("The storage system does not have a medium value.");
-			if (Volumes.Count > 0 && WriteStatus.HasValue) {
-				var write_status = Volumes[0].WriteStatus;
-				for (var i = 1; i < Volumes.Count; i++) {
-					if (Volumes[0].WriteStatus != write_status && WriteStatus.Value != Mono.Upnp.DidlLite.WriteStatus.Mixed) {
-						throw new DeserializationException ("The storage system must have a mixed write status if its volumes' write status are heterogenius.");
-					}
-				}
-				if (WriteStatus != write_status) {
-					throw new DeserializationException ("The storage system has a different write status than its volumes.");
-				}
-			}
-		}
+//		protected override void VerifyDeserialization ()
+//		{
+//			if (StorageTotal == null)
+//				throw new DeserializationException ("The storage system does not have a total value.");
+//			if (StorageUsed == null)
+//				throw new DeserializationException ("The storage system does not have a used value.");
+//			if (StorageFree == null)
+//				throw new DeserializationException ("The storage system does not have a free value.");
+//			if (StorageMaxPartition == null)
+//				throw new DeserializationException ("The storage system does not have a max partition value.");
+//			if (StorageMedium == null)
+//				throw new DeserializationException ("The storage system does not have a medium value.");
+//			if (Volumes.Count > 0 && WriteStatus.HasValue) {
+//				var write_status = Volumes[0].WriteStatus;
+//				for (var i = 1; i < Volumes.Count; i++) {
+//					if (Volumes[0].WriteStatus != write_status && WriteStatus.Value != Mono.Upnp.DidlLite.WriteStatus.Mixed) {
+//						throw new DeserializationException ("The storage system must have a mixed write status if its volumes' write status are heterogenius.");
+//					}
+//				}
+//				if (WriteStatus != write_status) {
+//					throw new DeserializationException ("The storage system has a different write status than its volumes.");
+//				}
+//			}
+//		}
 	}
 }

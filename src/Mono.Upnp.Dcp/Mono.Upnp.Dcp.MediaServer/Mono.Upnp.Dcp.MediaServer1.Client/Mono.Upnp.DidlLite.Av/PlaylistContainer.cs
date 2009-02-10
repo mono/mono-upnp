@@ -44,7 +44,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<string> right_list = new List<string> ();
 		readonly ReadOnlyCollection<string> rights;
 		
-		internal PlaylistContainer ()
+		protected PlaylistContainer ()
 		{
 			artists = artist_list.AsReadOnly ();
 			producers = producer_list.AsReadOnly ();

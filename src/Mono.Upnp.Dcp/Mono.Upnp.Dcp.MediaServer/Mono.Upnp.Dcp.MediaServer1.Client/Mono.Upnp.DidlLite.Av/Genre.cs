@@ -31,6 +31,10 @@ namespace Mono.Upnp.DidlLite.Av
 {
 	public class Genre : Container
 	{
+		protected Genre ()
+		{
+		}
+		
 		public string LongDescription { get; private set; }
 		public string Description { get; private set; }
 		

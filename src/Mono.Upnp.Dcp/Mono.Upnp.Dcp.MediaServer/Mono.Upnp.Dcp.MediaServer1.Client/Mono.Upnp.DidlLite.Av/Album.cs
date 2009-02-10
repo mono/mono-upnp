@@ -42,7 +42,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<string> right_list = new List<string> ();
 		readonly ReadOnlyCollection<string> rights;
 		
-		internal Album ()
+		protected Album ()
 		{
 			publishers = publisher_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();

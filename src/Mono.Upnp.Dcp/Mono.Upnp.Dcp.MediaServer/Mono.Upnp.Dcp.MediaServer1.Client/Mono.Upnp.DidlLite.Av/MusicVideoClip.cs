@@ -46,7 +46,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<DateTime> scheduled_end_time_list = new List<DateTime>();
 		readonly ReadOnlyCollection<DateTime> scheduled_end_times;
 		
-		internal MusicVideoClip ()
+		protected MusicVideoClip ()
 		{
 			artists = artist_list.AsReadOnly ();
 			directors = director_list.AsReadOnly ();

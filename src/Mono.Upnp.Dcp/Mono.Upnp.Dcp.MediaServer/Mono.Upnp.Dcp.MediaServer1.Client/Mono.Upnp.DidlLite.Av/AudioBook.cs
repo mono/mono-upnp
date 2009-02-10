@@ -38,7 +38,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<string> contributor_list = new List<string> ();
 		readonly ReadOnlyCollection<string> contributors;
 		
-		internal AudioBook ()
+		protected AudioBook ()
 		{
 			producers = producer_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();
@@ -52,7 +52,7 @@ namespace Mono.Upnp.DidlLite.Av
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
-			
+			protected
 			if (reader.NamespaceURI == Protocol.UpnpSchema) {
 				switch (reader.Name) {
 				case "producer":

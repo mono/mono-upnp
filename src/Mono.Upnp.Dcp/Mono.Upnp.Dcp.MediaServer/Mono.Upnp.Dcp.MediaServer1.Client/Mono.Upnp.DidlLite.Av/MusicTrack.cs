@@ -42,7 +42,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<string> playlist_list = new List<string> ();
 		readonly ReadOnlyCollection<string> playlists;
 		
-		internal MusicTrack ()
+		protected MusicTrack ()
 		{
 			artists = artist_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();

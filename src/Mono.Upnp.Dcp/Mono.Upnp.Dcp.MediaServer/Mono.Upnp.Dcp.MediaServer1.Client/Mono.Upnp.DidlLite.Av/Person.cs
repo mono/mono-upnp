@@ -31,6 +31,10 @@ namespace Mono.Upnp.DidlLite.Av
 {
 	public class Person : Container
 	{
+		protected Person ()
+		{
+		}
+		
 		public string Language { get; private set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)

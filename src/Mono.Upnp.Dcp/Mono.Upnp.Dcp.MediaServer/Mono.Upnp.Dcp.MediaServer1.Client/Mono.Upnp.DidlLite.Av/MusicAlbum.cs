@@ -42,7 +42,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<Uri> album_art_uri_list = new List<Uri> ();
 		readonly ReadOnlyCollection<Uri> album_art_uris;
 		
-		internal MusicAlbum ()
+		protected MusicAlbum ()
 		{
 			artists = artist_list.AsReadOnly ();
 			producers = producer_list.AsReadOnly ();

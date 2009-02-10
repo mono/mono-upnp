@@ -38,7 +38,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<DateTime> scheduled_end_time_list = new List<DateTime>();
 		readonly ReadOnlyCollection<DateTime> scheduled_end_times;
 		
-		internal Movie ()
+		protected Movie ()
 		{
 			scheduled_start_times = scheduled_start_time_list.AsReadOnly ();
 			scheduled_end_times = scheduled_end_time_list.AsReadOnly ();

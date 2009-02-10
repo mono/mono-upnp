@@ -28,5 +28,8 @@ namespace Mono.Upnp.DidlLite.Av
 {
 	public class MovieGenre : Genre
 	{
+		protected MovieGenre ()
+		{
+		}
 	}
 }

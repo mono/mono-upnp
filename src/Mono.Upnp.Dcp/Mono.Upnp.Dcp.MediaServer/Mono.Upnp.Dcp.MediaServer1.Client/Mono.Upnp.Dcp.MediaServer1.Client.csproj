@@ -57,13 +57,9 @@
     <Compile Include="Mono.Upnp.DidlLite\Object.cs" />
     <Compile Include="Mono.Upnp.DidlLite\WriteStatus.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\Album.cs" />
-    <Compile Include="Mono.Upnp.DidlLite.Av\AllOrFirstRunOrRepeat.cs" />
-    <Compile Include="Mono.Upnp.DidlLite.Av\AllowedUse.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\AudioBook.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\AudioBroadcast.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\AudioItem.cs" />
-    <Compile Include="Mono.Upnp.DidlLite.Av\ChannelId.cs" />
-    <Compile Include="Mono.Upnp.DidlLite.Av\FirstRunOrRepeat.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\Genre.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\ImageItem.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\Movie.cs" />

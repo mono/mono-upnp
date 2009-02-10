@@ -30,5 +30,8 @@ namespace Mono.Upnp.DidlLite.Av
 {
 	public class PhotoAlbum : Album
 	{
+		protected PhotoAlbum ()
+		{
+		}
 	}
 }

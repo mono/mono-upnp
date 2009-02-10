@@ -36,7 +36,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<string> genre_list = new List<string> ();
 		readonly ReadOnlyCollection<string> genres;
 		
-		internal MusicArtist ()
+		protected MusicArtist ()
 		{
 			genres = genre_list.AsReadOnly ();
 		}

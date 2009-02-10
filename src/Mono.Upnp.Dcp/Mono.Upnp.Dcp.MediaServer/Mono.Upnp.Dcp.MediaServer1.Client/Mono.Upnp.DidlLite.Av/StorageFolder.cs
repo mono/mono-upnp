@@ -32,10 +32,11 @@ namespace Mono.Upnp.DidlLite.Av
 {
 	public class StorageFolder : Container
 	{
-		public long StorageUsed { get; private set; }
+		protected StorageFolder ()
+		{
+		}
 		
-		IEnumerable<StorageFolder> Folders { get; set; }
-		IEnumerable<Object> Files { get; set; }
+		protected long StorageUsed { get; private set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{

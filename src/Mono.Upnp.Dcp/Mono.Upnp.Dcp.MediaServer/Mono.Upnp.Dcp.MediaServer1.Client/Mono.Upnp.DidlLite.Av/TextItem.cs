@@ -44,7 +44,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<string> right_list = new List<string> ();
 		readonly ReadOnlyCollection<string> rights;
 		
-		internal TextItem ()
+		protected TextItem ()
 		{
 			authors = author_list.AsReadOnly ();
 			publishers = publisher_list.AsReadOnly ();

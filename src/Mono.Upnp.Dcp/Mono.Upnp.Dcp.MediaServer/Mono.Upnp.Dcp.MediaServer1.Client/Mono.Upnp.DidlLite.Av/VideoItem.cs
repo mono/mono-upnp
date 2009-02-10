@@ -46,7 +46,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<Uri> relation_list = new List<Uri>();
 		readonly ReadOnlyCollection<Uri> relations;
 		
-		internal VideoItem ()
+		protected VideoItem ()
 		{
 			actors = actor_list.AsReadOnly ();
 			producers = producer_list.AsReadOnly ();

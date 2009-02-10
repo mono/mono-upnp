@@ -36,7 +36,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<string> album_list = new List<string> ();
 		readonly ReadOnlyCollection<string> albums;
 		
-		internal Photo ()
+		protected Photo ()
 		{
 			albums = album_list.AsReadOnly ();
 		}

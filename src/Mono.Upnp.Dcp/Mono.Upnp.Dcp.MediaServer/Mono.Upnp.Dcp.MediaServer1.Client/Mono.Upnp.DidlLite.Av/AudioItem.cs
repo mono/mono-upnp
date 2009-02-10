@@ -42,7 +42,7 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly List<string> right_list = new List<string> ();
 		readonly ReadOnlyCollection<string> rights;
 		
-		internal AudioItem ()
+		protected AudioItem ()
 		{
 			publishers = publisher_list.AsReadOnly ();
 			genres = genre_list.AsReadOnly ();

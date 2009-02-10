@@ -31,6 +31,10 @@ namespace Mono.Upnp.DidlLite.Av
 {
 	public class AudioBroadcast  : AudioItem
 	{
+		protected AudioBroadcast ()
+		{
+		}
+		
         public string Region { get; private set; }
         public string RadioCallSign { get; private set; }
         public string RadioStationId { get; private set; }
