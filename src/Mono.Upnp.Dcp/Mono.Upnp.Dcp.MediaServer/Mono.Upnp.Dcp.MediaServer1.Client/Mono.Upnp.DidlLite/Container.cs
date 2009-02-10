@@ -27,6 +27,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite
 {
@@ -44,11 +45,65 @@ namespace Mono.Upnp.DidlLite
 		}
 		
 		bool has_child_count;
-		bool has_searchable;
 		
         public int ChildCount { get; private set; }
         public ReadOnlyCollection<ClassReference> CreateClasses { get { return create_classes; } }
 		public ReadOnlyCollection<ClassReference> SearchClasses { get { return search_classes; } }
         public bool Searchable { get; private set; }
+		
+		public bool CanSearchFor (Type type)
+		{
+			return IsValidType (type, search_classes);
+		}
+		
+		public bool CanCreate (Type type)
+		{
+			return IsValidType (type, create_classes);
+		}
+		
+		static bool IsValidType (Type type, IEnumerable<ClassReference> classes)
+		{
+			// TODO this
+//			foreach (var @class in classes) {
+//				if (@class.Class == type || (@class.IncludeDerived && @class.Class.IsSubclassOf (type))) {
+//					return true;
+//				}
+//			}
+			return false;
+		}
+		
+		protected override void DeserializeRootElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			Searchable = reader["searchable", Protocol.DidlLiteSchema] == "true";
+			int child_count;
+			if (int.TryParse (reader["childCount", Protocol.DidlLiteSchema], out child_count)) {
+				ChildCount = child_count;
+			}
+			
+			base.DeserializeRootElement (reader);
+		}
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+				switch (reader.Name) {
+				case "searchClass":
+					search_class_list.Add (new ClassReference (reader));
+					break;
+				case "createClass":
+					create_class_list.Add (new ClassReference (reader));
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

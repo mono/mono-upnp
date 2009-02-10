@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -34,10 +35,13 @@ namespace Mono.Upnp.DidlLite.Av
 	{
 		readonly List<string> publisher_list = new List<string> ();
 		readonly ReadOnlyCollection<string> publishers;
+		readonly List<string> right_list = new List<string> ();
+		readonly ReadOnlyCollection<string> rights;
 		
 		internal ImageItem ()
 		{
 			publishers = publisher_list.AsReadOnly ();
+			rights = right_list.AsReadOnly ();
 		}
 		
 		public string LongDescription { get; private set; }
@@ -46,6 +50,27 @@ namespace Mono.Upnp.DidlLite.Av
 		public string Description { get; private set; }
 		public ReadOnlyCollection<string> Publishers { get { return publishers; } }
 		public string Date { get; private set; }
-		public string Rights { get; private set; }
+		public ReadOnlyCollection<string> Rights { get { return rights; } }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			switch (reader.NamespaceURI) {
+			case Protocol.DublinCoreSchema:
+				switch (reader.Name) {
+				case "publisher":
+					publisher_list.Add (reader.ReadString ());
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+				break;
+			default:
+				base.DeserializePropertyElement (reader);
+				break;
+			}
+		}
 	}
 }

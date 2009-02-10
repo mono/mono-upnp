@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -38,16 +39,22 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly ReadOnlyCollection<string> producers;
 		readonly List<string> contributor_list = new List<string> ();
 		readonly ReadOnlyCollection<string> contributors;
+		readonly List<string> genre_list = new List<string> ();
+		readonly ReadOnlyCollection<string> genres;
+		readonly List<string> right_list = new List<string> ();
+		readonly ReadOnlyCollection<string> rights;
 		
 		internal PlaylistContainer ()
 		{
 			artists = artist_list.AsReadOnly ();
 			producers = producer_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();
+			genres = genre_list.AsReadOnly ();
+			rights = right_list.AsReadOnly ();
 		}
 		
         public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-		public string Genre { get; private set; }
+		public ReadOnlyCollection<string> Genres { get { return genres; } }
 		public string LongDescription { get; private set; }
 		public ReadOnlyCollection<string> Producers { get { return producers; } }
 		public string StorageMedium { get; private set; }
@@ -55,6 +62,43 @@ namespace Mono.Upnp.DidlLite.Av
 		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
 		public string Date { get; private set; }
 		public string Language { get; private set; }
-		public string Rights { get; private set; }
+		public ReadOnlyCollection<string> Rights { get { return rights; } }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			switch (reader.NamespaceURI) {
+			case Protocol.UpnpSchema:
+				switch (reader.Name) {
+				case "artist":
+					artist_list.Add (new PersonWithRole (reader));
+					break;
+				case "producer":
+					producer_list.Add (reader.ReadString ());
+					break;
+				case "genre":
+					genre_list.Add (reader.ReadString ());
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+				break;
+			case Protocol.DublinCoreSchema:
+				switch (reader.Name) {
+				case "contributor":
+					contributor_list.Add (reader.ReadString ());
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+				break;
+			default:
+				base.DeserializePropertyElement (reader);
+				break;
+			}
+		}
 	}
 }

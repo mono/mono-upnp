@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -34,9 +35,39 @@ namespace Mono.Upnp.DidlLite.Av
 		public long StorageTotal { get; private set; }
 		public long StorageUsed { get; private set; }
 		public long StorageFree { get; private set; }
-		public StorageMedium StorageMedium { get; private set; }
+		public string StorageMedium { get; private set; }
 		
 		IEnumerable<StorageFolder> Folders { get; set; }
 		IEnumerable<Object> Files { get; set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+				switch (reader.Name) {
+				case "storageTotal":
+					reader.Read ();
+					StorageTotal = reader.ReadContentAsLong ();
+					break;
+				case "storageUsed":
+					reader.Read ();
+					StorageUsed = reader.ReadContentAsLong ();
+					break;
+				case "storageFree":
+					reader.Read ();
+					StorageFree = reader.ReadContentAsLong ();
+					break;
+				case "storageMedium":
+					StorageMedium = reader.ReadString ();
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

@@ -78,10 +78,7 @@
     <Compile Include="Mono.Upnp.DidlLite.Av\PhotoAlbum.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\PlaylistContainer.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\PlaylistItem.cs" />
-    <Compile Include="Mono.Upnp.DidlLite.Av\RadioBand.cs" />
-    <Compile Include="Mono.Upnp.DidlLite.Av\Ratings.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\StorageFolder.cs" />
-    <Compile Include="Mono.Upnp.DidlLite.Av\StorageMedium.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\StorageSystem.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\StorageVolume.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\TextItem.cs" />
@@ -91,6 +88,9 @@
     <Compile Include="Mono.Upnp.DidlLite\Deserializer.cs" />
     <Compile Include="Mono.Upnp.DidlLite\Protocol.cs" />
     <Compile Include="Mono.Upnp.DidlLite.Av\PersonWithRole.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Resource.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Resolution.cs" />
+    <Compile Include="Mono.Upnp.DidlLite\Class.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

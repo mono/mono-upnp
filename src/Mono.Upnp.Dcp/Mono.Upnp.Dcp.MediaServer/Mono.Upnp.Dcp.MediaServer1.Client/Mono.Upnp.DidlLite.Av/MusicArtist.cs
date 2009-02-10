@@ -26,16 +26,43 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
 	public class MusicArtist : Person
 	{
-		public string Genre { get; private set; }
+		readonly List<string> genre_list = new List<string> ();
+		readonly ReadOnlyCollection<string> genres;
+		
+		internal MusicArtist ()
+		{
+			genres = genre_list.AsReadOnly ();
+		}
+		
+		public ReadOnlyCollection<string> Genres { get { return genres; } }
 		public Uri ArtistDiscographyUri { get; private set; }
 		
 		IEnumerable<MusicAlbum> Albums { get; set; }
 		IEnumerable<MusicTrack> Tracks { get; set; }
 		IEnumerable<MusicVideoClip> Videos { get; set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+				if (reader.Name == "genre") {
+					genre_list.Add (reader.ReadString ());
+				} else if (reader.Name == "artistDiscographyURI") {
+					ArtistDiscographyUri = new Uri (reader.ReadString ());
+				} else {
+					base.DeserializePropertyElement (reader);
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

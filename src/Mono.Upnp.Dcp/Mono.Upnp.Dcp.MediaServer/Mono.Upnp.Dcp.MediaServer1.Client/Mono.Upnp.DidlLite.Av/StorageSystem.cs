@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -34,7 +35,7 @@ namespace Mono.Upnp.DidlLite.Av
 		public long StorageTotal { get; private set; }
 		public long StorageUsed { get; private set; }
 		public long StorageFree { get; private set; }
-		public string StorageMaxPartition { get; private set; }
+		public long StorageMaxPartition { get; private set; }
 		public string StorageMedium { get; private set; }
 		
 		IList<StorageVolume> Volumes { get; set; }
@@ -42,7 +43,41 @@ namespace Mono.Upnp.DidlLite.Av
 		IList<StorageFolder> Folders { get; set; }
 		IList<Object> VirtualVolume { get; set; }
 		
-		protected override void VerifyCore ()
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+				switch (reader.Name) {
+				case "storageTotal":
+					reader.Read ();
+					StorageTotal = reader.ReadContentAsLong ();
+					break;
+				case "storageUsed":
+					reader.Read ();
+					StorageUsed = reader.ReadContentAsLong ();
+					break;
+				case "storageFree":
+					reader.Read ();
+					StorageFree = reader.ReadContentAsLong ();
+					break;
+				case "storageMaxPartition":
+					reader.Read ();
+					StorageMaxPartition = reader.ReadContentAsLong ();
+					break;
+				case "storageMedium":
+					StorageMedium = reader.ReadString ();
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
+		
+		protected override void VerifyDeserialization ()
 		{
 			if (StorageTotal == null)
 				throw new DeserializationException ("The storage system does not have a total value.");

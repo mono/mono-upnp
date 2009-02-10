@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -40,6 +41,10 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly ReadOnlyCollection<string> directors;
 		readonly List<string> publisher_list = new List<string> ();
 		readonly ReadOnlyCollection<string> publishers;
+		readonly List<string> genre_list = new List<string> ();
+		readonly ReadOnlyCollection<string> genres;
+		readonly List<Uri> relation_list = new List<Uri>();
+		readonly ReadOnlyCollection<Uri> relations;
 		
 		internal VideoItem ()
 		{
@@ -47,9 +52,11 @@ namespace Mono.Upnp.DidlLite.Av
 			producers = producer_list.AsReadOnly ();
 			directors = director_list.AsReadOnly ();
 			publishers = publisher_list.AsReadOnly ();
+			genres = genre_list.AsReadOnly ();
+			relations = relation_list.AsReadOnly ();
 		}
 		
-        public string Genre { get; private set; }
+        public ReadOnlyCollection<string> Genres { get { return genres; } }
         public string LongDescription { get; private set; }
         public ReadOnlyCollection<string> Producers { get { return producers; } }
         public string Rating { get; private set; }
@@ -58,6 +65,39 @@ namespace Mono.Upnp.DidlLite.Av
         public string Description { get; private set; }
         public ReadOnlyCollection<string> Publisher { get {return publishers; } }
         public string Language { get; private set; }
-        public string Relation { get; private set; }
+        public ReadOnlyCollection<Uri> Relations { get { return relations; } }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+				switch (reader.Name) {
+				case "actor":
+					actor_list.Add (new PersonWithRole (reader));
+					break;
+				case "producer":
+					producer_list.Add (reader.ReadString ());
+					break;
+				case "director":
+					director_list.Add (reader.ReadString ());
+					break;
+				case "genre":
+					genre_list.Add (reader.ReadString ());
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else if (reader.NamespaceURI == Protocol.DublinCoreSchema) {
+				if (reader.Name == "relation") {
+					relation_list.Add (new Uri (reader.ReadString ()));
+				} else {
+					base.DeserializePropertyElement (reader);
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

@@ -25,15 +25,28 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Mono.Upnp.DidlLite.Av
 {
 	public class Movie : VideoItem
 	{
+		readonly List<DateTime> scheduled_start_time_list = new List<DateTime>();
+		readonly ReadOnlyCollection<DateTime> scheduled_start_times;
+		readonly List<DateTime> scheduled_end_time_list = new List<DateTime>();
+		readonly ReadOnlyCollection<DateTime> scheduled_end_times;
+		
+		internal Movie ()
+		{
+			scheduled_start_times = scheduled_start_time_list.AsReadOnly ();
+			scheduled_end_times = scheduled_end_time_list.AsReadOnly ();
+		}
+		
         public string StorageMedium { get; private set; }
-        public string DvdRegionCode { get; private set; }
+        public int DvdRegionCode { get; private set; }
         public string ChannelName { get; private set; }
-        public string ScheduledStartTime { get; private set; }
-        public string ScheduledEndTime { get; private set; }
-	}
+        public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
+        public ReadOnlyCollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
+    }
 }

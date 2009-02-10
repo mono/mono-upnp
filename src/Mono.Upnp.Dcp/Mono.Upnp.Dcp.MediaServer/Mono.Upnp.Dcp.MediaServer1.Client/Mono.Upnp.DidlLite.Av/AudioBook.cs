@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -47,5 +48,36 @@ namespace Mono.Upnp.DidlLite.Av
         public ReadOnlyCollection<string> Producers { get { return producers; } }
         public ReadOnlyCollection<string> Contributors { get { return contributors; } }
         public string Date { get; private set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			switch (reader.NamespaceURI) {
+			case Protocol.UpnpSchema:
+				switch (reader.Name) {
+				case "producer":
+					producer_list.Add (reader.ReadString ());
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+				break;
+			case Protocol.DublinCoreSchema:
+				switch (reader.Name) {
+				case "contributor":
+					contributor_list.Add (reader.ReadString ());
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+				break;
+			default:
+				base.DeserializePropertyElement (reader);
+				break;
+			}
+		}
 	}
 }

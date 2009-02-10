@@ -26,21 +26,30 @@
 
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Mono.Upnp.DidlLite
 {
 	public abstract class Object
 	{
-		readonly List<Uri> res = new List<Uri> ();
+		readonly List<Resource> resource_list = new List<Resource> ();
+		readonly ReadOnlyCollection<Resource> resources;
+		bool has_class;
         bool has_restricted;
+		bool verified;
+		
+		protected Object ()
+		{
+			resources = resource_list.AsReadOnly ();
+		}
 
         public string Id { get; private set; }
         public string ParentId { get; private set; }
         public string Title { get; private set; }
         public string Creator { get; private set; }
-        public IEnumerable<Uri> Res { get { return res; } }
-        public string Class { get; private set; }
+        public ReadOnlyCollection<Resource> Resources { get { return resources; } }
+        public Class Class { get; private set; }
         public bool Restricted { get; private set; }
         public WriteStatus? WriteStatus { get; private set; }
 
@@ -57,36 +66,97 @@ namespace Mono.Upnp.DidlLite
 
         internal void Deserialize (XmlReader reader)
         {
-            DeserializeCore (reader);
+            DeserializeRootElement (reader);
             Verify ();
         }
 
-        protected virtual void DeserializeCore (XmlReader reader)
+        protected virtual void DeserializeRootElement (XmlReader reader)
         {
-			using (reader) {
-	            reader.Read ();
-	            Id = reader["id"];
-	            ParentId = reader["parentID"];
-	            bool restricted;
-	            if (bool.TryParse (reader["restricted"], out restricted)) {
-	                Restricted = restricted;
-					has_restricted = true;
-	            }
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+            Id = reader["id", Protocol.DidlLiteSchema];
+            ParentId = reader["parentID", Protocol.DidlLiteSchema];
+            bool restricted;
+            if (bool.TryParse (reader["restricted", Protocol.DidlLiteSchema], out restricted)) {
+                Restricted = restricted;
+				has_restricted = true;
+            }
+			
+			while (ReadToNextElement (reader)) {
+				var property_reader = reader.ReadSubtree ();
+				property_reader.Read ();
+				try {
+					DeserializePropertyElement (property_reader);
+				} catch (Exception e) {
+					// TODO log?
+				} finally {
+					property_reader.Close ();
+				}
 			}
         }
+		
+		protected virtual void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			switch (reader.NamespaceURI){
+			case Protocol.DidlLiteSchema:
+				switch (reader.Name) {
+				case "res":
+					resource_list.Add (new Resource (reader));
+					break;
+				}
+				break;
+			case Protocol.UpnpSchema:
+				switch (reader.Name) {
+				case "class":
+					Class = new Class (reader);
+					has_class = true;
+					break;
+				case "writeStatus":
+					// TODO parse here
+					break;
+				}
+				break;
+			case Protocol.DublinCoreSchema:
+				switch (reader.Name) {
+				case "title":
+					Title = reader.ReadString ();
+					break;
+				case "creator":
+					Creator = reader.ReadString ();
+					break;
+				}
+				break;
+			}
+		}
 
         void Verify ()
         {
-            if (Id == null) throw new DeserializationException ("The object does not have an ID.");
-            if (ParentId == null) throw new DeserializationException (string.Format ("The object {0} does not have a parent ID.", Id));
-            if (Title == null) throw new DeserializationException (string.Format ("The object {0} does not have a title.", Id));
-            if (Class == null) throw new DeserializationException (string.Format ("The object {0} does not have a class.", Id));
-            if (!has_restricted) throw new DeserializationException (string.Format ("The object {0} does not have a restricted value.", Id));
-			VerifyCore ();
+			VerifyDeserialization ();
+			if (!verified) {
+				throw new DeserializationException ("The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
+			}
         }
 		
-		protected virtual void VerifyCore ()
+		protected virtual void VerifyDeserialization ()
 		{
+			if (Id == null) throw new DeserializationException ("The object does not have an ID.");
+            if (ParentId == null) throw new DeserializationException (string.Format ("The object {0} does not have a parent ID.", Id));
+            if (Title == null) throw new DeserializationException (string.Format ("The object {0} does not have a title.", Id));
+            if (!has_class) throw new DeserializationException (string.Format ("The object {0} does not have a class.", Id));
+            if (!has_restricted) throw new DeserializationException (string.Format ("The object {0} does not have a restricted value.", Id));
+			verified = true;
 		}
+		
+		static bool ReadToNextElement (XmlReader reader)
+        {
+            while (reader.Read ()) {
+                if (reader.NodeType == XmlNodeType.Element) {
+                    return true;
+                }
+            }
+            return false;
+        }
 	}
 }

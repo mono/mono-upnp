@@ -24,12 +24,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-﻿using System;
+using System;
+﻿using System.Xml;
 
 namespace Mono.Upnp.DidlLite
 {
 	public abstract class Item : Object
 	{
         public string RefId { get; private set; }
+		
+		protected override void DeserializeRootElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			RefId = reader["refID", Protocol.UpnpSchema];
+			
+			base.DeserializeRootElement (reader);
+		}
 	}
 }

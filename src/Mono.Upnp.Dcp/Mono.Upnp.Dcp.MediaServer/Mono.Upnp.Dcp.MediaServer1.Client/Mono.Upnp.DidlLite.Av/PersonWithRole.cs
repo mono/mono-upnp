@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -33,10 +33,10 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly string name;
 		readonly string role;
 		
-		public PersonWithRole (string name, string role)
+		public PersonWithRole (XmlReader reader)
 		{
-			this.name = name;
-			this.role = role;
+			role = reader["role", Protocol.UpnpSchema];
+			name = reader.ReadString ();
 		}
 		
 		public string Name { get { return name; } }

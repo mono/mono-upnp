@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -34,18 +35,42 @@ namespace Mono.Upnp.DidlLite.Av
 	{
 		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
 		readonly ReadOnlyCollection<PersonWithRole> artists;
+		readonly List<string> genre_list = new List<string> ();
+		readonly ReadOnlyCollection<string> genres;
 		
 		internal PlaylistItem ()
 		{
 			artists = artist_list.AsReadOnly ();
+			genres = genre_list.AsReadOnly ();
 		}
 		
         public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-		public string Genre { get; private set; }
+		public ReadOnlyCollection<string> Genres { get { return genres; } }
 		public string LongDescription { get; private set; }
 		public string StorageMedium { get; private set; }
 		public string Description { get; private set; }
 		public string Date { get; private set; }
 		public string Language { get; private set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+				switch (reader.Name) {
+				case "artist":
+					artist_list.Add (new PersonWithRole (reader));
+					break;
+				case "genre":
+					genre_list.Add (reader.ReadString ());
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

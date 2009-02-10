@@ -30,8 +30,8 @@ namespace Mono.Upnp.DidlLite.Av
 {
 	public class VideoBroadcast : VideoItem
 	{
-        public string Icon { get; private set; }
+        public Uri Icon { get; private set; }
         public string Region { get; private set; }
-        public string ChannelNumber { get; private set; }
+        public int ChannelNr { get; private set; }
 	}
 }

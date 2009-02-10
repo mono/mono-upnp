@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -36,11 +37,17 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly ReadOnlyCollection<string> publishers;
 		readonly List<string> contributor_list = new List<string> ();
 		readonly ReadOnlyCollection<string> contributors;
+		readonly List<Uri> relation_list = new List<Uri>();
+		readonly ReadOnlyCollection<Uri> relations;
+		readonly List<string> right_list = new List<string> ();
+		readonly ReadOnlyCollection<string> rights;
 		
 		internal Album ()
 		{
 			publishers = publisher_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();
+			relations = relation_list.AsReadOnly ();
+			rights = right_list.AsReadOnly ();
 		}
 		
 		public string StorageMedium { get; private set; }
@@ -49,7 +56,35 @@ namespace Mono.Upnp.DidlLite.Av
 		public ReadOnlyCollection<string> Publishers { get { return publishers; } }
 		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
 		public string Date { get; private set; }
-		public string Relation { get; private set; }
-		public string Rights { get; private set; }
+		public ReadOnlyCollection<Uri> Relations { get { return relations; } }
+		public ReadOnlyCollection<string> Rights { get { return rights; } }
+		public Uri LyricsUri { get; private set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			switch (reader.NamespaceURI) {
+			case Protocol.DublinCoreSchema:
+				switch (reader.Name) {
+				case "publisher":
+					publisher_list.Add (reader.ReadString ());
+					break;
+				case "contributor":
+					contributor_list.Add (reader.ReadString ());
+					break;
+				case "relation":
+					relation_list.Add (new Uri (reader.ReadString ()));
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+				break;
+			default:
+				base.DeserializePropertyElement (reader);
+				break;
+			}
+		}
 	}
 }

@@ -34,6 +34,6 @@ namespace Mono.Upnp.DidlLite.Av
         public string RadioCallSign { get; private set; }
         public string RadioStationId { get; private set; }
         public string RadioBand { get; private set; }
-        public string ChannelNumber { get; private set; }
+        public int ChannelNr { get; private set; }
 	}
 }

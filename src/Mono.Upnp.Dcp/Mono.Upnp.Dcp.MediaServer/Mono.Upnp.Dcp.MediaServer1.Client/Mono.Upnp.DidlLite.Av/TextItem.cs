@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -38,12 +39,18 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly ReadOnlyCollection<string> publishers;
 		readonly List<string> contributor_list = new List<string> ();
 		readonly ReadOnlyCollection<string> contributors;
+		readonly List<Uri> relation_list = new List<Uri>();
+		readonly ReadOnlyCollection<Uri> relations;
+		readonly List<string> right_list = new List<string> ();
+		readonly ReadOnlyCollection<string> rights;
 		
 		internal TextItem ()
 		{
 			authors = author_list.AsReadOnly ();
 			publishers = publisher_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();
+			relations = relation_list.AsReadOnly ();
+			rights = right_list.AsReadOnly ();
 		}
 		
 		public ReadOnlyCollection<PersonWithRole> Authors { get { return authors; } }
@@ -55,8 +62,45 @@ namespace Mono.Upnp.DidlLite.Av
 		public ReadOnlyCollection<string> Publishers { get { return publishers; } }
 		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
 		public string Date { get; private set; }
-		public string Relation { get; private set; }
+		public ReadOnlyCollection<Uri> Relations { get { return relations; } }
 		public string Language { get; private set; }
-		public string Rights { get; private set; }
+		public ReadOnlyCollection<string> Rights { get { return rights; } }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			switch (reader.NamespaceURI) {
+			case Protocol.UpnpSchema:
+				switch (reader.Name) {
+				case "author":
+					author_list.Add (new PersonWithRole (reader));
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+				break;
+			case Protocol.DublinCoreSchema:
+				switch (reader.Name) {
+				case "publisher":
+					publisher_list.Add (reader.ReadString ());
+					break;
+				case "contributor":
+					contributor_list.Add (reader.ReadString ());
+					break;
+				case "relation":
+					relation_list.Add (new Uri (reader.ReadString ()));
+					break;
+				default:
+					base.DeserializeRootElement (reader);
+					break;
+				}
+				break;
+			default:
+				base.DeserializeRootElement (reader);
+				break;
+			}
+		}
 	}
 }

@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -38,21 +39,67 @@ namespace Mono.Upnp.DidlLite.Av
 		readonly ReadOnlyCollection<string> directors;
 		readonly List<string> contributor_list = new List<string> ();
 		readonly ReadOnlyCollection<string> contributors;
+		readonly List<string> album_list = new List<string>();
+		readonly ReadOnlyCollection<string> albums;
+		readonly List<DateTime> scheduled_start_time_list = new List<DateTime>();
+		readonly ReadOnlyCollection<DateTime> scheduled_start_times;
+		readonly List<DateTime> scheduled_end_time_list = new List<DateTime>();
+		readonly ReadOnlyCollection<DateTime> scheduled_end_times;
 		
 		internal MusicVideoClip ()
 		{
 			artists = artist_list.AsReadOnly ();
 			directors = director_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();
+			albums = album_list.AsReadOnly ();
+			scheduled_start_times = scheduled_start_time_list.AsReadOnly ();
+			scheduled_end_times = scheduled_end_time_list.AsReadOnly ();
 		}
 		
         public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
 		public string StorageMedium { get; private set; }
-		public string Album { get; private set; }
-		public string ScheduledStartTime { get; private set; }
-		public string ScheduledStopTime { get; private set; }
+		public ReadOnlyCollection<string> Albums { get { return albums; } }
+		public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
+        public ReadOnlyCollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
 		public ReadOnlyCollection<string> Directors { get { return directors; } }
 		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
 		public string Date { get; private set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			switch (reader.NamespaceURI) {
+			case Protocol.UpnpSchema:
+				switch (reader.Name) {
+				case "artist":
+					artist_list.Add (new PersonWithRole (reader));
+					break;
+				case "director":
+					director_list.Add (reader.ReadString ());
+					break;
+				case "album":
+					album_list.Add (reader.ReadString ());
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+				break;
+			case Protocol.DublinCoreSchema:
+				switch (reader.Name) {
+				case "contributor":
+					contributor_list.Add (reader.ReadString ());
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+				break;
+			default:
+				base.DeserializePropertyElement (reader);
+				break;
+			}
+		}
 	}
 }

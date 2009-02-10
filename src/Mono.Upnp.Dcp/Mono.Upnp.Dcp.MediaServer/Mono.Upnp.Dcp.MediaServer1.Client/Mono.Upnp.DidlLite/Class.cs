@@ -1,5 +1,5 @@
 // 
-// StorageMedium.cs
+// Class.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,50 +24,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.DidlLite.Av
+using System.Xml;
+
+namespace Mono.Upnp.DidlLite
 {
-	public enum StorageMedium
+	public struct Class
 	{
-		Other,
-		Unknown,
-		Dv,
-		MiniDv,
-		Vhs,
-		WVhs,
-		SVhs,
-		DVhs,
-		Vhsc,
-		Video8,
-		Hi8,
-		CdRom,
-		CdDa,
-		CdR,
-		CdRw,
-		VideoCd,
-		Sacd,
-		MdAudio,
-		MdPicture,
-		DvdRom,
-		DvdVideo,
-		DvdPlusR,
-		DvdR,
-		DvdPlusRw,
-		DvdRw,
-		DvdRam,
-		DvdAudio,
-		Dat,
-		Ld,
-		Hdd,
-		MicroMv,
-		Network,
-		None,
-		NotImplemented,
-		Sd,
-		PcCard,
-		Mmc,
-		Cf,
-		Bd,
-		Ms,
-		HdDvd
+		readonly string friendly_class_name;
+		readonly string full_class_name;
+		
+		internal Class (XmlReader reader)
+		{
+			friendly_class_name = reader["name"];
+			full_class_name = reader.ReadString ();
+		}
+		
+		public string FriendlyClassName { get { return friendly_class_name; } }
+		public string FullClassName { get { return full_class_name; } }
 	}
 }

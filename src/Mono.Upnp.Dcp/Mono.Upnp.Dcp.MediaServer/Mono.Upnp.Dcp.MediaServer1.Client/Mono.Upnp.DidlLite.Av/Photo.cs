@@ -25,11 +25,33 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
 	public class Photo : ImageItem
 	{
-		public string Album { get; private set; }
+		readonly List<string> album_list = new List<string> ();
+		readonly ReadOnlyCollection<string> albums;
+		
+		internal Photo ()
+		{
+			albums = album_list.AsReadOnly ();
+		}
+		
+		public ReadOnlyCollection<string> Albums { get { return albums; } }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema && reader.Name == "album") {
+				album_list.Add (reader.ReadString ());
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

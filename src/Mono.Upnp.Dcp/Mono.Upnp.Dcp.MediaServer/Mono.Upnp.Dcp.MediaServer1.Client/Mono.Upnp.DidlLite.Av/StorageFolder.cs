@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -35,5 +36,17 @@ namespace Mono.Upnp.DidlLite.Av
 		
 		IEnumerable<StorageFolder> Folders { get; set; }
 		IEnumerable<Object> Files { get; set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema && reader.Name == "storageUsed") {
+					reader.Read ();
+					StorageUsed = reader.ReadContentAsLong ();
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

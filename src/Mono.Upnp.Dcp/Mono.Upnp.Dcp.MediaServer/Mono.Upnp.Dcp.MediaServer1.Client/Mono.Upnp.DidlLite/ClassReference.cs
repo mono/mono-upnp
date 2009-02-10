@@ -25,12 +25,22 @@
 // THE SOFTWARE.
 
 using System;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite
 {
 	public struct ClassReference
 	{
-		public Type Class { get; private set; }
-		public bool IncludeDerived { get; private set; }
+		readonly Class @class;
+		readonly bool include_derived;
+		
+		internal ClassReference (XmlReader reader)
+		{
+			include_derived = bool.Parse (reader["includeDerived", Protocol.UpnpSchema]);
+			@class = new Class (reader);
+		}
+		
+		public Class Class { get { return @class; } }
+		public bool IncludeDerived { get { return include_derived; } }
 	}
 }
