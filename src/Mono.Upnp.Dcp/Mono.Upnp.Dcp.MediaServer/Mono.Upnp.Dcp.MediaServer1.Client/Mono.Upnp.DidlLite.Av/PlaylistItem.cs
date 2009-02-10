@@ -64,6 +64,24 @@ namespace Mono.Upnp.DidlLite.Av
 				case "genre":
 					genre_list.Add (reader.ReadString ());
 					break;
+				case "longDescription":
+					LongDescription = reader.ReadString ();
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else if (reader.NamespaceURI == Protocol.DublinCoreSchema) {
+				switch (reader.Name) {
+				case "description":
+					Description = reader.ReadString ();
+					break;
+				case "date":
+					Date = reader.ReadString ();
+					break;
+				case "language":
+					Language = reader.ReadString ();
+					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;

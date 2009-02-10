@@ -25,13 +25,23 @@
 // THE SOFTWARE.
 
 using System;
-
-using Mono.Upnp.DidlLite;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
 	public class Person : Container
 	{
 		public string Language { get; private set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.DublinCoreSchema && reader.Name == "language") {
+				Language = reader.ReadString ();
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -34,6 +35,36 @@ namespace Mono.Upnp.DidlLite.Av
         public string RadioCallSign { get; private set; }
         public string RadioStationId { get; private set; }
         public string RadioBand { get; private set; }
-        public int ChannelNr { get; private set; }
+        public int ChannelNr { get; private set; } // FIXME is this right?
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+				switch (reader.Name) {
+				case "region":
+					Region = reader.ReadString ();
+				 	break;
+				case "radioCallSign":
+					RadioCallSign = reader.ReadString ();
+					break;
+				case "radioStationID":
+					RadioStationId = reader.ReadString ();
+					break;
+				case "radioBand":
+					RadioBand = reader.ReadString ();
+					break;
+				case "channelNr":
+					ChannelNr = reader.ReadContentAsInt ();
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

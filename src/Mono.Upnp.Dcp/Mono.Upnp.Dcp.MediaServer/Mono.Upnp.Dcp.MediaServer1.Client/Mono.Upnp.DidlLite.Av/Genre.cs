@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -32,5 +33,18 @@ namespace Mono.Upnp.DidlLite.Av
 	{
 		public string LongDescription { get; private set; }
 		public string Description { get; private set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.DublinCoreSchema && reader.Name == "description") {
+				Description = reader.ReadString ();
+			} if (reader.NamespaceURI == Protocol.UpnpSchema && reader.Name == "longDescription") {
+				LongDescription = reader.ReadString ();
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }

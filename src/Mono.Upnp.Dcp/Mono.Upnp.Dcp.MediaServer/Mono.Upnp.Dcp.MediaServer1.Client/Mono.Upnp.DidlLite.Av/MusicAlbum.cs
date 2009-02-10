@@ -74,6 +74,9 @@ namespace Mono.Upnp.DidlLite.Av
 				case "albumArtURI":
 					album_art_uri_list.Add (new Uri (reader.ReadString ()));
 					break;
+				case "toc":
+					Toc = reader.ReadString ();
+					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;

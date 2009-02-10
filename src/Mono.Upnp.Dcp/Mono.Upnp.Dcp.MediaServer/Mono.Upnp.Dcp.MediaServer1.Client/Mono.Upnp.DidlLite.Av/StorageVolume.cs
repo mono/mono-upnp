@@ -47,16 +47,13 @@ namespace Mono.Upnp.DidlLite.Av
 			if (reader.NamespaceURI == Protocol.UpnpSchema) {
 				switch (reader.Name) {
 				case "storageTotal":
-					reader.Read ();
-					StorageTotal = reader.ReadContentAsLong ();
+					StorageTotal = reader.ReadElementContentAsLong ();
 					break;
 				case "storageUsed":
-					reader.Read ();
-					StorageUsed = reader.ReadContentAsLong ();
+					StorageUsed = reader.ReadElementContentAsLong ();
 					break;
 				case "storageFree":
-					reader.Read ();
-					StorageFree = reader.ReadContentAsLong ();
+					StorageFree = reader.ReadElementContentAsLong ();
 					break;
 				case "storageMedium":
 					StorageMedium = reader.ReadString ();

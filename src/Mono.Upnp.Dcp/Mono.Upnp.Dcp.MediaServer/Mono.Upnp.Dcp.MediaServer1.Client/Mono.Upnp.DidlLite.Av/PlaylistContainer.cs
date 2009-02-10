@@ -68,8 +68,7 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			switch (reader.NamespaceURI) {
-			case Protocol.UpnpSchema:
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
 				switch (reader.Name) {
 				case "artist":
 					artist_list.Add (new PersonWithRole (reader));
@@ -80,24 +79,36 @@ namespace Mono.Upnp.DidlLite.Av
 				case "genre":
 					genre_list.Add (reader.ReadString ());
 					break;
+				case "longDescription":
+					LongDescription = reader.ReadString ();
+					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;
 				}
-				break;
-			case Protocol.DublinCoreSchema:
+			} else if (reader.NamespaceURI == Protocol.DublinCoreSchema) {
 				switch (reader.Name) {
 				case "contributor":
 					contributor_list.Add (reader.ReadString ());
 					break;
+				case "description":
+					Description = reader.ReadString ();
+					break;
+				case "rights":
+					right_list.Add (reader.ReadString ());
+					break;
+				case "date":
+					Date = reader.ReadString ();
+					break;
+				case "language":
+					Language = reader.ReadString ();
+					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;
 				}
-				break;
-			default:
+			} else {
 				base.DeserializePropertyElement (reader);
-				break;
 			}
 		}
 	}

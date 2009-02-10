@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -48,5 +49,32 @@ namespace Mono.Upnp.DidlLite.Av
         public string ChannelName { get; private set; }
         public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
         public ReadOnlyCollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+				switch (reader.Name) {
+				case "channelName":
+					ChannelName = reader.ReadString ();
+					break;
+				case "scheduledStartTime":
+					scheduled_start_time_list.Add (reader.ReadElementContentAsDateTime ()); // TODO this is ISO 8601
+					break;
+				case "scheduledEndTime":
+					scheduled_end_time_list.Add (reader.ReadElementContentAsDateTime ());
+					break;
+				case "DVDRegionCode":
+					DvdRegionCode = reader.ReadElementContentAsInt ();
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
     }
 }

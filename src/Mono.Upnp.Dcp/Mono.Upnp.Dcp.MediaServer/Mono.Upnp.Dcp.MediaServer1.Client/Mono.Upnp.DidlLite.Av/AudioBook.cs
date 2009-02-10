@@ -53,8 +53,7 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			switch (reader.NamespaceURI) {
-			case Protocol.UpnpSchema:
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
 				switch (reader.Name) {
 				case "producer":
 					producer_list.Add (reader.ReadString ());
@@ -63,20 +62,20 @@ namespace Mono.Upnp.DidlLite.Av
 					base.DeserializePropertyElement (reader);
 					break;
 				}
-				break;
-			case Protocol.DublinCoreSchema:
+			} else if (reader.NamespaceURI == Protocol.DublinCoreSchema) {
 				switch (reader.Name) {
 				case "contributor":
 					contributor_list.Add (reader.ReadString ());
+					break;
+				case "date":
+					Date = reader.ReadString ();
 					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;
 				}
-				break;
-			default:
+			} else {
 				base.DeserializePropertyElement (reader);
-				break;
 			}
 		}
 	}

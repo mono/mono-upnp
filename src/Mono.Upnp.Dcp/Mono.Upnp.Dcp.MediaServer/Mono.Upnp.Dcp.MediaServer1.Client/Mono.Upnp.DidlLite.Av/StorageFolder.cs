@@ -42,8 +42,7 @@ namespace Mono.Upnp.DidlLite.Av
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Protocol.UpnpSchema && reader.Name == "storageUsed") {
-					reader.Read ();
-					StorageUsed = reader.ReadContentAsLong ();
+					StorageUsed = reader.ReadElementContentAsLong ();
 			} else {
 				base.DeserializePropertyElement (reader);
 			}

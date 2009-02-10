@@ -85,15 +85,30 @@ namespace Mono.Upnp.DidlLite.Av
 				case "genre":
 					genre_list.Add (reader.ReadString ());
 					break;
+				case "longDescription":
+					LongDescription = reader.ReadString ();
+					break;
+				case "rating":
+					Rating = reader.ReadString ();
+					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;
 				}
 			} else if (reader.NamespaceURI == Protocol.DublinCoreSchema) {
-				if (reader.Name == "relation") {
+				switch (reader.Name) {
+				case "relation":
 					relation_list.Add (new Uri (reader.ReadString ()));
-				} else {
+					break;
+				case "description":
+					Description = reader.ReadString ();
+					break;
+				case "language":
+					Language = reader.ReadString ();
+					break;
+				default:
 					base.DeserializePropertyElement (reader);
+					break;
 				}
 			} else {
 				base.DeserializePropertyElement (reader);

@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Xml;
 
 namespace Mono.Upnp.DidlLite.Av
 {
@@ -33,5 +34,29 @@ namespace Mono.Upnp.DidlLite.Av
         public Uri Icon { get; private set; }
         public string Region { get; private set; }
         public int ChannelNr { get; private set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+				switch (reader.Name) {
+				case "icon":
+					Icon = new Uri (reader.ReadString ());
+					break;
+				case "region":
+					Region = reader.ReadString ();
+				 	break;
+				case "channelNr":
+					ChannelNr = reader.ReadElementContentAsInt ();
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
+		}
 	}
 }
