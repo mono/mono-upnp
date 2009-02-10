@@ -46,7 +46,7 @@ namespace Mono.Upnp.Description
         {
             if (url == null) throw new ArgumentNullException ("url");
 			if (disposer != null) throw new InvalidOperationException (
-				"Deserializers can only deserialize one device description.");
+				"Deserializers can only be used to deserialize one device description once.");
 
             disposer = new Disposer (url);
             UrlBase = url;
@@ -60,56 +60,68 @@ namespace Mono.Upnp.Description
             // TODO handle ACCEPT-LANGUAGE
             using (var response = Helper.GetResponse (url)) {
                 using (var stream = response.GetResponseStream ()) {
-                    return DeserializeDescriptionCore (XmlReader.Create (stream));
+					using (var reader = XmlReader.Create (stream)) {
+						if (reader.ReadToFollowing ("root")) {
+							using (var root_reader = reader.ReadSubtree ()) {
+								root_reader.Read ();
+	                    		return DeserializeDescriptionRootElement (reader);
+							}
+						} else {
+							Log.Exception (new UpnpDeserializationException (
+								"The device description does not have a root element."));
+							return null;
+						}
+					}
                 }
             }
         }
 
-        protected virtual DeviceDescription DeserializeDescriptionCore (XmlReader reader)
+        protected virtual DeviceDescription DeserializeDescriptionRootElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.Read ();
                 while (Helper.ReadToNextElement (reader)) {
+					var property_reader = reader.ReadSubtree ();
+					property_reader.Read ();
                     try {
-                        DeserializeDescriptionCore (reader.ReadSubtree (), reader.Name);
+                        DeserializeDescriptionPropertyElement (property_reader);
                     } catch (Exception e) {
                         Log.Exception (
                             "There was a problem deserializing one of the root description elements.", e);
-                    }
+                    } finally {
+						property_reader.Close ();
+					}
                 }
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deserializing a root XML file.", e);
-            } finally {
-                reader.Close ();
             }
 
             return root_device;
         }
 
-        protected virtual void DeserializeDescriptionCore (XmlReader reader, string element)
+        protected virtual void DeserializeDescriptionPropertyElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-			using (reader) {
-	            reader.Read ();
-	            switch (element.ToLower ()) {
-	            case "specversion":
-	                SpecVersion = Helper.DeserializeSpecVersion (reader.ReadSubtree ());
-	                break;
-	            case "urlbase":
-	                UrlBase = new Uri (reader.ReadString ());
-	                break;
-	            case "device":
-	                root_device = DeserializeDevice (reader.ReadSubtree ());
-                    disposer.SetRootDevice (root_device);
-	                break;
-	            default: // This is a workaround for Mono bug 334752
-	                reader.Skip ();
-	                break;
-	            }
-			}
+            switch (reader.Name) {
+            case "specVersion":
+                SpecVersion = Helper.DeserializeSpecVersion (reader.ReadSubtree ());
+                break;
+            case "URLBase":
+                UrlBase = new Uri (reader.ReadString ());
+                break;
+            case "device":
+				using (var device_reader = reader.ReadSubtree ()) {
+					device_reader.Read ();
+	                root_device = DeserializeDevice (device_reader);
+	                disposer.SetRootDevice (root_device);
+				}
+                break;
+            default: // This is a workaround for Mono bug 334752
+                reader.Skip ();
+                break;
+            }
         }
 
         public ServiceController DeserializeController (ServiceDescription service)
@@ -126,7 +138,18 @@ namespace Mono.Upnp.Description
 
             using (var response = Helper.GetResponse (service.ScpdUrl)) {
                 using (var stream = response.GetResponseStream ()) {
-                    return DeserializeControllerCore (service, XmlReader.Create (stream));
+					using (var reader = XmlReader.Create (stream)) {
+						if (reader.ReadToFollowing ("scpd")) {
+							using (var controller_reader = reader.ReadSubtree ()) {
+								controller_reader.Read ();
+                    			return DeserializeControllerCore (service, controller_reader);
+							}
+						} else {
+							Log.Exception (new UpnpDeserializationException (
+								"The service description does not have an scpd element."));
+							return null;
+						}
+					}
                 }
             }
         }
@@ -205,20 +228,16 @@ namespace Mono.Upnp.Description
 
         protected virtual Uri DeserializeUrlCore (XmlReader reader)
         {
-            if (reader == null)
-				throw new ArgumentNullException ("reader");
+            if (reader == null) throw new ArgumentNullException ("reader");
 			if (UrlBase == null)
 				throw new InvalidOperationException ("A description must be deserialized before a URL.");
 
             try {
-                reader.Read ();
                 var url = reader.ReadString ();
                 return Uri.IsWellFormedUriString (url, UriKind.Absolute)
                     ? new Uri (url) : new Uri (UrlBase, url);
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deserializing a URL.", e);
-            } finally {
-                reader.Close ();
             }
         }
 	}

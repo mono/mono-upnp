@@ -46,6 +46,7 @@ namespace Mono.Upnp.Control
         readonly Dictionary<string, Argument> out_argument_dict = new Dictionary<string,Argument> ();
         readonly ReadOnlyDictionary<string, Argument> out_arguments;
         bool bypass_return_argument;
+		bool verified;
 
         protected internal ServiceAction (ServiceController serviceController)
         {
@@ -205,49 +206,50 @@ namespace Mono.Upnp.Control
 
         public void Deserialize (XmlReader reader)
         {
-            DeserializeCore (reader);
-            VerifyDeserialization ();
+            DeserializeRootElement (reader);
+            Verify ();
         }
 
-        protected virtual void DeserializeCore (XmlReader reader)
+        protected virtual void DeserializeRootElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.Read ();
                 while (Helper.ReadToNextElement (reader)) {
+					var property_reader = reader.ReadSubtree ();
+					property_reader.Read ();
                     try {
-                        DeserializeCore (reader.ReadSubtree (), reader.Name);
+                        DeserializePropertyElement (property_reader);
                     } catch (Exception e) {
                         Log.Exception (
                             "There was a problem deserializing one of the action description elements.", e);
-                    }
+                    } finally {
+						property_reader.Close ();
+					}
                 }
             } catch (Exception e) {
                 throw new UpnpDeserializationException (
                     string.Format ("There was a problem deserializing {0}.", ToString ()), e);
-            } finally {
-                reader.Close ();
             }
         }
 
-        protected virtual void DeserializeCore (XmlReader reader, string element)
+        protected virtual void DeserializePropertyElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                reader.Read ();
-                switch (element.ToLower ()) {
-                case "name":
-                    Name = reader.ReadString ();
-                    break;
-                case "argumentlist":
-                    DeserializeArguments (reader.ReadSubtree ());
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
+            switch (reader.Name) {
+            case "name":
+                Name = reader.ReadString ();
+                break;
+            case "argumentList":
+				using (var arguments_reader = reader.ReadSubtree ()) {
+					arguments_reader.Read ();
+                	DeserializeArguments (arguments_reader);
+				}
+                break;
+            default: // This is a workaround for Mono bug 334752
+                reader.Skip ();
+                break;
             }
         }
 
@@ -255,14 +257,16 @@ namespace Mono.Upnp.Control
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                while (reader.ReadToFollowing ("argument")) {
-                    try {
-                        DeserializeArgument (reader.ReadSubtree ());
-                    } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing an argument list element.", e);
-                    }
-                }
+            while (reader.ReadToFollowing ("argument")) {
+				var argument_reader = reader.ReadSubtree ();
+				argument_reader.Read ();
+                try {
+                    DeserializeArgument (reader.ReadSubtree ());
+                } catch (Exception e) {
+                    Log.Exception ("There was a problem deserializing an argument list element.", e);
+                } finally {
+					argument_reader.Close ();
+				}
             }
         }
 
@@ -303,8 +307,17 @@ namespace Mono.Upnp.Control
                 }
             }
         }
+		
+		void Verify ()
+		{
+			VerifyDeserialization ();
+			if (!verified) {
+				throw new UpnpDeserializationException (
+					"The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
+			}
+		}
 
-        void VerifyDeserialization ()
+        protected virtual void VerifyDeserialization ()
         {
             if (Name == null) {
                 throw new UpnpDeserializationException (
@@ -314,6 +327,7 @@ namespace Mono.Upnp.Control
                 Log.Exception (new UpnpDeserializationException (
                     string.Format ("The action on {0} has an empty name.", controller)));
             }
+			verified = true;
         }
 
         public override string ToString ()

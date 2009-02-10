@@ -46,6 +46,7 @@ namespace Mono.Upnp.Control
         SoapInvoker soap_adapter;
         EventSubscriber event_subscriber;
         int events_ref_count;
+		bool verified;
 
         protected internal ServiceController (ServiceDescription service)
         {
@@ -150,49 +151,53 @@ namespace Mono.Upnp.Control
 
         public void Deserialize (XmlReader reader)
         {
-            DeserializeCore (reader);
-            VerifyDeserialization ();
+            DeserializeRootElement (reader);
+            Verify ();
         }
 
-        protected virtual void DeserializeCore (XmlReader reader)
+        protected virtual void DeserializeRootElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.Read ();
                 while (Helper.ReadToNextElement (reader)) {
+					var property_reader = reader.ReadSubtree ();
+					property_reader.Read ();
                     try {
-                        DeserializeCore (reader.ReadSubtree (), reader.Name);
+                        DeserializePropertyElement (property_reader);
                     } catch (Exception e) {
                         Log.Exception (
                             "There was a problem deserializing one of the controller description elements.", e);
-                    }
+                    } finally {
+						property_reader.Close ();
+					}
                 }
             } catch (Exception e) {
                 throw new UpnpDeserializationException (
                     string.Format ("There was a problem deserializing {0}.", ToString ()), e);
-            } finally {
-                reader.Close ();
             }
         }
 
-        protected virtual void DeserializeCore (XmlReader reader, string element)
+        protected virtual void DeserializePropertyElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                reader.Read ();
-                switch (element.ToLower ()) {
-                case "actionlist":
-                    DeserializeActions (reader.ReadSubtree ());
-                    break;
-                case "servicestatetable":
-                    DeserializeStateVariables (reader.ReadSubtree ());
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
+            switch (reader.Name) {
+            case "actionList":
+				using (var actions_reader = reader.ReadSubtree ()) {
+					actions_reader.Read ();
+                	DeserializeActions (actions_reader);
+				}
+                break;
+            case "serviceStateTable":
+				using (var state_variables_reader = reader.ReadSubtree ()) {
+					state_variables_reader.Read ();
+                	DeserializeStateVariables (state_variables_reader);
+				}
+                break;
+            default: // This is a workaround for Mono bug 334752
+                reader.Skip ();
+                break;
             }
         }
 
@@ -200,14 +205,16 @@ namespace Mono.Upnp.Control
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                while (reader.ReadToFollowing ("action")) {
-                    try {
-                        DeserializeAction (reader.ReadSubtree ());
-                    } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing an action list element.", e);
-                    }
-                }
+            while (reader.ReadToFollowing ("action")) {
+				var action_reader = reader.ReadSubtree ();
+				action_reader.Read ();
+                try {
+                    DeserializeAction (action_reader);
+                } catch (Exception e) {
+                    Log.Exception ("There was a problem deserializing an action list element.", e);
+                } finally {
+					action_reader.Close ();
+				}
             }
         }
 
@@ -229,14 +236,16 @@ namespace Mono.Upnp.Control
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                while (reader.ReadToFollowing ("stateVariable")) {
-                    try {
-                        DeserializeStateVariable (reader.ReadSubtree ());
-                    } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing a state variable list element.", e);
-                    }
-                }
+            while (reader.ReadToFollowing ("stateVariable")) {
+				var state_variable_reader = reader.ReadSubtree ();
+				state_variable_reader.Read ();
+                try {
+                    DeserializeStateVariable (state_variable_reader);
+                } catch (Exception e) {
+                    Log.Exception ("There was a problem deserializing a state variable list element.", e);
+                } finally {
+					state_variable_reader.Close ();
+				}
             }
         }
 
@@ -253,8 +262,17 @@ namespace Mono.Upnp.Control
         {
             return new StateVariable (this);
         }
+		
+		void Verify ()
+		{
+			VerifyDeserialization ();
+			if (!verified) {
+				throw new UpnpDeserializationException (
+					"The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
+			}
+		}
 
-        void VerifyDeserialization ()
+        protected virtual void VerifyDeserialization ()
         {
             foreach (var action in actions.Values) {
                 foreach (var argument in action.InArguments.Values) {
@@ -267,6 +285,7 @@ namespace Mono.Upnp.Control
                 	VerifyRelatedStateVariable (action.ReturnArgument);
 				}
             }
+			verified = true;
         }
 
         void VerifyRelatedStateVariable (Argument argument)
@@ -277,7 +296,7 @@ namespace Mono.Upnp.Control
             }
         }
 
-        internal virtual void DeserializeEvents (HttpListenerRequest response)
+        internal void DeserializeEvents (HttpListenerRequest response)
         {
             DeserializeEventsCore (response);
         }

@@ -39,6 +39,7 @@ namespace Mono.Upnp.Description
         readonly IDisposer disposer;
         IDeserializer deserializer;
         ServiceController controller;
+		bool verified;
 
         protected internal ServiceDescription (IDisposer disposer)
         {
@@ -108,63 +109,72 @@ namespace Mono.Upnp.Description
             if (deserializer == null) throw new ArgumentNullException ("deserializer");
 
             this.deserializer = deserializer;
-            DeserializeCore (reader);
-            VerifyDeserialization ();
+            DeserializeRootElement (reader);
+            Verify ();
         }
 
-        protected virtual void DeserializeCore (XmlReader reader)
+        protected virtual void DeserializeRootElement (XmlReader reader)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
+            if (reader == null)
+				throw new ArgumentNullException ("reader");
 
             try {
-                reader.Read ();
                 while (Helper.ReadToNextElement (reader)) {
+					var property_reader = reader.ReadSubtree ();
+					property_reader.Read ();
                     try {
-                        DeserializeCore (reader.ReadSubtree (), reader.Name);
+                        DeserializePropertyElement (property_reader);
                     } catch (Exception e) {
                         Log.Exception (
                             "There was a problem deserializing one of the service description elements.", e);
-                    }
+                    } finally {
+						property_reader.Close ();
+					}
                 }
             } catch (Exception e) {
                 throw new UpnpDeserializationException (
                     string.Format ("There was a problem deserializing {0}.", ToString ()), e);
-            } finally {
-				reader.Close ();
-			}
-        }
-
-        protected virtual void DeserializeCore (XmlReader reader, string element)
-        {
-            if (reader == null) throw new ArgumentNullException ("reader");
-
-            using (reader) {
-                reader.Read ();
-                switch (element.ToLower ()) {
-                case "servicetype":
-                    Type = new ServiceType (reader.ReadString ());
-                    break;
-                case "serviceid":
-                    // TODO better handling of this complex string
-                    Id = reader.ReadString ().Trim ();
-                    break;
-                case "scpdurl":
-                    ScpdUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                    break;
-                case "controlurl":
-                    ControlUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                    break;
-                case "eventsuburl":
-                    EventUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
             }
         }
 
-        void VerifyDeserialization ()
+        protected virtual void DeserializePropertyElement (XmlReader reader)
+        {
+            if (reader == null)
+				throw new ArgumentNullException ("reader");
+
+            switch (reader.Name) {
+            case "serviceType":
+                Type = new ServiceType (reader.ReadString ());
+                break;
+            case "serviceId":
+                // TODO better handling of this complex string
+                Id = reader.ReadString ().Trim ();
+                break;
+            case "SCPDURL":
+                ScpdUrl = deserializer.DeserializeUrl (reader);
+                break;
+            case "controlURL":
+                ControlUrl = deserializer.DeserializeUrl (reader);
+                break;
+            case "eventsubURL":
+                EventUrl = deserializer.DeserializeUrl (reader);
+                break;
+            default: // This is a workaround for Mono bug 334752
+                reader.Skip ();
+                break;
+            }
+        }
+		
+		void Verify ()
+		{
+			VerifyDeserialization ();
+			if (!verified) {
+				throw new UpnpDeserializationException (
+					"The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
+			}
+		}
+
+        protected virtual void VerifyDeserialization ()
         {
             if (Id == null) {
                 var message = Type == null
@@ -188,6 +198,7 @@ namespace Mono.Upnp.Description
                 Log.Exception (new UpnpDeserializationException (
 					string.Format ("{0} has no event URL.", ToString ())));
             }
+			verified = true;
         }
 
         public override string ToString ()

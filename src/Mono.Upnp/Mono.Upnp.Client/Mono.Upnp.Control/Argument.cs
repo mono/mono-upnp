@@ -39,6 +39,7 @@ namespace Mono.Upnp.Control
         readonly ServiceAction action;
         ArgumentDirection? direction;
         StateVariable related_state_variable;
+		bool verified;
 
         protected internal Argument (ServiceAction action)
         {
@@ -73,59 +74,66 @@ namespace Mono.Upnp.Control
 
         public void Deserialize (XmlReader reader)
         {
-            DeserializeCore (reader);
-            VerifyDeserialization ();
+            DeserializeRootElement (reader);
+            Verify ();
         }
 
-        protected virtual void DeserializeCore (XmlReader reader)
+        protected virtual void DeserializeRootElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.Read ();
                 while (Helper.ReadToNextElement (reader)) {
+					var property_reader = reader.ReadSubtree ();
+					property_reader.Read ();
                     try {
-                        DeserializeCore (reader.ReadSubtree (), reader.Name);
+                        DeserializePropertyElement (property_reader);
                     } catch (Exception e) {
                         Log.Exception (
                             "There was a problem deserializing one of the argument description elements.", e);
-                    }
+                    } finally {
+						property_reader.Close ();
+					}
                 }
             } catch (Exception e) {
                 throw new UpnpDeserializationException (
                     string.Format ("There was a problem deserializing {0}.", ToString ()), e);
-            } finally {
-                reader.Close ();
             }
         }
 
-        protected virtual void DeserializeCore (XmlReader reader, string element)
+        protected virtual void DeserializePropertyElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                reader.Read ();
-                switch (element.ToLower ()) {
-                case "name":
-                    Name = reader.ReadString ().Trim ();
-                    break;
-                case "direction":
-                    Direction = reader.ReadString ().Trim () == "in" ? ArgumentDirection.In : ArgumentDirection.Out;
-                    break;
-                case "retval":
-                    IsReturnValue = true;
-                    break;
-                case "relatedstatevariable":
-                    RelatedStateVariableName = reader.ReadString ().Trim ();
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
+            switch (reader.Name) {
+            case "name":
+                Name = reader.ReadString ().Trim ();
+                break;
+            case "direction":
+                Direction = reader.ReadString ().Trim () == "in" ? ArgumentDirection.In : ArgumentDirection.Out;
+                break;
+            case "retval":
+                IsReturnValue = true;
+                break;
+            case "relatedStateVariable":
+                RelatedStateVariableName = reader.ReadString ().Trim ();
+                break;
+            default: // This is a workaround for Mono bug 334752
+                reader.Skip ();
+                break;
             }
         }
+		
+		void Verify ()
+		{
+			VerifyDeserialization ();
+			if (!verified) {
+				throw new UpnpDeserializationException (
+					"The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
+			}
+		}
 
-        void VerifyDeserialization ()
+        protected virtual void VerifyDeserialization ()
         {
             if (Name == null) {
                 throw new UpnpDeserializationException (string.Format (
@@ -144,6 +152,7 @@ namespace Mono.Upnp.Control
                     "{0} has no direction, defaulting to 'in'.", ToString ())));
                 direction = ArgumentDirection.In;
             }
+			verified = true;
         }
 
         public override string ToString ()

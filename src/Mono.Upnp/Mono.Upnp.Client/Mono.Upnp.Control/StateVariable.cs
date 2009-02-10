@@ -39,6 +39,7 @@ namespace Mono.Upnp.Control
     {
         readonly ServiceController controller;
         event EventHandler<StateVariableChangedArgs<string>> changed;
+		bool verified;
 
         protected internal StateVariable (ServiceController service)
         {
@@ -115,75 +116,78 @@ namespace Mono.Upnp.Control
 
         public void Deserialize (XmlReader reader)
         {
-            DeserializeCore (reader);
-            VerifyDeserialization ();
+            DeserializeRootElement (reader);
+            Verify ();
         }
 
-        protected virtual void DeserializeCore (XmlReader reader)
+        protected virtual void DeserializeRootElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.Read ();
                 SendEvents = reader["sendEvents"] != "no";
                 while (Helper.ReadToNextElement (reader)) {
+					var property_reader = reader.ReadSubtree ();
+					property_reader.Read ();
                     try {
-                        DeserializeCore (reader.ReadSubtree (), reader.Name);
+                        DeserializePropertyElement (property_reader);
                     } catch (Exception e) {
                         Log.Exception ("There was a problem deserializing one of the state variable description elements.", e);
-                    }
+                    } finally {
+						property_reader.Close ();
+					}
                 }
             } catch (Exception e) {
                 throw new UpnpDeserializationException (string.Format ("There was a problem deserializing {0}.", ToString ()), e);
-            } finally {
-                reader.Close ();
             }
         }
 
-        protected virtual void DeserializeCore (XmlReader reader, string element)
+        protected virtual void DeserializePropertyElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                switch (element.ToLower ()) {
-                case "name":
-                    Name = reader.ReadString ().Trim ();
-                    break;
-                case "datatype":
-                    DataType = reader.ReadString ().Trim ();
-                    Type = controller.DeserializeDataType (DataType);
-                    break;
-                case "defaultvalue":
-                    DefaultValue = reader.ReadString ();
-                    break;
-                case "allowedvaluelist":
-                    DeserializeAllowedValues (reader.ReadSubtree ());
-                    break;
-                case "allowedvaluerange":
-                    AllowedValueRange = new AllowedValueRange (Type, reader.ReadSubtree ());
-                    break;
-                case "sendeventsattribute":
-                    SendEvents = reader.ReadString ().Trim () != "no";
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
+            switch (reader.Name) {
+            case "name":
+                Name = reader.ReadString ().Trim ();
+                break;
+            case "dataType":
+                DataType = reader.ReadString ().Trim ();
+                Type = controller.DeserializeDataType (DataType);
+                break;
+            case "defaultValue":
+                DefaultValue = reader.ReadString ();
+                break;
+            case "allowedValueList":
+                DeserializeAllowedValues (reader);
+                break;
+            case "allowedValueRange":
+                AllowedValueRange = new AllowedValueRange (Type, reader.ReadSubtree ());
+                break;
+            default: // This is a workaround for Mono bug 334752
+                reader.Skip ();
+                break;
             }
         }
 
         void DeserializeAllowedValues (XmlReader reader)
         {
-            using (reader) {
-                var allowed_value_list = new List<string> ();
-                while (reader.ReadToFollowing ("allowedValue") && reader.NodeType == XmlNodeType.Element) {
-                    allowed_value_list.Add (reader.ReadString ());
-                }
-                AllowedValues = allowed_value_list.AsReadOnly ();
+            var allowed_value_list = new List<string> ();
+            while (reader.ReadToFollowing ("allowedValue") && reader.NodeType == XmlNodeType.Element) {
+                allowed_value_list.Add (reader.ReadString ());
             }
+            AllowedValues = allowed_value_list.AsReadOnly ();
         }
+		
+		void Verify ()
+		{
+			VerifyDeserialization ();
+			if (!verified) {
+				throw new UpnpDeserializationException (
+					"The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
+			}
+		}
 
-        void VerifyDeserialization ()
+        protected virtual void VerifyDeserialization ()
         {
             if (Name == null) {
                 throw new UpnpDeserializationException (
@@ -214,6 +218,7 @@ namespace Mono.Upnp.Control
             //    throw new UpnpDeserializationException (String.Format (
             //        "The state variable {0} has allowedValueRange, but is of type {2}.", name, type));
             //}
+			verified = true;
         }
 
         public override string ToString ()

@@ -44,8 +44,8 @@ namespace Mono.Upnp.Description
         readonly ReadOnlyCollection<DeviceDescription> devices;
         readonly List<Icon> icon_list = new List<Icon> ();
         readonly ReadOnlyCollection<Icon> icons;
-        
         IDeserializer deserializer;
+		bool verified;
 
         protected internal DeviceDescription (IDisposer disposer)
         {
@@ -134,89 +134,96 @@ namespace Mono.Upnp.Description
             if (deserializer == null) throw new ArgumentNullException ("deserializer");
 
             this.deserializer = deserializer;
-            DeserializeCore (reader);
-            VerifyDeserialization ();
+            DeserializeRootElement (reader);
+            Verify ();
             this.deserializer = null;
         }
 
-        protected virtual void DeserializeCore (XmlReader reader)
+        protected virtual void DeserializeRootElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.Read ();
                 while (Helper.ReadToNextElement (reader)) {
+					var property_reader = reader.ReadSubtree ();
+					property_reader.Read ();
                     try {
-                        DeserializeCore (reader.ReadSubtree (), reader.Name);
+                        DeserializePropertyElement (property_reader);
                     } catch (Exception e) {
                         Log.Exception (
                             "There was a problem deserializing one of the device description elements.", e);
-                    }
+                    } finally {
+						property_reader.Close ();
+					}
                 }
             } catch (Exception e) {
                 throw new UpnpDeserializationException (
                     string.Format ("There was a problem deserializing {0}.", ToString ()), e);
-            } finally {
-                reader.Close ();
             }
         }
 
-        protected virtual void DeserializeCore (XmlReader reader, string element)
+        protected virtual void DeserializePropertyElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                reader.Read ();
-                switch (element.ToLower ()) {
-                case "devicetype":
-                    Type = new DeviceType (reader.ReadString ());
-                    break;
-                case "friendlyname":
-                    FriendlyName = reader.ReadString ();
-                    break;
-                case "manufacturer":
-                    Manufacturer = reader.ReadString ();
-                    break;
-                case "manufacturerurl":
-                    ManufacturerUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                    break;
-                case "modeldescription":
-                    ModelDescription = reader.ReadString ();
-                    break;
-                case "modelname":
-                    ModelName = reader.ReadString ();
-                    break;
-                case "modelnumber":
-                    ModelNumber = reader.ReadString ();
-                    break;
-                case "modelurl":
-                    ModelUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                    break;
-                case "serialnumber":
-                    SerialNumber = reader.ReadString ();
-                    break;
-                case "udn":
-                    Udn = reader.ReadString ().Trim ();
-                    break;
-                case "upc":
-                    Upc = reader.ReadString ();
-                    break;
-                case "iconlist":
-                    DeserializeIcons (reader.ReadSubtree ());
-                    break;
-                case "servicelist":
-                    DeserializeServices (reader.ReadSubtree ());
-                    break;
-                case "devicelist":
-                    DeserializeDevice (reader.ReadSubtree ());
-                    break;
-                case "presentationurl":
-                    PresentationUrl = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
+            switch (reader.Name) {
+            case "deviceType":
+                Type = new DeviceType (reader.ReadString ());
+                break;
+            case "friendlyName":
+                FriendlyName = reader.ReadString ();
+                break;
+            case "manufacturer":
+                Manufacturer = reader.ReadString ();
+                break;
+            case "manufacturerURL":
+                ManufacturerUrl = deserializer.DeserializeUrl (reader);
+                break;
+            case "modelDescription":
+                ModelDescription = reader.ReadString ();
+                break;
+            case "modelName":
+                ModelName = reader.ReadString ();
+                break;
+            case "modelNumber":
+                ModelNumber = reader.ReadString ();
+                break;
+            case "modelURL":
+                ModelUrl = deserializer.DeserializeUrl (reader);
+                break;
+            case "serialNumber":
+                SerialNumber = reader.ReadString ();
+                break;
+            case "UDN":
+                Udn = reader.ReadString ().Trim ();
+                break;
+            case "UPC":
+                Upc = reader.ReadString ();
+                break;
+            case "iconList":
+				using (var icons_reader = reader.ReadSubtree ()) {
+                	icons_reader.Read ();
+					DeserializeIcons (icons_reader);
+				}
+                break;
+            case "serviceList":
+				using (var services_reader = reader.ReadSubtree ()) {
+                	services_reader.Read ();
+					DeserializeServices (services_reader);
+				}
+                break;
+            case "deviceList":
+				using (var devices_reader = reader.ReadSubtree ()) {
+                	devices_reader.Read ();
+					DeserializeDevice (devices_reader);
+				}
+                break;
+            case "presentationURL":
+                PresentationUrl = deserializer.DeserializeUrl (reader);
+                break;
+            default: // This is a workaround for Mono bug 334752
+                reader.Skip ();
+                break;
             }
         }
 
@@ -224,14 +231,16 @@ namespace Mono.Upnp.Description
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                while (reader.ReadToFollowing ("icon")) {
-                    try {
-                        DeserializeIcon (reader.ReadSubtree ());
-                    } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing an icon list element.", e);
-                    }
-                }
+            while (reader.ReadToFollowing ("icon")) {
+				var icon_reader = reader.ReadSubtree ();
+				icon_reader.Read ();
+                try {
+                    DeserializeIcon (icon_reader);
+                } catch (Exception e) {
+                    Log.Exception ("There was a problem deserializing an icon list element.", e);
+                } finally {
+					icon_reader.Close ();
+				}
             }
         }
 
@@ -253,14 +262,16 @@ namespace Mono.Upnp.Description
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader) {
-                while (reader.ReadToFollowing ("service")) {
-                    try {
-                        DeserializeService (reader.ReadSubtree ());
-                    } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing a service list element.", e);
-                    }
-                }
+            while (reader.ReadToFollowing ("service")) {
+				var service_reader = reader.ReadSubtree ();
+				service_reader.Read ();
+                try {
+                    DeserializeService (service_reader);
+                } catch (Exception e) {
+                    Log.Exception ("There was a problem deserializing a service list element.", e);
+                } finally {
+					service_reader.Close ();
+				}
             }
         }
 
@@ -273,14 +284,16 @@ namespace Mono.Upnp.Description
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
-            using (reader ) {
-                while (reader.ReadToFollowing ("device")) {
-                    try {
-                        DeserializeDevices (reader.ReadSubtree ());
-                    } catch (Exception e) {
-                        Log.Exception ("There was a problem deserializing a device list element.", e);
-                    }
-                }
+            while (reader.ReadToFollowing ("device")) {
+				var device_reader = reader.ReadSubtree ();
+				device_reader.Read ();
+                try {
+                    DeserializeDevices (device_reader);
+                } catch (Exception e) {
+                    Log.Exception ("There was a problem deserializing a device list element.", e);
+                } finally {
+					device_reader.Close ();
+				}
             }
         }
 
@@ -288,8 +301,17 @@ namespace Mono.Upnp.Description
         {
             AddDevice (deserializer.DeserializeDevice (reader));
         }
+		
+		void Verify ()
+		{
+			VerifyDeserialization ();
+			if (!verified) {
+				throw new UpnpDeserializationException (
+					"The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
+			}
+		}
 
-        void VerifyDeserialization ()
+        protected virtual void VerifyDeserialization ()
         {
             // We only throw for critical errors
             // TODO The "critical errors" use to mean things that could cause an NPE in Equals and GetHashCode, but
@@ -333,6 +355,7 @@ namespace Mono.Upnp.Description
                         "{0} does not have a PNG file in its icon list.", ToString ())));
                 }
             }
+			verified = true;
         }
 
         public override string ToString ()

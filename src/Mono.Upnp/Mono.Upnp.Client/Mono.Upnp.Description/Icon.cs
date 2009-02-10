@@ -42,6 +42,7 @@ namespace Mono.Upnp.Description
 		bool has_depth;
         byte[] data;
         IDeserializer deserializer;
+		bool verified;
 
         protected internal Icon (DeviceDescription device)
         {
@@ -101,68 +102,77 @@ namespace Mono.Upnp.Description
             if (deserializer == null) throw new ArgumentNullException ("deserializer");
 
             this.deserializer = deserializer;
-            DeserializeCore (reader);
+            DeserializeRootElement (reader);
             Verify ();
             this.deserializer = null;
         }
 
-        protected virtual void DeserializeCore (XmlReader reader)
+        protected virtual void DeserializeRootElement (XmlReader reader)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
+            if (reader == null)
+				throw new ArgumentNullException ("reader");
 
             try {
-                reader.Read ();
                 while (Helper.ReadToNextElement (reader)) {
+					var property_reader = reader.ReadSubtree ();
+					property_reader.Read ();
                     try {
-                        DeserializeCore (reader.ReadSubtree (), reader.Name);
+                        DeserializePropertyElement (property_reader);
                     } catch (Exception e) {
                         Log.Exception (
                             "There was a problem deserializing one of the icon description elements.", e);
-                    }
+                    } finally {
+						property_reader.Close ();
+					}
                 }
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deserializing an icon.", e);
-            } finally {
-                reader.Close ();
             }
         }
 
-        protected virtual void DeserializeCore (XmlReader reader, string element)
+        protected virtual void DeserializePropertyElement (XmlReader reader)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
+            if (reader == null)
+				throw new ArgumentNullException ("reader");
 
-            using (reader) {
+            switch (reader.Name) {
+            case "mimetype":
+                MimeType = reader.ReadString ();
+                break;
+            case "width":
                 reader.Read ();
-                switch (element.ToLower ()) {
-                case "mimetype":
-                    MimeType = reader.ReadString ();
-                    break;
-                case "width":
-                    reader.Read ();
-                    Width = reader.ReadContentAsInt ();
-					has_width = true;
-                    break;
-                case "height":
-                    reader.Read ();
-                    Height = reader.ReadContentAsInt ();
-					has_height = true;
-                    break;
-                case "depth":
-                    reader.Read ();
-                    Depth = reader.ReadContentAsInt ();
-					has_depth = true;
-                    break;
-                case "url":
-                    Url = deserializer.DeserializeUrl (reader.ReadSubtree ());
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
+                Width = reader.ReadContentAsInt ();
+				has_width = true;
+                break;
+            case "height":
+                reader.Read ();
+                Height = reader.ReadContentAsInt ();
+				has_height = true;
+                break;
+            case "depth":
+                reader.Read ();
+                Depth = reader.ReadContentAsInt ();
+				has_depth = true;
+                break;
+            case "url":
+                Url = deserializer.DeserializeUrl (reader);
+                break;
+            default: // This is a workaround for Mono bug 334752
+                reader.Skip ();
+                break;
             }
         }
+		
+		void Verify ()
+		{
+			VerifyDeserialization ();
+			if (!verified) {
+				throw new UpnpDeserializationException (
+					"The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
+			}
+		}
 
-        void Verify ()
+        protected virtual void VerifyDeserialization ()
         {
             if (Url == null) {
                 throw new UpnpDeserializationException ("The icon has no URL.");
@@ -179,6 +189,7 @@ namespace Mono.Upnp.Description
             if (!has_depth) {
                 Log.Exception (new UpnpDeserializationException ("The icon has no depth."));
             }
+			verified = true;
         }
     }
 }

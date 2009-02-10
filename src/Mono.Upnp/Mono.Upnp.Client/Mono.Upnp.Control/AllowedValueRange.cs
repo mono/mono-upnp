@@ -39,7 +39,7 @@ namespace Mono.Upnp.Control
 
         public AllowedValueRange (Type type, XmlReader reader)
         {
-            Deserialize (reader);
+            DeserializeRootElement (reader);
             VerifyDeserialization (type);
         }
         
@@ -49,46 +49,44 @@ namespace Mono.Upnp.Control
         internal IComparable Min { get; set; }
         internal IComparable Max { get; set; }
 
-        void Deserialize (XmlReader reader)
+        void DeserializeRootElement (XmlReader reader)
         {
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                reader.Read ();
                 while (Helper.ReadToNextElement (reader)) {
+					var property_reader = reader.ReadSubtree ();
+					property_reader.Read ();
                     try {
-                        Deserialize (reader.ReadSubtree (), reader.Name.ToLower ());
+                    	DeserializePropertyElement (property_reader);
                     } catch (Exception e) {
                         Log.Exception (
                             "There was a problem deserializing one of the allowed value range description elements.", e);
-                    }
+                    } finally {
+						property_reader.Close ();
+					}
                 }
             } catch (Exception e) {
                 throw new UpnpDeserializationException (
                     string.Format ("There was a problem deserializing {0}.", ToString ()), e);
-            } finally {
-                reader.Close ();
             }
         }
 
-        void Deserialize (XmlReader reader, string element)
+        void DeserializePropertyElement (XmlReader reader)
         {
-            using (reader) {
-                reader.Read ();
-                switch (element.ToLower ()) {
-                case "maximum":
-                    Maximum = reader.ReadString ();
-                    break;
-                case "minimum":
-                    Minimum = reader.ReadString ();
-                    break;
-                case "step":
-                    Step = reader.ReadString ();
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
+            switch (reader.Name) {
+            case "maximum":
+                Maximum = reader.ReadString ();
+                break;
+            case "minimum":
+                Minimum = reader.ReadString ();
+                break;
+            case "step":
+                Step = reader.ReadString ();
+                break;
+            default: // This is a workaround for Mono bug 334752
+                reader.Skip ();
+                break;
             }
         }
 
