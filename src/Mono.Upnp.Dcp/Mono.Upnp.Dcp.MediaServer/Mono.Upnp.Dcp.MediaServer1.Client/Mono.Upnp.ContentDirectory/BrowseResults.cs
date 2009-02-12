@@ -45,7 +45,8 @@ namespace Mono.Upnp.ContentDirectory
 			if (!HasMoreResults) return null;
 			var browse_results = new BrowseResults (ContentDirectory, ObjectId, RequestCount,
 				 sortCriteria, Offset + ReturnedCount);
-			return browse_results.FetchResults () ? browse_results : null;
+			browse_results.FetchResults ();
+			return browse_results;
 		}
 	}
 }

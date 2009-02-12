@@ -48,7 +48,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Client
 			if (!HasMoreResults) return null;
 			var search_results = new SearchResults (ContentDirectory, ObjectId, search_criteria, RequestCount,
 				sortCriteria, Offset + ReturnedCount);
-			return search_results.FetchResults () ? search_results : null;
+			search_results.FetchResults ();
+			return  search_results;
 		}
 	}
 }

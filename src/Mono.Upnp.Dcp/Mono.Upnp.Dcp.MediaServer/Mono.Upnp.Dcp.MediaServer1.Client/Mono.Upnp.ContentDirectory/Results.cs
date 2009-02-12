@@ -37,6 +37,7 @@ namespace Mono.Upnp.ContentDirectory
 		readonly string sort_criteria;
 		readonly uint offset;
 		string xml;
+		bool out_of_date;
 		
 		protected Browser(ContentDirectory contentDirectory, string objectId,
 		                  uint requestCount, string sortCriteria, int offset)
@@ -66,19 +67,30 @@ namespace Mono.Upnp.ContentDirectory
 			get { return Offset + ReturnedCount < TotalCount; }
 		}
 		
-		internal bool FetchResults ()
+		public bool IsOutOfDate {
+			get { is_out_of_date; }
+		}
+		
+		internal void FetchResults ()
 		{
 			uint returned_count, total_count, update_id;
 			xml = FetchXml (out returned_count, out total_count, out update_id);
 			ReturnedCount = returned_count;
 			TotalCount = total_count;
-			return !content_directory.CheckIfContainerIsOutOfDate (object_id, update_id);
+			if (content_directory.CheckIfContainerIsOutOfDate (object_id, update_id) && offset != 0) {
+				out_of_date = true;
+				xml = null;
+			}
+			return;
 		}
 		
 		protected abstract string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId);
 		
 		public IEnumerator<T> GetEnumerator ()
 		{
+			if (!IsOutOfDate) {
+				yield break;
+			}
 			foreach (T t in content_directory.Deserialize (xml)) {
 				yield return t;
 			}
