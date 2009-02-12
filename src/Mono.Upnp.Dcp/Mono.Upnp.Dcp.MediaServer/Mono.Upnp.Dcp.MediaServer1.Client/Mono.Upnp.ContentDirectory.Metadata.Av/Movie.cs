@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Xml;
 
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class Movie : VideoItem
 	{
@@ -54,7 +54,7 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.Name) {
 				case "channelName":
 					ChannelName = reader.ReadString ();

@@ -28,9 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 
-using Mono.Upnp.Dcp.MediaServer1;
-
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class StorageSystem : Container
 	{
@@ -60,7 +58,7 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.Name) {
 				case "storageTotal":
 					StorageTotal = reader.ReadElementContentAsLong ();

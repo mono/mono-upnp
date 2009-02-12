@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Xml;
 
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class PlaylistItem : Item
 	{
@@ -56,7 +56,7 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.Name) {
 				case "artist":
 					artist_list.Add (new PersonWithRole (reader));
@@ -71,7 +71,7 @@ namespace Mono.Upnp.DidlLite.Av
 					base.DeserializePropertyElement (reader);
 					break;
 				}
-			} else if (reader.NamespaceURI == Protocol.DublinCoreSchema) {
+			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
 				switch (reader.Name) {
 				case "description":
 					Description = reader.ReadString ();

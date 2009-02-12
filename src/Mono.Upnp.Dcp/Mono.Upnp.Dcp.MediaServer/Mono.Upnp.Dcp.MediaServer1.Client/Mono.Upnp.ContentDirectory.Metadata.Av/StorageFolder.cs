@@ -28,9 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 
-using Mono.Upnp.Dcp.MediaServer1;
-
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class StorageFolder : Container
 	{
@@ -48,7 +46,7 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.UpnpSchema && reader.Name == "storageUsed") {
+			if (reader.NamespaceURI == Schemas.UpnpSchema && reader.Name == "storageUsed") {
 					StorageUsed = reader.ReadElementContentAsLong ();
 			} else {
 				base.DeserializePropertyElement (reader);

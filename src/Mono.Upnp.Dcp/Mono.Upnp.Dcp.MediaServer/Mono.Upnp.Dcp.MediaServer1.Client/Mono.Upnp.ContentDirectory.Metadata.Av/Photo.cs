@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Xml;
 
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class Photo : ImageItem
 	{
@@ -47,7 +47,7 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.UpnpSchema && reader.Name == "album") {
+			if (reader.NamespaceURI == Schemas.UpnpSchema && reader.Name == "album") {
 				album_list.Add (reader.ReadString ());
 			} else {
 				base.DeserializePropertyElement (reader);

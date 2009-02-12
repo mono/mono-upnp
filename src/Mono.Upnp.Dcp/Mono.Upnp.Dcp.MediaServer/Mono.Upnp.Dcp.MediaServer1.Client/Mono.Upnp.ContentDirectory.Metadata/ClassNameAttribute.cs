@@ -26,7 +26,7 @@
 
 using System;
 
-namespace Mono.Upnp.DidlLite
+namespace Mono.Upnp.ContentDirectory.Metadata
 {
 	[AttributeUsage (AttributeTargets.Class)]
 	public sealed class ClassNameAttribute : Attribute

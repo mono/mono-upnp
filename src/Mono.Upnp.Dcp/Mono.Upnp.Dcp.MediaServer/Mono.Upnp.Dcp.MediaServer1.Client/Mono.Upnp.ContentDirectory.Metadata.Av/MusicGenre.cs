@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 using Mono.Upnp.Dcp.MediaServer1;
 
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class MusicGenre : Genre
 	{

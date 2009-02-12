@@ -27,7 +27,7 @@
 using System;
 using System.Xml;
 
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class VideoBroadcast : VideoItem
 	{
@@ -43,7 +43,7 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.Name) {
 				case "icon":
 					Icon = new Uri (reader.ReadString ());

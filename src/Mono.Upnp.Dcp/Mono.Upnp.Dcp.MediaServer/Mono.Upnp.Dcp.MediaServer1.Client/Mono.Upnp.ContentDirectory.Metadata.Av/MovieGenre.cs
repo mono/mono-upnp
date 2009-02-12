@@ -26,7 +26,7 @@
 
 using System.Collections.Generic;
 
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class MovieGenre : Genre
 	{

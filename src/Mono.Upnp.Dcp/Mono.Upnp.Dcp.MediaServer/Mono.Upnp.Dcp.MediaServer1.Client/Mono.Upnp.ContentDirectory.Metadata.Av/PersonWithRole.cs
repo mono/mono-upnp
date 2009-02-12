@@ -26,16 +26,16 @@
 
 using System.Xml;
 
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public struct PersonWithRole
 	{
 		readonly string name;
 		readonly string role;
 		
-		public PersonWithRole (XmlReader reader)
+		internal PersonWithRole (XmlReader reader)
 		{
-			role = reader["role", Protocol.UpnpSchema];
+			role = reader["role", Schemas.UpnpSchema];
 			name = reader.ReadString ();
 		}
 		

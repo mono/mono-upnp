@@ -28,9 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 
-using Mono.Upnp.Dcp.MediaServer1;
-
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class Genre : Container
 	{
@@ -65,9 +63,9 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.DublinCoreSchema && reader.Name == "description") {
+			if (reader.NamespaceURI == Schemas.DublinCoreSchema && reader.Name == "description") {
 				Description = reader.ReadString ();
-			} if (reader.NamespaceURI == Protocol.UpnpSchema && reader.Name == "longDescription") {
+			} if (reader.NamespaceURI == Schemas.UpnpSchema && reader.Name == "longDescription") {
 				LongDescription = reader.ReadString ();
 			} else {
 				base.DeserializePropertyElement (reader);

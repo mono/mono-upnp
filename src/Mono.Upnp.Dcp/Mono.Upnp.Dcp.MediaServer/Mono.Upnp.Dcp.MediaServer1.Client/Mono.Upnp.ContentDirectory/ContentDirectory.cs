@@ -8,8 +8,6 @@ using System.Xml.XPath;
 using Mono.Upnp.Description;
 using Mono.Upnp.Control;
 
-using Mono.Upnp.ContentDirectory.Internal;
-
 namespace Mono.Upnp.ContentDirectory
 {
     public class ContentDirectory
@@ -17,9 +15,8 @@ namespace Mono.Upnp.ContentDirectory
         public static readonly ServiceType ServiceType = new ServiceType (
 			"urn:schemas-upnp-org:service:ContentDirectory:1");
 		
-		readonly Dictionary<string, WeakReference> object_cache = new Dictionary<string, WeakReference>();
-		readonly Dictionary<string, Dictionary<string, WeakReference>> object_hierarchy =
-			new Dictionary<string, Dictionary<string, string>>();
+		readonly Dictionary<string, Dictionary<string, WeakReference>> object_cache =
+			new Dictionary<string, WeakReference> ();
 		readonly Dictionary<string, uint> container_update_ids = new Dictionary<string, uint> ();
 		
         readonly ServiceController controller;
@@ -60,7 +57,7 @@ namespace Mono.Upnp.ContentDirectory
             return action_result.OutValues["Id"];
         }
 
-        public string Browse (string objectId, BrowseFlag browseFlag, string filter, uint startingIndex, uint requestedCount, string sortCriteria, out uint numberReturned, out uint totalMatches, out uint updateId)
+        internal string Browse (string objectId, BrowseFlag browseFlag, string filter, uint startingIndex, uint requestedCount, string sortCriteria, out uint numberReturned, out uint totalMatches, out uint updateId)
         {
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (6);
             in_arguments.Add ("ObjectID", objectId);
@@ -77,7 +74,7 @@ namespace Mono.Upnp.ContentDirectory
         }
 
         public bool CanSearch { get { return controller.Actions.ContainsKey ("Search"); } }
-        public string Search (string containerId, string searchCriteria, string filter, uint startingIndex, uint requestedCount, string sortCriteria, out uint numberReturned, out uint totalMatches, out uint updateId)
+        internal string Search (string containerId, string searchCriteria, string filter, uint startingIndex, uint requestedCount, string sortCriteria, out uint numberReturned, out uint totalMatches, out uint updateId)
         {
             if (!CanSearch) throw new NotImplementedException ();
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (6);
@@ -220,45 +217,57 @@ namespace Mono.Upnp.ContentDirectory
 
         void Verify ()
         {
-            if (!controller.Actions.ContainsKey ("GetSearchCapabilities")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSearchCapabilities.", controller.Description.Id));
-            if (!controller.Actions.ContainsKey ("GetSortCapabilities")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSortCapabilities.", controller.Description.Id));
-            if (!controller.Actions.ContainsKey ("GetSystemUpdateID")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSystemUpdateID.", controller.Description.Id));
-            if (!controller.Actions.ContainsKey ("Browse")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action Browse.", controller.Description.Id));
-            if (!controller.StateVariables.ContainsKey ("SystemUpdateID")) throw new UpnpDeserializationException (String.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required state variable SystemUpdateID.", controller.Description.Id));
+            if (!controller.Actions.ContainsKey ("GetSearchCapabilities"))
+				throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSearchCapabilities.", controller.Description.Id));
+            if (!controller.Actions.ContainsKey ("GetSortCapabilities"))
+				throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSortCapabilities.", controller.Description.Id));
+            if (!controller.Actions.ContainsKey ("GetSystemUpdateID"))
+				throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSystemUpdateID.", controller.Description.Id));
+            if (!controller.Actions.ContainsKey ("Browse"))
+				throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action Browse.", controller.Description.Id));
+            if (!controller.StateVariables.ContainsKey ("SystemUpdateID"))
+				throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required state variable SystemUpdateID.", controller.Description.Id));
         }
 		
-		internal IEnumerable<T> Deserialize<T> (string xml) where T : Object
+		internal IEnumerable<T> Deserialize<T> (string filter, string xml) where T : Object
 		{
+			if (!object_cache.ContainsKey (filter)) {
+				object_cache[filter] = new Dictionary<string, WeakReference> ();
+			}
+			
 			using (var reader = new StringReader (xml)) {
 				var navigator = new XPathDocument (reader).CreateNavigator ();
 				if (navigator.MoveToNext ("DIDL-Lite", Protocol.DidlLiteSchema) && navigator.MoveToFirstChild ()) {
 					do {
-						yield return DerserializeObject (navigator);
+						yield return DerserializeObject (filter, navigator);
 					} while (navigator.MoveToNext ());
 				}
 			}
 		}
 		
-		T DerserializeObject<T> (XPathNavigator navigator) where T : Object
+		T DerserializeObject<T> (string filter, XPathNavigator navigator) where T : Object
 		{
-			return GetObjectFromCache (navigator) ?? CreateObject (navigator);
+			return GetObjectFromCache (filter, navigator) ?? CreateObject (filter, navigator);
 		}
 		
-		T GetObjectFromCache<T> (XPathNavigator navigator) where T : Object
+		T GetObjectFromCache<T> (string filter, XPathNavigator navigator) where T : Object
 		{
 			if (navigator.MoveToAttribute ("id", Protocol.DidlLiteSchema)) {
 				var id = navigator.Value;
-				if (object_cache.ContainsKey (id)) {
-					var weak_reference = object_cache[id];
+				if (object_cache.ContainsKey (filter) && object_cache[filter].ContainsKey (id)) {
+					var weak_reference = object_cache[filter][id];
 					if (weak_reference.IsAlive) {
-						return (Object)weak_reference.Target;
+						var @object = (Object)weak_reference.Target;
+						if (!CheckIfObjectIsOutOfDate (@object)) {
+							return @object;
+						}
 					}
 				}
 			}
 			return null;
 		}
 		
-		T CreateObject<T> (XPathNavigator navigator) where T : Object
+		T CreateObject<T> (string filter, XPathNavigator navigator) where T : Object
 		{
 			navigator.MoveToChild ("class", Protocol.UpnpSchema);
 			var @class = navigator.Value;
@@ -270,44 +279,31 @@ namespace Mono.Upnp.ContentDirectory
 			
 			@object = (Object)Activator.CreateInstance (types[@class], true);
 			@object.Deserialize (navigator.ReadSubtree ());
+			if (container_update_ids.ContainsKey (@object.ParentId)) {
+				@object.ParentUpdateId = container_update_ids[@object.ParentId];
+			}
 			
 			if (!object_hierarchy.ContainsKey (@object.ParentId)) {
 				object_hierarchy[@object.ParentId] = new Dictionary<string, string> ();
 			}
 			object_hierarchy[@object.ParentId][@object.Id] = null;
-			object_cache[@object.Id] = new WeakReference (@object);
+			object_cache[filter][@object.Id] = new WeakReference (@object);
 		}
 		
 		internal bool CheckIfContainerIsOutOfDate (string id, uint updateId)
 		{
 			var result = false;
 			if (container_update_ids.ContainsKey (id) && container_update_ids [id] != updateId) {
-				InvalidateContainer (id);
 				result = true;
 			}
 			container_update_ids [id] = updateId;
 			return result;
 		}
 		
-		void InvalidateContainer (string id)
-		{
-			if (object_hierarchy.ContainsKey (id)) {
-				foreach (var @object in object_hierarchy[id].Keys) {
-					InvalidateContainer (@oject);
-				}
-				object_hierarchy.Remove (id);
-			}
-			object_cache.Remove (id);
-		}
-		
 		internal bool CheckIfObjectIsOutOfDate (Object @object)
 		{
-			if (!object_cache.ContainsKey (@object.Id)) {
-				return true;
-			} else {
-				var weak_reference = object_cache[@object.Id];
-				return !weak_reference.IsAlive || weak_reference.Target != @object;
-			}
+			return container_update_ids.ContainsKey (@object.ParentId) &&
+				container_update_ids[@object.ParentId] != @object.ParentUpdateId;
 		}
     }
 }

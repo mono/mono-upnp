@@ -27,7 +27,7 @@
 using System;
 ﻿using System.Xml;
 
-namespace Mono.Upnp.DidlLite
+namespace Mono.Upnp.ContentDirectory.Metadata
 {
 	public abstract class Item : Object
 	{
@@ -37,7 +37,7 @@ namespace Mono.Upnp.DidlLite
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			RefId = reader["refID", Protocol.UpnpSchema];
+			RefId = reader["refID", Schemas.UpnpSchema];
 			
 			base.DeserializeRootElement (reader);
 		}

@@ -31,7 +31,7 @@ using System.Xml;
 
 using Mono.Upnp.Dcp.MediaServer1;
 
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class MusicArtist : Person
 	{
@@ -62,7 +62,7 @@ namespace Mono.Upnp.DidlLite.Av
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				if (reader.Name == "genre") {
 					genre_list.Add (reader.ReadString ());
 				} else if (reader.Name == "artistDiscographyURI") {

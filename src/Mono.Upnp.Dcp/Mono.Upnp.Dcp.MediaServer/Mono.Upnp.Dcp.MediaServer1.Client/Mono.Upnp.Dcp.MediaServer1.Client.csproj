@@ -72,7 +72,7 @@
     <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\VideoBroadcast.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\VideoItem.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory.Metadata\ClassReference.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Protocol.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Schemas.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\PersonWithRole.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Resource.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Resolution.cs" />

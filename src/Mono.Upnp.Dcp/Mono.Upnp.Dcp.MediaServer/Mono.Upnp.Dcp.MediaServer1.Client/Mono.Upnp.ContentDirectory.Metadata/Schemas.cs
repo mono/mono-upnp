@@ -1,5 +1,5 @@
 // 
-// Protocol.cs
+// Schemas.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,11 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-
-namespace Mono.Upnp.DidlLite
+namespace Mono.Upnp.ContentDirectory.Metadata
 {
-	static class Protocol
+	public static class Schemas
 	{
 		public const string UpnpSchema = "urn:schemas-upnp-org:metadata-1-0/upnp/";
 		public const string DidlLiteSchema = "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/";

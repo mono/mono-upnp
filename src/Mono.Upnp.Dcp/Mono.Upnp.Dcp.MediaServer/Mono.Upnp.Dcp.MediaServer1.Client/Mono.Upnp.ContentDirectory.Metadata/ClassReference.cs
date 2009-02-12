@@ -27,7 +27,7 @@
 using System;
 using System.Xml;
 
-namespace Mono.Upnp.DidlLite
+namespace Mono.Upnp.ContentDirectory.Metadata
 {
 	public struct ClassReference
 	{

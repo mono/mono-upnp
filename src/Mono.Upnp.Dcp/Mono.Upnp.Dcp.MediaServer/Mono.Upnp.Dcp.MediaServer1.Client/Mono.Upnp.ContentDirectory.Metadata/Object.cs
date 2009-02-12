@@ -48,20 +48,24 @@ namespace Mono.Upnp.ContentDirectory.Metadata
 			resources = resource_list.AsReadOnly ();
 		}
 		
-		protected Browser<T> Browse<T> (uint requestCount, string sortCriteria)
+		protected BrowseResult<T> Browse<T> (uint requestCount, string sortCriteria)
 		{
-			return new Browser<T> (content_directory, Id, requestCount, sortCriteria);
+			var browse_results = new BrowseResult<T> (content_directory, Id, requestCount, sortCriteria);
+			browse_results.FetchResults ();
+			return browse_results;
 		}
 		
 		public Container GetParent ()
 		{
 			if (ParentId == "-1") return null;
-			uint returned, total;
+			uint returned, total, update_id;
 			var xml = content_directory.Browse (ParentId, BrowseFlag.BrowseMetadata, "*", 0, 1, "",
-				out returned, out total);
+				out returned, out total, out update_id);
+			content_directory.CheckIfContainerIsOutOfDate (ParentId, update_id);
 			foreach (var container in content_directory.Deserialize<Container> (xml)) {
 				return container;
 			}
+			return null;
 		}
 		
 		public bool IsOutOfDate {
@@ -76,17 +80,13 @@ namespace Mono.Upnp.ContentDirectory.Metadata
         public Class Class { get; private set; }
         public bool Restricted { get; private set; }
         public WriteStatus? WriteStatus { get; private set; }
+		internal uint ParentUpdateId { get; set; }
+		
+		public override string ToString ()
+		{
+			return string.Format("{0} ({1})", Id, Class.FullClassName);
+		}
 
-        public override bool Equals (object obj)
-        {
-            Object @object = obj as Object;
-            return @object != null && @object.Id == Id;
-        }
-
-        public override int GetHashCode ()
-        {
-            return ~Id.GetHashCode ();
-        }
 
         internal void Deserialize (XmlReader reader)
         {
@@ -98,10 +98,10 @@ namespace Mono.Upnp.ContentDirectory.Metadata
         {
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-            Id = reader["id", Protocol.DidlLiteSchema];
-            ParentId = reader["parentID", Protocol.DidlLiteSchema];
+            Id = reader["id", Schemas.DidlLiteSchema];
+            ParentId = reader["parentID", Schemas.DidlLiteSchema];
             bool restricted;
-            if (bool.TryParse (reader["restricted", Protocol.DidlLiteSchema], out restricted)) {
+            if (bool.TryParse (reader["restricted", Schemas.DidlLiteSchema], out restricted)) {
                 Restricted = restricted;
 				has_restricted = true;
             }
@@ -123,13 +123,13 @@ namespace Mono.Upnp.ContentDirectory.Metadata
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.DidlLiteSchema) {
+			if (reader.NamespaceURI == Schemas.DidlLiteSchema) {
 				if (reader.Name == "res") {
 					resource_list.Add (new Resource (reader));
 				} else {
 					reader.Skip (); // This is a workaround for Mono bug 334752
 				}
-			} else if (reader.NamespaceURI == Protocol.UpnpSchema) {
+			} else if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.Name) {
 				case "class":
 					Class = new Class (reader);
@@ -142,7 +142,7 @@ namespace Mono.Upnp.ContentDirectory.Metadata
 					reader.Skip ();
 					break;
 				}
-			} else if (reader.NamespaceURI == Protocol.DublinCoreSchema) {
+			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
 				switch (reader.Name) {
 				case "title":
 					Title = reader.ReadString ();

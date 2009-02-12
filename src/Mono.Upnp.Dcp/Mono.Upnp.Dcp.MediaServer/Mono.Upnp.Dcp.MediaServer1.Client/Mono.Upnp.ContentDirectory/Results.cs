@@ -36,11 +36,10 @@ namespace Mono.Upnp.ContentDirectory
 		readonly uint request_count;
 		readonly string sort_criteria;
 		readonly uint offset;
-		string xml;
-		bool out_of_date;
+		readonly List<T> results = new List<T> ();
 		
-		protected Browser(ContentDirectory contentDirectory, string objectId,
-		                  uint requestCount, string sortCriteria, int offset)
+		protected Browser (ContentDirectory contentDirectory, string objectId,
+		                   uint requestCount, string sortCriteria, int offset)
 		{
 			content_directory = ContentDirectory;
 			object_id = objectId;
@@ -63,38 +62,32 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public int TotalCount { get; private set; }
 		
+		public bool IsOutOfDate { get; private set; }
+		
 		public bool HasMoreResults {
 			get { return Offset + ReturnedCount < TotalCount; }
-		}
-		
-		public bool IsOutOfDate {
-			get { is_out_of_date; }
 		}
 		
 		internal void FetchResults ()
 		{
 			uint returned_count, total_count, update_id;
-			xml = FetchXml (out returned_count, out total_count, out update_id);
+			var xml = FetchXml (out returned_count, out total_count, out update_id);
 			ReturnedCount = returned_count;
 			TotalCount = total_count;
 			if (content_directory.CheckIfContainerIsOutOfDate (object_id, update_id) && offset != 0) {
-				out_of_date = true;
-				xml = null;
+				IsOutOfDate = true;
+			} else {
+				foreach (var result in content_directory.Deserialize<T> (xml)) {
+					results.Add (result);
+				}
 			}
-			return;
 		}
 		
 		protected abstract string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId);
 		
 		public IEnumerator<T> GetEnumerator ()
 		{
-			if (!IsOutOfDate) {
-				yield break;
-			}
-			foreach (T t in content_directory.Deserialize (xml)) {
-				yield return t;
-			}
-			xml = null;
+			return results.GetEnumerator ();
 		}
 		
 		IEnumerator IEnumerable.GetEnumerator ()

@@ -28,7 +28,7 @@
 
 using System;
 
-namespace Mono.Upnp.DidlLite
+namespace Mono.Upnp.ContentDirectory.Metadata
 {
 	public class DeserializationException : Exception
 	{

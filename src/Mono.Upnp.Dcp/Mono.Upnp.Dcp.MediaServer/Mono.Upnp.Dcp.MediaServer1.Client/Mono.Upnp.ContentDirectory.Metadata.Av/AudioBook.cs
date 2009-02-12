@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Xml;
 
-namespace Mono.Upnp.DidlLite.Av
+namespace Mono.Upnp.ContentDirectory.Metadata.Av
 {
 	public class AudioBook : AudioItem
 	{
@@ -52,7 +52,8 @@ namespace Mono.Upnp.DidlLite.Av
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
-			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+			
+			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.Name) {
 				case "producer":
 					producer_list.Add (reader.ReadString ());
@@ -61,7 +62,7 @@ namespace Mono.Upnp.DidlLite.Av
 					base.DeserializePropertyElement (reader);
 					break;
 				}
-			} else if (reader.NamespaceURI == Protocol.DublinCoreSchema) {
+			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
 				switch (reader.Name) {
 				case "contributor":
 					contributor_list.Add (reader.ReadString ());

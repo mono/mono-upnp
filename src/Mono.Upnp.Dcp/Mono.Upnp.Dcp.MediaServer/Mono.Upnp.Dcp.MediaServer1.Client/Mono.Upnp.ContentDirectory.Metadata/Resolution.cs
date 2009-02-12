@@ -26,7 +26,7 @@
 
 using System;
 
-namespace Mono.Upnp.DidlLite
+namespace Mono.Upnp.ContentDirectory.Metadata
 {
 	public struct Resolution : IEquatable<Resolution>
 	{

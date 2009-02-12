@@ -31,7 +31,7 @@ using System.Xml;
 
 using Mono.Upnp.Dcp.MediaServer1;
 
-namespace Mono.Upnp.DidlLite
+namespace Mono.Upnp.ContentDirectory.Metadata
 {
 	public abstract class Container : Object
 	{
@@ -48,7 +48,7 @@ namespace Mono.Upnp.DidlLite
 		
 		bool has_child_count;
 		
-        public int ChildCount { get; private set; }
+        public int? ChildCount { get; private set; }
         public ReadOnlyCollection<ClassReference> CreateClasses { get { return create_classes; } }
 		public ReadOnlyCollection<ClassReference> SearchClasses { get { return search_classes; } }
         public bool Searchable { get; private set; }
@@ -82,9 +82,9 @@ namespace Mono.Upnp.DidlLite
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			Searchable = reader["searchable", Protocol.DidlLiteSchema] == "true";
+			Searchable = reader["searchable", Schemas.DidlLiteSchema] == "true";
 			int child_count;
-			if (int.TryParse (reader["childCount", Protocol.DidlLiteSchema], out child_count)) {
+			if (int.TryParse (reader["childCount", Schemas.DidlLiteSchema], out child_count)) {
 				ChildCount = child_count;
 			}
 			
@@ -95,7 +95,7 @@ namespace Mono.Upnp.DidlLite
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			if (reader.NamespaceURI == Protocol.UpnpSchema) {
+			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.Name) {
 				case "searchClass":
 					search_class_list.Add (new ClassReference (reader));
