@@ -7,6 +7,9 @@ using System.Xml.XPath;
 
 using Mono.Upnp.Description;
 using Mono.Upnp.Control;
+using Mono.Upnp.ContentDirectory.Metadata;
+
+using UpnpObject = Mono.Upnp.ContentDirectory.Metadata.Object;
 
 namespace Mono.Upnp.ContentDirectory
 {
@@ -229,7 +232,7 @@ namespace Mono.Upnp.ContentDirectory
 				throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required state variable SystemUpdateID.", controller.Description.Id));
         }
 		
-		internal IEnumerable<T> Deserialize<T> (string filter, string xml) where T : Object
+		internal IEnumerable<T> Deserialize<T> (string filter, string xml) where T : UpnpObject
 		{
 			if (!object_cache.ContainsKey (filter)) {
 				object_cache[filter] = new Dictionary<string, WeakReference> ();
@@ -239,55 +242,60 @@ namespace Mono.Upnp.ContentDirectory
 				var navigator = new XPathDocument (reader).CreateNavigator ();
 				if (navigator.MoveToNext ("DIDL-Lite", Protocol.DidlLiteSchema) && navigator.MoveToFirstChild ()) {
 					do {
-						yield return DerserializeObject (filter, navigator);
+						T @object = DerserializeObject (filter, navigator);
+						if (@object != null) {
+							yield return @object;
+						}
 					} while (navigator.MoveToNext ());
 				}
 			}
 		}
 		
-		T DerserializeObject<T> (string filter, XPathNavigator navigator) where T : Object
+		T DerserializeObject<T> (string filter, XPathNavigator navigator) where T : UpnpObject
 		{
 			return GetObjectFromCache (filter, navigator) ?? CreateObject (filter, navigator);
 		}
 		
-		T GetObjectFromCache<T> (string filter, XPathNavigator navigator) where T : Object
+		T GetObjectFromCache<T> (string filter, XPathNavigator navigator) where T : UpnpObject
 		{
 			if (navigator.MoveToAttribute ("id", Protocol.DidlLiteSchema)) {
 				var id = navigator.Value;
+				WeakReference weak_reference;
 				if (object_cache.ContainsKey (filter) && object_cache[filter].ContainsKey (id)) {
-					var weak_reference = object_cache[filter][id];
-					if (weak_reference.IsAlive) {
-						var @object = (Object)weak_reference.Target;
-						if (!CheckIfObjectIsOutOfDate (@object)) {
-							return @object;
-						}
+					weak_reference = object_cache[filter][id];
+				} else if (filter != "*" && object_cache.ContainsKey ("*") && object_cache["*"].ContainsKey (id)) {
+					weak_reference = object_cache["*"][id];
+				} else {
+					return null;
+				}
+				if (weak_reference.IsAlive) {
+					var @object = (T)weak_reference.Target;
+					if (!CheckIfObjectIsOutOfDate (@object)) {
+						return @object;
 					}
 				}
 			}
 			return null;
 		}
 		
-		T CreateObject<T> (string filter, XPathNavigator navigator) where T : Object
+		T CreateObject<T> (string filter, XPathNavigator navigator) where T : UpnpObject
 		{
 			navigator.MoveToChild ("class", Protocol.UpnpSchema);
-			var @class = navigator.Value;
+			var type = ClassManager.GetTypeFromClass (navigator.Value);
 			navigator.MoveToParent ();
 			
-			while (!types.ContainsKey (@class)) {
-				@class = @class.Substring (0, @class.LastIndexOf ('.'));
+			if (type == null || (type != typeof (T) && !type.IsSubclassOf (typeof (T)))) {
+				return null;
 			}
 			
-			@object = (Object)Activator.CreateInstance (types[@class], true);
+			@object = (T)Activator.CreateInstance (type, true);
 			@object.Deserialize (navigator.ReadSubtree ());
 			if (container_update_ids.ContainsKey (@object.ParentId)) {
 				@object.ParentUpdateId = container_update_ids[@object.ParentId];
 			}
 			
-			if (!object_hierarchy.ContainsKey (@object.ParentId)) {
-				object_hierarchy[@object.ParentId] = new Dictionary<string, string> ();
-			}
-			object_hierarchy[@object.ParentId][@object.Id] = null;
 			object_cache[filter][@object.Id] = new WeakReference (@object);
+			return @object;
 		}
 		
 		internal bool CheckIfContainerIsOutOfDate (string id, uint updateId)
@@ -300,10 +308,30 @@ namespace Mono.Upnp.ContentDirectory
 			return result;
 		}
 		
-		internal bool CheckIfObjectIsOutOfDate (Object @object)
+		internal bool CheckIfObjectIsOutOfDate (UpnpObject @object)
 		{
 			return container_update_ids.ContainsKey (@object.ParentId) &&
 				container_update_ids[@object.ParentId] != @object.ParentUpdateId;
+		}
+		
+		public T GetUpdatedObject<T> (T @object) where T : UpnpObject
+		{
+			if (@object == null) throw new ArgumentNullException ("object");
+			return GetObject (@object.Id);
+		}
+		
+		internal T GetObject<T> (string id) where T : UpnpObject
+		{
+			uint returned, total, update_id;
+			var xml = content_directory.Browse (id, BrowseFlag.BrowseMetadata, "*", 0, 1, "",
+				out returned, out total, out update_id);
+			
+			CheckIfContainerIsOutOfDate (id, update_id);
+			foreach (var result in Deserialize<T> (xml)) {
+				return result;
+			}
+			
+			return null;
 		}
     }
 }

@@ -1,5 +1,5 @@
 // 
-// SearchResults.cs
+// ClassNameAttribute.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,32 +24,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Mono.Upnp.ContentDirectory
 {
-	public sealed class SearchResults<T> : Results<T>
+	[AttributeUsage (AttributeTargets.Class)]
+	public sealed class ClassNameAttribute : Attribute
 	{
-		readonly string search_criteria;
+		readonly string class_name;
 		
-		internal SearchResults(ContentDirectory contentDirectory, string objectId, string searchCriteria,
-		                       string filter, uint requestCount, string sortCriteria, int offset)
-			: base (contentDirectory, objectId, filter, requestCount, sortCriteria, offset)
+		public ClassNameAttribute(string className)
 		{
-			search_criteria = searchCriteria;
+			class_name = className;
 		}
 		
-		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
-		{
-			return ContentDirectory.Search (ObjectId, search_criteria, Filter, Offset, 
-				RequestCount, SortCriteria, out returnedCount, out totalCount, out id, out updateId);
-		}
-
-		public BrowseResults<T> GetMoreResults ()
-		{
-			if (!HasMoreResults) return null;
-			var search_results = new SearchResults (ContentDirectory, ObjectId, search_criteria, Filter,
-				RequestCount, sortCriteria, Offset + ReturnedCount);
-			search_results.FetchResults ();
-			return  search_results;
-		}
+		public string ClassName { get { return class_name; } }
 	}
 }

@@ -1,5 +1,5 @@
 // 
-// SearchResults.cs
+// Schemas.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -26,30 +26,10 @@
 
 namespace Mono.Upnp.ContentDirectory
 {
-	public sealed class SearchResults<T> : Results<T>
+	public static class Schemas
 	{
-		readonly string search_criteria;
-		
-		internal SearchResults(ContentDirectory contentDirectory, string objectId, string searchCriteria,
-		                       string filter, uint requestCount, string sortCriteria, int offset)
-			: base (contentDirectory, objectId, filter, requestCount, sortCriteria, offset)
-		{
-			search_criteria = searchCriteria;
-		}
-		
-		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
-		{
-			return ContentDirectory.Search (ObjectId, search_criteria, Filter, Offset, 
-				RequestCount, SortCriteria, out returnedCount, out totalCount, out id, out updateId);
-		}
-
-		public BrowseResults<T> GetMoreResults ()
-		{
-			if (!HasMoreResults) return null;
-			var search_results = new SearchResults (ContentDirectory, ObjectId, search_criteria, Filter,
-				RequestCount, sortCriteria, Offset + ReturnedCount);
-			search_results.FetchResults ();
-			return  search_results;
-		}
+		public const string UpnpSchema = "urn:schemas-upnp-org:metadata-1-0/upnp/";
+		public const string DidlLiteSchema = "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/";
+		public const string DublinCoreSchema = "http://purl.org/dc/elements/1.1/";
 	}
 }

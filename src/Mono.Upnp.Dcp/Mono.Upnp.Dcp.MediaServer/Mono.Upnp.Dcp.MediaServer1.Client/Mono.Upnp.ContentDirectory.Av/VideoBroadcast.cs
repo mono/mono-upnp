@@ -1,5 +1,5 @@
 // 
-// SearchResults.cs
+// VideoBroadcast.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,32 +24,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.ContentDirectory
-{
-	public sealed class SearchResults<T> : Results<T>
-	{
-		readonly string search_criteria;
-		
-		internal SearchResults(ContentDirectory contentDirectory, string objectId, string searchCriteria,
-		                       string filter, uint requestCount, string sortCriteria, int offset)
-			: base (contentDirectory, objectId, filter, requestCount, sortCriteria, offset)
-		{
-			search_criteria = searchCriteria;
-		}
-		
-		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
-		{
-			return ContentDirectory.Search (ObjectId, search_criteria, Filter, Offset, 
-				RequestCount, SortCriteria, out returnedCount, out totalCount, out id, out updateId);
-		}
+using System;
+using System.Xml;
 
-		public BrowseResults<T> GetMoreResults ()
+namespace Mono.Upnp.ContentDirectory.Av
+{
+	public class VideoBroadcast : VideoItem
+	{
+		protected VideoBroadcast ()
 		{
-			if (!HasMoreResults) return null;
-			var search_results = new SearchResults (ContentDirectory, ObjectId, search_criteria, Filter,
-				RequestCount, sortCriteria, Offset + ReturnedCount);
-			search_results.FetchResults ();
-			return  search_results;
+		}
+		
+        public Uri Icon { get; private set; }
+        public string Region { get; private set; }
+        public int? ChannelNr { get; private set; }
+		
+		protected override void DeserializePropertyElement (XmlReader reader)
+		{
+			if (reader == null) throw new ArgumentNullException ("reader");
+			
+			if (reader.NamespaceURI == Schemas.UpnpSchema) {
+				switch (reader.Name) {
+				case "icon":
+					Icon = new Uri (reader.ReadString ());
+					break;
+				case "region":
+					Region = reader.ReadString ();
+				 	break;
+				case "channelNr":
+					ChannelNr = reader.ReadElementContentAsInt ();
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else {
+				base.DeserializePropertyElement (reader);
+			}
 		}
 	}
 }

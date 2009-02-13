@@ -1,5 +1,5 @@
 // 
-// SearchResults.cs
+// Class.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,32 +24,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Xml;
+
 namespace Mono.Upnp.ContentDirectory
 {
-	public sealed class SearchResults<T> : Results<T>
+	public struct Class
 	{
-		readonly string search_criteria;
+		readonly string friendly_class_name;
+		readonly string full_class_name;
 		
-		internal SearchResults(ContentDirectory contentDirectory, string objectId, string searchCriteria,
-		                       string filter, uint requestCount, string sortCriteria, int offset)
-			: base (contentDirectory, objectId, filter, requestCount, sortCriteria, offset)
+		internal Class (XmlReader reader)
 		{
-			search_criteria = searchCriteria;
+			friendly_class_name = reader["name"];
+			full_class_name = reader.ReadString ();
 		}
 		
-		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
-		{
-			return ContentDirectory.Search (ObjectId, search_criteria, Filter, Offset, 
-				RequestCount, SortCriteria, out returnedCount, out totalCount, out id, out updateId);
-		}
-
-		public BrowseResults<T> GetMoreResults ()
-		{
-			if (!HasMoreResults) return null;
-			var search_results = new SearchResults (ContentDirectory, ObjectId, search_criteria, Filter,
-				RequestCount, sortCriteria, Offset + ReturnedCount);
-			search_results.FetchResults ();
-			return  search_results;
-		}
+		public string FriendlyClassName { get { return friendly_class_name; } }
+		public string FullClassName { get { return full_class_name; } }
 	}
 }

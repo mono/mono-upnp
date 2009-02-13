@@ -41,48 +41,49 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\Direction.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\DiscoveryEventArgs.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\TransferStatus.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\ClassNameAttribute.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Container.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\DeserializationException.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Item.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Object.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\WriteStatus.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\Album.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\AudioBook.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\AudioBroadcast.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\AudioItem.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\Genre.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\ImageItem.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\Movie.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\MovieGenre.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\MusicAlbum.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\MusicArtist.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\MusicGenre.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\MusicTrack.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\MusicVideoClip.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\Person.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\Photo.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\PhotoAlbum.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\PlaylistContainer.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\PlaylistItem.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\StorageFolder.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\StorageSystem.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\StorageVolume.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\TextItem.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\VideoBroadcast.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\VideoItem.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\ClassReference.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Schemas.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata.Av\PersonWithRole.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Resource.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Resolution.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory.Metadata\Class.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\Album.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\AudioBook.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\AudioBroadcast.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\AudioItem.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\Genre.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\ImageItem.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\Movie.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MovieGenre.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicAlbum.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicArtist.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicGenre.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicTrack.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicVideoClip.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\Person.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\Photo.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\PhotoAlbum.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\PlaylistContainer.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\PlaylistItem.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\StorageFolder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\StorageSystem.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\StorageVolume.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\TextItem.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\VideoBroadcast.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\VideoItem.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\PersonWithRole.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\Results.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\BrowseFlag.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\ContentDirectory.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\ContentDirectoryClient.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\BrowseResults.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\SearchResults.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\Class.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\ClassManager.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\ClassNameAttribute.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\ClassReference.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\Container.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\DeserializationException.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\Item.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\Object.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\Resolution.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\Resource.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\Schemas.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\WriteStatus.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -93,8 +94,7 @@
   </Target>
   -->
   <ItemGroup>
-    <Folder Include="Mono.Upnp.ContentDirectory.Metadata/" />
-    <Folder Include="Mono.Upnp.ContentDirectory.Metadata.Av/" />
+    <Folder Include="Mono.Upnp.ContentDirectory.Av/" />
     <Folder Include="Mono.Upnp.ContentDirectory/" />
   </ItemGroup>
 </Project>

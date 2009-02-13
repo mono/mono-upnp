@@ -1,5 +1,5 @@
 // 
-// SearchResults.cs
+// ClassReference.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,32 +24,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using System.Xml;
+
 namespace Mono.Upnp.ContentDirectory
 {
-	public sealed class SearchResults<T> : Results<T>
+	public struct ClassReference
 	{
-		readonly string search_criteria;
+		readonly Class @class;
+		readonly bool include_derived;
 		
-		internal SearchResults(ContentDirectory contentDirectory, string objectId, string searchCriteria,
-		                       string filter, uint requestCount, string sortCriteria, int offset)
-			: base (contentDirectory, objectId, filter, requestCount, sortCriteria, offset)
+		internal ClassReference (XmlReader reader)
 		{
-			search_criteria = searchCriteria;
+			include_derived = bool.Parse (reader["includeDerived", Protocol.UpnpSchema]);
+			@class = new Class (reader);
 		}
 		
-		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
-		{
-			return ContentDirectory.Search (ObjectId, search_criteria, Filter, Offset, 
-				RequestCount, SortCriteria, out returnedCount, out totalCount, out id, out updateId);
-		}
-
-		public BrowseResults<T> GetMoreResults ()
-		{
-			if (!HasMoreResults) return null;
-			var search_results = new SearchResults (ContentDirectory, ObjectId, search_criteria, Filter,
-				RequestCount, sortCriteria, Offset + ReturnedCount);
-			search_results.FetchResults ();
-			return  search_results;
-		}
+		public Class Class { get { return @class; } }
+		public bool IncludeDerived { get { return include_derived; } }
 	}
 }

@@ -33,37 +33,32 @@ namespace Mono.Upnp.ContentDirectory
 	{
 		readonly ContentDirectory content_directory;
 		readonly string object_id;
+		readonly string filter;
 		readonly uint request_count;
 		readonly string sort_criteria;
 		readonly uint offset;
 		readonly List<T> results = new List<T> ();
 		
-		protected Browser (ContentDirectory contentDirectory, string objectId,
+		protected Browser (ContentDirectory contentDirectory, string objectId, string filter,
 		                   uint requestCount, string sortCriteria, int offset)
 		{
 			content_directory = ContentDirectory;
 			object_id = objectId;
+			this.filter = filter;
 			request_count = requestCount;
 			sort_criteria = sortCriteria;
 			this.offset = offset;
 		}
 		
 		protected ContentDirectory ContentDirectory { get { return content_directory; } }
-		
 		protected string ObjectId { get { return object_id; } }
-		
+		protected string Filter { get { return filter; } }
 		protected uint RequestCount { get { return request_count; } }
-		
 		protected string SortCriteria { get { return sort_criteria; } }
-		
 		public uint Offset { get { return offset; } }
-		
 		public int ReturnedCount { get; private set; }
-		
 		public int TotalCount { get; private set; }
-		
 		public bool IsOutOfDate { get; private set; }
-		
 		public bool HasMoreResults {
 			get { return Offset + ReturnedCount < TotalCount; }
 		}
