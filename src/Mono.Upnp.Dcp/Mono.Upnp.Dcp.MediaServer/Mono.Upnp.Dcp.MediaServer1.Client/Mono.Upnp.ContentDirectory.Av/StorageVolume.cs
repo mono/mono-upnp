@@ -25,7 +25,6 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
