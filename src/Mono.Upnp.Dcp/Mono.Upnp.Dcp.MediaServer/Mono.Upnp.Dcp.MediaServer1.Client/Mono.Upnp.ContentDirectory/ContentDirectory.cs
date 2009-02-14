@@ -7,9 +7,6 @@ using System.Xml.XPath;
 
 using Mono.Upnp.Description;
 using Mono.Upnp.Control;
-using Mono.Upnp.ContentDirectory.Metadata;
-
-using UpnpObject = Mono.Upnp.ContentDirectory.Metadata.Object;
 
 namespace Mono.Upnp.ContentDirectory
 {
@@ -232,7 +229,7 @@ namespace Mono.Upnp.ContentDirectory
 				throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required state variable SystemUpdateID.", controller.Description.Id));
         }
 		
-		internal IEnumerable<T> Deserialize<T> (string filter, string xml) where T : UpnpObject
+		internal IEnumerable<T> Deserialize<T> (string filter, string xml) where T : Object
 		{
 			if (!object_cache.ContainsKey (filter)) {
 				object_cache[filter] = new Dictionary<string, WeakReference> ();
@@ -242,21 +239,18 @@ namespace Mono.Upnp.ContentDirectory
 				var navigator = new XPathDocument (reader).CreateNavigator ();
 				if (navigator.MoveToNext ("DIDL-Lite", Protocol.DidlLiteSchema) && navigator.MoveToFirstChild ()) {
 					do {
-						T @object = DerserializeObject (filter, navigator);
-						if (@object != null) {
-							yield return @object;
-						}
+						yield return @object;
 					} while (navigator.MoveToNext ());
 				}
 			}
 		}
 		
-		T DerserializeObject<T> (string filter, XPathNavigator navigator) where T : UpnpObject
+		T DerserializeObject<T> (string filter, XPathNavigator navigator) where T : Object
 		{
 			return GetObjectFromCache (filter, navigator) ?? CreateObject (filter, navigator);
 		}
 		
-		T GetObjectFromCache<T> (string filter, XPathNavigator navigator) where T : UpnpObject
+		T GetObjectFromCache<T> (string filter, XPathNavigator navigator) where T : Object
 		{
 			if (navigator.MoveToAttribute ("id", Protocol.DidlLiteSchema)) {
 				var id = navigator.Value;
@@ -278,7 +272,7 @@ namespace Mono.Upnp.ContentDirectory
 			return null;
 		}
 		
-		T CreateObject<T> (string filter, XPathNavigator navigator) where T : UpnpObject
+		T CreateObject<T> (string filter, XPathNavigator navigator) where T : Object
 		{
 			navigator.MoveToChild ("class", Protocol.UpnpSchema);
 			var type = ClassManager.GetTypeFromClass (navigator.Value);
@@ -308,19 +302,19 @@ namespace Mono.Upnp.ContentDirectory
 			return result;
 		}
 		
-		internal bool CheckIfObjectIsOutOfDate (UpnpObject @object)
+		internal bool CheckIfObjectIsOutOfDate (Object @object)
 		{
 			return container_update_ids.ContainsKey (@object.ParentId) &&
 				container_update_ids[@object.ParentId] != @object.ParentUpdateId;
 		}
 		
-		public T GetUpdatedObject<T> (T @object) where T : UpnpObject
+		public T GetUpdatedObject<T> (T @object) where T : Object
 		{
 			if (@object == null) throw new ArgumentNullException ("object");
 			return GetObject (@object.Id);
 		}
 		
-		internal T GetObject<T> (string id) where T : UpnpObject
+		internal T GetObject<T> (string id) where T : Object
 		{
 			uint returned, total, update_id;
 			var xml = content_directory.Browse (id, BrowseFlag.BrowseMetadata, "*", 0, 1, "",

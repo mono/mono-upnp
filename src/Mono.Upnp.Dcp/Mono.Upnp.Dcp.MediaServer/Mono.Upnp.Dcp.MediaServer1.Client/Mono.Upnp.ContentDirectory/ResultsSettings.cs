@@ -1,5 +1,5 @@
 // 
-// BrowseResults.cs
+// ResultsSettings.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,28 +24,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Collections.Generic;
+using System;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.Client
 {
-	sealed class BrowseResults : Results<Object>
+	public sealed class ResultsSettings
 	{
-		public BrowseResults(ContentDirectory contentDirectory, string objectId, string sortCriteria,
-		                     string filter, uint requestCount, int offset)
-			: base (contentDirectory, objectId, sortCriteria, filter, requestCount, offset)
-		{
-		}
-		
-		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
-		{
-			return ContentDirectory.Browse (ObjectId, BrowseFlag.BrowseDirectChildren, Filter, Offset, 
-				RequestCount, SortCriteria, out returnedCount, out totalCount, out id, out updateId);
-		}
-		
-		protected override Results<Object> CreateMoreResults ()
-		{
-			return new BrowseResults (ContentDirectory, ObjectId, Filter,
-				 RequestCount, SortCriteria, Offset + ReturnedCount);
-		}
+		public string SortCriteria { get; set; }
+		public string Filter { get; set; }
+		public uint RequestCount { get; set; }
+		public uint Offset { get; set; }
 	}
 }

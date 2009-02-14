@@ -33,28 +33,28 @@ namespace Mono.Upnp.ContentDirectory
 	{
 		readonly ContentDirectory content_directory;
 		readonly string object_id;
+		readonly string sort_criteria;
 		readonly string filter;
 		readonly uint request_count;
-		readonly string sort_criteria;
 		readonly uint offset;
 		readonly List<T> results = new List<T> ();
 		
-		protected Browser (ContentDirectory contentDirectory, string objectId, string filter,
-		                   uint requestCount, string sortCriteria, int offset)
+		internal Browser (ContentDirectory contentDirectory, string objectId, string sortCriteria,
+		                  string filter, uint requestCount, int offset)
 		{
-			content_directory = ContentDirectory;
-			object_id = objectId;
-			this.filter = filter;
-			request_count = requestCount;
-			sort_criteria = sortCriteria;
+			this.content_directory = ContentDirectory;
+			this.object_id = objectId;
+			this.sort_criteria = sortCriteria ?? "";
+			this.filter = string.IsNullOrEmpty (filter) ? "*" : filter;
+			this.request_count = requestCount;
 			this.offset = offset;
 		}
 		
 		protected ContentDirectory ContentDirectory { get { return content_directory; } }
 		protected string ObjectId { get { return object_id; } }
+		protected string SortCriteria { get { return sort_criteria; } }
 		protected string Filter { get { return filter; } }
 		protected uint RequestCount { get { return request_count; } }
-		protected string SortCriteria { get { return sort_criteria; } }
 		public uint Offset { get { return offset; } }
 		public int ReturnedCount { get; private set; }
 		public int TotalCount { get; private set; }
@@ -79,6 +79,17 @@ namespace Mono.Upnp.ContentDirectory
 		}
 		
 		protected abstract string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId);
+		
+		public Results<T> GetMoreResults ()
+		{
+			if (!HasMoreResults) return null;
+			
+			var results = CreateMoreResults ();
+			results.FetchResults ();
+			return results;
+		}
+		
+		protected abstract Results<T> CreateMoreResults ();
 		
 		public IEnumerator<T> GetEnumerator ()
 		{

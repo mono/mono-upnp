@@ -25,11 +25,12 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory
 {
-	public struct ClassReference
+	public struct ClassReference : IComparable<ClassReference>
 	{
 		readonly Class @class;
 		readonly bool include_derived;
@@ -42,5 +43,10 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public Class Class { get { return @class; } }
 		public bool IncludeDerived { get { return include_derived; } }
+		
+		int IComparable<ClassReference>.CompareTo (ClassReference classReference)
+		{
+			return @class.CompareTo (classReference.@class);
+		}
 	}
 }

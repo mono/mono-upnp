@@ -60,10 +60,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		public ReadOnlyCollection<string> Rights { get { return rights; } }
 		public Uri LyricsUri { get; private set; }
 		
-		public Browser<Object> BrowseAlbumContents ()
-		{
-		}
-		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");

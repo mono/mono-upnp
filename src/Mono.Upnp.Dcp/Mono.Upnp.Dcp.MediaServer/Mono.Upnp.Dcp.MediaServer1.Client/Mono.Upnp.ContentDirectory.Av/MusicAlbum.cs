@@ -55,13 +55,30 @@ namespace Mono.Upnp.ContentDirectory.Av
 		public ReadOnlyCollection<string> Producers { get { return producers; } }
 		public ReadOnlyCollection<Uri> AlbumArtUris { get { return album_art_uris; } }
 		public string Toc { get; private set; }
+		public bool CanBrowseMusicTracks { get; private set; }
+		public bool CanBrowseMusicAlbums { get; private set; }
 		
-		public Browser<MusicTrack> BrowseMusicTracks ()
+		public Results<MusicTrack> BrowseMusicTracks ()
 		{
+			return BrowseMusicAlbums (null);
 		}
 		
-		public Browser<MusicAlbum> BrowseMusicAlbums ()
+		public Results<MusicTrack> BrowseMusicTracks (ResultsSettings settings)
 		{
+			// FIXME do this check?
+			if (!CanBrowseMusicTracks)
+				throw new InvalidOperationException ("Browsing for music tracks is unavailable.");
+			return Browse<MusicTrack> (settings);
+		}
+		
+		public Results<MusicAlbum> BrowseMusicAlbums ()
+		{
+			return BrowseMusicAlbums (null);
+		}
+		
+		public Results<MusicAlbum> BrowseMusicAlbums (ResultsSettings settings)
+		{
+			return Browse<MusicAlbum> (settings);
 		}
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
@@ -92,6 +109,13 @@ namespace Mono.Upnp.ContentDirectory.Av
 			} else {
 				base.DeserializePropertyElement (reader);
 			}
+		}
+		
+		protected override void VerifyDeserialization ()
+		{
+			base.VerifyDeserialization ();
+			CanBrowseMusicTracks = CanSearchForType<MusicTrack> ();
+			CanBrowseMusicAlbums = CanSearchForType<MusicAlbum> ();
 		}
 	}
 }

@@ -33,35 +33,24 @@ namespace Mono.Upnp.ContentDirectory
 {
 	public abstract class Object
 	{
-		readonly ContentDirectory content_directory;
 		readonly List<Resource> resource_list = new List<Resource> ();
 		readonly ReadOnlyCollection<Resource> resources;
 		bool has_class;
         bool has_restricted;
 		bool verified;
 		
-		protected Object (ContentDirectory contentDirectory)
+		protected Object ()
 		{
-			if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
-			
-			content_directory = contentDirectory;
 			resources = resource_list.AsReadOnly ();
-		}
-		
-		protected BrowseResult Browse (uint requestCount, string sortCriteria)
-		{
-			var browse_results = new BrowseResult (content_directory, Id, requestCount, sortCriteria);
-			browse_results.FetchResults ();
-			return browse_results;
 		}
 		
 		public Container GetParent ()
 		{
-			return ParentId == "-1" ? null : content_directory.GetObject<Container> (ParentId);
+			return ParentId == "-1" ? null : ContentDirectory.GetObject<Container> (ParentId);
 		}
 		
 		public bool IsOutOfDate {
-			get { return content_directory.CheckIfObjectIsOutOfDate (this); }
+			get { return ContentDirectory.CheckIfObjectIsOutOfDate (this); }
 		}
 
         public string Id { get; private set; }
@@ -72,6 +61,7 @@ namespace Mono.Upnp.ContentDirectory
         public Class Class { get; private set; }
         public bool Restricted { get; private set; }
         public WriteStatus? WriteStatus { get; private set; }
+		protected ContentDirectory ContentDirectory { get; private set; }
 		internal uint ParentUpdateId { get; set; }
 		
 		public override string ToString ()
@@ -80,8 +70,9 @@ namespace Mono.Upnp.ContentDirectory
 		}
 
 
-        internal void Deserialize (XmlReader reader)
+        internal void Deserialize (ContentDirectory contentDirectory, XmlReader reader)
         {
+			ContentDirectory = contentDirectory;
             DeserializeRootElement (reader);
             Verify ();
         }

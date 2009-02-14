@@ -26,13 +26,13 @@
 
 namespace Mono.Upnp.ContentDirectory
 {
-	public sealed class SearchResults<T> : Results<T>
+	sealed class SearchResults<T> : Results<T> where T : Object
 	{
 		readonly string search_criteria;
 		
-		internal SearchResults(ContentDirectory contentDirectory, string objectId, string searchCriteria,
-		                       string filter, uint requestCount, string sortCriteria, int offset)
-			: base (contentDirectory, objectId, filter, requestCount, sortCriteria, offset)
+		public SearchResults(ContentDirectory contentDirectory, string objectId, string searchCriteria,
+		                       string sortCriteria, string filter, uint requestCount, int offset)
+			: base (contentDirectory, objectId, sortCriteria, filter, requestCount, offset)
 		{
 			search_criteria = searchCriteria;
 		}
@@ -42,14 +42,11 @@ namespace Mono.Upnp.ContentDirectory
 			return ContentDirectory.Search (ObjectId, search_criteria, Filter, Offset, 
 				RequestCount, SortCriteria, out returnedCount, out totalCount, out id, out updateId);
 		}
-
-		public BrowseResults<T> GetMoreResults ()
+		
+		protected override Results<T> CreateMoreResults ()
 		{
-			if (!HasMoreResults) return null;
-			var search_results = new SearchResults (ContentDirectory, ObjectId, search_criteria, Filter,
-				RequestCount, sortCriteria, Offset + ReturnedCount);
-			search_results.FetchResults ();
-			return  search_results;
+			return new SearchResults<T> (ContentDirectory, ObjectId, search_criteria, Filter,
+				RequestCount, SortCriteria, Offset + ReturnedCount);
 		}
 	}
 }

@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 using Mono.Upnp.ContentDirectory.Av;
@@ -35,55 +36,65 @@ namespace Mono.Upnp.ContentDirectory
 	public static class ClassManager
 	{
 		readonly static Dictionary<string, Type> types;
+		readonly static Dictionary<Type, string> names;
 		
 		static ClassManager ()
 		{
 			types = new Dictionary<string, Type> ();
-			RegisterType (typeof (Object));
-			RegisterType (typeof (Item));
-			RegisterType (typeof (Container));
-			RegisterType (typeof (Album));
-			RegisterType (typeof (AudioBook));
-			RegisterType (typeof (AudioBroadcast));
-			RegisterType (typeof (AudioItem));
-			RegisterType (typeof (Genre));
-			RegisterType (typeof (ImageItem));
-			RegisterType (typeof (Movie));
-			RegisterType (typeof (MovieGenre));
-			RegisterType (typeof (MusicAlbum));
-			RegisterType (typeof (MusicArtist));
-			RegisterType (typeof (MusicGenre));
-			RegisterType (typeof (MusicTrack));
-			RegisterType (typeof (MusicVideoClip));
-			RegisterType (typeof (Person));
-			RegisterType (typeof (Photo));
-			RegisterType (typeof (PhotoAlbum));
-			RegisterType (typeof (PlaylistContainer));
-			RegisterType (typeof (PlaylistItem));
-			RegisterType (typeof (StorageFolder));
-			RegisterType (typeof (StorageSystem));
-			RegisterType (typeof (StorageVolume));
-			RegisterType (typeof (TextItem));
-			RegisterType (typeof (VideoBroadcast));
-			RegisterType (typeof (VideoItem));
+			names = new Dictionary<Type, string>();
+			RegisterType<Object> ();
+			RegisterType<Item> ();
+			RegisterType<Contain> ();
+			RegisterType<Album> ();
+			RegisterType<AudioBook> ();
+			RegisterType<AudioBroadcast> ();
+			RegisterType<AudioItem> ();
+			RegisterType<Genre> ();
+			RegisterType<ImageItem> ();
+			RegisterType<Movie> ();
+			RegisterType<MovieGenre> ();
+			RegisterType<MusicAlbum> ();
+			RegisterType<MusicArtist> ();
+			RegisterType<MusicGenre> ();
+			RegisterType<MusicTrack> ();
+			RegisterType<MusicVideoClip> ();
+			RegisterType<Person> ();
+			RegisterType<Photo> ();
+			RegisterType<PhotoAlbum> ();
+			RegisterType<PlaylistContainer> ();
+			RegisterType<PlaylistItem> ();
+			RegisterType<StorageFolder> ();
+			RegisterType<StorageSystem> ();
+			RegisterType<StorageVolume> ();
+			RegisterType<TextItem> ();
+			RegisterType<VideoBroadcast> ();
+			RegisterType<VideoItem> ();
 		}
 		
-		public static void RegisterType (Type type)
+		public static void RegisterType<T> () where T : Object
 		{
-			if (type != typeof (Object) && !type.IsSubclassOf (typeof (Object))) {
-				throw new ArgumentException (
-					"The type is not a subclass of Mono.Upnp.ContentDirectory.Metadata.Object");
+			var type = typeof (T);
+			var name = CreateClassName<T> ();
+			types[name] = typeof (T);
+			names[type] = name;
+		}
+		
+		public static string GetClassFromType<T> () where T : Object
+		{
+			string name;
+			var type = typeof (T);
+			if (names.TryGetValue (type, out name)) {
+				return name;
+			} else {
+				throw new InvalidOperationException (string.Format (
+					"The type {0} has not been registered for use with the ClassManager.", type));
 			}
-			
-			var builder = new StringBuilder ();
-			BuildClassName (type, builder);
-			types[builder.ToString ()] = type;
 		}
 		
-		static string GetClassName (Type type)
+		static string CreateClassName<T> () where T : Object
 		{
 			var builder = new StringBuilder ();
-			BuildClassName (type, builder);
+			BuildClassName (typeof (T), builder);
 			return builder.ToString ();
 		}
 		

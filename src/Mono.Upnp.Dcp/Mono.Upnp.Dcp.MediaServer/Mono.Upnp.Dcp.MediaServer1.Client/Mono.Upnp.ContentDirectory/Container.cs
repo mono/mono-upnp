@@ -33,6 +33,10 @@ namespace Mono.Upnp.ContentDirectory
 {
 	public abstract class Container : Object
 	{
+		class ClassComparer : IComparer<ClassReference>
+		{
+		}
+		
 		readonly List<ClassReference> search_class_list = new List<ClassReference> ();
 		readonly List<ClassReference> create_class_list = new List<ClassReference> ();
 		readonly ReadOnlyCollection<ClassReference> search_classes;
@@ -51,28 +55,81 @@ namespace Mono.Upnp.ContentDirectory
 		public ReadOnlyCollection<ClassReference> SearchClasses { get { return search_classes; } }
         public bool Searchable { get; private set; }
 		
-		public BrowserResults GetContents ()
+		public Results<Object> Browse ()
 		{
+			return GetContents (null);
 		}
 		
-		public bool CanSearchFor (Type type)
+		public Results<Object> Browse (ResultsSettings settings)
 		{
-			return IsValidType (type, search_classes);
+			var results = settings != null
+				? new BrowseResults (ContentDirectory, Id, settings.SortCriteria,
+					settings.Filter, settings.RequestCount, settings.Offset)
+				: new BrowseResults (ContentDirectory, Id, null, null, 0, 0);
+			results.FetchResults ();
+			return results;
 		}
 		
-		public bool CanCreate (Type type)
+		protected Results<T> Browse<T> (ResultsSettings settings) where T : Object
 		{
-			return IsValidType (type, create_classes);
+			// TODO I don't know about this
+			if (!CanSearchForType<T> ()) throw new ArgumentException (string.Format (
+				"The container cannot search for the type {0}.", typeof (T)));
+			
+			return Search<T> (string.Format (
+				@"upnp:class derivedFrom ""{0}""", ClassManager.GetClassName<T>()), settings);
 		}
 		
-		static bool IsValidType (Type type, IEnumerable<ClassReference> classes)
+		public Results<Object> Search (string searchCriteria)
 		{
-			// TODO this
-//			foreach (var @class in classes) {
-//				if (@class.Class == type || (@class.IncludeDerived && @class.Class.IsSubclassOf (type))) {
-//					return true;
-//				}
-//			}
+			return Search (searchCriteria, null);
+		}
+		
+		public Results<Object> Search (string searchCriteria, ResultsSettings settings)
+		{
+			return Search<Object> (searchCriteria, settings);
+		}
+		
+		Results<T> Search<T> (string searchCriteria, ResultsSettings settings) where T : Object
+		{
+			if (searchCriteria == null) throw new ArgumentNullException ("searchCriteria");
+			
+			var results = settings != null
+				? new SearchResults<T> (ContentDirectory, Id, searchCriteria,
+					settings.SortCriteria, settings.Filter, settings.RequestCount, settings.Offset)
+				: new SearchResults<T> (ContentDirectory, Id, searchCriteria, null, null, 0, 0);
+			results.FetchResults ();
+			return results;
+			
+			return base.Search<T> (searchCriteria, settings);
+		}
+		
+		public bool CanSearchForType<T> () where T : Object
+		{
+			return Searchable && IsValidType<T> (search_classes);
+		}
+		
+		public bool CanCreateType<T> () where T : Object
+		{
+			return IsValidType (create_classes);
+		}
+		
+		static bool IsValidType<T> (IList<ClassReference> classes) where T : Object
+		{
+			if (classes.Count == 0) {
+				return true;
+			}
+			var type = ClassManager.GetClassFromType<T> ();
+			foreach (var @class in classes) {
+				var compare = type.CompareTo (@class.Class);
+				if (compare == 0) {
+					return true;
+				} else if (compare == 1) {
+					return false;
+				} else if (type.StartsWith (@class.Class) && @class.IncludeDerived) {
+					return true;
+				}
+			}
 			return false;
 		}
 		
@@ -108,6 +165,13 @@ namespace Mono.Upnp.ContentDirectory
 			} else {
 				base.DeserializePropertyElement (reader);
 			}
+		}
+		
+		protected override void VerifyDeserialization ()
+		{
+			base.VerifyDeserialization ();
+			search_class_list.Sort ();
+			create_class_list.Sort ();
 		}
 	}
 }
