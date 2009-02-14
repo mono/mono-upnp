@@ -39,8 +39,8 @@ namespace Mono.Upnp.ContentDirectory
 		readonly uint offset;
 		readonly List<T> results = new List<T> ();
 		
-		internal Browser (ContentDirectory contentDirectory, string objectId, string sortCriteria,
-		                  string filter, uint requestCount, int offset)
+		internal Results (ContentDirectory contentDirectory, string objectId, string sortCriteria,
+		                  string filter, uint requestCount, uint offset)
 		{
 			this.content_directory = ContentDirectory;
 			this.object_id = objectId;
@@ -56,8 +56,8 @@ namespace Mono.Upnp.ContentDirectory
 		protected string Filter { get { return filter; } }
 		protected uint RequestCount { get { return request_count; } }
 		public uint Offset { get { return offset; } }
-		public int ReturnedCount { get; private set; }
-		public int TotalCount { get; private set; }
+		public uint ReturnedCount { get; private set; }
+		public uint TotalCount { get; private set; }
 		public bool IsOutOfDate { get; private set; }
 		public bool HasMoreResults {
 			get { return Offset + ReturnedCount < TotalCount; }
@@ -72,7 +72,7 @@ namespace Mono.Upnp.ContentDirectory
 			if (content_directory.CheckIfContainerIsOutOfDate (object_id, update_id) && offset != 0) {
 				IsOutOfDate = true;
 			} else {
-				foreach (var result in content_directory.Deserialize<T> (xml)) {
+				foreach (var result in content_directory.Deserialize<T> (filter, xml)) {
 					results.Add (result);
 				}
 			}

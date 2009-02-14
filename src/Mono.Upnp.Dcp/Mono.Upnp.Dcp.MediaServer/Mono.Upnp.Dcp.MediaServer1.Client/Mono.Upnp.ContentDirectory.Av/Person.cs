@@ -25,10 +25,7 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.Xml;
-
-using Mono.Upnp.Dcp.MediaServer1;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
@@ -40,17 +37,24 @@ namespace Mono.Upnp.ContentDirectory.Av
 		
 		public string Language { get; private set; }
 		
-		public Browser<Album> BrowseAlbums ()
+		public Results<Album> BrowseAlbums ()
 		{
+			return BrowseAlbums (null);
 		}
 		
-		public Browser<Item> BrowseItems ()
+		public Results<Album> BrowseAlbums (ResultsSettings settings)
 		{
+			return Browse<Album> (settings);
 		}
 		
-		// FIXME is this right?
-		public IEnumerable<PlaylistContainer> GetPlaylists ()
+		public Results<Item> BrowseItems ()
 		{
+			return BrowseItems (null);
+		}
+		
+		public Results<Item> BrowseItems (ResultsSettings settings)
+		{
+			return Browse<Item> (settings);
 		}
 		
 		protected override void DeserializePropertyElement (XmlReader reader)

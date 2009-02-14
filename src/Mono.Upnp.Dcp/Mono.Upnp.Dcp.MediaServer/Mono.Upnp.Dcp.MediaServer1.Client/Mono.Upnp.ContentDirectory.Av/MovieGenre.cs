@@ -24,14 +24,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Collections.Generic;
-
 namespace Mono.Upnp.ContentDirectory.Av
 {
 	public class MovieGenre : Genre
 	{
 		protected MovieGenre ()
 		{
+		}
+		
+		public Results<Person> BrowsePeople ()
+		{
+			return BrowsePeople (null);
+		}
+		
+		public Results<Person> BrowsePeople (ResultsSettings settings)
+		{
+			return Browse<Person> (settings);
+		}
+		
+		public Results<VideoItem> BrowseVideoItems ()
+		{
+			return BrowseVideoItems (null);
+		}
+		
+		public Results<VideoItem> BrowseVideoItems (ResultsSettings settings)
+		{
+			return Browse<VideoItem> (settings);
+		}
+		
+		public Results<MovieGenre> BrowseMovieGenres ()
+		{
+			return BrowseMovieGenres (null);
+		}
+		
+		public Results<MovieGenre> BrowseMovieGenres (ResultsSettings settings)
+		{
+			return Browse<MovieGenre> (settings);
 		}
 	}
 }

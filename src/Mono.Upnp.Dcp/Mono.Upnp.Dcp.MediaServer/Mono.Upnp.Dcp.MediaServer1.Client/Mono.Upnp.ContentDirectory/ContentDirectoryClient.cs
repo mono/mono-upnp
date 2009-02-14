@@ -2,6 +2,8 @@
 
 using System;
 
+using Mono.Upnp.Dcp.MediaServer1;
+
 namespace Mono.Upnp.ContentDirectory
 {
     public class ContentDirectoryClient
@@ -40,7 +42,7 @@ namespace Mono.Upnp.ContentDirectory
 
         public void Browse ()
         {
-            client.Browse (ContentDirectory1.ServiceType);
+            client.Browse (ContentDirectory.ServiceType);
         }
 
         void OnContentDirectoryAdded (DiscoveryEventArgs<ContentDirectory> e)

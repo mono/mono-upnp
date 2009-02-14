@@ -41,12 +41,24 @@ namespace Mono.Upnp.ContentDirectory.Av
 		public long StorageFree { get; private set; }
 		public string StorageMedium { get; private set; }
 		
-		public Browser<StorageVolume> BrowseStorageVolumes ()
+		public Results<StorageVolume> BrowseStorageVolumes ()
 		{
+			return BrowseStorageVolumes (null);
 		}
 		
-		public Browser<StorageFolder> BrowseStorageFolders ()
+		public Results<StorageVolume> BrowseStorageVolumes (ResultsSettings settings)
 		{
+			return Browse<StorageVolume> (settings);
+		}
+		
+		public Results<StorageFolder> BrowseStorageFolders ()
+		{
+			return BrowseStorageFolders (null);
+		}
+		
+		public Results<StorageFolder> BrowseStorageFolders (ResultsSettings settings)
+		{
+			return Browse<StorageFolder> (settings);
 		}
 		
 		protected override void DeserializePropertyElement (XmlReader reader)

@@ -26,7 +26,7 @@
 
 using System;
 
-namespace Mono.Upnp.Dcp.MediaServer1.Client
+namespace Mono.Upnp.ContentDirectory
 {
 	public sealed class ResultsSettings
 	{

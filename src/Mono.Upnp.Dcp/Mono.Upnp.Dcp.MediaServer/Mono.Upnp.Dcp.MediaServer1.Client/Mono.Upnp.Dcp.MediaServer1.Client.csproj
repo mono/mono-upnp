@@ -98,4 +98,10 @@
     <Folder Include="Mono.Upnp.ContentDirectory.Av/" />
     <Folder Include="Mono.Upnp.ContentDirectory/" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp.Client\Mono.Upnp.Client.csproj">
+      <Project>{F88B8BD0-B03C-41DD-BA82-86D865E46B43}</Project>
+      <Name>Mono.Upnp.Client</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

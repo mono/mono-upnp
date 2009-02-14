@@ -25,7 +25,6 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
@@ -38,8 +37,14 @@ namespace Mono.Upnp.ContentDirectory.Av
 		
 		protected long StorageUsed { get; private set; }
 		
-		public Browser<StorageFolder> BrowseStorageFolders ()
+		public Results<StorageFolder> BrowseStorageFolders ()
 		{
+			return BrowseStorageFolders (null);
+		}
+		
+		public Results<StorageFolder> BrowseStorageFolders (ResultsSettings settings)
+		{
+			return Browse<StorageFolder> (settings);
 		}
 		
 		protected override void DeserializePropertyElement (XmlReader reader)

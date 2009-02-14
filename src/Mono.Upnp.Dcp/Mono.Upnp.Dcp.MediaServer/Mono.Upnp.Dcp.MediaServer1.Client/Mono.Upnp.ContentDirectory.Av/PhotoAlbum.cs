@@ -35,12 +35,24 @@ namespace Mono.Upnp.ContentDirectory.Av
 		{
 		}
 		
-		public Browser<Photo> BrowsePhotos ()
+		public Results<Photo> BrowsePhotos ()
 		{
+			return BrowsePhotos (null);
 		}
 		
-		public Browser<PhotoAlbum> BrowsePhotoAlbums ()
+		public Results<Photo> BrowsePhotos (ResultsSettings settings)
 		{
+			return Browse<Photo> (settings);
+		}
+		
+		public Results<PhotoAlbum> BrowsePhotoAlbums ()
+		{
+			return BrowsePhotoAlbums (null);
+		}
+		
+		public Results<PhotoAlbum> BrowsePhotoAlbums (ResultsSettings settings)
+		{
+			return Browse<PhotoAlbum> (settings);
 		}
 	}
 }

@@ -69,7 +69,7 @@ namespace Mono.Upnp.ContentDirectory
 			if (uint.TryParse (reader["nrAudioChannels", Schemas.DidlLiteSchema], out nr_audio_channels))
 				this.nr_audio_channels = nr_audio_channels;
 			
-			if (Mono.Upnp.DidlLite.Resolution.TryParse (reader["resolution", Schemas.DidlLiteSchema], out resolution))
+			if (Mono.Upnp.ContentDirectory.Resolution.TryParse (reader["resolution", Schemas.DidlLiteSchema], out resolution))
 				this.resolution = resolution;
 			
 			if (uint.TryParse (reader["colorDepth", Schemas.DidlLiteSchema], out color_depth))

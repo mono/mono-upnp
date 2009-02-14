@@ -37,7 +37,7 @@ namespace Mono.Upnp.ContentDirectory
 		
 		internal ClassReference (XmlReader reader)
 		{
-			include_derived = bool.Parse (reader["includeDerived", Protocol.UpnpSchema]);
+			include_derived = bool.Parse (reader["includeDerived", Schemas.UpnpSchema]);
 			@class = new Class (reader);
 		}
 		
@@ -46,7 +46,7 @@ namespace Mono.Upnp.ContentDirectory
 		
 		int IComparable<ClassReference>.CompareTo (ClassReference classReference)
 		{
-			return @class.CompareTo (classReference.@class);
+			return @class.FullClassName.CompareTo (classReference.@class.FullClassName);
 		}
 	}
 }

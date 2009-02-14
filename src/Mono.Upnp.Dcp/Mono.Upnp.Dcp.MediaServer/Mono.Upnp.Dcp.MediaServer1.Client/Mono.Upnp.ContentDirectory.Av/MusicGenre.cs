@@ -24,11 +24,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-
-using Mono.Upnp.Dcp.MediaServer1;
-
 namespace Mono.Upnp.ContentDirectory.Av
 {
 	public class MusicGenre : Genre
@@ -37,12 +32,44 @@ namespace Mono.Upnp.ContentDirectory.Av
 		{
 		}
 		
-		public Browser<MusicArtist> BrowseArtists ()
+		public Results<MusicArtist> BrowseArtists ()
 		{
+			return BrowseArtists (null);
 		}
 		
-		public Browser<MusicAlbum> BrowseAlbum ()
+		public Results<MusicArtist> BrowseArtists (ResultsSettings settings)
 		{
+			return Browse<MusicArtist> (settings);
+		}
+		
+		public Results<MusicAlbum> BrowseAlbums ()
+		{
+			return BrowseAlbums (null);
+		}
+		
+		public Results<MusicAlbum> BrowseAlbums (ResultsSettings settings)
+		{
+			return Browse<MusicAlbum> (settings);
+		}
+		
+		public Results<AudioItem> BrowseAudioItems ()
+		{
+			return BrowseAudioItems (null);
+		}
+		
+		public Results<AudioItem> BrowseAudioItems (ResultsSettings settings)
+		{
+			return Browse<AudioItem> (settings);
+		}
+		
+		public Results<MusicGenre> BrowseMusicGenres ()
+		{
+			return BrowseMusicGenres (null);
+		}
+		
+		public Results<MusicGenre> BrowseMusicGenres (ResultsSettings settings)
+		{
+			return Browse<MusicGenre> (settings);
 		}
 	}
 }

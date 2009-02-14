@@ -33,10 +33,6 @@ namespace Mono.Upnp.ContentDirectory
 {
 	public abstract class Container : Object
 	{
-		class ClassComparer : IComparer<ClassReference>
-		{
-		}
-		
 		readonly List<ClassReference> search_class_list = new List<ClassReference> ();
 		readonly List<ClassReference> create_class_list = new List<ClassReference> ();
 		readonly ReadOnlyCollection<ClassReference> search_classes;
@@ -57,7 +53,7 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public Results<Object> Browse ()
 		{
-			return GetContents (null);
+			return Browse (null);
 		}
 		
 		public Results<Object> Browse (ResultsSettings settings)
@@ -77,7 +73,7 @@ namespace Mono.Upnp.ContentDirectory
 				"The container cannot search for the type {0}.", typeof (T)));
 			
 			return Search<T> (string.Format (
-				@"upnp:class derivedFrom ""{0}""", ClassManager.GetClassName<T>()), settings);
+				@"upnp:class derivedFrom ""{0}""", ClassManager.GetClassFromType<T>()), settings);
 		}
 		
 		public Results<Object> Search (string searchCriteria)
@@ -100,8 +96,6 @@ namespace Mono.Upnp.ContentDirectory
 				: new SearchResults<T> (ContentDirectory, Id, searchCriteria, null, null, 0, 0);
 			results.FetchResults ();
 			return results;
-			
-			return base.Search<T> (searchCriteria, settings);
 		}
 		
 		public bool CanSearchForType<T> () where T : Object
@@ -111,7 +105,7 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public bool CanCreateType<T> () where T : Object
 		{
-			return IsValidType (create_classes);
+			return IsValidType<T> (create_classes);
 		}
 		
 		static bool IsValidType<T> (IList<ClassReference> classes) where T : Object
@@ -121,12 +115,13 @@ namespace Mono.Upnp.ContentDirectory
 			}
 			var type = ClassManager.GetClassFromType<T> ();
 			foreach (var @class in classes) {
-				var compare = type.CompareTo (@class.Class);
+				var class_name = @class.Class.FullClassName;
+				var compare = type.CompareTo (class_name);
 				if (compare == 0) {
 					return true;
 				} else if (compare == 1) {
 					return false;
-				} else if (type.StartsWith (@class.Class) && @class.IncludeDerived) {
+				} else if (type.StartsWith (class_name) && @class.IncludeDerived) {
 					return true;
 				}
 			}

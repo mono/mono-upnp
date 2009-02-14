@@ -31,7 +31,7 @@ namespace Mono.Upnp.ContentDirectory
 		readonly string search_criteria;
 		
 		public SearchResults(ContentDirectory contentDirectory, string objectId, string searchCriteria,
-		                       string sortCriteria, string filter, uint requestCount, int offset)
+		                       string sortCriteria, string filter, uint requestCount, uint offset)
 			: base (contentDirectory, objectId, sortCriteria, filter, requestCount, offset)
 		{
 			search_criteria = searchCriteria;
@@ -40,13 +40,13 @@ namespace Mono.Upnp.ContentDirectory
 		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
 		{
 			return ContentDirectory.Search (ObjectId, search_criteria, Filter, Offset, 
-				RequestCount, SortCriteria, out returnedCount, out totalCount, out id, out updateId);
+				RequestCount, SortCriteria, out returnedCount, out totalCount, out updateId);
 		}
 		
 		protected override Results<T> CreateMoreResults ()
 		{
-			return new SearchResults<T> (ContentDirectory, ObjectId, search_criteria, Filter,
-				RequestCount, SortCriteria, Offset + ReturnedCount);
+			return new SearchResults<T> (ContentDirectory, ObjectId, search_criteria, SortCriteria,
+				Filter, RequestCount, Offset + ReturnedCount);
 		}
 	}
 }

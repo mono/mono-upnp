@@ -31,7 +31,7 @@ namespace Mono.Upnp.ContentDirectory
 	sealed class BrowseResults : Results<Object>
 	{
 		public BrowseResults(ContentDirectory contentDirectory, string objectId, string sortCriteria,
-		                     string filter, uint requestCount, int offset)
+		                     string filter, uint requestCount, uint offset)
 			: base (contentDirectory, objectId, sortCriteria, filter, requestCount, offset)
 		{
 		}
@@ -39,13 +39,13 @@ namespace Mono.Upnp.ContentDirectory
 		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
 		{
 			return ContentDirectory.Browse (ObjectId, BrowseFlag.BrowseDirectChildren, Filter, Offset, 
-				RequestCount, SortCriteria, out returnedCount, out totalCount, out id, out updateId);
+				RequestCount, SortCriteria, out returnedCount, out totalCount, out updateId);
 		}
 		
 		protected override Results<Object> CreateMoreResults ()
 		{
-			return new BrowseResults (ContentDirectory, ObjectId, Filter,
-				 RequestCount, SortCriteria, Offset + ReturnedCount);
+			return new BrowseResults (ContentDirectory, ObjectId, SortCriteria,
+				 Filter, RequestCount, Offset + ReturnedCount);
 		}
 	}
 }

@@ -44,7 +44,7 @@ namespace Mono.Upnp.ContentDirectory
 			names = new Dictionary<Type, string>();
 			RegisterType<Object> ();
 			RegisterType<Item> ();
-			RegisterType<Contain> ();
+			RegisterType<Container> ();
 			RegisterType<Album> ();
 			RegisterType<AudioBook> ();
 			RegisterType<AudioBroadcast> ();

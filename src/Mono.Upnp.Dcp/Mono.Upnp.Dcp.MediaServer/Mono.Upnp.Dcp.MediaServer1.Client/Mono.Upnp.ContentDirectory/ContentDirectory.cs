@@ -16,7 +16,7 @@ namespace Mono.Upnp.ContentDirectory
 			"urn:schemas-upnp-org:service:ContentDirectory:1");
 		
 		readonly Dictionary<string, Dictionary<string, WeakReference>> object_cache =
-			new Dictionary<string, WeakReference> ();
+			new Dictionary<string, Dictionary<string, WeakReference>> ();
 		readonly Dictionary<string, uint> container_update_ids = new Dictionary<string, uint> ();
 		
         readonly ServiceController controller;
@@ -237,9 +237,9 @@ namespace Mono.Upnp.ContentDirectory
 			
 			using (var reader = new StringReader (xml)) {
 				var navigator = new XPathDocument (reader).CreateNavigator ();
-				if (navigator.MoveToNext ("DIDL-Lite", Protocol.DidlLiteSchema) && navigator.MoveToFirstChild ()) {
+				if (navigator.MoveToNext ("DIDL-Lite", Schemas.DidlLiteSchema) && navigator.MoveToFirstChild ()) {
 					do {
-						yield return @object;
+						yield return DerserializeObject<T> (filter, navigator);
 					} while (navigator.MoveToNext ());
 				}
 			}
@@ -247,12 +247,12 @@ namespace Mono.Upnp.ContentDirectory
 		
 		T DerserializeObject<T> (string filter, XPathNavigator navigator) where T : Object
 		{
-			return GetObjectFromCache (filter, navigator) ?? CreateObject (filter, navigator);
+			return GetObjectFromCache<T> (filter, navigator) ?? CreateObject<T> (filter, navigator);
 		}
 		
 		T GetObjectFromCache<T> (string filter, XPathNavigator navigator) where T : Object
 		{
-			if (navigator.MoveToAttribute ("id", Protocol.DidlLiteSchema)) {
+			if (navigator.MoveToAttribute ("id", Schemas.DidlLiteSchema)) {
 				var id = navigator.Value;
 				WeakReference weak_reference;
 				if (object_cache.ContainsKey (filter) && object_cache[filter].ContainsKey (id)) {
@@ -274,7 +274,7 @@ namespace Mono.Upnp.ContentDirectory
 		
 		T CreateObject<T> (string filter, XPathNavigator navigator) where T : Object
 		{
-			navigator.MoveToChild ("class", Protocol.UpnpSchema);
+			navigator.MoveToChild ("class", Schemas.UpnpSchema);
 			var type = ClassManager.GetTypeFromClass (navigator.Value);
 			navigator.MoveToParent ();
 			
@@ -282,8 +282,8 @@ namespace Mono.Upnp.ContentDirectory
 				return null;
 			}
 			
-			@object = (T)Activator.CreateInstance (type, true);
-			@object.Deserialize (navigator.ReadSubtree ());
+			var @object = (T)Activator.CreateInstance (type, true);
+			@object.Deserialize (this, navigator.ReadSubtree ());
 			if (container_update_ids.ContainsKey (@object.ParentId)) {
 				@object.ParentUpdateId = container_update_ids[@object.ParentId];
 			}
@@ -311,17 +311,17 @@ namespace Mono.Upnp.ContentDirectory
 		public T GetUpdatedObject<T> (T @object) where T : Object
 		{
 			if (@object == null) throw new ArgumentNullException ("object");
-			return GetObject (@object.Id);
+			return GetObject<T> (@object.Id);
 		}
 		
 		internal T GetObject<T> (string id) where T : Object
 		{
 			uint returned, total, update_id;
-			var xml = content_directory.Browse (id, BrowseFlag.BrowseMetadata, "*", 0, 1, "",
+			var xml = Browse (id, BrowseFlag.BrowseMetadata, "*", 0, 1, "",
 				out returned, out total, out update_id);
 			
 			CheckIfContainerIsOutOfDate (id, update_id);
-			foreach (var result in Deserialize<T> (xml)) {
+			foreach (var result in Deserialize<T> ("*", xml)) {
 				return result;
 			}
 			
