@@ -24,35 +24,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using System.Collections.ObjectModel;
-
 namespace Mono.Upnp.ContentDirectory.Av
 {
 	public class PhotoAlbum : Album
 	{
 		protected PhotoAlbum ()
 		{
-		}
-		
-		public Results<Photo> BrowsePhotos ()
-		{
-			return BrowsePhotos (null);
-		}
-		
-		public Results<Photo> BrowsePhotos (ResultsSettings settings)
-		{
-			return Browse<Photo> (settings);
-		}
-		
-		public Results<PhotoAlbum> BrowsePhotoAlbums ()
-		{
-			return BrowsePhotoAlbums (null);
-		}
-		
-		public Results<PhotoAlbum> BrowsePhotoAlbums (ResultsSettings settings)
-		{
-			return Browse<PhotoAlbum> (settings);
 		}
 	}
 }

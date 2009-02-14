@@ -56,26 +56,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		public ReadOnlyCollection<Uri> AlbumArtUris { get { return album_art_uris; } }
 		public string Toc { get; private set; }
 		
-		public Results<MusicTrack> BrowseMusicTracks ()
-		{
-			return BrowseMusicTracks (null);
-		}
-		
-		public Results<MusicTrack> BrowseMusicTracks (ResultsSettings settings)
-		{
-			return Browse<MusicTrack> (settings);
-		}
-		
-		public Results<MusicAlbum> BrowseMusicAlbums ()
-		{
-			return BrowseMusicAlbums (null);
-		}
-		
-		public Results<MusicAlbum> BrowseMusicAlbums (ResultsSettings settings)
-		{
-			return Browse<MusicAlbum> (settings);
-		}
-		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");

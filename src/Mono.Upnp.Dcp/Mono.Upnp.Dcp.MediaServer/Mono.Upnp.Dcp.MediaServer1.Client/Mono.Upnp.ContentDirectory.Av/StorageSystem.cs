@@ -42,36 +42,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		public long StorageMaxPartition { get; private set; }
 		public string StorageMedium { get; private set; }
 		
-		public Results<StorageSystem> BrowseStorageSystems ()
-		{
-			return BrowseStorageSystems (null);
-		}
-		
-		public Results<StorageSystem> BrowseStorageSystems (ResultsSettings settings)
-		{
-			return Browse<StorageSystem> (settings);
-		}
-		
-		public Results<StorageVolume> BrowseStorageVolumes ()
-		{
-			return BrowseStorageVolumes (null);
-		}
-		
-		public Results<StorageVolume> BrowseStorageVolumes (ResultsSettings settings)
-		{
-			return Browse<StorageVolume> (settings);
-		}
-		
-		public Results<StorageFolder> BrowseStorageFolders ()
-		{
-			return BrowseStorageFolders (null);
-		}
-		
-		public Results<StorageFolder> BrowseStorageFolders (ResultsSettings settings)
-		{
-			return Browse<StorageFolder> (settings);
-		}
-		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");

@@ -59,17 +59,6 @@ namespace Mono.Upnp.ContentDirectory
 			return ContentDirectory.Browse (Id, settings);
 		}
 		
-		public Results<T> Browse<T> () where T : Object
-		{
-			return Browse<T> (null);
-		}
-		
-		public Results<T> Browse<T> (ResultsSettings settings) where T : Object
-		{
-			return ContentDirectory.Search<T> (Id, string.Format (
-				@"upnp:class derivedFrom ""{0}""", ClassManager.GetClassFromType<T>()), settings);
-		}
-		
 		public Results<Object> Search (string searchCriteria)
 		{
 			return Search (searchCriteria, null);

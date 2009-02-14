@@ -46,36 +46,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		public ReadOnlyCollection<string> Genres { get { return genres; } }
 		public Uri ArtistDiscographyUri { get; private set; }
 		
-		public Results<MusicAlbum> BrowseMusicAlbums ()
-		{
-			return BrowseMusicAlbums (null);
-		}
-		
-		public Results<MusicAlbum> BrowseMusicAlbums (ResultsSettings settings)
-		{
-			return Browse<MusicAlbum> (settings);
-		}
-		
-		public Results<MusicTrack> BrowseMusicTracks ()
-		{
-			return BrowseMusicTracks (null);
-		}
-		
-		public Results<MusicTrack> BrowseMusicTracks (ResultsSettings settings)
-		{
-			return Browse<MusicTrack> (settings);
-		}
-		
-		public Results<MusicVideoClip> BrowseMusicVideoClips ()
-		{
-			return BrowseMusicVideoClips (null);
-		}
-		
-		public Results<MusicVideoClip> BrowseMusicVideoClips (ResultsSettings settings)
-		{
-			return Browse<MusicVideoClip> (settings);
-		}
-		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");

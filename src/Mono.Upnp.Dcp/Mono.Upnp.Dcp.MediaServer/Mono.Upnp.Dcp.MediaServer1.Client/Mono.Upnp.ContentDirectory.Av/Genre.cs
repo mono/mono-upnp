@@ -38,56 +38,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		public string LongDescription { get; private set; }
 		public string Description { get; private set; }
 		
-		public Results<Genre> BrowseGenres ()
-		{
-			return BrowseGenres (null);
-		}
-		
-		public Results<Genre> BrowseGenres (ResultsSettings settings)
-		{
-			return Browse<Genre> (settings);
-		}
-		
-		public Results<Person> BrowsePeople ()
-		{
-			return BrowsePeople (null);
-		}
-		
-		public Results<Person> BrowsePeople (ResultsSettings settings)
-		{
-			return Browse<Person> (settings);
-		}
-		
-		public Results<Album> BrowseAlbums ()
-		{
-			return BrowseAlbums (null);
-		}
-		
-		public Results<Album> BrowseAlbums (ResultsSettings settings)
-		{
-			return Browse<Album> (settings);
-		}
-		
-		public Results<AudioItem> BrowseAudioItems ()
-		{
-			return BrowseAudioItems (null);
-		}
-		
-		public Results<AudioItem> BrowseAudioItems (ResultsSettings settings)
-		{
-			return Browse<AudioItem> (settings);
-		}
-		
-		public Results<VideoItem> BrowseVideoItems ()
-		{
-			return BrowseVideoItems (null);
-		}
-		
-		public Results<VideoItem> BrowseVideoItems (ResultsSettings settings)
-		{
-			return Browse<VideoItem> (settings);
-		}
-		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");

@@ -37,16 +37,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		
 		protected long StorageUsed { get; private set; }
 		
-		public Results<StorageFolder> BrowseStorageFolders ()
-		{
-			return BrowseStorageFolders (null);
-		}
-		
-		public Results<StorageFolder> BrowseStorageFolders (ResultsSettings settings)
-		{
-			return Browse<StorageFolder> (settings);
-		}
-		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");

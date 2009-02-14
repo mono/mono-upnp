@@ -37,26 +37,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		
 		public string Language { get; private set; }
 		
-		public Results<Album> BrowseAlbums ()
-		{
-			return BrowseAlbums (null);
-		}
-		
-		public Results<Album> BrowseAlbums (ResultsSettings settings)
-		{
-			return Browse<Album> (settings);
-		}
-		
-		public Results<Item> BrowseItems ()
-		{
-			return BrowseItems (null);
-		}
-		
-		public Results<Item> BrowseItems (ResultsSettings settings)
-		{
-			return Browse<Item> (settings);
-		}
-		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");

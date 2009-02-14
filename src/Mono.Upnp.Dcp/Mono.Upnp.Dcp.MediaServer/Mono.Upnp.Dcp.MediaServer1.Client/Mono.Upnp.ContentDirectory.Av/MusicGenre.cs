@@ -31,25 +31,5 @@ namespace Mono.Upnp.ContentDirectory.Av
 		protected MusicGenre ()
 		{
 		}
-		
-		public Results<MusicArtist> BrowseArtists ()
-		{
-			return BrowseArtists (null);
-		}
-		
-		public Results<MusicArtist> BrowseArtists (ResultsSettings settings)
-		{
-			return Browse<MusicArtist> (settings);
-		}
-		
-		public Results<MusicGenre> BrowseMusicGenres ()
-		{
-			return BrowseMusicGenres (null);
-		}
-		
-		public Results<MusicGenre> BrowseMusicGenres (ResultsSettings settings)
-		{
-			return Browse<MusicGenre> (settings);
-		}
 	}
 }

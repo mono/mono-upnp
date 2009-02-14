@@ -328,6 +328,11 @@ namespace Mono.Upnp.ContentDirectory
 			return null;
 		}
 		
+		public Results<Object> Browse ()
+		{
+			return Browse (null);
+		}
+		
 		public Results<Object> Browse (ResultsSettings settings)
 		{
 			return Browse ("0", settings);
@@ -341,6 +346,16 @@ namespace Mono.Upnp.ContentDirectory
 				: new BrowseResults (this, id, null, null, 0, 0);
 			results.FetchResults ();
 			return results;
+		}
+		
+		public Results<Object> Search (string searchCriteria)
+		{
+			return Search (searchCriteria, null);
+		}
+		
+		public Results<Object> Search (string searchCriteria, ResultsSettings settings)
+		{
+			return Search<Object> ("0", searchCriteria, settings);
 		}
 		
 		internal Results<T> Search<T> (string id, string searchCriteria, ResultsSettings settings) where T : Object

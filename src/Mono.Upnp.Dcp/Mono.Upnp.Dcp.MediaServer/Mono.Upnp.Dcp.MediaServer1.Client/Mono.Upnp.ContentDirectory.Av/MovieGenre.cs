@@ -31,15 +31,5 @@ namespace Mono.Upnp.ContentDirectory.Av
 		protected MovieGenre ()
 		{
 		}
-		
-		public Results<MovieGenre> BrowseMovieGenres ()
-		{
-			return BrowseMovieGenres (null);
-		}
-		
-		public Results<MovieGenre> BrowseMovieGenres (ResultsSettings settings)
-		{
-			return Browse<MovieGenre> (settings);
-		}
 	}
 }
