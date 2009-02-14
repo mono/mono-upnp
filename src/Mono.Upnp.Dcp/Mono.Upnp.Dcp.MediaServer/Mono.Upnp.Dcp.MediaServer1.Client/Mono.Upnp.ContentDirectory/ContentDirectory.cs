@@ -109,7 +109,7 @@ namespace Mono.Upnp.ContentDirectory
             if (!CanDestroyObject) throw new NotImplementedException ();
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
             in_arguments.Add ("ObjectID", objectId);
-            ActionResult action_result = controller.Actions["DestroyObject"].Invoke (in_arguments);
+            controller.Actions["DestroyObject"].Invoke (in_arguments);
         }
 
         public bool CanUpdateObject { get { return controller.Actions.ContainsKey ("UpdateObject"); } }
@@ -120,7 +120,7 @@ namespace Mono.Upnp.ContentDirectory
             in_arguments.Add ("ObjectID", objectId);
             in_arguments.Add ("CurrentTagValue", currentTagValue);
             in_arguments.Add ("NewTagValue", newTagValue);
-            ActionResult action_result = controller.Actions["UpdateObject"].Invoke (in_arguments);
+            controller.Actions["UpdateObject"].Invoke (in_arguments);
         }
 
         public bool CanImportResource { get { return controller.Actions.ContainsKey ("ImportResource"); } }
@@ -151,7 +151,7 @@ namespace Mono.Upnp.ContentDirectory
             if (!CanStopTransferResource) throw new NotImplementedException ();
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
             in_arguments.Add ("TransferID", transferId.ToString ());
-            ActionResult action_result = controller.Actions["StopTransferResource"].Invoke (in_arguments);
+            controller.Actions["StopTransferResource"].Invoke (in_arguments);
         }
 
         public bool CanGetTransferProgress { get { return controller.Actions.ContainsKey ("GetTransferProgress"); } }
@@ -172,7 +172,7 @@ namespace Mono.Upnp.ContentDirectory
             if (!CanDeleteResource) throw new NotImplementedException ();
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
             in_arguments.Add ("ResourceURI", resourceUri.ToString ());
-            ActionResult action_result = controller.Actions["DeleteResource"].Invoke (in_arguments);
+            controller.Actions["DeleteResource"].Invoke (in_arguments);
         }
 
         public bool CanCreateReference { get { return controller.Actions.ContainsKey ("CreateReference"); } }
@@ -326,6 +326,33 @@ namespace Mono.Upnp.ContentDirectory
 			}
 			
 			return null;
+		}
+		
+		public Results<Object> Browse (ResultsSettings settings)
+		{
+			return Browse ("0", settings);
+		}
+		
+		internal Results<Object> Browse (string id, ResultsSettings settings)
+		{
+			var results = settings != null
+				? new BrowseResults (this, id, settings.SortCriteria,
+					settings.Filter, settings.RequestCount, settings.Offset)
+				: new BrowseResults (this, id, null, null, 0, 0);
+			results.FetchResults ();
+			return results;
+		}
+		
+		internal Results<T> Search<T> (string id, string searchCriteria, ResultsSettings settings) where T : Object
+		{
+			if (searchCriteria == null) throw new ArgumentNullException ("searchCriteria");
+			
+			var results = settings != null
+				? new SearchResults<T> (this, id, searchCriteria,
+					settings.SortCriteria, settings.Filter, settings.RequestCount, settings.Offset)
+				: new SearchResults<T> (this, id, searchCriteria, null, null, 0, 0);
+			results.FetchResults ();
+			return results;
 		}
     }
 }

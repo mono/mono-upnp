@@ -31,7 +31,7 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public sealed class PlaylistContainer : Container
+	public class PlaylistContainer : Container
 	{
 		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
 		readonly ReadOnlyCollection<PersonWithRole> artists;

@@ -32,26 +32,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		{
 		}
 		
-		public Results<Person> BrowsePeople ()
-		{
-			return BrowsePeople (null);
-		}
-		
-		public Results<Person> BrowsePeople (ResultsSettings settings)
-		{
-			return Browse<Person> (settings);
-		}
-		
-		public Results<VideoItem> BrowseVideoItems ()
-		{
-			return BrowseVideoItems (null);
-		}
-		
-		public Results<VideoItem> BrowseVideoItems (ResultsSettings settings)
-		{
-			return Browse<VideoItem> (settings);
-		}
-		
 		public Results<MovieGenre> BrowseMovieGenres ()
 		{
 			return BrowseMovieGenres (null);

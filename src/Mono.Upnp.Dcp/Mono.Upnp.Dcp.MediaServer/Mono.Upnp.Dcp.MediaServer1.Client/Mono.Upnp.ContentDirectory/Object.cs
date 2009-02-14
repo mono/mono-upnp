@@ -94,7 +94,7 @@ namespace Mono.Upnp.ContentDirectory
 				property_reader.Read ();
 				try {
 					DeserializePropertyElement (property_reader);
-				} catch (Exception e) {
+				} catch (Exception) {
 					// TODO log?
 				} finally {
 					property_reader.Close ();

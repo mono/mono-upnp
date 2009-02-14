@@ -35,8 +35,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 	{
 		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
 		readonly ReadOnlyCollection<PersonWithRole> artists;
-		readonly List<string> director_list = new List<string> ();
-		readonly ReadOnlyCollection<string> directors;
 		readonly List<string> contributor_list = new List<string> ();
 		readonly ReadOnlyCollection<string> contributors;
 		readonly List<string> album_list = new List<string>();
@@ -49,7 +47,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		protected MusicVideoClip ()
 		{
 			artists = artist_list.AsReadOnly ();
-			directors = director_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();
 			albums = album_list.AsReadOnly ();
 			scheduled_start_times = scheduled_start_time_list.AsReadOnly ();
@@ -61,7 +58,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 		public ReadOnlyCollection<string> Albums { get { return albums; } }
 		public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
         public ReadOnlyCollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
-		public ReadOnlyCollection<string> Directors { get { return directors; } }
 		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
 		public string Date { get; private set; }
 		
@@ -73,9 +69,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 				switch (reader.Name) {
 				case "artist":
 					artist_list.Add (new PersonWithRole (reader));
-					break;
-				case "director":
-					director_list.Add (reader.ReadString ());
 					break;
 				case "album":
 					album_list.Add (reader.ReadString ());

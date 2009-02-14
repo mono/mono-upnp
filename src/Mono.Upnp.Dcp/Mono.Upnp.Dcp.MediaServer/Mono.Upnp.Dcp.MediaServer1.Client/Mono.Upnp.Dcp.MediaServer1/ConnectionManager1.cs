@@ -47,7 +47,7 @@ namespace Mono.Upnp.Dcp.MediaServer1
             if (!CanConnectionComplete) throw new NotImplementedException ();
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
             in_arguments.Add ("ConnectionID", connectionID.ToString ());
-            ActionResult action_result = controller.Actions["ConnectionComplete"].Invoke (in_arguments);
+            controller.Actions["ConnectionComplete"].Invoke (in_arguments);
         }
 
         public string GetCurrentConnectionIDs ()

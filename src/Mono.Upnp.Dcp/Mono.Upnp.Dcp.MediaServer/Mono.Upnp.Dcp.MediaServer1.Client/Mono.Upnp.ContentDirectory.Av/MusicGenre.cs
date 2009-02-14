@@ -42,26 +42,6 @@ namespace Mono.Upnp.ContentDirectory.Av
 			return Browse<MusicArtist> (settings);
 		}
 		
-		public Results<MusicAlbum> BrowseAlbums ()
-		{
-			return BrowseAlbums (null);
-		}
-		
-		public Results<MusicAlbum> BrowseAlbums (ResultsSettings settings)
-		{
-			return Browse<MusicAlbum> (settings);
-		}
-		
-		public Results<AudioItem> BrowseAudioItems ()
-		{
-			return BrowseAudioItems (null);
-		}
-		
-		public Results<AudioItem> BrowseAudioItems (ResultsSettings settings)
-		{
-			return Browse<AudioItem> (settings);
-		}
-		
 		public Results<MusicGenre> BrowseMusicGenres ()
 		{
 			return BrowseMusicGenres (null);

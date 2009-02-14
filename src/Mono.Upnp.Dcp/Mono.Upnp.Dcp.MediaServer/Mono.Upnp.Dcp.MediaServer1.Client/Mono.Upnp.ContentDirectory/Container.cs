@@ -44,8 +44,6 @@ namespace Mono.Upnp.ContentDirectory
 			create_classes = create_class_list.AsReadOnly ();
 		}
 		
-		bool has_child_count;
-		
         public int? ChildCount { get; private set; }
         public ReadOnlyCollection<ClassReference> CreateClasses { get { return create_classes; } }
 		public ReadOnlyCollection<ClassReference> SearchClasses { get { return search_classes; } }
@@ -58,21 +56,17 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public Results<Object> Browse (ResultsSettings settings)
 		{
-			var results = settings != null
-				? new BrowseResults (ContentDirectory, Id, settings.SortCriteria,
-					settings.Filter, settings.RequestCount, settings.Offset)
-				: new BrowseResults (ContentDirectory, Id, null, null, 0, 0);
-			results.FetchResults ();
-			return results;
+			return ContentDirectory.Browse (Id, settings);
 		}
 		
-		protected Results<T> Browse<T> (ResultsSettings settings) where T : Object
+		public Results<T> Browse<T> () where T : Object
 		{
-			// TODO I don't know about this
-			if (!CanSearchForType<T> ()) throw new ArgumentException (string.Format (
-				"The container cannot search for the type {0}.", typeof (T)));
-			
-			return Search<T> (string.Format (
+			return Browse<T> (null);
+		}
+		
+		public Results<T> Browse<T> (ResultsSettings settings) where T : Object
+		{
+			return ContentDirectory.Search<T> (Id, string.Format (
 				@"upnp:class derivedFrom ""{0}""", ClassManager.GetClassFromType<T>()), settings);
 		}
 		
@@ -83,19 +77,7 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public Results<Object> Search (string searchCriteria, ResultsSettings settings)
 		{
-			return Search<Object> (searchCriteria, settings);
-		}
-		
-		Results<T> Search<T> (string searchCriteria, ResultsSettings settings) where T : Object
-		{
-			if (searchCriteria == null) throw new ArgumentNullException ("searchCriteria");
-			
-			var results = settings != null
-				? new SearchResults<T> (ContentDirectory, Id, searchCriteria,
-					settings.SortCriteria, settings.Filter, settings.RequestCount, settings.Offset)
-				: new SearchResults<T> (ContentDirectory, Id, searchCriteria, null, null, 0, 0);
-			results.FetchResults ();
-			return results;
+			return ContentDirectory.Search<Object> (Id, searchCriteria, settings);
 		}
 		
 		public bool CanSearchForType<T> () where T : Object
