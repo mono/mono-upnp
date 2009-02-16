@@ -73,29 +73,37 @@ namespace Mono.Upnp.Control
             get { return out_arguments; }
         }
 
-        public int Retry { get; set; }
-
         public bool IsDisposed {
             get { return controller.IsDisposed; }
         }
+		
+		public ActionResult Invoke ()
+		{
+			return Invoke (0);
+		}
 
-        public ActionResult Invoke ()
+        public ActionResult Invoke (int retryAttempts)
         {
-            return Invoke (emptyArguments);
+            return Invoke (emptyArguments, retryAttempts);
         }
+		
+		public ActionResult Invoke (IDictionary<string, string> arguments)
+        {
+			return Invoke (arguments, 0);
+		}
 
-        public ActionResult Invoke (IDictionary<string, string> arguments)
+        public ActionResult Invoke (IDictionary<string, string> arguments, int retryAttempts)
         {
             VerifyArguments (arguments);
             CheckDisposed ();
-            return InvokeCore (arguments);
+            return InvokeCore (arguments, retryAttempts);
         }
 
-        protected virtual ActionResult InvokeCore (IDictionary<string, string> arguments)
+        protected virtual ActionResult InvokeCore (IDictionary<string, string> arguments, int retryAttempts)
         {
             if (arguments == null) throw new ArgumentNullException ("arguments");
             
-            return controller.Invoke (this, arguments);
+            return controller.Invoke (this, arguments, retryAttempts);
         }
 
         void VerifyArguments (IDictionary<string, string> arguments)

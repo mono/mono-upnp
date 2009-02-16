@@ -59,7 +59,8 @@ namespace Mono.Upnp.Internal
         }
 			
 		delegate HttpWebRequest RequestProvider (ServiceAction action, WebHeaderCollection headers);
-		delegate HttpWebResponse RequestHandler (HttpWebRequest request, ServiceAction action, Stream stream);
+		delegate HttpWebResponse RequestHandler (HttpWebRequest request, ServiceAction action,
+			                                     int retry, Stream stream);
         
         static SoapInvoker ()
         {
@@ -83,20 +84,20 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        public ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments)
+        public ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments, int retry)
         {
             var encoding = fallback.UseUtf8 ? Encoding.UTF8 : Encoding.ASCII;
             var fallbackEncoding = fallback.UseUtf8 ? Encoding.ASCII : Encoding.UTF8;
-            var result = Invoke (action, arguments, encoding, false);
+            var result = Invoke (action, arguments, encoding, retry, false);
             if (result == null) {
                 fallback.UseUtf8 = !fallback.UseUtf8;
-                result = Invoke (action, arguments, fallbackEncoding, true);
+                result = Invoke (action, arguments, fallbackEncoding, retry, true);
             }
             return result;
         }
 
         private ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments,
-                             Encoding encoding, bool isFallback)
+                             Encoding encoding, int retry, bool isFallback)
         {
             // Because we may do several fallbacks, we serialize to a memory stream and copy that
             // to the network stream. That way we only have to serialize once (unless we have to
@@ -110,7 +111,7 @@ namespace Mono.Upnp.Internal
                         action.SerializeRequest (arguments, headers, writer);
                     }
     
-                    using (var response = GetResponse (action, headers, stream)) {
+                    using (var response = GetResponse (action, headers, retry, stream)) {
                         if (response.StatusCode == HttpStatusCode.OK) {
                             return action.DeserializeResponse (response);
                         } else if (response.StatusCode == HttpStatusCode.InternalServerError) {
@@ -130,9 +131,10 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse GetResponse (ServiceAction action, WebHeaderCollection headers, Stream stream)
+        private HttpWebResponse GetResponse (ServiceAction action, WebHeaderCollection headers,
+			                                 int retry, Stream stream)
         {
-            var response = Stage1 (action, headers, stream);
+            var response = Stage1 (action, headers, retry, stream);
             if (response.StatusCode == HttpStatusCode.NotImplemented || response.StatusDescription == "Not Extended") {
                 // FIXME is this the right exception type?
                 throw new UpnpException ("The SOAP request failed.");
@@ -141,21 +143,21 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, Stream stream)
+        private HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, int retry, Stream stream)
         {
             if (fallback.OmitMan) {
-                return Stage1 (action, headers, stream, CreateRequestWithoutMan, CreateRequestWithMan);
+                return Stage1 (action, headers, retry, stream, CreateRequestWithoutMan, CreateRequestWithMan);
             } else {
-                return Stage1 (action, headers, stream, CreateRequestWithMan, CreateRequestWithoutMan);
+                return Stage1 (action, headers, retry, stream, CreateRequestWithMan, CreateRequestWithoutMan);
             }
         }
 
-        private HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, Stream stream,
+        private HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, int retry, Stream stream,
                                         RequestProvider requestProvider1, RequestProvider requestProvider2)
         {
-            var response = Stage2 (requestProvider1, action, headers, stream);
+            var response = Stage2 (requestProvider1, action, headers, retry, stream);
             if (response.StatusCode == HttpStatusCode.MethodNotAllowed) {
-                response = Stage2 (requestProvider2, action, headers, stream);
+                response = Stage2 (requestProvider2, action, headers, retry, stream);
             }
             return response;
         }
@@ -192,47 +194,49 @@ namespace Mono.Upnp.Internal
         }
 
         private HttpWebResponse Stage2 (RequestProvider requestProvider, ServiceAction action,
-                                        WebHeaderCollection headers, Stream stream)
+                                        WebHeaderCollection headers, int retry, Stream stream)
         {
             var request = requestProvider (action, headers);
             if (fallback.Chuncked) {
-                return Stage2 (request, action, stream, Stage3Chuncked, Stage3Unchunked);
+                return Stage2 (request, action, retry, stream, Stage3Chuncked, Stage3Unchunked);
             } else {
-                return Stage2 (request, action, stream, Stage3Unchunked, Stage3Chuncked);
+                return Stage2 (request, action, retry, stream, Stage3Unchunked, Stage3Chuncked);
             }
         }
 
-        private HttpWebResponse Stage2 (HttpWebRequest request, ServiceAction action, Stream stream,
+        private HttpWebResponse Stage2 (HttpWebRequest request, ServiceAction action, int retry, Stream stream,
                                         RequestHandler requestHandler1, RequestHandler requestHandler2)
         {
             try {
-                var response = requestHandler1 (request, action, stream);
+                var response = requestHandler1 (request, action, retry, stream);
                 if (response.StatusCode == HttpStatusCode.HttpVersionNotSupported) {
                     throw new ProtocolViolationException ();
                 }
                 return response;
             } catch (ProtocolViolationException) {
-                return requestHandler2 (request, action, stream);
+                return requestHandler2 (request, action, retry, stream);
             }
         }
 
-        private HttpWebResponse Stage3Chuncked (HttpWebRequest request, ServiceAction action, Stream stream)
+        private HttpWebResponse Stage3Chuncked (HttpWebRequest request, ServiceAction action,
+			                                    int retry, Stream stream)
         {
             fallback.Chuncked = true;
             request.ProtocolVersion = new Version (1, 1);
             request.SendChunked = true;
-            return Final (request, action, stream);
+            return Final (request, action, retry, stream);
         }
 
-        private HttpWebResponse Stage3Unchunked (HttpWebRequest request, ServiceAction action, Stream stream)
+        private HttpWebResponse Stage3Unchunked (HttpWebRequest request, ServiceAction action,
+			                                     int retry, Stream stream)
         {
             fallback.Chuncked = false;
             request.ProtocolVersion = new Version (1, 0);
             request.SendChunked = false;
-            return Final (request, action, stream);
+            return Final (request, action, retry, stream);
         }
 
-        private HttpWebResponse Final (HttpWebRequest request, ServiceAction action, Stream stream)
+        private HttpWebResponse Final (HttpWebRequest request, ServiceAction action, int retry, Stream stream)
         {
             stream.Seek (0, SeekOrigin.Begin);
             request.ContentLength = stream.Length;
@@ -243,7 +247,7 @@ namespace Mono.Upnp.Internal
                 output.Write (buffer, 0, count);
             }
             output.Close ();
-            return Helper.GetResponse (request, action.Retry);
+            return Helper.GetResponse (request, retry);
         }
 	}
 }

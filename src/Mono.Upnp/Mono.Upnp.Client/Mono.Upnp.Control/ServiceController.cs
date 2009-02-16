@@ -105,7 +105,7 @@ namespace Mono.Upnp.Control
             }
         }
 
-        internal ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments)
+        internal ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments, int retry)
         {
             if (soap_adapter == null) {
                 if (service_description.ControlUrl == null) {
@@ -115,7 +115,7 @@ namespace Mono.Upnp.Control
                 soap_adapter = new SoapInvoker (service_description.ControlUrl);
             }
             try {
-                return soap_adapter.Invoke (action, arguments);
+                return soap_adapter.Invoke (action, arguments, retry);
             } catch (WebException e) {
                 if (e.Status == WebExceptionStatus.Timeout) {
                     service_description.CheckDisposed ();
