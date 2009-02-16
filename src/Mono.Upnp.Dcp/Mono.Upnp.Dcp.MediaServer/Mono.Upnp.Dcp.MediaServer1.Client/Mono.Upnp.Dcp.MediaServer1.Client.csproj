@@ -87,7 +87,7 @@
     <Compile Include="Mono.Upnp.ContentDirectory.Av\PersonWithRole.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\Results.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\BrowseFlag.cs" />
-    <Compile Include="Mono.Upnp.ContentDirectory\ContentDirectory.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\ContentDirectoryController.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\ContentDirectoryClient.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\BrowseResults.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\SearchResults.cs" />
@@ -104,6 +104,7 @@
     <Compile Include="Mono.Upnp.ContentDirectory\Schemas.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\WriteStatus.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\ResultsSettings.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\ContentDirectory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

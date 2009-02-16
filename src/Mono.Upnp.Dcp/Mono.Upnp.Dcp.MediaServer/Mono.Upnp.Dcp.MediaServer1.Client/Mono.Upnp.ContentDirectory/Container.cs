@@ -71,15 +71,27 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public bool CanSearchForType<T> () where T : Object
 		{
-			return Searchable && IsValidType<T> (search_classes);
+			return Searchable && IsValidType<T> (search_classes, true);
 		}
 		
 		public bool CanCreateType<T> () where T : Object
 		{
-			return IsValidType<T> (create_classes);
+			return IsValidType<T> (create_classes, false);
 		}
 		
-		static bool IsValidType<T> (IList<ClassReference> classes) where T : Object
+		public Object CreateReference (Object target)
+		{
+			// TODO return actual object? That is another network call
+			// (but we're doing network calls anyway, so it's not like
+			// speed is SOOO important
+			if (Restricted) throw new InvalidOperationException (
+				"A reference cannot be created because the parent object is restricted.");
+			
+			var id = ContentDirectory.Controller.CreateReference (Id, target.Id);
+			return ContentDirectory.GetObject <Object> (id);
+		}
+		
+		static bool IsValidType<T> (IList<ClassReference> classes, bool allowSuperClasses) where T : Object
 		{
 			if (classes.Count == 0) {
 				return true;
@@ -89,6 +101,8 @@ namespace Mono.Upnp.ContentDirectory
 				var class_name = @class.Class.FullClassName;
 				var compare = type.CompareTo (class_name);
 				if (compare == 0) {
+					return true;
+				} else if (allowSuperClasses && class_name.StartsWith (type)) {
 					return true;
 				} else if (compare == 1) {
 					return false;

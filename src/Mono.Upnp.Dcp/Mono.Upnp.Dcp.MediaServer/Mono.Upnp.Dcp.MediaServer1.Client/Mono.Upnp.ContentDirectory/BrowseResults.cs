@@ -38,7 +38,7 @@ namespace Mono.Upnp.ContentDirectory
 		
 		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
 		{
-			return ContentDirectory.Browse (ObjectId, BrowseFlag.BrowseDirectChildren, Filter, Offset, 
+			return ContentDirectory.Controller.Browse (ObjectId, BrowseFlag.BrowseDirectChildren, Filter, Offset, 
 				RequestCount, SortCriteria, out returnedCount, out totalCount, out updateId);
 		}
 		

@@ -39,7 +39,7 @@ namespace Mono.Upnp.ContentDirectory
 		
 		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
 		{
-			return ContentDirectory.Search (ObjectId, search_criteria, Filter, Offset, 
+			return ContentDirectory.Controller.Search (ObjectId, search_criteria, Filter, Offset, 
 				RequestCount, SortCriteria, out returnedCount, out totalCount, out updateId);
 		}
 		

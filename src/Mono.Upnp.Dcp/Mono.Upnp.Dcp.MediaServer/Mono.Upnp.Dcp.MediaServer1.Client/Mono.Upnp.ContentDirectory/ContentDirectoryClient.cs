@@ -32,8 +32,14 @@ namespace Mono.Upnp.ContentDirectory
             if (args.Service.Type != ContentDirectory.ServiceType) return;
 
             try {
-                ContentDirectory service = new ContentDirectory (args.Service);
-                OnContentDirectoryAdded (new DiscoveryEventArgs<ContentDirectory> (service));
+				var description = args.Service.GetDescription ();
+				if (description != null) {
+					var controller = description.GetController ();
+					if (controller != null) {
+						var service = new ContentDirectory (new ContentDirectoryController (controller));
+						OnContentDirectoryAdded (new DiscoveryEventArgs<ContentDirectory> (service));
+					}
+				}
             }
             catch
             {

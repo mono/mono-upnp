@@ -32,6 +32,15 @@ namespace Mono.Upnp.ContentDirectory
 	public abstract class Item : Object
 	{
         public string RefId { get; private set; }
+		public bool IsReference { get { return RefId != null; } }
+		
+		public Item GetReferedObject ()
+		{
+			if (RefId == null) throw new InvalidOperationException (
+				"Cannot get refered object because the item is not a reference.");
+			
+			return ContentDirectory.GetObject<Item> (RefId);
+		}
 		
 		protected override void DeserializeRootElement (XmlReader reader)
 		{
