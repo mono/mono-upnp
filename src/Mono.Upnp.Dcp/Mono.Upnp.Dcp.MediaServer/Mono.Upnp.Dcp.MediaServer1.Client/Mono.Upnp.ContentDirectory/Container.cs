@@ -31,7 +31,7 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory
 {
-	public abstract class Container : Object
+	public class Container : Object
 	{
 		readonly List<ClassReference> search_class_list = new List<ClassReference> ();
 		readonly List<ClassReference> create_class_list = new List<ClassReference> ();

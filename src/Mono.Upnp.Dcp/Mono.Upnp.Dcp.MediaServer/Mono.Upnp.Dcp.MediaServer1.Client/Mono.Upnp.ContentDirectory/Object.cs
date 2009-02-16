@@ -31,7 +31,7 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory
 {
-	public abstract class Object
+	public class Object
 	{
 		readonly List<Resource> resource_list = new List<Resource> ();
 		readonly ReadOnlyCollection<Resource> resources;
