@@ -1,5 +1,5 @@
 // 
-// PersonWithRole.cs
+// AudioBookBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,33 +24,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Xml;
+using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.ContentDirectory
 {
-	public struct PersonWithRole
+	public class AudioBookBuilder : AudioItemBuilder
 	{
-		readonly string name;
-		readonly string role;
+		readonly List<string> producers = new List<string> ();
+		readonly List<string> contributors = new List<string> ();
 		
-		public PersonWithRole (string name, string role)
-		{
-			this.name = name;
-			this.role = role;
-		}
+		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
+		public string StorageMedium { get; set; }
 		
-		internal static PersonWithRole Deserialize (XmlReader reader)
-		{
-			var role = reader["role", Schemas.UpnpSchema];
-			var name = reader.ReadString ();
-			return new PersonWithRole (name, role);
-		}
+		[XmlArrayItem ("producer", Namespace = Schemas.UpnpSchema)]
+        public ICollection<string> Producers { get { return producers; } }
 		
-		[XmlText]
-		public string Name { get { return name; } }
+		[XmlArrayItem ("contributor", Namespace = Schemas.DublinCoreSchema)]
+        public ICollection<string> Contributors { get { return contributors; } }
 		
-		[XmlAttribute ("role", Namespace = Schemas.UpnpSchema)]
-		public string Role { get { return role; } }
+		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]
+        public string Date { get; set; }
 	}
 }

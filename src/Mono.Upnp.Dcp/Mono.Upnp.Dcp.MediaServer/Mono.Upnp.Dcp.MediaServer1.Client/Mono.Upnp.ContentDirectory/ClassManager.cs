@@ -74,8 +74,8 @@ namespace Mono.Upnp.ContentDirectory
 		public static void RegisterType<T> () where T : Object
 		{
 			var type = typeof (T);
-			var name = CreateClassName<T> ();
-			types[name] = typeof (T);
+			var name = CreateClassName (type, typeof (Object));
+			types[name] = type;
 			names[type] = name;
 		}
 		
@@ -91,17 +91,17 @@ namespace Mono.Upnp.ContentDirectory
 			}
 		}
 		
-		static string CreateClassName<T> () where T : Object
+		internal static string CreateClassName (Type type, Type rootType)
 		{
 			var builder = new StringBuilder ();
-			BuildClassName (typeof (T), builder);
+			BuildClassName (type, rootType, builder);
 			return builder.ToString ();
 		}
 		
-		static void BuildClassName (Type type, StringBuilder builder)
+		static void BuildClassName (Type type, Type rootType, StringBuilder builder)
 		{
-			if (type != typeof (Object)) {
-				BuildClassName (type.BaseType, builder);
+			if (type != rootType) {
+				BuildClassName (type.BaseType, rootType, builder);
 				builder.Append ('.');
 			}
 			

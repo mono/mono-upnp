@@ -22,19 +22,19 @@ namespace Mono.Upnp.ContentDirectory
 
         public string GetSearchCapabilities ()
         {
-            ActionResult action_result = controller.Actions["GetSearchCapabilities"].Invoke ();
+            ActionResult action_result = controller.Actions["GetSearchCapabilities"].Invoke (2);
             return action_result.OutValues["SearchCaps"];
         }
 
         public string GetSortCapabilities ()
         {
-            ActionResult action_result = controller.Actions["GetSortCapabilities"].Invoke ();
+            ActionResult action_result = controller.Actions["GetSortCapabilities"].Invoke (2);
             return action_result.OutValues["SortCaps"];
         }
 
         public string GetSystemUpdateId ()
         {
-            ActionResult action_result = controller.Actions["GetSystemUpdateID"].Invoke ();
+            ActionResult action_result = controller.Actions["GetSystemUpdateID"].Invoke (2);
             return action_result.OutValues["Id"];
         }
 
@@ -47,7 +47,7 @@ namespace Mono.Upnp.ContentDirectory
             in_arguments.Add ("StartingIndex", startingIndex.ToString ());
             in_arguments.Add ("RequestedCount", requestedCount.ToString ());
             in_arguments.Add ("SortCriteria", sortCriteria);
-            ActionResult action_result = controller.Actions["Browse"].Invoke (in_arguments);
+            ActionResult action_result = controller.Actions["Browse"].Invoke (in_arguments, 2);
             numberReturned = uint.Parse (action_result.OutValues["NumberReturned"]);
             totalMatches = uint.Parse (action_result.OutValues["TotalMatches"]);
             updateId = uint.Parse (action_result.OutValues["UpdateID"]);
@@ -65,7 +65,7 @@ namespace Mono.Upnp.ContentDirectory
             in_arguments.Add ("StartingIndex", startingIndex.ToString ());
             in_arguments.Add ("RequestedCount", requestedCount.ToString ());
             in_arguments.Add ("SortCriteria", sortCriteria);
-            ActionResult action_result = controller.Actions["Search"].Invoke (in_arguments);
+            ActionResult action_result = controller.Actions["Search"].Invoke (in_arguments, 2);
             numberReturned = uint.Parse (action_result.OutValues["NumberReturned"]);
             totalMatches = uint.Parse (action_result.OutValues["TotalMatches"]);
             updateId = uint.Parse (action_result.OutValues["UpdateID"]);

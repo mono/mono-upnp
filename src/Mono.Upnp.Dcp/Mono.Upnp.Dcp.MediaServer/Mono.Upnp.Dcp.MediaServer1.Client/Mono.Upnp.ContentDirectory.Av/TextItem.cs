@@ -73,7 +73,7 @@ namespace Mono.Upnp.ContentDirectory.Av
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.Name) {
 				case "author":
-					author_list.Add (new PersonWithRole (reader));
+					author_list.Add (PersonWithRole.Deserialize (reader));
 					break;
 				case "longDescription":
 					LongDescription = reader.ReadString ();

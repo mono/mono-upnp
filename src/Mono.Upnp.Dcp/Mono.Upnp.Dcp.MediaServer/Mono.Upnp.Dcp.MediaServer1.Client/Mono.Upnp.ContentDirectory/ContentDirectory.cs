@@ -45,6 +45,7 @@ namespace Mono.Upnp.ContentDirectory
 		public ContentDirectory (ContentDirectoryController controller)
 		{
 			if (controller == null) throw new ArgumentNullException ("controller");
+			
 			this.controller = controller;
 		}
 		
@@ -129,12 +130,6 @@ namespace Mono.Upnp.ContentDirectory
 				container_update_ids[@object.ParentId] != @object.ParentUpdateId;
 		}
 		
-		public T GetUpdatedObject<T> (T @object) where T : Object
-		{
-			if (@object == null) throw new ArgumentNullException ("object");
-			return GetObject<T> (@object.Id);
-		}
-		
 		internal T GetObject<T> (string id) where T : Object
 		{
 			uint returned, total, update_id;
@@ -189,6 +184,13 @@ namespace Mono.Upnp.ContentDirectory
 				: new SearchResults<T> (this, id, searchCriteria, null, null, 0, 0);
 			results.FetchResults ();
 			return results;
+		}
+		
+		public static T GetUpdatedObject<T> (T @object) where T : Object
+		{
+			if (@object == null) throw new ArgumentNullException ("object");
+			
+			return @object.ContentDirectory.GetObject<T> (@object.Id);
 		}
 	}
 }

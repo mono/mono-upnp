@@ -1,5 +1,5 @@
 // 
-// PersonWithRole.cs
+// ObjectBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,33 +24,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Xml;
+using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.ContentDirectory
 {
-	public struct PersonWithRole
+	public abstract class ObjectBuilder
 	{
-		readonly string name;
-		readonly string role;
+		static readonly Dictionary<Type, string> class_names = new Dictionary<Type, string> ();
 		
-		public PersonWithRole (string name, string role)
-		{
-			this.name = name;
-			this.role = role;
+		readonly List<ResourceBuilder> resources = new List<ResourceBuilder> ();
+		
+		[XmlAttribute ("id", Namespace = Schemas.DidlLiteSchema)]
+		string id = "";
+		
+		[XmlAttribute ("restricted", Namespace = Schemas.DidlLiteSchema)]
+        bool restricted;
+		
+		[XmlElement ("title", Namespace = Schemas.DublinCoreSchema)]
+		public string Title { get; set; }
+		
+		[XmlElement ("creator", Namespace = Schemas.DublinCoreSchema)]
+        public string Creator { get; set; }
+		
+		[XmlArrayItem]
+		protected ICollection<ResourceBuilder> Resources { get { return resources; } }
+		
+        public WriteStatus? WriteStatus { get; set; }
+		
+		[XmlElement ("class", Namespace = Schemas.UpnpSchema)]
+		string Class {
+			get {
+				var type = GetType ();
+				string name;
+				if (class_names.TryGetValue (type, out name)) {
+					return name;
+				}
+				name = ClassManager.CreateClassName (type, typeof (ObjectBuilder));
+				class_names[type] = name;
+				return name;
+			}
 		}
-		
-		internal static PersonWithRole Deserialize (XmlReader reader)
-		{
-			var role = reader["role", Schemas.UpnpSchema];
-			var name = reader.ReadString ();
-			return new PersonWithRole (name, role);
-		}
-		
-		[XmlText]
-		public string Name { get { return name; } }
-		
-		[XmlAttribute ("role", Namespace = Schemas.UpnpSchema)]
-		public string Role { get { return role; } }
 	}
 }

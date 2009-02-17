@@ -1,5 +1,5 @@
 // 
-// PersonWithRole.cs
+// AudioBroadcastBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,33 +24,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Xml;
+using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.ContentDirectory
 {
-	public struct PersonWithRole
+	public class AudioBroadcastBuilder : AudioItemBuilder
 	{
-		readonly string name;
-		readonly string role;
-		
-		public PersonWithRole (string name, string role)
+		public AudioBroadcastBuilder (IEnumerable<ResourceBuilder> resources)
 		{
-			this.name = name;
-			this.role = role;
+			foreach (var resource in resources) {
+				Resources.Add (resource);
+			}
 		}
 		
-		internal static PersonWithRole Deserialize (XmlReader reader)
-		{
-			var role = reader["role", Schemas.UpnpSchema];
-			var name = reader.ReadString ();
-			return new PersonWithRole (name, role);
-		}
+		[XmlElement ("region", Namespace = Schemas.UpnpSchema)]
+		public string Region { get; set; }
 		
-		[XmlText]
-		public string Name { get { return name; } }
+		[XmlElement ("radioCallSign", Namespace = Schemas.UpnpSchema)]
+        public string RadioCallSign { get; set; }
 		
-		[XmlAttribute ("role", Namespace = Schemas.UpnpSchema)]
-		public string Role { get { return role; } }
+		[XmlElement ("radioStationID", Namespace = Schemas.UpnpSchema)]
+        public string RadioStationId { get; set; }
+		
+		[XmlElement ("radioBand", Namespace = Schemas.UpnpSchema)]
+        public string RadioBand { get; set; }
+		
+		[XmlElement ("chanelNr", Namespace = Schemas.UpnpSchema)]
+        public int? ChannelNr { get; set; }
 	}
 }

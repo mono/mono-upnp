@@ -61,7 +61,7 @@ namespace Mono.Upnp.ContentDirectory
         public Class Class { get; private set; }
         public bool Restricted { get; private set; }
         public WriteStatus? WriteStatus { get; private set; }
-		protected ContentDirectory ContentDirectory { get; private set; }
+		internal ContentDirectory ContentDirectory { get; private set; }
 		internal uint ParentUpdateId { get; set; }
 		
 		public override string ToString ()

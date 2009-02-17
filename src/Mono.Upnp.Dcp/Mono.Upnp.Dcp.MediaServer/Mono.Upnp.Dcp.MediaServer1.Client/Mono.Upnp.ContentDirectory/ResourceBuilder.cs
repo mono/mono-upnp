@@ -1,5 +1,5 @@
 // 
-// PersonWithRole.cs
+// ResourceBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,33 +24,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Xml;
+using System;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.ContentDirectory
 {
-	public struct PersonWithRole
+	[XmlType ("res", Namespace = Schemas.DidlLiteSchema)]
+	public sealed class ResourceBuilder
 	{
-		readonly string name;
-		readonly string role;
+		readonly Uri resource_uri;
+		readonly string protocol_info;
 		
-		public PersonWithRole (string name, string role)
+		public ResourceBuilder (Uri resourceUri, string contentType)
 		{
-			this.name = name;
-			this.role = role;
+			if (resourceUri == null) throw new ArgumentNullException ("resourceUri");
+			if (!resourceUri.IsAbsoluteUri) throw new ArgumentException (
+				"The provided URI must be an absolute URI.", "resourceUri");
+			
+			if (resourceUri.IsFile && resourceUri.IsLoopback) {
+				protocol_info = string.Format ("*:*:{0}:*", contentType ?? "*");
+			} else {
+				protocol_info = string.Format ("{0}:*:{1}:*", resourceUri.Scheme, contentType ?? "*");
+			}
+			
+			resource_uri = resourceUri;
 		}
-		
-		internal static PersonWithRole Deserialize (XmlReader reader)
-		{
-			var role = reader["role", Schemas.UpnpSchema];
-			var name = reader.ReadString ();
-			return new PersonWithRole (name, role);
-		}
-		
-		[XmlText]
-		public string Name { get { return name; } }
-		
-		[XmlAttribute ("role", Namespace = Schemas.UpnpSchema)]
-		public string Role { get { return role; } }
 	}
 }

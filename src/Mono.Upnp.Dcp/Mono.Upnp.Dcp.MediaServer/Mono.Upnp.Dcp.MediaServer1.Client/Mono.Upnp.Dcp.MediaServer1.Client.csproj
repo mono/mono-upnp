@@ -105,6 +105,15 @@
     <Compile Include="Mono.Upnp.ContentDirectory\WriteStatus.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\ResultsSettings.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory\ContentDirectory.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\ObjectBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\ItemBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\ContainerBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory\ResourceBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\AlbumBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\AudioItemBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicTrackBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\AudioBroadcastBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\AudioBookBuilder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -66,7 +66,7 @@ namespace Mono.Upnp.ContentDirectory.Av
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.Name) {
 				case "artist":
-					artist_list.Add (new PersonWithRole (reader));
+					artist_list.Add (PersonWithRole.Deserialize (reader));
 					break;
 				case "album":
 					album_list.Add (reader.ReadString ());

@@ -1,5 +1,5 @@
 // 
-// PersonWithRole.cs
+// ContainerBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,33 +24,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Xml;
+using System;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.ContentDirectory
 {
-	public struct PersonWithRole
+	[XmlType ("container", Namespace = Schemas.DidlLiteSchema)]
+	public abstract class ContainerBuilder : ObjectBuilder
 	{
-		readonly string name;
-		readonly string role;
-		
-		public PersonWithRole (string name, string role)
-		{
-			this.name = name;
-			this.role = role;
-		}
-		
-		internal static PersonWithRole Deserialize (XmlReader reader)
-		{
-			var role = reader["role", Schemas.UpnpSchema];
-			var name = reader.ReadString ();
-			return new PersonWithRole (name, role);
-		}
-		
-		[XmlText]
-		public string Name { get { return name; } }
-		
-		[XmlAttribute ("role", Namespace = Schemas.UpnpSchema)]
-		public string Role { get { return role; } }
 	}
 }
