@@ -63,7 +63,7 @@ namespace Mono.Upnp.ContentDirectory.Av
         public ReadOnlyCollection<PersonWithRole> Actors { get { return actors; } }
         public ReadOnlyCollection<string> Directors { get { return directors; } }
         public string Description { get; private set; }
-        public ReadOnlyCollection<string> Publisher { get {return publishers; } }
+        public ReadOnlyCollection<string> Publishers { get {return publishers; } }
         public string Language { get; private set; }
         public ReadOnlyCollection<Uri> Relations { get { return relations; } }
 		

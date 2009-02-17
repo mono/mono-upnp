@@ -1,5 +1,5 @@
 // 
-// AudioBookBuilder.cs
+// VideoItemBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -30,21 +30,43 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class AudioBookBuilder : AudioItemBuilder
+	public class VideoItemBuilder : ItemBuilder
 	{
+		readonly List<string> genres = new List<string> ();
 		readonly List<string> producers = new List<string> ();
-		readonly List<string> contributors = new List<string> ();
+		readonly List<PersonWithRole> actors = new List<PersonWithRole> ();
+		readonly List<string> directors = new List<string> ();
+		readonly List<string> publishers = new List<string> ();
+		readonly List<Uri> relations = new List<Uri> ();
 		
-		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
-		public string StorageMedium { get; set; }
+		[XmlArrayItem ("genre", Namespace = Schemas.UpnpSchema)]
+		public ICollection<string> Genres { get { return genres; } }
+		
+		[XmlElement ("longDescription", Namespace = Schemas.UpnpSchema)]
+        public string LongDescription { get; set; }
 		
 		[XmlArrayItem ("producer", Namespace = Schemas.UpnpSchema)]
         public ICollection<string> Producers { get { return producers; } }
 		
-		[XmlArrayItem ("contributor", Namespace = Schemas.DublinCoreSchema)]
-        public ICollection<string> Contributors { get { return contributors; } }
+		[XmlElement ("rating", Namespace = Schemas.UpnpSchema)]
+        public string Rating { get; set; }
 		
-		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]
-        public string Date { get; set; }
+		[XmlArrayItem ("actor", Namespace = Schemas.UpnpSchema)]
+        public ICollection<PersonWithRole> Actors { get { return actors; } }
+		
+		[XmlArrayItem ("director", Namespace = Schemas.UpnpSchema)]
+        public ICollection<string> Directors { get { return directors; } }
+		
+		[XmlElement ("description", Namespace = Schemas.DublinCoreSchema)]
+        public string Description { get; set; }
+		
+		[XmlArrayItem ("publisher", Namespace = Schemas.DublinCoreSchema)]
+        public ICollection<string> Publishers { get {return publishers; } }
+		
+		[XmlElement ("language", Namespace = Schemas.DublinCoreSchema)]
+        public string Language { get; set; }
+		
+		[XmlArrayItem ("relation", Namespace = Schemas.DublinCoreSchema)]
+        public ICollection<Uri> Relations { get { return relations; } }
 	}
 }
