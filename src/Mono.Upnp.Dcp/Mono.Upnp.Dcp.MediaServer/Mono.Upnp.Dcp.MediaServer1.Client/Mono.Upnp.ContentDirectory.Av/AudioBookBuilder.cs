@@ -38,10 +38,10 @@ namespace Mono.Upnp.ContentDirectory.Av
 		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
 		public string StorageMedium { get; set; }
 		
-		[XmlArrayItem ("producer", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("producer", Namespace = Schemas.UpnpSchema)]
         public ICollection<string> Producers { get { return producers; } }
 		
-		[XmlArrayItem ("contributor", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("contributor", Namespace = Schemas.DublinCoreSchema)]
         public ICollection<string> Contributors { get { return contributors; } }
 		
 		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]

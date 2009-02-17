@@ -48,7 +48,7 @@ namespace Mono.Upnp.ContentDirectory
 		[XmlElement ("creator", Namespace = Schemas.DublinCoreSchema)]
         public string Creator { get; set; }
 		
-		[XmlArrayItem]
+		[XmlElement ("res", Namespace = Schemas.DidlLiteSchema)]
 		protected ICollection<ResourceBuilder> Resources { get { return resources; } }
 		
         public WriteStatus? WriteStatus { get; set; }

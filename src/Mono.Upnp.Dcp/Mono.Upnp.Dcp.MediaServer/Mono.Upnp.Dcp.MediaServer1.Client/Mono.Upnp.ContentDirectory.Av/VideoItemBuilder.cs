@@ -39,34 +39,34 @@ namespace Mono.Upnp.ContentDirectory.Av
 		readonly List<string> publishers = new List<string> ();
 		readonly List<Uri> relations = new List<Uri> ();
 		
-		[XmlArrayItem ("genre", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("genre", Namespace = Schemas.UpnpSchema)]
 		public ICollection<string> Genres { get { return genres; } }
 		
 		[XmlElement ("longDescription", Namespace = Schemas.UpnpSchema)]
         public string LongDescription { get; set; }
 		
-		[XmlArrayItem ("producer", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("producer", Namespace = Schemas.UpnpSchema)]
         public ICollection<string> Producers { get { return producers; } }
 		
 		[XmlElement ("rating", Namespace = Schemas.UpnpSchema)]
         public string Rating { get; set; }
 		
-		[XmlArrayItem ("actor", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("actor", Namespace = Schemas.UpnpSchema)]
         public ICollection<PersonWithRole> Actors { get { return actors; } }
 		
-		[XmlArrayItem ("director", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("director", Namespace = Schemas.UpnpSchema)]
         public ICollection<string> Directors { get { return directors; } }
 		
 		[XmlElement ("description", Namespace = Schemas.DublinCoreSchema)]
         public string Description { get; set; }
 		
-		[XmlArrayItem ("publisher", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("publisher", Namespace = Schemas.DublinCoreSchema)]
         public ICollection<string> Publishers { get {return publishers; } }
 		
 		[XmlElement ("language", Namespace = Schemas.DublinCoreSchema)]
         public string Language { get; set; }
 		
-		[XmlArrayItem ("relation", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("relation", Namespace = Schemas.DublinCoreSchema)]
         public ICollection<Uri> Relations { get { return relations; } }
 	}
 }

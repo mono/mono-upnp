@@ -46,19 +46,19 @@ namespace Mono.Upnp.ContentDirectory.Av
 		[XmlElement ("description", Namespace = Schemas.DublinCoreSchema)]
 		public string Description { get; set; }
 		
-		[XmlArrayItem ("publisher", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("publisher", Namespace = Schemas.DublinCoreSchema)]
 		public ICollection<string> Publishers { get { return publishers; } }
 		
-		[XmlArrayItem ("contributor", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("contributor", Namespace = Schemas.DublinCoreSchema)]
 		public ICollection<string> Contributors { get { return contributors; } }
 		
 		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]
 		public string Date { get; set; }
 		
-		[XmlArrayItem ("relation", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("relation", Namespace = Schemas.DublinCoreSchema)]
 		public ICollection<Uri> Relations { get { return relations; } }
 		
-		[XmlArrayItem ("rights", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("rights", Namespace = Schemas.DublinCoreSchema)]
 		public ICollection<string> Rights { get { return rights; } }
 	}
 }

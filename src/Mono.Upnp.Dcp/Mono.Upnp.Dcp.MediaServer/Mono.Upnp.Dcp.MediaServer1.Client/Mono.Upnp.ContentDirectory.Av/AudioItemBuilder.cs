@@ -37,7 +37,7 @@ namespace Mono.Upnp.ContentDirectory.Av
 		readonly List<Uri> relations = new List<Uri> ();
 		readonly List<string> rights = new List<string> ();
 		
-		[XmlArrayItem ("genre", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("genre", Namespace = Schemas.UpnpSchema)]
 		public ICollection<string> Genres { get { return genres; } }
 		
 		[XmlElement ("description", Namespace = Schemas.UpnpSchema)]
@@ -46,16 +46,16 @@ namespace Mono.Upnp.ContentDirectory.Av
 		[XmlElement ("longDescription", Namespace = Schemas.UpnpSchema)]
         public string LongDescription { get; set; }
 		
-		[XmlArrayItem ("publisher", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("publisher", Namespace = Schemas.DublinCoreSchema)]
         public ICollection<string> Publishers { get { return publishers; } }
 		
 		[XmlElement ("language", Namespace = Schemas.DublinCoreSchema)]
         public string Language { get; set; }
 		
-		[XmlArrayItem ("relation", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("relation", Namespace = Schemas.DublinCoreSchema)]
         public ICollection<Uri> Relations { get { return relations; } }
 		
-		[XmlArrayItem ("rights", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("rights", Namespace = Schemas.DublinCoreSchema)]
         public ICollection<string> Rights { get { return rights; } }
 	}
 }

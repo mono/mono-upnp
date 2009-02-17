@@ -42,22 +42,22 @@ namespace Mono.Upnp.ContentDirectory.Av
 			Resources.Add (new ResourceBuilder (resourceUri, contentType ?? "audio"));
 		}
 		
-		[XmlArrayItem ("artist", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("artist", Namespace = Schemas.UpnpSchema)]
 		public ICollection<PersonWithRole> Artists { get { return artists; } }
 		
-		[XmlArrayItem ("album", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("album", Namespace = Schemas.UpnpSchema)]
         public ICollection<string> Albums { get { return albums; } }
 		
 		[XmlElement ("originalTrackNumber", Namespace = Schemas.UpnpSchema)]
         public int? OriginalTrackNumber { get; private set; }
 		
-		[XmlArrayItem ("playlist", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("playlist", Namespace = Schemas.UpnpSchema)]
         public ICollection<string> Playlists { get { return playlists; } }
 		
 		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
         public string StorageMedium { get; private set; }
 		
-		[XmlArrayItem ("contributor", Namespace = Schemas.DublinCoreSchema)]
+		[XmlElement ("contributor", Namespace = Schemas.DublinCoreSchema)]
         public ICollection<string> Contributors { get { return contributors; } }
 		
 		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]

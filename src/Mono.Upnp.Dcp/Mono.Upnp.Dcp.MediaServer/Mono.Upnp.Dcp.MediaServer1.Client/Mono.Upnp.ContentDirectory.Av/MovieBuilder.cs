@@ -44,18 +44,17 @@ namespace Mono.Upnp.ContentDirectory.Av
 		[XmlElement ("channelName", Namespace = Schemas.UpnpSchema)]
         public string ChannelName { get; set; }
 		
-		[XmlIgnore]
         public ICollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
 		
-		[XmlIgnore]
+		// FIXME does this need XmlIgnore?
         public ICollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
 		
-		[XmlArrayItem ("scheduledStartTime", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("scheduledStartTime", Namespace = Schemas.UpnpSchema)]
 		IEnumerable<string> StartTimes {
 			get { return ToFormattedTimes (scheduled_start_times); }
 		}
 		
-		[XmlArrayItem ("scheduledEndTime", Namespace = Schemas.UpnpSchema)]
+		[XmlElement ("scheduledEndTime", Namespace = Schemas.UpnpSchema)]
 		IEnumerable<string> EndTimes {
 			get { return ToFormattedTimes (scheduled_end_times); }
 		}
