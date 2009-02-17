@@ -1,5 +1,5 @@
 // 
-// ObjectBuilder.cs
+// MovieBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -28,50 +28,36 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.ContentDirectory.Av
 {
-	public abstract class ObjectBuilder
+	public class MovieBuilder : VideoItemBuilder
 	{
-		static readonly Dictionary<Type, string> class_names = new Dictionary<Type, string> ();
+		readonly List<DateTime> scheduled_start_times = new List<DateTime> ();
+		readonly List<DateTime> scheduled_end_times = new List<DateTime> ();
 		
-		readonly List<ResourceBuilder> resources = new List<ResourceBuilder> ();
+		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
+		public string StorageMedium { get; set; }
 		
-		[XmlAttribute ("id", Namespace = Schemas.DidlLiteSchema)]
-		string id = "";
+		[XmlElement ("DVDRegionCode", Namespace = Schemas.UpnpSchema)]
+        public int? DvdRegionCode { get; set; }
 		
-		[XmlAttribute ("restricted", Namespace = Schemas.DidlLiteSchema)]
-        bool restricted;
+		[XmlElement ("channelName", Namespace = Schemas.UpnpSchema)]
+        public string ChannelName { get; set; }
 		
-		[XmlElement ("title", Namespace = Schemas.DublinCoreSchema)]
-		public string Title { get; set; }
+		[XmlIgnore]
+        public ICollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
 		
-		[XmlElement ("creator", Namespace = Schemas.DublinCoreSchema)]
-        public string Creator { get; set; }
+		[XmlIgnore]
+        public ICollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
 		
-		[XmlArrayItem]
-		protected ICollection<ResourceBuilder> Resources { get { return resources; } }
-		
-        public WriteStatus? WriteStatus { get; set; }
-		
-		[XmlElement ("class", Namespace = Schemas.UpnpSchema)]
-		string Class {
-			get {
-				var type = GetType ();
-				string name;
-				if (class_names.TryGetValue (type, out name)) {
-					return name;
-				}
-				name = ClassManager.CreateClassName (type, typeof (ObjectBuilder));
-				class_names[type] = name;
-				return name;
-			}
+		[XmlArrayItem ("scheduledStartTime", Namespace = Schemas.UpnpSchema)]
+		IEnumerable<string> StartTimes {
+			get { return ToFormattedTimes (scheduled_start_times); }
 		}
 		
-		protected static IEnumerable<string> ToFormattedTimes (IEnumerable<DateTime> times)
-		{
-			foreach (var time in times) {
-				yield return time.ToString ("o");
-			}
+		[XmlArrayItem ("scheduledEndTime", Namespace = Schemas.UpnpSchema)]
+		IEnumerable<string> EndTimes {
+			get { return ToFormattedTimes (scheduled_end_times); }
 		}
 	}
 }

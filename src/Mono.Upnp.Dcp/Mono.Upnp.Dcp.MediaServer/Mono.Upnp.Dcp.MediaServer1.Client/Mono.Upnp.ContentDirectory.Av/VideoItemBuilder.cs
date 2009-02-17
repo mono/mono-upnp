@@ -30,7 +30,7 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class VideoItemBuilder : ItemBuilder
+	public abstract class VideoItemBuilder : ItemBuilder
 	{
 		readonly List<string> genres = new List<string> ();
 		readonly List<string> producers = new List<string> ();
