@@ -1,5 +1,5 @@
 // 
-// ItemBuilder.cs
+// VideoBroadcastBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -27,11 +27,18 @@
 using System;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("item")]
-	[XmlType ("item", Namespace = Schemas.DidlLiteSchema)]
-	public class ItemBuilder : ObjectBuilder
+	[ClassName ("videoBroadcast")]
+	public class VideoBroadcastBuilder : VideoItemBuilder
 	{
+		[XmlElement ("icon", Namespace = Schemas.UpnpSchema)]
+		public Uri Icon { get; set; }
+		
+		[XmlElement ("region", Namespace = Schemas.UpnpSchema)]
+        public string Region { get; set; }
+		
+		[XmlElement ("channelNr", Namespace = Schemas.UpnpSchema)]
+        public int? ChannelNr { get; set; }
 	}
 }

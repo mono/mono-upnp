@@ -29,8 +29,9 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory
 {
+	[ClassName ("container")]
 	[XmlType ("container", Namespace = Schemas.DidlLiteSchema)]
-	public abstract class ContainerBuilder : ObjectBuilder
+	public class ContainerBuilder : ObjectBuilder
 	{
 	}
 }

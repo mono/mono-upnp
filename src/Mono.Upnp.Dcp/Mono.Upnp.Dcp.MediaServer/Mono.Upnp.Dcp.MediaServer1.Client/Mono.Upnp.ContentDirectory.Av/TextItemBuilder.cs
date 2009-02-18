@@ -1,5 +1,5 @@
 // 
-// VideoItemBuilder.cs
+// TextItemBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -30,44 +30,49 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("videoItem")]
-	public class VideoItemBuilder : ItemBuilder
+	[ClassName ("textItem")]
+	public class TextItemBuilder : ItemBuilder
 	{
-		readonly List<string> genres = new List<string> ();
-		readonly List<string> producers = new List<string> ();
-		readonly List<PersonWithRole> actors = new List<PersonWithRole> ();
-		readonly List<string> directors = new List<string> ();
+		readonly List<PersonWithRole> authors = new List<PersonWithRole> ();
 		readonly List<string> publishers = new List<string> ();
+		readonly List<string> contributors = new List<string> ();
 		readonly List<Uri> relations = new List<Uri> ();
+		readonly List<string> rights = new List<string> ();
 		
-		[XmlElement ("genre", Namespace = Schemas.UpnpSchema)]
-		public ICollection<string> Genres { get { return genres; } }
+		[XmlElement ("author", Namespace = Schemas.UpnpSchema)]
+		public ICollection<PersonWithRole> Authors { get { return authors; } }
+		
+		[XmlElement ("protection", Namespace = Schemas.UpnpSchema)]
+		public string Protection { get; set; }
 		
 		[XmlElement ("longDescription", Namespace = Schemas.UpnpSchema)]
-        public string LongDescription { get; set; }
+		public string LongDescription { get; set; }
 		
-		[XmlElement ("producer", Namespace = Schemas.UpnpSchema)]
-        public ICollection<string> Producers { get { return producers; } }
+		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
+		public string StorageMedium { get; set; }
 		
 		[XmlElement ("rating", Namespace = Schemas.UpnpSchema)]
-        public string Rating { get; set; }
-		
-		[XmlElement ("actor", Namespace = Schemas.UpnpSchema)]
-        public ICollection<PersonWithRole> Actors { get { return actors; } }
-		
-		[XmlElement ("director", Namespace = Schemas.UpnpSchema)]
-        public ICollection<string> Directors { get { return directors; } }
+		public string Rating { get; set; }
 		
 		[XmlElement ("description", Namespace = Schemas.DublinCoreSchema)]
-        public string Description { get; set; }
+		public string Description { get; set; }
 		
 		[XmlElement ("publisher", Namespace = Schemas.DublinCoreSchema)]
-        public ICollection<string> Publishers { get {return publishers; } }
+		public ICollection<string> Publishers { get { return publishers; } }
 		
-		[XmlElement ("language", Namespace = Schemas.DublinCoreSchema)]
-        public string Language { get; set; }
+		[XmlElement ("contributor", Namespace = Schemas.DublinCoreSchema)]
+		public ICollection<string> Contributors { get { return contributors; } }
+		
+		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]
+		public string Date { get; set; }
 		
 		[XmlElement ("relation", Namespace = Schemas.DublinCoreSchema)]
-        public ICollection<Uri> Relations { get { return relations; } }
+		public ICollection<Uri> Relations { get { return relations; } }
+		
+		[XmlElement ("language", Namespace = Schemas.DublinCoreSchema)]
+		public string Language { get; set; }
+		
+		[XmlElement ("rights", Namespace = Schemas.DublinCoreSchema)]
+		public ICollection<string> Rights { get { return rights; } }
 	}
 }

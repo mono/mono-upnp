@@ -30,7 +30,8 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory
 {
-	public abstract class ObjectBuilder
+	[ClassName ("object")]
+	public class ObjectBuilder
 	{
 		static readonly Dictionary<Type, string> class_names = new Dictionary<Type, string> ();
 		
@@ -49,7 +50,7 @@ namespace Mono.Upnp.ContentDirectory
         public string Creator { get; set; }
 		
 		[XmlElement ("res", Namespace = Schemas.DidlLiteSchema)]
-		protected ICollection<ResourceBuilder> Resources { get { return resources; } }
+		public ICollection<ResourceBuilder> Resources { get { return resources; } }
 		
         public WriteStatus? WriteStatus { get; set; }
 		

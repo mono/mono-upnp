@@ -1,5 +1,5 @@
 // 
-// ItemBuilder.cs
+// PersonBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,14 +24,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("item")]
-	[XmlType ("item", Namespace = Schemas.DidlLiteSchema)]
-	public class ItemBuilder : ObjectBuilder
+	[ClassName ("person")]
+	public class PersonBuilder : ContainerBuilder
 	{
+		[XmlElement ("language", Namespace = Schemas.DublinCoreSchema)]
+		public string Language { get; set; }
 	}
 }

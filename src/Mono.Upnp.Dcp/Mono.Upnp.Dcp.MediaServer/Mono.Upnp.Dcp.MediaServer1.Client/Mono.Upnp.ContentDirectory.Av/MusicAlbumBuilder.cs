@@ -1,5 +1,5 @@
 // 
-// ItemBuilder.cs
+// MusicAlbumBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -25,13 +25,32 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("item")]
-	[XmlType ("item", Namespace = Schemas.DidlLiteSchema)]
-	public class ItemBuilder : ObjectBuilder
+	[ClassName ("musicAlbum")]
+	public class MusicAlbumBuilder : AlbumBuilder
 	{
+		readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
+		readonly List<string> genres = new List<string> ();
+		readonly List<string> producers = new List<string> ();
+		readonly List<Uri> album_art_uris = new List<Uri> ();
+		
+		[XmlElement ("artist", Namespace = Schemas.UpnpSchema)]
+		public ICollection<PersonWithRole> Artists { get { return artists; } }
+		
+		[XmlElement ("genre", Namespace = Schemas.UpnpSchema)]
+		public ICollection<string> Genres { get { return genres; } }
+		
+		[XmlElement ("producer", Namespace = Schemas.UpnpSchema)]
+		public ICollection<string> Producers { get { return producers; } }
+		
+		[XmlElement ("albumArtURI", Namespace = Schemas.UpnpSchema)]
+		public ICollection<Uri> AlbumArtUris { get { return album_art_uris; } }
+		
+		[XmlElement ("toc", Namespace = Schemas.UpnpSchema)]
+		public string Toc { get; set; }
 	}
 }

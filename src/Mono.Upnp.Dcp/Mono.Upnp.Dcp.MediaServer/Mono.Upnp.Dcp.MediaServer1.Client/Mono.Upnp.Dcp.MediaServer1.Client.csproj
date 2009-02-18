@@ -116,6 +116,23 @@
     <Compile Include="Mono.Upnp.ContentDirectory.Av\AudioBookBuilder.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory.Av\VideoItemBuilder.cs" />
     <Compile Include="Mono.Upnp.ContentDirectory.Av\MovieBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\VideoBroadcastBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\ImageItemBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicVideoClipBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\PhotoBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\PlaylistItemBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\TextItemBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicAlbumBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\PhotoAlbumBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\GenreBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicGenreBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MovieGenreBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\PlaylistContainerBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\PersonBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\MusicArtistBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\StorageSystemBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\StorageVolumeBuilder.cs" />
+    <Compile Include="Mono.Upnp.ContentDirectory.Av\StorageFolderBuilder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

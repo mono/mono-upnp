@@ -1,5 +1,5 @@
 // 
-// MovieBuilder.cs
+// MusicVideoClipBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -30,25 +30,33 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("movie")]
-	public class MovieBuilder : VideoItemBuilder
+	[ClassName ("musicVideoClip")]
+	public class MusicVideoClipBuilder : VideoItemBuilder
 	{
+		readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
+		readonly List<string> albums = new List<string> ();
 		readonly List<DateTime> scheduled_start_times = new List<DateTime> ();
 		readonly List<DateTime> scheduled_end_times = new List<DateTime> ();
+		readonly List<string> contributors = new List<string> ();
+		
+		[XmlElement ("artist", Namespace = Schemas.UpnpSchema)]
+		public ICollection<PersonWithRole> Artists { get { return artists; } }
 		
 		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
 		public string StorageMedium { get; set; }
 		
-		[XmlElement ("DVDRegionCode", Namespace = Schemas.UpnpSchema)]
-        public int? DvdRegionCode { get; set; }
+		[XmlElement ("album", Namespace = Schemas.UpnpSchema)]
+		public ICollection<string> Albums { get { return albums; } }
 		
-		[XmlElement ("channelName", Namespace = Schemas.UpnpSchema)]
-        public string ChannelName { get; set; }
+		public ICollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
 		
-        public ICollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
-		
-		// FIXME does this need XmlIgnore?
         public ICollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
+		
+		[XmlElement ("contributor", Namespace = Schemas.DublinCoreSchema)]
+		public ICollection<string> Contributors { get { return contributors; } }
+		
+		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]
+		public string Date { get; set; }
 		
 		[XmlElement ("scheduledStartTime", Namespace = Schemas.UpnpSchema)]
 		IEnumerable<string> StartTimes {

@@ -1,5 +1,5 @@
 // 
-// ItemBuilder.cs
+// PlaylistItemBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,14 +24,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("item")]
-	[XmlType ("item", Namespace = Schemas.DidlLiteSchema)]
-	public class ItemBuilder : ObjectBuilder
+	[ClassName ("playlistItem")]
+	public class PlaylistItemBuilder : ItemBuilder
 	{
+		readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
+		readonly List<string> genres = new List<string> ();
+		
+		[XmlElement ("artist", Namespace = Schemas.UpnpSchema)]
+		public ICollection<PersonWithRole> Artists { get { return artists; } }
+		
+		[XmlElement ("genre", Namespace = Schemas.UpnpSchema)]
+		public ICollection<string> Genres { get { return genres; } }
+		
+		[XmlElement ("longDescription", Namespace = Schemas.UpnpSchema)]
+		public string LongDescription { get; set; }
+		
+		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
+		public string StorageMedium { get; set; }
+		
+		[XmlElement ("description", Namespace = Schemas.DublinCoreSchema)]
+		public string Description { get; set; }
+		
+		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]
+		public string Date { get; set; }
+		
+		[XmlElement ("language", Namespace = Schemas.DublinCoreSchema)]
+		public string Language { get; set; }
 	}
 }

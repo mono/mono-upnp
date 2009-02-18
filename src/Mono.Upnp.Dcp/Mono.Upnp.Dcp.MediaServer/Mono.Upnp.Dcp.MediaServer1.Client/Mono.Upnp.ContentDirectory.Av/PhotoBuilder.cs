@@ -1,5 +1,5 @@
 // 
-// ItemBuilder.cs
+// PhotoBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,14 +24,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("item")]
-	[XmlType ("item", Namespace = Schemas.DidlLiteSchema)]
-	public class ItemBuilder : ObjectBuilder
+	public class PhotoBuilder : ImageItemBuilder
 	{
+		readonly List<string> albums = new List<string> ();
+		
+		[XmlElement ("album", Namespace = Schemas.UpnpSchema)]
+		public ICollection<string> Albums { get { return albums; } }
 	}
 }

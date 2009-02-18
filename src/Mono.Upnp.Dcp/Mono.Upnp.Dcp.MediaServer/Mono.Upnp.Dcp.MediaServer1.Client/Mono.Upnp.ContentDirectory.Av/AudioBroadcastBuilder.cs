@@ -30,6 +30,7 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
+	[ClassName ("audioBroadcast")]
 	public class AudioBroadcastBuilder : AudioItemBuilder
 	{
 		public AudioBroadcastBuilder (IEnumerable<ResourceBuilder> resources)

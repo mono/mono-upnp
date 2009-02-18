@@ -1,5 +1,5 @@
 // 
-// ItemBuilder.cs
+// GenreBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,14 +24,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("item")]
-	[XmlType ("item", Namespace = Schemas.DidlLiteSchema)]
-	public class ItemBuilder : ObjectBuilder
+	[ClassName ("genre")]
+	public class GenreBuilder : ContainerBuilder
 	{
+		[XmlElement ("longDescription", Namespace = Schemas.UpnpSchema)]
+		public string LongDescription { get; set; }
+		
+		[XmlElement ("description", Namespace = Schemas.DublinCoreSchema)]
+		public string Description { get; set; }
 	}
 }

@@ -1,5 +1,5 @@
 // 
-// MusicTrackBuilder.cs
+// PlaylistContainerBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -30,40 +30,43 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("musicTrack")]
-	public class MusicTrackBuilder : AudioItemBuilder
+	[ClassName ("playlistContainer")]
+	public class PlaylistContainerBuilder : ContainerBuilder
 	{
 		readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
-		readonly List<string> albums = new List<string> ();
-		readonly List<string> playlists = new List<string> ();
+		readonly List<string> genres = new List<string> ();
+		readonly List<string> producers = new List<string> ();
 		readonly List<string> contributors = new List<string> ();
-		
-		public MusicTrackBuilder (Uri resourceUri, string contentType)
-		{
-			Resources.Add (new ResourceBuilder (resourceUri, contentType ?? "audio"));
-		}
+		readonly List<string> rights = new List<string> ();
 		
 		[XmlElement ("artist", Namespace = Schemas.UpnpSchema)]
 		public ICollection<PersonWithRole> Artists { get { return artists; } }
 		
-		[XmlElement ("album", Namespace = Schemas.UpnpSchema)]
-        public ICollection<string> Albums { get { return albums; } }
+		[XmlElement ("genre", Namespace = Schemas.UpnpSchema)]
+		public ICollection<string> Genres { get { return genres; } }
 		
-		[XmlElement ("originalTrackNumber", Namespace = Schemas.UpnpSchema)]
-        public int? OriginalTrackNumber { get; private set; }
+		[XmlElement ("longDescription", Namespace = Schemas.UpnpSchema)]
+		public string LongDescription { get; set; }
 		
-		[XmlElement ("playlist", Namespace = Schemas.UpnpSchema)]
-        public ICollection<string> Playlists { get { return playlists; } }
+		[XmlElement ("producer", Namespace = Schemas.UpnpSchema)]
+		public ICollection<string> Producers { get { return producers; } }
 		
 		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
-        public string StorageMedium { get; private set; }
+		public string StorageMedium { get; set; }
+		
+		[XmlElement ("description", Namespace = Schemas.DublinCoreSchema)]
+		public string Description { get; set; }
 		
 		[XmlElement ("contributor", Namespace = Schemas.DublinCoreSchema)]
-        public ICollection<string> Contributors { get { return contributors; } }
+		public ICollection<string> Contributors { get { return contributors; } }
 		
 		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]
-        public string Date { get; private set; }
+		public string Date { get; set; }
 		
-		//public Uri LyricsUri { get; private set; }
+		[XmlElement ("language", Namespace = Schemas.DublinCoreSchema)]
+		public string Language { get; set; }
+		
+		[XmlElement ("rights", Namespace = Schemas.DublinCoreSchema)]
+		public ICollection<string> Rights { get { return rights; } }
 	}
 }

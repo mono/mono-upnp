@@ -30,6 +30,7 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
+	[ClassName ("audioBook")]
 	public class AudioBookBuilder : AudioItemBuilder
 	{
 		readonly List<string> producers = new List<string> ();

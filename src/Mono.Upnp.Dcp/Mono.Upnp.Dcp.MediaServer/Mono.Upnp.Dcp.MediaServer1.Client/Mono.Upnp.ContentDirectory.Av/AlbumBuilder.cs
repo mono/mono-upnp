@@ -30,7 +30,8 @@ using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public abstract class AlbumBuilder : ContainerBuilder
+	[ClassName ("album")]
+	public class AlbumBuilder : ContainerBuilder
 	{
 		readonly List<string> publishers = new List<string> ();
 		readonly List<string> contributors = new List<string> ();

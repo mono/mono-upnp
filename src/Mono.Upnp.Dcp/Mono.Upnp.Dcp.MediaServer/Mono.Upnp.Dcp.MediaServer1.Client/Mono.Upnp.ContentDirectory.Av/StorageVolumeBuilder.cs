@@ -1,5 +1,5 @@
 // 
-// ItemBuilder.cs
+// StorageVolumeBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,14 +24,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
 using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory
 {
-	[ClassName ("item")]
-	[XmlType ("item", Namespace = Schemas.DidlLiteSchema)]
-	public class ItemBuilder : ObjectBuilder
+	[ClassName ("storageVolume")]
+	public class StorageVolumeBuilder : ContainerBuilder
 	{
+		[XmlElement ("storageTotal", Namespace = Schemas.UpnpSchema)]
+		public long StorageTotal { get; set; }
+		
+		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
+		public string StorageMedium { get; set; }
 	}
 }

@@ -1,5 +1,5 @@
 // 
-// ItemBuilder.cs
+// ImageItemBuilder.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,14 +24,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.ContentDirectory.Av
 {
-	[ClassName ("item")]
-	[XmlType ("item", Namespace = Schemas.DidlLiteSchema)]
-	public class ItemBuilder : ObjectBuilder
+	[ClassName ("imageItem")]
+	public class ImageItemBuilder : ItemBuilder
 	{
+		readonly List<string> publishers = new List<string> ();
+		readonly List<string> rights = new List<string> ();
+		
+		[XmlElement ("longDescription", Namespace = Schemas.UpnpSchema)]
+		public string LongDescription { get; set; }
+		
+		[XmlElement ("storageMedium", Namespace = Schemas.UpnpSchema)]
+		public string StorageMedium { get; set; }
+		
+		[XmlElement ("rating", Namespace = Schemas.UpnpSchema)]
+		public string Rating { get; set; }
+		
+		[XmlElement ("description", Namespace = Schemas.DublinCoreSchema)]
+		public string Description { get; set; }
+		
+		[XmlElement ("publisher", Namespace = Schemas.DublinCoreSchema)]
+		public ICollection<string> Publishers { get { return publishers; } }
+		
+		[XmlElement ("date", Namespace = Schemas.DublinCoreSchema)]
+		public string Date { get; set; }
+		
+		[XmlElement ("rights", Namespace = Schemas.DublinCoreSchema)]
+		public ICollection<string> Rights { get { return rights; } }
 	}
 }
