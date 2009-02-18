@@ -73,15 +73,14 @@ namespace Mono.Upnp.ContentDirectory
         }
 
         public bool CanCreateObject { get { return controller.Actions.ContainsKey ("CreateObject"); } }
-        public void CreateObject (string containerId, string elements, out string objectId, out string result)
+        public string CreateObject (string containerId, string elements)
         {
             if (!CanCreateObject) throw new NotImplementedException ();
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
             in_arguments.Add ("ContainerID", containerId);
             in_arguments.Add ("Elements", elements);
             ActionResult action_result = controller.Actions["CreateObject"].Invoke (in_arguments);
-            objectId = action_result.OutValues["ObjectID"];
-            result = action_result.OutValues["Result"];
+            return action_result.OutValues["Result"];
         }
 
         public bool CanDestroyObject { get { return controller.Actions.ContainsKey ("DestroyObject"); } }

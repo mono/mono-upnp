@@ -49,6 +49,15 @@ namespace Mono.Upnp.ContentDirectory
 			return ParentId == "-1" ? null : ContentDirectory.GetObject<Container> (ParentId);
 		}
 		
+		public bool CanDestroy {
+			get { return !IsRestricted && ContentDirectory.Controller.CanDestroyObject; }
+		}
+		
+		public void Destroy ()
+		{
+			ContentDirectory.Controller.DestroyObject (Id);
+		}
+		
 		public bool IsOutOfDate {
 			get { return ContentDirectory.CheckIfObjectIsOutOfDate (this); }
 		}
@@ -59,7 +68,7 @@ namespace Mono.Upnp.ContentDirectory
         public string Creator { get; private set; }
         public ReadOnlyCollection<Resource> Resources { get { return resources; } }
         public Class Class { get; private set; }
-        public bool Restricted { get; private set; }
+        public bool IsRestricted { get; private set; }
         public WriteStatus? WriteStatus { get; private set; }
 		internal ContentDirectory ContentDirectory { get; private set; }
 		internal uint ParentUpdateId { get; set; }
@@ -85,7 +94,7 @@ namespace Mono.Upnp.ContentDirectory
             ParentId = reader["parentID", Schemas.DidlLiteSchema];
             bool restricted;
             if (bool.TryParse (reader["restricted", Schemas.DidlLiteSchema], out restricted)) {
-                Restricted = restricted;
+                IsRestricted = restricted;
 				has_restricted = true;
             }
 			

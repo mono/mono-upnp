@@ -27,7 +27,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace Mono.Upnp.ContentDirectory
 {
@@ -69,6 +72,26 @@ namespace Mono.Upnp.ContentDirectory
 			return ContentDirectory.Search<Object> (Id, searchCriteria, settings);
 		}
 		
+		public T CreateObject<T> (ObjectBuilder builder) where T : Object
+		{
+			// TODO update resources
+			var xml = new StringBuilder ();
+			using (var stream = new StringWriter (xml)) {
+				using (var writer = XmlWriter.Create (stream)) {
+					writer.WriteStartElement ("DIDL-Lite", Schemas.DidlLiteSchema);
+					writer.WriteAttributeString ("xmlns", "dc", null, Schemas.DublinCoreSchema);
+					writer.WriteAttributeString ("xmlns", "upnp", null, Schemas.UpnpSchema);
+					var serializer = new XmlSerializer (builder.GetType ());
+					serializer.Serialize (writer, builder);
+				}
+			}
+			var @object = ContentDirectory.Controller.CreateObject (Id, xml.ToString ());
+			foreach (var result in ContentDirectory.Deserialize<T> ("*", @object)) {
+				return result;
+			}
+			return null;
+		}
+		
 		public bool CanSearchForType<T> () where T : Object
 		{
 			return Searchable && IsValidType<T> (search_classes, true);
@@ -76,7 +99,7 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public bool CanCreateType<T> () where T : Object
 		{
-			return IsValidType<T> (create_classes, false);
+			return ContentDirectory.Controller.CanCreateObject && IsValidType<T> (create_classes, false);
 		}
 		
 		public Object CreateReference (Object target)
@@ -84,7 +107,7 @@ namespace Mono.Upnp.ContentDirectory
 			// TODO return actual object? That is another network call
 			// (but we're doing network calls anyway, so it's not like
 			// speed is SOOO important
-			if (Restricted) throw new InvalidOperationException (
+			if (IsRestricted) throw new InvalidOperationException (
 				"A reference cannot be created because the parent object is restricted.");
 			
 			var id = ContentDirectory.Controller.CreateReference (Id, target.Id);
