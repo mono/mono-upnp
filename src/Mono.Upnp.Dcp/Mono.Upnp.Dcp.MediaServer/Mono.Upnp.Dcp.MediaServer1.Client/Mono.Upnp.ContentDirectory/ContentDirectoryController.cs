@@ -19,6 +19,10 @@ namespace Mono.Upnp.ContentDirectory
             this.controller = controller;
             Verify ();
         }
+		
+		public ServiceController ServiceController {
+			get { return controller; }
+		}
 
         public string GetSearchCapabilities ()
         {

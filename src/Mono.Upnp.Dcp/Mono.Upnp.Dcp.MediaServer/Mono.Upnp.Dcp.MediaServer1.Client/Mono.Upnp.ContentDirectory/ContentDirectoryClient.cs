@@ -20,7 +20,7 @@ namespace Mono.Upnp.ContentDirectory
         public ContentDirectoryClient (UpnpClient client)
         {
             this.client = client ?? new UpnpClient ();
-            client.ServiceAdded += ClientServiceAdded;
+            this.client.ServiceAdded += ClientServiceAdded;
         }
 
         public UpnpClient Client {
