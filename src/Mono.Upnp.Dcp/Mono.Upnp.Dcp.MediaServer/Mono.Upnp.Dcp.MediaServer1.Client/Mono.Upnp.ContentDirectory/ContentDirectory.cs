@@ -41,6 +41,7 @@ namespace Mono.Upnp.ContentDirectory
 		readonly Dictionary<string, uint> container_update_ids = new Dictionary<string, uint> ();
 		
 		readonly ContentDirectoryController controller;
+		Container root_container;
 		
 		public ContentDirectory (ContentDirectoryController controller)
 		{
@@ -50,6 +51,14 @@ namespace Mono.Upnp.ContentDirectory
 		}
 		
 		public ContentDirectoryController Controller { get { return controller; } }
+		
+		public Container GetRootContainer ()
+		{
+			if (root_container == null) {
+				root_container = GetObject<Container> ("0");
+			}
+			return root_container;
+		}
 		
 		internal IEnumerable<T> Deserialize<T> (string filter, string xml) where T : Object
 		{
@@ -142,48 +151,6 @@ namespace Mono.Upnp.ContentDirectory
 			}
 			
 			return null;
-		}
-		
-		public Results<Object> Browse ()
-		{
-			return Browse (null);
-		}
-		
-		public Results<Object> Browse (ResultsSettings settings)
-		{
-			return Browse ("0", settings);
-		}
-		
-		internal Results<Object> Browse (string id, ResultsSettings settings)
-		{
-			var results = settings != null
-				? new BrowseResults (this, id, settings.SortCriteria,
-					settings.Filter, settings.RequestCount, settings.Offset)
-				: new BrowseResults (this, id, null, null, 0, 0);
-			results.FetchResults ();
-			return results;
-		}
-		
-		public Results<Object> Search (string searchCriteria)
-		{
-			return Search (searchCriteria, null);
-		}
-		
-		public Results<Object> Search (string searchCriteria, ResultsSettings settings)
-		{
-			return Search<Object> ("0", searchCriteria, settings);
-		}
-		
-		internal Results<T> Search<T> (string id, string searchCriteria, ResultsSettings settings) where T : Object
-		{
-			if (searchCriteria == null) throw new ArgumentNullException ("searchCriteria");
-			
-			var results = settings != null
-				? new SearchResults<T> (this, id, searchCriteria,
-					settings.SortCriteria, settings.Filter, settings.RequestCount, settings.Offset)
-				: new SearchResults<T> (this, id, searchCriteria, null, null, 0, 0);
-			results.FetchResults ();
-			return results;
 		}
 		
 		public static T GetUpdatedObject<T> (T @object) where T : Object

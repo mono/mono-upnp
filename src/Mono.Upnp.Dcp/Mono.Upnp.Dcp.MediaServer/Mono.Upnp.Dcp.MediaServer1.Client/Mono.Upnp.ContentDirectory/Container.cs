@@ -59,7 +59,12 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public Results<Object> Browse (ResultsSettings settings)
 		{
-			return ContentDirectory.Browse (Id, settings);
+			var results = settings != null
+				? new BrowseResults (ContentDirectory, Id, settings.SortCriteria,
+					settings.Filter, settings.RequestCount, settings.Offset)
+				: new BrowseResults (ContentDirectory, Id, null, null, 0, 0);
+			results.FetchResults ();
+			return results;
 		}
 		
 		public Results<Object> Search (string searchCriteria)
@@ -69,7 +74,19 @@ namespace Mono.Upnp.ContentDirectory
 		
 		public Results<Object> Search (string searchCriteria, ResultsSettings settings)
 		{
-			return ContentDirectory.Search<Object> (Id, searchCriteria, settings);
+			return Search<Object> (searchCriteria, settings);
+		}
+		
+		internal Results<T> Search<T> (string searchCriteria, ResultsSettings settings) where T : Object
+		{
+			if (searchCriteria == null) throw new ArgumentNullException ("searchCriteria");
+			
+			var results = settings != null
+				? new SearchResults<T> (ContentDirectory, Id, searchCriteria,
+					settings.SortCriteria, settings.Filter, settings.RequestCount, settings.Offset)
+				: new SearchResults<T> (ContentDirectory, Id, searchCriteria, null, null, 0, 0);
+			results.FetchResults ();
+			return results;
 		}
 		
 		public T CreateObject<T> (ObjectBuilder builder) where T : Object

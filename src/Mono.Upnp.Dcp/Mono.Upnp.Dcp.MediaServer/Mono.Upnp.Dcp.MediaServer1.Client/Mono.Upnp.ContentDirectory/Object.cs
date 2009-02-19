@@ -78,7 +78,6 @@ namespace Mono.Upnp.ContentDirectory
 			return string.Format("{0} ({1})", Id, Class.FullClassName);
 		}
 
-
         internal void Deserialize (ContentDirectory contentDirectory, XmlReader reader)
         {
 			ContentDirectory = contentDirectory;
