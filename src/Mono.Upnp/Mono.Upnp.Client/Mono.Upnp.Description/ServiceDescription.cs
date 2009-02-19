@@ -156,7 +156,7 @@ namespace Mono.Upnp.Description
             case "controlURL":
                 ControlUrl = deserializer.DeserializeUrl (reader);
                 break;
-            case "eventsubURL":
+            case "eventSubURL":
                 EventUrl = deserializer.DeserializeUrl (reader);
                 break;
             default: // This is a workaround for Mono bug 334752

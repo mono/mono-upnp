@@ -292,7 +292,7 @@ namespace Mono.Upnp.Control
         {
             if (argument.RelatedStateVariable == null) {
                 Log.Exception (new UpnpDeserializationException (
-                    string.Format ("{0} does not have the related state variable.", argument)));
+                    string.Format ("{0} does not have a related state variable.", argument)));
             }
         }
 

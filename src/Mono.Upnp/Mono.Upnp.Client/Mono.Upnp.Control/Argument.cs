@@ -65,7 +65,7 @@ namespace Mono.Upnp.Control
 
         public StateVariable RelatedStateVariable {
             get {
-                if (RelatedStateVariableName == null) {
+                if (RelatedStateVariableName != null) {
                     action.Controller.StateVariables.TryGetValue (RelatedStateVariableName, out related_state_variable);
                 }
                 return related_state_variable;
@@ -157,7 +157,7 @@ namespace Mono.Upnp.Control
 
         public override string ToString ()
         {
-            return string.Format (@"Argument {{ {1} }}", Name);
+            return string.Format (@"Argument {{ {0} }}", Name);
         }
     }
 }
