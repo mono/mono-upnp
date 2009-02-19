@@ -269,7 +269,7 @@ namespace Mono.Upnp.Control
 				var argument_reader = reader.ReadSubtree ();
 				argument_reader.Read ();
                 try {
-                    DeserializeArgument (reader.ReadSubtree ());
+                    DeserializeArgument (reader);
                 } catch (Exception e) {
                     Log.Exception ("There was a problem deserializing an argument list element.", e);
                 } finally {
