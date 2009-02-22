@@ -157,7 +157,7 @@ namespace Mono.Upnp.ContentDirectory
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			Searchable = reader["searchable", Schemas.DidlLiteSchema] == "true";
+			Searchable = bool.Parse (reader["searchable", Schemas.DidlLiteSchema]);
 			int child_count;
 			if (int.TryParse (reader["childCount", Schemas.DidlLiteSchema], out child_count)) {
 				ChildCount = child_count;

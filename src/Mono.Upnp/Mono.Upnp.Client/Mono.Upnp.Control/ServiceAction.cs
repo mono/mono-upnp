@@ -156,13 +156,13 @@ namespace Mono.Upnp.Control
         }
         
         internal void SerializeRequest (IDictionary<string, string> arguments,
-                                         WebHeaderCollection headers, XmlWriter writer)
+                                        WebHeaderCollection headers, XmlWriter writer)
         {
             SerializeRequestCore (arguments, headers, writer);
         }
 
         protected virtual void SerializeRequestCore (IDictionary<string, string> arguments,
-                                                       WebHeaderCollection headers, XmlWriter writer)
+                                                     WebHeaderCollection headers, XmlWriter writer)
         {
             Helper.WriteStartSoapBody (writer);
             SerializeRequestCore (arguments, writer);

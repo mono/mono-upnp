@@ -89,7 +89,7 @@ namespace Mono.Upnp.ContentDirectory
         {
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-            Id = reader["id", Schemas.DidlLiteSchema];
+            Id = reader["id"];
             ParentId = reader["parentID", Schemas.DidlLiteSchema];
             bool restricted;
             if (bool.TryParse (reader["restricted", Schemas.DidlLiteSchema], out restricted)) {

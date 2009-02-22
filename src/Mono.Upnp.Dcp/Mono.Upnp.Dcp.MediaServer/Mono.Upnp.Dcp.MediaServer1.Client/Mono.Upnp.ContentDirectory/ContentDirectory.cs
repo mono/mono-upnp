@@ -68,7 +68,7 @@ namespace Mono.Upnp.ContentDirectory
 			
 			using (var reader = new StringReader (xml)) {
 				var navigator = new XPathDocument (reader).CreateNavigator ();
-				if (navigator.MoveToNext ("DIDL-Lite", Schemas.DidlLiteSchema) && navigator.MoveToFirstChild ()) {
+				if (navigator.MoveToChild ("DIDL-Lite", Schemas.DidlLiteSchema) && navigator.MoveToFirstChild ()) {
 					do {
 						yield return DerserializeObject<T> (filter, navigator);
 					} while (navigator.MoveToNext ());
@@ -114,7 +114,10 @@ namespace Mono.Upnp.ContentDirectory
 			}
 			
 			var @object = (T)Activator.CreateInstance (type, true);
-			@object.Deserialize (this, navigator.ReadSubtree ());
+            using (var reader = navigator.ReadSubtree ()) {
+                reader.Read ();
+                @object.Deserialize (this, reader);
+            }
 			if (container_update_ids.ContainsKey (@object.ParentId)) {
 				@object.ParentUpdateId = container_update_ids[@object.ParentId];
 			}

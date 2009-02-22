@@ -68,7 +68,7 @@ namespace Mono.Upnp.Internal
         }
 
         readonly static Dictionary<string, FallbackInfo> fallbacks = new Dictionary<string, FallbackInfo> ();
-        readonly static Encoding fallback_utf8 = new UTF8Encoding (true);
+        readonly static Encoding fallback_utf8 = new UTF8Encoding (false);
 
         readonly Uri location;
         readonly FallbackInfo fallback;
@@ -87,18 +87,18 @@ namespace Mono.Upnp.Internal
 
         public ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments, int retry)
         {
-            Encoding encoding, fallbackEncoding;
+            Encoding encoding, fallback_encoding;
             if (fallback.UseDefaultUtf8) {
                 encoding = Encoding.UTF8;
-                fallbackEncoding = fallback_utf8;
+                fallback_encoding = fallback_utf8;
             } else {
                 encoding = fallback_utf8;
-                fallbackEncoding = Encoding.UTF8;
+                fallback_encoding = Encoding.UTF8;
             }
             var result = Invoke (action, arguments, encoding, retry, false);
             if (result == null) {
                 fallback.UseDefaultUtf8 = !fallback.UseDefaultUtf8;
-                result = Invoke (action, arguments, fallbackEncoding, retry, true);
+                result = Invoke (action, arguments, fallback_encoding, retry, true);
             }
             return result;
         }
