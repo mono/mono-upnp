@@ -1,3 +1,8 @@
+2009-02-22  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Internal/SoapInvoker.cs: Got ride of "private"
+	modifiers.
+
 2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Discovery: Got rid of Mono.Upnp.Discovery

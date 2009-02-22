@@ -130,15 +130,22 @@ Global
 		$0.StandardHeader = $1
 		$1.inheritsSet = MITX11License
 		$0.DotNetNamingPolicy = $2
-		$2.DirectoryNamespaceAssociation = None
+		$2.DirectoryNamespaceAssociation = Flat
 		$2.ResourceNamePolicy = FileFormatDefault
 		$0.TextStylePolicy = $3
 		$3.FileWidth = 120
 		$3.TabWidth = 4
-		$3.TabsToSpaces = False
+		$3.TabsToSpaces = True
 		$3.NoTabsAfterNonTabs = False
 		$3.RemoveTrailingWhitespace = False
 		$3.EolMarker = Native
+		$0.VersionControlPolicy = $4
+		$4.inheritsSet = Mono
+		$0.ChangeLogPolicy = $5
+		$5.UpdateMode = Nearest
+		$5.MessageStyle = $6
+		$6.LineAlign = 0
+		$5.inheritsSet = Mono
 		name = Mono.Upnp
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution

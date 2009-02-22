@@ -11,20 +11,27 @@ namespace Mono.Upnp.ConsoleClient
     {
         static void Main (string[] args)
         {
-//            ContentDirectory1Client client = new ContentDirectory1Client ();
-//            client.ContentDirectory1Added += client_ContentDirectory1Added;
-//            client.Browse ();
+            var client = new ContentDirectoryClient ();
+            client.ContentDirectoryAdded += client_ContentDirectoryAdded;
+            client.Browse ();
 
             while (true) {
                 System.Threading.Thread.Sleep (1000);
             }
         }
 
-//        static void client_ContentDirectory1Added (object sender, DiscoveryEventArgs<ContentDirectory> e)
-//        {
-//            string results, returned, count, s;
-//            //e.Item.Browse ("0", BrowseFlag.BrowseDirectChildren, "*", 0, 10, "", out results, out returned, out count, out s);
-//            Console.WriteLine (results);
-//        }
+        static void HandleServiceAdded(object sender, ServiceEventArgs e)
+        {
+        	Console.WriteLine (e.Service);
+        }
+
+        static void client_ContentDirectoryAdded (object sender, DiscoveryEventArgs<Mono.Upnp.ContentDirectory.ContentDirectory> e)
+        {
+			Console.WriteLine ("Found");
+            var root = e.Item.GetRootContainer ();
+			foreach (var item in root.Browse ()) {
+				Console.WriteLine (item);
+			}
+        }
     }
 }

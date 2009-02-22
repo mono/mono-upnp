@@ -96,8 +96,8 @@ namespace Mono.Upnp.Internal
             return result;
         }
 
-        private ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments,
-                             Encoding encoding, int retry, bool isFallback)
+        ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments,
+                            Encoding encoding, int retry, bool isFallback)
         {
             // Because we may do several fallbacks, we serialize to a memory stream and copy that
             // to the network stream. That way we only have to serialize once (unless we have to
@@ -131,7 +131,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse GetResponse (ServiceAction action, WebHeaderCollection headers,
+        HttpWebResponse GetResponse (ServiceAction action, WebHeaderCollection headers,
 			                                 int retry, Stream stream)
         {
             var response = Stage1 (action, headers, retry, stream);
@@ -143,7 +143,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, int retry, Stream stream)
+        HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, int retry, Stream stream)
         {
             if (fallback.OmitMan) {
                 return Stage1 (action, headers, retry, stream, CreateRequestWithoutMan, CreateRequestWithMan);
@@ -152,8 +152,8 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, int retry, Stream stream,
-                                        RequestProvider requestProvider1, RequestProvider requestProvider2)
+        HttpWebResponse Stage1 (ServiceAction action, WebHeaderCollection headers, int retry, Stream stream,
+                               RequestProvider requestProvider1, RequestProvider requestProvider2)
         {
             var response = Stage2 (requestProvider1, action, headers, retry, stream);
             if (response.StatusCode == HttpStatusCode.MethodNotAllowed) {
@@ -162,7 +162,7 @@ namespace Mono.Upnp.Internal
             return response;
         }
 
-        private HttpWebRequest CreateRequestWithoutMan (ServiceAction action, WebHeaderCollection headers)
+        HttpWebRequest CreateRequestWithoutMan (ServiceAction action, WebHeaderCollection headers)
         {
             fallback.OmitMan = true;
             var request = CreateRequest (headers);
@@ -172,7 +172,7 @@ namespace Mono.Upnp.Internal
             return request;
         }
 
-        private HttpWebRequest CreateRequestWithMan (ServiceAction action, WebHeaderCollection headers)
+        HttpWebRequest CreateRequestWithMan (ServiceAction action, WebHeaderCollection headers)
         {
             fallback.OmitMan = false;
             var request = CreateRequest (headers);
@@ -183,9 +183,11 @@ namespace Mono.Upnp.Internal
             return request;
         }
 
-        private HttpWebRequest CreateRequest (WebHeaderCollection headers)
+        HttpWebRequest CreateRequest (WebHeaderCollection headers)
         {
             var request = (HttpWebRequest)WebRequest.Create (location);
+			// TODO ascii?
+			request.UserAgent = Protocol.UserAgent;
             request.ContentType = @"text/xml; charset=""utf-8""";
             foreach (string header in headers.Keys) {
                 request.Headers.Add (header, headers[header]);
@@ -193,7 +195,7 @@ namespace Mono.Upnp.Internal
             return request;
         }
 
-        private HttpWebResponse Stage2 (RequestProvider requestProvider, ServiceAction action,
+        HttpWebResponse Stage2 (RequestProvider requestProvider, ServiceAction action,
                                         WebHeaderCollection headers, int retry, Stream stream)
         {
             var request = requestProvider (action, headers);
@@ -204,7 +206,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse Stage2 (HttpWebRequest request, ServiceAction action, int retry, Stream stream,
+        HttpWebResponse Stage2 (HttpWebRequest request, ServiceAction action, int retry, Stream stream,
                                         RequestHandler requestHandler1, RequestHandler requestHandler2)
         {
             try {
@@ -218,7 +220,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private HttpWebResponse Stage3Chuncked (HttpWebRequest request, ServiceAction action,
+        HttpWebResponse Stage3Chuncked (HttpWebRequest request, ServiceAction action,
 			                                    int retry, Stream stream)
         {
             fallback.Chuncked = true;
@@ -227,7 +229,7 @@ namespace Mono.Upnp.Internal
             return Final (request, action, retry, stream);
         }
 
-        private HttpWebResponse Stage3Unchunked (HttpWebRequest request, ServiceAction action,
+        HttpWebResponse Stage3Unchunked (HttpWebRequest request, ServiceAction action,
 			                                     int retry, Stream stream)
         {
             fallback.Chuncked = false;
@@ -236,10 +238,12 @@ namespace Mono.Upnp.Internal
             return Final (request, action, retry, stream);
         }
 
-        private HttpWebResponse Final (HttpWebRequest request, ServiceAction action, int retry, Stream stream)
+        HttpWebResponse Final (HttpWebRequest request, ServiceAction action, int retry, Stream stream)
         {
             stream.Seek (0, SeekOrigin.Begin);
-            request.ContentLength = stream.Length;
+			if (!fallback.Chuncked) {
+            	request.ContentLength = stream.Length;
+			}
             var output = request.GetRequestStream ();
             var buffer = new byte[1024];
             int count;
