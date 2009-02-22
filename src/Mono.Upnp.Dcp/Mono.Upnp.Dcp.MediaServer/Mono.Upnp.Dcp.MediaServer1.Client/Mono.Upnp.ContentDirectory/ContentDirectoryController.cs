@@ -44,6 +44,8 @@ namespace Mono.Upnp.ContentDirectory
 
         public string Browse (string objectId, BrowseFlag browseFlag, string filter, uint startingIndex, uint requestedCount, string sortCriteria, out uint numberReturned, out uint totalMatches, out uint updateId)
         {
+            if (browseFlag < BrowseFlag.BrowseMetadata || browseFlag > BrowseFlag.BrowseDirectChildren)
+                throw new ArgumentOutOfRangeException ("browseFlag");
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (6);
             in_arguments.Add ("ObjectID", objectId);
             in_arguments.Add ("BrowseFlag", browseFlag.ToString ());

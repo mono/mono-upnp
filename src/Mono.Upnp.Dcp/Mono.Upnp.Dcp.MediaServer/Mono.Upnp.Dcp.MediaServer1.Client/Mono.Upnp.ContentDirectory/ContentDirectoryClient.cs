@@ -40,9 +40,7 @@ namespace Mono.Upnp.ContentDirectory
 						OnContentDirectoryAdded (new DiscoveryEventArgs<ContentDirectory> (service));
 					}
 				}
-            }
-            catch
-            {
+            } catch {
             }
         }
 

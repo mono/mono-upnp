@@ -46,14 +46,14 @@ namespace Mono.Upnp.Internal
         class FallbackInfo
         {
             public bool OmitMan = true;
-            public bool Chuncked = true;
-            public bool UseUtf8 = true;
+            public bool Chuncked = false;
+            public bool UseDefaultUtf8 = true;
             public FallbackInfo Clone ()
             {
                 return new FallbackInfo {
                     OmitMan = OmitMan,
                     Chuncked = Chuncked,
-                    UseUtf8 = UseUtf8
+                    UseDefaultUtf8 = UseDefaultUtf8
                 };
             }
         }
@@ -68,6 +68,7 @@ namespace Mono.Upnp.Internal
         }
 
         readonly static Dictionary<string, FallbackInfo> fallbacks = new Dictionary<string, FallbackInfo> ();
+        readonly static Encoding fallback_utf8 = new UTF8Encoding (true);
 
         readonly Uri location;
         readonly FallbackInfo fallback;
@@ -86,11 +87,17 @@ namespace Mono.Upnp.Internal
 
         public ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments, int retry)
         {
-            var encoding = fallback.UseUtf8 ? Encoding.UTF8 : Encoding.ASCII;
-            var fallbackEncoding = fallback.UseUtf8 ? Encoding.ASCII : Encoding.UTF8;
+            Encoding encoding, fallbackEncoding;
+            if (fallback.UseDefaultUtf8) {
+                encoding = Encoding.UTF8;
+                fallbackEncoding = fallback_utf8;
+            } else {
+                encoding = fallback_utf8;
+                fallbackEncoding = Encoding.UTF8;
+            }
             var result = Invoke (action, arguments, encoding, retry, false);
             if (result == null) {
-                fallback.UseUtf8 = !fallback.UseUtf8;
+                fallback.UseDefaultUtf8 = !fallback.UseDefaultUtf8;
                 result = Invoke (action, arguments, fallbackEncoding, retry, true);
             }
             return result;
@@ -103,14 +110,13 @@ namespace Mono.Upnp.Internal
             // to the network stream. That way we only have to serialize once (unless we have to
             // try a different encoding scheme).
             using (var stream = new MemoryStream ()) {
-                var headers = new WebHeaderCollection ();
-
                 try {
+                    var headers = new WebHeaderCollection ();
                     var settings = new XmlWriterSettings { Encoding = encoding };
                     using (var writer = XmlWriter.Create (stream, settings)) {
                         action.SerializeRequest (arguments, headers, writer);
                     }
-    
+
                     using (var response = GetResponse (action, headers, retry, stream)) {
                         if (response.StatusCode == HttpStatusCode.OK) {
                             return action.DeserializeResponse (response);
@@ -119,10 +125,12 @@ namespace Mono.Upnp.Internal
                                 action.DeserializeResponseFault (response);
                             }
                             return null;
+                        } else if (response.StatusCode == HttpStatusCode.BadRequest) {
+                            return null;
                         } else {
                             throw new UpnpException (string.Format (
                                 "There was an unknown error while invoking the action: " +
-								"the service returned status code {0}.", response.StatusCode));
+                                "the service returned status code {0}.", response.StatusCode));
                         }
                     }
                 } catch (Exception e) {
@@ -168,7 +176,7 @@ namespace Mono.Upnp.Internal
             var request = CreateRequest (headers);
             request.Method = "POST";
             request.Headers.Add ("SOAPACTION", string.Format (
-				@"""{0}#{1}""", action.Controller.Description.Type, action.Name));
+                @"""{0}#{1}""", action.Controller.Description.Type, action.Name));
             return request;
         }
 
@@ -189,6 +197,7 @@ namespace Mono.Upnp.Internal
 			// TODO ascii?
 			request.UserAgent = Protocol.UserAgent;
             request.ContentType = @"text/xml; charset=""utf-8""";
+            request.KeepAlive = false;
             foreach (string header in headers.Keys) {
                 request.Headers.Add (header, headers[header]);
             }
@@ -241,16 +250,16 @@ namespace Mono.Upnp.Internal
         HttpWebResponse Final (HttpWebRequest request, ServiceAction action, int retry, Stream stream)
         {
             stream.Seek (0, SeekOrigin.Begin);
-			if (!fallback.Chuncked) {
-            	request.ContentLength = stream.Length;
-			}
-            var output = request.GetRequestStream ();
-            var buffer = new byte[1024];
-            int count;
-            while ((count = stream.Read (buffer, 0, 1024)) > 0) {
-                output.Write (buffer, 0, count);
+            if (!fallback.Chuncked) {
+                request.ContentLength = stream.Length;
             }
-            output.Close ();
+            using (var output = request.GetRequestStream ()) {
+                var buffer = new byte[1024];
+                int count;
+                while ((count = stream.Read (buffer, 0, 1024)) > 0) {
+                    output.Write (buffer, 0, count);
+                }
+            }
             return Helper.GetResponse (request, retry);
         }
 	}
