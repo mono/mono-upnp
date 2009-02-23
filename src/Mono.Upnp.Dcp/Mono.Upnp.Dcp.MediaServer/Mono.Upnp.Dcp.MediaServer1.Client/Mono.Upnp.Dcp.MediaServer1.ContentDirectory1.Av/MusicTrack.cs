@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Xml;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
 	public class MusicTrack : AudioItem
 	{

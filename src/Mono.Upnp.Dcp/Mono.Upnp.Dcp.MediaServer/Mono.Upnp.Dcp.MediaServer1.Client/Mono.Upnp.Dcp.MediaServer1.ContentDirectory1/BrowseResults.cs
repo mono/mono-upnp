@@ -26,7 +26,7 @@
 
 using System.Collections.Generic;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	sealed class BrowseResults : Results<Object>
 	{

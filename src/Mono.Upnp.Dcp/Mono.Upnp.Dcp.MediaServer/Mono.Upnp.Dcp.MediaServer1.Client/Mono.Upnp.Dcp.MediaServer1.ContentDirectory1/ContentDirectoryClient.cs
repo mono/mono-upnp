@@ -4,7 +4,7 @@ using System;
 
 using Mono.Upnp.Dcp.MediaServer1;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public class ContentDirectoryClient
     {

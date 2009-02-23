@@ -27,7 +27,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	[XmlType ("res", Namespace = Schemas.DidlLiteSchema)]
 	public sealed class ResourceBuilder

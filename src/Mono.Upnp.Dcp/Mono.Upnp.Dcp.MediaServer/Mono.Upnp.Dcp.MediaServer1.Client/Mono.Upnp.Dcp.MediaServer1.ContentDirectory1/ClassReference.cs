@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	public struct ClassReference : IComparable<ClassReference>
 	{

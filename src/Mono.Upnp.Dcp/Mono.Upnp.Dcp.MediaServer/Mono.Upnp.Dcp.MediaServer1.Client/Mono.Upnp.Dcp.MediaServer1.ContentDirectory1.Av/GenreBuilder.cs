@@ -26,7 +26,7 @@
 
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
 	[ClassName ("genre")]
 	public class GenreBuilder : ContainerBuilder

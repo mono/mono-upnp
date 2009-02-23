@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.XPath;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	public class ContentDirectory
 	{

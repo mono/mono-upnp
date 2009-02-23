@@ -29,9 +29,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-using Mono.Upnp.ContentDirectory.Av;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	public static class ClassManager
 	{

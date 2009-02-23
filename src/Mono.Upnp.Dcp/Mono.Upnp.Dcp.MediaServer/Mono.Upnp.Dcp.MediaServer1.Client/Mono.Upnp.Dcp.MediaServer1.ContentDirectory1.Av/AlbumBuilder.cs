@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
 	[ClassName ("album")]
 	public class AlbumBuilder : ContainerBuilder

@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
 	[ClassName ("movieGenre")]
 	public class MovieGenreBuilder : GenreBuilder

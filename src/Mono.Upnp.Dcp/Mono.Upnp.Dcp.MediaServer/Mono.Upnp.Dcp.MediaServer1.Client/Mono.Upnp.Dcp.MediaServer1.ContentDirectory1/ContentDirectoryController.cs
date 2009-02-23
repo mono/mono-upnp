@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Mono.Upnp.Description;
 using Mono.Upnp.Control;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public class ContentDirectoryController
     {

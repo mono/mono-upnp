@@ -27,7 +27,7 @@
 using System;
 using System.Xml;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	public class Resource
 	{
@@ -69,7 +69,8 @@ namespace Mono.Upnp.ContentDirectory
 			if (uint.TryParse (reader["nrAudioChannels"], out nr_audio_channels))
 				this.nr_audio_channels = nr_audio_channels;
 			
-			if (Mono.Upnp.ContentDirectory.Resolution.TryParse (reader["resolution"], out resolution))
+            // FIXME I shouldn't have to qualify this
+			if (Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Resolution.TryParse (reader["resolution"], out resolution))
 				this.resolution = resolution;
 			
 			if (uint.TryParse (reader["colorDepth"], out color_depth))

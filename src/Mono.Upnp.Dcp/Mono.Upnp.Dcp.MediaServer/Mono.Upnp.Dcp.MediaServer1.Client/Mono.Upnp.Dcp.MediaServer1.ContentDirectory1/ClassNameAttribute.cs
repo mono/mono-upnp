@@ -26,7 +26,7 @@
 
 using System;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	[AttributeUsage (AttributeTargets.Class)]
 	public sealed class ClassNameAttribute : Attribute

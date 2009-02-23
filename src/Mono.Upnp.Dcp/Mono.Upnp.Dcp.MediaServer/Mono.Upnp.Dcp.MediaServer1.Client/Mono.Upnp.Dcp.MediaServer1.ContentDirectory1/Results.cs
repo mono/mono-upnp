@@ -27,7 +27,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	public abstract class Results<T> : IEnumerable<T> where T : Object
 	{

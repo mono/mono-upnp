@@ -32,7 +32,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	public class Container : Object
 	{

@@ -27,8 +27,7 @@
 //
 
 using System;
-
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	public class DeserializationException : Exception
 	{

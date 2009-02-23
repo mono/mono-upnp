@@ -27,7 +27,7 @@
 using System;
 using System.Xml;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
 	public class VideoBroadcast : VideoItem
 	{

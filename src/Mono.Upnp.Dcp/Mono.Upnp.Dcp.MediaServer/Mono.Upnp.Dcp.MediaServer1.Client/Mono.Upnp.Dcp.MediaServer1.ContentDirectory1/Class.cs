@@ -26,7 +26,7 @@
 
 using System.Xml;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	public struct Class
 	{

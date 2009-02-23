@@ -31,7 +31,7 @@ using System.Xml;
 
 using Mono.Upnp.Dcp.MediaServer1;
 
-namespace Mono.Upnp.ContentDirectory.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
 	public class MusicArtist : Person
 	{

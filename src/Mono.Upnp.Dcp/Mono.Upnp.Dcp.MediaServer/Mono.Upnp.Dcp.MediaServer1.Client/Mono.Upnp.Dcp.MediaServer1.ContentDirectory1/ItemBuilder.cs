@@ -27,7 +27,7 @@
 using System;
 using System.Xml.Serialization;
 
-namespace Mono.Upnp.ContentDirectory
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
 	[ClassName ("item")]
 	[XmlType ("item", Namespace = Schemas.DidlLiteSchema)]
