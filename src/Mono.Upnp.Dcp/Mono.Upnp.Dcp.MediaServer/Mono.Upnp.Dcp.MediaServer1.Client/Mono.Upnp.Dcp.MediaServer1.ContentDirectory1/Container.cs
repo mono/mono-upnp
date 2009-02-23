@@ -63,11 +63,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 				? new BrowseResults (ContentDirectory, Id, settings.SortCriteria,
 					settings.Filter, settings.RequestCount, settings.Offset)
 				: new BrowseResults (ContentDirectory, Id, null, null, 0, 0);
-            try {
 			results.FetchResults ();
-            } catch (Exception e) {
-                Console.WriteLine (e);
-            }
 			return results;
 		}
 		
