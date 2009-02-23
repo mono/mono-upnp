@@ -71,7 +71,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 					LongDescription = reader.ReadString ();
 					break;
 				default:
-					base.DeserializeRootElement (reader);
+					base.DeserializePropertyElement (reader);
 					break;
 				}
 			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {

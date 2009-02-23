@@ -1,3 +1,8 @@
+2009-02-23  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Control/ServiceAction.cs: Use XmlReader.LocalName
+	instead of Name (b/c that's what we should be doing)
+
 2009-02-22  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Internal/SoapInvoker.cs: Got ride of "private"

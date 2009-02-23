@@ -109,11 +109,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 					Language = reader.ReadString ();
 					break;
 				default:
-					base.DeserializeRootElement (reader);
+					base.DeserializePropertyElement (reader);
 					break;
 				}
 			} else {
-				base.DeserializeRootElement (reader);
+				base.DeserializePropertyElement (reader);
 			}
 		}
 	}

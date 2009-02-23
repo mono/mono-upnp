@@ -76,6 +76,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 		{
 			return Search<Object> (searchCriteria, settings);
 		}
+        
+        public Results<T> SearchForType<T> () where T : Object
+        {
+            return SearchForType<T> (null);
+        }
+        
+        public Results<T> SearchForType<T> (ResultsSettings settings) where T : Object
+        {
+            var class_name = ClassManager.GetClassFromType<T> ();
+            return Search<T> (string.Format (@"upnp:class derivedfrom ""{0}""", class_name), settings);
+        }
 		
 		internal Results<T> Search<T> (string searchCriteria, ResultsSettings settings) where T : Object
 		{
@@ -85,7 +96,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 				? new SearchResults<T> (ContentDirectory, Id, searchCriteria,
 					settings.SortCriteria, settings.Filter, settings.RequestCount, settings.Offset)
 				: new SearchResults<T> (ContentDirectory, Id, searchCriteria, null, null, 0, 0);
-			results.FetchResults ();
+            results.FetchResults ();
 			return results;
 		}
 		

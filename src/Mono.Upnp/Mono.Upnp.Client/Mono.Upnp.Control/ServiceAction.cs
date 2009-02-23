@@ -188,14 +188,14 @@ namespace Mono.Upnp.Control
         protected virtual ActionResult DeserializeResponseCore (HttpWebResponse response)
         {
             using (var reader = XmlReader.Create (response.GetResponseStream ())) {
-                reader.ReadToFollowing (Name + "Response", controller.Description.Type.ToString ());
+                reader.ReadToDescendant (Name + "Response", controller.Description.Type.ToString ());
                 var out_args = new Dictionary<string, string> ();
                 string return_value = null;
                 while (Helper.ReadToNextElement (reader)) {
-                    if (ReturnArgument != null && ReturnArgument.Name == reader.Name) {
+                    if (ReturnArgument != null && ReturnArgument.Name == reader.LocalName) {
                         return_value = reader.ReadString ();
                     } else {
-                        out_args [reader.Name] = reader.ReadString ();
+                        out_args [reader.LocalName] = reader.ReadString ();
                     }
                 }
                 return new ActionResult (return_value, out_args);

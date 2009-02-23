@@ -1,5 +1,17 @@
 2009-02-23  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/Container.cs:
+	Added SearchForType<T>.
+
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/Resolution.cs:
+	Fixed NRE.
+
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av/TextItem.cs:
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av/AudioItem.cs:
+	Fixed deserialization bug.
+
+2009-02-23  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Upnp.Dcp.MediaServer1.Client.csproj:
 	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/Item.cs:
 	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/Class.cs:

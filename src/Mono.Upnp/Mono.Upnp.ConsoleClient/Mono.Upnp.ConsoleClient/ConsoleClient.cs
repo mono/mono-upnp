@@ -2,8 +2,9 @@
 
 using Mono.Upnp;
 using Mono.Upnp.Control;
-using Mono.Upnp.ContentDirectory;
 using Mono.Upnp.Dcp.MediaServer1;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
 
 namespace Mono.Upnp.ConsoleClient
 {
@@ -25,12 +26,15 @@ namespace Mono.Upnp.ConsoleClient
         	Console.WriteLine (e.Service);
         }
 
-        static void client_ContentDirectoryAdded (object sender, DiscoveryEventArgs<Mono.Upnp.ContentDirectory.ContentDirectory> e)
+        static void client_ContentDirectoryAdded (object sender, DiscoveryEventArgs<ContentDirectory> e)
         {
 			Console.WriteLine ("Found");
             var root = e.Item.GetRootContainer ();
-			foreach (var item in root.Browse ()) {
-				Console.WriteLine (item);
+			foreach (var item in root.SearchForType<MusicTrack> (new ResultsSettings { RequestCount = 10 })) {
+                Console.WriteLine (item);
+                foreach (var res in item.Resources) {
+                    Console.WriteLine ("\t{0}{1}", res.ProtocolInfo, res.Uri);
+                }
 			}
         }
     }

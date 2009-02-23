@@ -74,14 +74,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 		
 		internal static bool TryParse (string s, out Resolution result)
 		{
-			var index = s.IndexOf ('x');
-			if (index > -1) {
-				uint x, y;
-				if (uint.TryParse (s.Substring (0, index), out x) && uint.TryParse (s.Substring (index + 1), out y)) {
-					result = new Resolution (x, y);
-					return true;
-				}
-			}
+            if (s != null) {
+    			var index = s.IndexOf ('x');
+    			if (index > -1) {
+    				uint x, y;
+    				if (uint.TryParse (s.Substring (0, index), out x) && uint.TryParse (s.Substring (index + 1), out y)) {
+    					result = new Resolution (x, y);
+    					return true;
+    				}
+    			}
+            }
 			result = new Resolution (0, 0);
 			return false;
 		}
