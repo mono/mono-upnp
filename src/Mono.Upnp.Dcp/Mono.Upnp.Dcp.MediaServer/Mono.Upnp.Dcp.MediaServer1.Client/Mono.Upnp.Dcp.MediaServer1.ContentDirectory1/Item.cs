@@ -46,7 +46,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			RefId = reader["refID", Schemas.UpnpSchema];
+			RefId = reader["refID"];
 			
 			base.DeserializeRootElement (reader);
 		}

@@ -1,5 +1,18 @@
 2009-02-23  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/Item.cs:
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/ClassReference.cs:
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av/PersonWithRole.cs:
+	Fixed attribute deserialization.
+
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/ContentDirectory.cs:
+	Get search and sort caps during construction.
+
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/ClassManager.cs:
+	Tweaked error message.
+
+2009-02-23  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/Container.cs:
 	Added SearchForType<T>.
 

@@ -37,7 +37,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 		
 		internal ClassReference (XmlReader reader)
 		{
-			include_derived = bool.Parse (reader["includeDerived", Schemas.UpnpSchema]);
+			include_derived = bool.Parse (reader["includeDerived"]);
 			@class = new Class (reader);
 		}
 		

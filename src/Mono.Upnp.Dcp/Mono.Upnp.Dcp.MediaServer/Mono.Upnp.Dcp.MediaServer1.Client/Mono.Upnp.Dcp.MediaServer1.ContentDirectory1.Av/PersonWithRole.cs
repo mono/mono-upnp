@@ -42,7 +42,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 		
 		internal static PersonWithRole Deserialize (XmlReader reader)
 		{
-			var role = reader["role", Schemas.UpnpSchema];
+			var role = reader["role"];
 			var name = reader.ReadString ();
 			return new PersonWithRole (name, role);
 		}

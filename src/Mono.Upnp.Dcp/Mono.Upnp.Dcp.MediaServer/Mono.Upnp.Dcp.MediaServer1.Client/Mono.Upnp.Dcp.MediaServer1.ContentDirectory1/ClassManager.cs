@@ -87,7 +87,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 				return name;
 			} else {
 				throw new InvalidOperationException (string.Format (
-					"The type {0} has not been registered for use with the ClassManager.", type));
+					"The type {0} has not been registered with the ClassManager.", type));
 			}
 		}
 		
