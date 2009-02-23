@@ -90,9 +90,9 @@ namespace Mono.Upnp.ContentDirectory
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
             Id = reader["id"];
-            ParentId = reader["parentID", Schemas.DidlLiteSchema];
+            ParentId = reader["parentID"];
             bool restricted;
-            if (bool.TryParse (reader["restricted", Schemas.DidlLiteSchema], out restricted)) {
+            if (TryParseBool (reader["restricted"], out restricted)) {
                 IsRestricted = restricted;
 				has_restricted = true;
             }
@@ -113,15 +113,15 @@ namespace Mono.Upnp.ContentDirectory
 		protected virtual void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
-			
+            
 			if (reader.NamespaceURI == Schemas.DidlLiteSchema) {
-				if (reader.Name == "res") {
+				if (reader.LocalName == "res") {
 					resource_list.Add (new Resource (reader));
 				} else {
 					reader.Skip (); // This is a workaround for Mono bug 334752
 				}
 			} else if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
+				switch (reader.LocalName) {
 				case "class":
 					Class = new Class (reader);
 					has_class = true;
@@ -134,7 +134,7 @@ namespace Mono.Upnp.ContentDirectory
 					break;
 				}
 			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-				switch (reader.Name) {
+				switch (reader.LocalName) {
 				case "title":
 					Title = reader.ReadString ();
 					break;
@@ -182,6 +182,30 @@ namespace Mono.Upnp.ContentDirectory
                 }
             }
             return false;
+        }
+        
+        protected static bool ParseBool (string value)
+        {
+            if (value == "0") {
+                return false;
+            } else if (value == "1") {
+                return true;
+            } else {
+                return bool.Parse (value);
+            }
+        }
+        
+        protected static bool TryParseBool (string value, out bool result)
+        {
+            if (value == "0") {
+                result = false;
+                return true;
+            } else if (value == "1") {
+                result = true;
+                return true;
+            } else {
+                return bool.TryParse (value, out result);
+            }
         }
 	}
 }

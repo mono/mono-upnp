@@ -1,5 +1,5 @@
 // 
-// AudioItem.cs
+// PlaylistContainer.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -31,39 +31,51 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class AudioItem : Item
+	public class PlaylistContainer : Container
 	{
-		readonly List<string> publisher_list = new List<string> ();
-		readonly ReadOnlyCollection<string> publishers;
+		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
+		readonly ReadOnlyCollection<PersonWithRole> artists;
+		readonly List<string> producer_list = new List<string> ();
+		readonly ReadOnlyCollection<string> producers;
+		readonly List<string> contributor_list = new List<string> ();
+		readonly ReadOnlyCollection<string> contributors;
 		readonly List<string> genre_list = new List<string> ();
 		readonly ReadOnlyCollection<string> genres;
-		readonly List<Uri> relation_list = new List<Uri>();
-		readonly ReadOnlyCollection<Uri> relations;
 		readonly List<string> right_list = new List<string> ();
 		readonly ReadOnlyCollection<string> rights;
 		
-		protected AudioItem ()
+		protected PlaylistContainer ()
 		{
-			publishers = publisher_list.AsReadOnly ();
+			artists = artist_list.AsReadOnly ();
+			producers = producer_list.AsReadOnly ();
+			contributors = contributor_list.AsReadOnly ();
 			genres = genre_list.AsReadOnly ();
-			relations = relation_list.AsReadOnly ();
 			rights = right_list.AsReadOnly ();
 		}
 		
-        public ReadOnlyCollection<string> Genres { get { return genres; } }
-        public string Description { get; private set; }
-        public string LongDescription { get; private set; }
-        public ReadOnlyCollection<string> Publishers { get { return publishers; } }
-        public string Language { get; private set; }
-        public ReadOnlyCollection<Uri> Relations { get { return relations; } }
-        public ReadOnlyCollection<string> Rights { get { return rights; } }
+        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
+		public ReadOnlyCollection<string> Genres { get { return genres; } }
+		public string LongDescription { get; private set; }
+		public ReadOnlyCollection<string> Producers { get { return producers; } }
+		public string StorageMedium { get; private set; }
+		public string Description { get; private set; }
+		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
+		public string Date { get; private set; }
+		public string Language { get; private set; }
+		public ReadOnlyCollection<string> Rights { get { return rights; } }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
+				switch (reader.LocalName) {
+				case "artist":
+					artist_list.Add (PersonWithRole.Deserialize (reader));
+					break;
+				case "producer":
+					producer_list.Add (reader.ReadString ());
+					break;
 				case "genre":
 					genre_list.Add (reader.ReadString ());
 					break;
@@ -71,22 +83,22 @@ namespace Mono.Upnp.ContentDirectory.Av
 					LongDescription = reader.ReadString ();
 					break;
 				default:
-					base.DeserializeRootElement (reader);
+					base.DeserializePropertyElement (reader);
 					break;
 				}
 			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-				switch (reader.Name) {
-				case "publisher":
-					publisher_list.Add (reader.ReadString ());
-					break;
-				case "relation":
-					relation_list.Add (new Uri (reader.ReadString ()));
+				switch (reader.LocalName) {
+				case "contributor":
+					contributor_list.Add (reader.ReadString ());
 					break;
 				case "description":
 					Description = reader.ReadString ();
 					break;
 				case "rights":
 					right_list.Add (reader.ReadString ());
+					break;
+				case "date":
+					Date = reader.ReadString ();
 					break;
 				case "language":
 					Language = reader.ReadString ();

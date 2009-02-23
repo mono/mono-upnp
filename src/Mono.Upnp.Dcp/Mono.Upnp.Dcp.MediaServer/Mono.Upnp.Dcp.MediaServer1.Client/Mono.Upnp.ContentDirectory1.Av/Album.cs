@@ -1,5 +1,5 @@
 // 
-// MusicTrack.cs
+// Album.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -31,32 +31,33 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class MusicTrack : AudioItem
+	public class Album : Container
 	{
-		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
-		readonly ReadOnlyCollection<PersonWithRole> artists;
+		readonly List<string> publisher_list = new List<string> ();
+		readonly ReadOnlyCollection<string> publishers;
 		readonly List<string> contributor_list = new List<string> ();
 		readonly ReadOnlyCollection<string> contributors;
-	 	readonly List<string> album_list = new List<string>();
-		readonly ReadOnlyCollection<string> albums;
-		readonly List<string> playlist_list = new List<string> ();
-		readonly ReadOnlyCollection<string> playlists;
+		readonly List<Uri> relation_list = new List<Uri>();
+		readonly ReadOnlyCollection<Uri> relations;
+		readonly List<string> right_list = new List<string> ();
+		readonly ReadOnlyCollection<string> rights;
 		
-		protected MusicTrack ()
+		protected Album ()
 		{
-			artists = artist_list.AsReadOnly ();
+			publishers = publisher_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();
-			albums = album_list.AsReadOnly ();
-			playlists = playlist_list.AsReadOnly ();
+			relations = relation_list.AsReadOnly ();
+			rights = right_list.AsReadOnly ();
 		}
 		
-        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-        public ReadOnlyCollection<string> Albums { get { return albums; } }
-        public int? OriginalTrackNumber { get; private set; }
-        public ReadOnlyCollection<string> Playlists { get { return playlists; } }
-        public string StorageMedium { get; private set; }
-        public ReadOnlyCollection<string> Contributors { get { return contributors; } }
-        public string Date { get; private set; }
+		public string StorageMedium { get; private set; }
+		public string LongDescription { get; private set; }
+		public string Description { get; private set; }
+		public ReadOnlyCollection<string> Publishers { get { return publishers; } }
+		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
+		public string Date { get; private set; }
+		public ReadOnlyCollection<Uri> Relations { get { return relations; } }
+		public ReadOnlyCollection<string> Rights { get { return rights; } }
 		public Uri LyricsUri { get; private set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
@@ -64,27 +65,33 @@ namespace Mono.Upnp.ContentDirectory.Av
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
-				case "artist":
-					artist_list.Add (PersonWithRole.Deserialize (reader));
+				switch (reader.LocalName) {
+				case "lyricsURL":
+					LyricsUri = new Uri (reader.ReadString ());
 					break;
-				case "album":
-					album_list.Add (reader.ReadString ());
-					break;
-				case "playlist":
-					playlist_list.Add (reader.ReadString ());
-					break;
-				case "originalTrackNumber":
-					OriginalTrackNumber = reader.ReadElementContentAsInt ();
+				case "longDescription":
+					LongDescription = reader.ReadString ();
 					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;
 				}
-		 	} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-				switch (reader.Name) {
+			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
+				switch (reader.LocalName) {
+				case "publisher":
+					publisher_list.Add (reader.ReadString ());
+					break;
 				case "contributor":
 					contributor_list.Add (reader.ReadString ());
+					break;
+				case "relation":
+					relation_list.Add (new Uri (reader.ReadString ()));
+					break;
+				case "description":
+					Description = reader.ReadString ();
+					break;
+				case "rights":
+					right_list.Add (reader.ReadString ());
 					break;
 				case "date":
 					Date = reader.ReadString ();
@@ -93,7 +100,7 @@ namespace Mono.Upnp.ContentDirectory.Av
 					base.DeserializePropertyElement (reader);
 					break;
 				}
-			} else {
+		 	} else {
 				base.DeserializePropertyElement (reader);
 			}
 		}

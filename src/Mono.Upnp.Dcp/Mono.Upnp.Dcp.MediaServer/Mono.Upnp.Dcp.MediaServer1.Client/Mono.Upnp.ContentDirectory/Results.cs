@@ -42,7 +42,7 @@ namespace Mono.Upnp.ContentDirectory
 		internal Results (ContentDirectory contentDirectory, string objectId, string sortCriteria,
 		                  string filter, uint requestCount, uint offset)
 		{
-			this.content_directory = ContentDirectory;
+			this.content_directory = contentDirectory;
 			this.object_id = objectId;
 			this.sort_criteria = sortCriteria ?? "";
 			this.filter = string.IsNullOrEmpty (filter) ? "*" : filter;

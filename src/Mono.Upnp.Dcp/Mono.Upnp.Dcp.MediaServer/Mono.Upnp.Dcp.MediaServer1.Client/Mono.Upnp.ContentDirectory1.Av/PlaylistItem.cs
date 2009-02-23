@@ -1,5 +1,5 @@
 // 
-// Movie.cs
+// PlaylistItem.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -31,42 +31,56 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class Movie : VideoItem
+	public class PlaylistItem : Item
 	{
-		readonly List<DateTime> scheduled_start_time_list = new List<DateTime>();
-		readonly ReadOnlyCollection<DateTime> scheduled_start_times;
-		readonly List<DateTime> scheduled_end_time_list = new List<DateTime>();
-		readonly ReadOnlyCollection<DateTime> scheduled_end_times;
+		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
+		readonly ReadOnlyCollection<PersonWithRole> artists;
+		readonly List<string> genre_list = new List<string> ();
+		readonly ReadOnlyCollection<string> genres;
 		
-		protected Movie ()
+		protected PlaylistItem ()
 		{
-			scheduled_start_times = scheduled_start_time_list.AsReadOnly ();
-			scheduled_end_times = scheduled_end_time_list.AsReadOnly ();
+			artists = artist_list.AsReadOnly ();
+			genres = genre_list.AsReadOnly ();
 		}
 		
-        public string StorageMedium { get; private set; }
-        public int? DvdRegionCode { get; private set; }
-        public string ChannelName { get; private set; }
-        public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
-        public ReadOnlyCollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
+        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
+		public ReadOnlyCollection<string> Genres { get { return genres; } }
+		public string LongDescription { get; private set; }
+		public string StorageMedium { get; private set; }
+		public string Description { get; private set; }
+		public string Date { get; private set; }
+		public string Language { get; private set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
-				case "channelName":
-					ChannelName = reader.ReadString ();
+				switch (reader.LocalName) {
+				case "artist":
+					artist_list.Add (PersonWithRole.Deserialize (reader));
 					break;
-				case "scheduledStartTime":
-					scheduled_start_time_list.Add (reader.ReadElementContentAsDateTime ()); // TODO this is ISO 8601
+				case "genre":
+					genre_list.Add (reader.ReadString ());
 					break;
-				case "scheduledEndTime":
-					scheduled_end_time_list.Add (reader.ReadElementContentAsDateTime ());
+				case "longDescription":
+					LongDescription = reader.ReadString ();
 					break;
-				case "DVDRegionCode":
-					DvdRegionCode = reader.ReadElementContentAsInt ();
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
+				switch (reader.LocalName) {
+				case "description":
+					Description = reader.ReadString ();
+					break;
+				case "date":
+					Date = reader.ReadString ();
+					break;
+				case "language":
+					Language = reader.ReadString ();
 					break;
 				default:
 					base.DeserializePropertyElement (reader);
@@ -76,5 +90,13 @@ namespace Mono.Upnp.ContentDirectory.Av
 				base.DeserializePropertyElement (reader);
 			}
 		}
-    }
+		
+		protected override void VerifyDeserialization ()
+		{
+			if (Resources.Count == 0) {
+				throw new DeserializationException ("A playlist item must have a res.");
+			}
+			base.VerifyDeserialization ();
+		}
+	}
 }

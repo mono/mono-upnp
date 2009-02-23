@@ -1,5 +1,5 @@
 // 
-// AudioBroadcast.cs
+// ImageItem.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -25,48 +25,68 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class AudioBroadcast  : AudioItem
+	public class ImageItem : Item
 	{
-		protected AudioBroadcast ()
+		readonly List<string> publisher_list = new List<string> ();
+		readonly ReadOnlyCollection<string> publishers;
+		readonly List<string> right_list = new List<string> ();
+		readonly ReadOnlyCollection<string> rights;
+		
+		protected ImageItem ()
 		{
+			publishers = publisher_list.AsReadOnly ();
+			rights = right_list.AsReadOnly ();
 		}
 		
-        public string Region { get; private set; }
-        public string RadioCallSign { get; private set; }
-        public string RadioStationId { get; private set; }
-        public string RadioBand { get; private set; }
-        public int? ChannelNr { get; private set; } // FIXME is this right?
+		public string LongDescription { get; private set; }
+		public string StorageMedium { get; private set; }
+		public string Rating { get; private set; }
+		public string Description { get; private set; }
+		public ReadOnlyCollection<string> Publishers { get { return publishers; } }
+		public string Date { get; private set; }
+		public ReadOnlyCollection<string> Rights { get { return rights; } }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
-				case "region":
-					Region = reader.ReadString ();
-				 	break;
-				case "radioCallSign":
-					RadioCallSign = reader.ReadString ();
+				switch (reader.LocalName) {
+				case "longDescription":
+					LongDescription = reader.ReadString ();
 					break;
-				case "radioStationID":
-					RadioStationId = reader.ReadString ();
-					break;
-				case "radioBand":
-					RadioBand = reader.ReadString ();
-					break;
-				case "channelNr":
-					ChannelNr = reader.ReadContentAsInt ();
+				case "rating":
+					Rating = reader.ReadString ();
 					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;
 				}
-			} else {
+			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
+				switch (reader.LocalName) {
+				case "publisher":
+					publisher_list.Add (reader.ReadString ());
+					break;
+				case "description":
+					Description = reader.ReadString ();
+					break;
+				case "rights":
+					right_list.Add (reader.ReadString ());
+					break;
+				case "date":
+					Date = reader.ReadString ();
+					break;
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+		 	} else {
 				base.DeserializePropertyElement (reader);
 			}
 		}

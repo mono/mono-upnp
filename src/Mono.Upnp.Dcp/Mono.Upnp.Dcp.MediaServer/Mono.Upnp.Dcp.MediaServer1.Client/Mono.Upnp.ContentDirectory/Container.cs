@@ -63,7 +63,11 @@ namespace Mono.Upnp.ContentDirectory
 				? new BrowseResults (ContentDirectory, Id, settings.SortCriteria,
 					settings.Filter, settings.RequestCount, settings.Offset)
 				: new BrowseResults (ContentDirectory, Id, null, null, 0, 0);
+            try {
 			results.FetchResults ();
+            } catch (Exception e) {
+                Console.WriteLine (e);
+            }
 			return results;
 		}
 		
@@ -157,9 +161,9 @@ namespace Mono.Upnp.ContentDirectory
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
-			Searchable = bool.Parse (reader["searchable", Schemas.DidlLiteSchema]);
+			Searchable = ParseBool (reader["searchable"]);
 			int child_count;
-			if (int.TryParse (reader["childCount", Schemas.DidlLiteSchema], out child_count)) {
+			if (int.TryParse (reader["childCount"], out child_count)) {
 				ChildCount = child_count;
 			}
 			
@@ -171,7 +175,7 @@ namespace Mono.Upnp.ContentDirectory
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
+				switch (reader.LocalName) {
 				case "searchClass":
 					search_class_list.Add (new ClassReference (reader));
 					break;

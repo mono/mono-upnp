@@ -1,5 +1,5 @@
 // 
-// PlaylistContainer.cs
+// TextItem.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -31,36 +31,38 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class PlaylistContainer : Container
+	public class TextItem : Item
 	{
-		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
-		readonly ReadOnlyCollection<PersonWithRole> artists;
-		readonly List<string> producer_list = new List<string> ();
-		readonly ReadOnlyCollection<string> producers;
+		readonly List<PersonWithRole> author_list = new List<PersonWithRole> ();
+		readonly ReadOnlyCollection<PersonWithRole> authors;
+		readonly List<string> publisher_list = new List<string> ();
+		readonly ReadOnlyCollection<string> publishers;
 		readonly List<string> contributor_list = new List<string> ();
 		readonly ReadOnlyCollection<string> contributors;
-		readonly List<string> genre_list = new List<string> ();
-		readonly ReadOnlyCollection<string> genres;
+		readonly List<Uri> relation_list = new List<Uri>();
+		readonly ReadOnlyCollection<Uri> relations;
 		readonly List<string> right_list = new List<string> ();
 		readonly ReadOnlyCollection<string> rights;
 		
-		protected PlaylistContainer ()
+		protected TextItem ()
 		{
-			artists = artist_list.AsReadOnly ();
-			producers = producer_list.AsReadOnly ();
+			authors = author_list.AsReadOnly ();
+			publishers = publisher_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();
-			genres = genre_list.AsReadOnly ();
+			relations = relation_list.AsReadOnly ();
 			rights = right_list.AsReadOnly ();
 		}
 		
-        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-		public ReadOnlyCollection<string> Genres { get { return genres; } }
+		public ReadOnlyCollection<PersonWithRole> Authors { get { return authors; } }
+		public string Protection { get; private set; }
 		public string LongDescription { get; private set; }
-		public ReadOnlyCollection<string> Producers { get { return producers; } }
 		public string StorageMedium { get; private set; }
+		public string Rating { get; private set; }
 		public string Description { get; private set; }
+		public ReadOnlyCollection<string> Publishers { get { return publishers; } }
 		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
 		public string Date { get; private set; }
+		public ReadOnlyCollection<Uri> Relations { get { return relations; } }
 		public string Language { get; private set; }
 		public ReadOnlyCollection<string> Rights { get { return rights; } }
 		
@@ -69,27 +71,30 @@ namespace Mono.Upnp.ContentDirectory.Av
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
-				case "artist":
-					artist_list.Add (PersonWithRole.Deserialize (reader));
-					break;
-				case "producer":
-					producer_list.Add (reader.ReadString ());
-					break;
-				case "genre":
-					genre_list.Add (reader.ReadString ());
+				switch (reader.LocalName) {
+				case "author":
+					author_list.Add (PersonWithRole.Deserialize (reader));
 					break;
 				case "longDescription":
 					LongDescription = reader.ReadString ();
+					break;
+				case "rating":
+					Rating = reader.ReadString ();
 					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;
 				}
 			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-				switch (reader.Name) {
+				switch (reader.LocalName) {
+				case "publisher":
+					publisher_list.Add (reader.ReadString ());
+					break;
 				case "contributor":
 					contributor_list.Add (reader.ReadString ());
+					break;
+				case "relation":
+					relation_list.Add (new Uri (reader.ReadString ()));
 					break;
 				case "description":
 					Description = reader.ReadString ();
@@ -104,11 +109,11 @@ namespace Mono.Upnp.ContentDirectory.Av
 					Language = reader.ReadString ();
 					break;
 				default:
-					base.DeserializePropertyElement (reader);
+					base.DeserializeRootElement (reader);
 					break;
 				}
 			} else {
-				base.DeserializePropertyElement (reader);
+				base.DeserializeRootElement (reader);
 			}
 		}
 	}

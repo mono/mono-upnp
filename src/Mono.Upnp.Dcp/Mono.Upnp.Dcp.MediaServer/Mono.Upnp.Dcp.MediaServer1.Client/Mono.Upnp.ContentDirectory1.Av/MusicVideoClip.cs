@@ -1,5 +1,5 @@
 // 
-// AudioBook.cs
+// MusicVideoClip.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -31,39 +31,60 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class AudioBook : AudioItem
+	public class MusicVideoClip : VideoItem
 	{
-		readonly List<string> producer_list = new List<string> ();
-		readonly ReadOnlyCollection<string> producers;
+		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
+		readonly ReadOnlyCollection<PersonWithRole> artists;
 		readonly List<string> contributor_list = new List<string> ();
 		readonly ReadOnlyCollection<string> contributors;
+		readonly List<string> album_list = new List<string>();
+		readonly ReadOnlyCollection<string> albums;
+		readonly List<DateTime> scheduled_start_time_list = new List<DateTime>();
+		readonly ReadOnlyCollection<DateTime> scheduled_start_times;
+		readonly List<DateTime> scheduled_end_time_list = new List<DateTime>();
+		readonly ReadOnlyCollection<DateTime> scheduled_end_times;
 		
-		protected AudioBook ()
+		protected MusicVideoClip ()
 		{
-			producers = producer_list.AsReadOnly ();
+			artists = artist_list.AsReadOnly ();
 			contributors = contributor_list.AsReadOnly ();
+			albums = album_list.AsReadOnly ();
+			scheduled_start_times = scheduled_start_time_list.AsReadOnly ();
+			scheduled_end_times = scheduled_end_time_list.AsReadOnly ();
 		}
 		
-        public string StorageMedium { get; private set; }
-        public ReadOnlyCollection<string> Producers { get { return producers; } }
-        public ReadOnlyCollection<string> Contributors { get { return contributors; } }
-        public string Date { get; private set; }
+        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
+		public string StorageMedium { get; private set; }
+		public ReadOnlyCollection<string> Albums { get { return albums; } }
+		public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
+        public ReadOnlyCollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
+		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
+		public string Date { get; private set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
-				case "producer":
-					producer_list.Add (reader.ReadString ());
+				switch (reader.LocalName) {
+				case "artist":
+					artist_list.Add (PersonWithRole.Deserialize (reader));
+					break;
+				case "album":
+					album_list.Add (reader.ReadString ());
+					break;
+				case "scheduledStartTime":
+					scheduled_start_time_list.Add (reader.ReadElementContentAsDateTime ()); // TODO is this going to work?
+					break;
+				case "scheduledEndTime":
+					scheduled_end_time_list.Add (reader.ReadElementContentAsDateTime ());
 					break;
 				default:
 					base.DeserializePropertyElement (reader);
 					break;
 				}
 			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-				switch (reader.Name) {
+				switch (reader.LocalName) {
 				case "contributor":
 					contributor_list.Add (reader.ReadString ());
 					break;

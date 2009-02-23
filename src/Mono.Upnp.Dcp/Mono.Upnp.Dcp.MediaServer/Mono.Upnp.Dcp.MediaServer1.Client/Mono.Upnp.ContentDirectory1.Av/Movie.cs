@@ -1,5 +1,5 @@
 // 
-// MusicVideoClip.cs
+// Movie.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -31,65 +31,42 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class MusicVideoClip : VideoItem
+	public class Movie : VideoItem
 	{
-		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
-		readonly ReadOnlyCollection<PersonWithRole> artists;
-		readonly List<string> contributor_list = new List<string> ();
-		readonly ReadOnlyCollection<string> contributors;
-		readonly List<string> album_list = new List<string>();
-		readonly ReadOnlyCollection<string> albums;
 		readonly List<DateTime> scheduled_start_time_list = new List<DateTime>();
 		readonly ReadOnlyCollection<DateTime> scheduled_start_times;
 		readonly List<DateTime> scheduled_end_time_list = new List<DateTime>();
 		readonly ReadOnlyCollection<DateTime> scheduled_end_times;
 		
-		protected MusicVideoClip ()
+		protected Movie ()
 		{
-			artists = artist_list.AsReadOnly ();
-			contributors = contributor_list.AsReadOnly ();
-			albums = album_list.AsReadOnly ();
 			scheduled_start_times = scheduled_start_time_list.AsReadOnly ();
 			scheduled_end_times = scheduled_end_time_list.AsReadOnly ();
 		}
 		
-        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-		public string StorageMedium { get; private set; }
-		public ReadOnlyCollection<string> Albums { get { return albums; } }
-		public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
+        public string StorageMedium { get; private set; }
+        public int? DvdRegionCode { get; private set; }
+        public string ChannelName { get; private set; }
+        public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
         public ReadOnlyCollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
-		public ReadOnlyCollection<string> Contributors { get { return contributors; } }
-		public string Date { get; private set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
-				case "artist":
-					artist_list.Add (PersonWithRole.Deserialize (reader));
-					break;
-				case "album":
-					album_list.Add (reader.ReadString ());
+				switch (reader.LocalName) {
+				case "channelName":
+					ChannelName = reader.ReadString ();
 					break;
 				case "scheduledStartTime":
-					scheduled_start_time_list.Add (reader.ReadElementContentAsDateTime ()); // TODO is this going to work?
+					scheduled_start_time_list.Add (reader.ReadElementContentAsDateTime ()); // TODO this is ISO 8601
 					break;
 				case "scheduledEndTime":
 					scheduled_end_time_list.Add (reader.ReadElementContentAsDateTime ());
 					break;
-				default:
-					base.DeserializePropertyElement (reader);
-					break;
-				}
-			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-				switch (reader.Name) {
-				case "contributor":
-					contributor_list.Add (reader.ReadString ());
-					break;
-				case "date":
-					Date = reader.ReadString ();
+				case "DVDRegionCode":
+					DvdRegionCode = reader.ReadElementContentAsInt ();
 					break;
 				default:
 					base.DeserializePropertyElement (reader);
@@ -99,5 +76,5 @@ namespace Mono.Upnp.ContentDirectory.Av
 				base.DeserializePropertyElement (reader);
 			}
 		}
-	}
+    }
 }

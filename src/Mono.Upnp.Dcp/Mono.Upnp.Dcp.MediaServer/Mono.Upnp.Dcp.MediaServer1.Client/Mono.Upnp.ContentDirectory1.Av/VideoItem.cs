@@ -72,7 +72,7 @@ namespace Mono.Upnp.ContentDirectory.Av
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
+				switch (reader.LocalName) {
 				case "actor":
 					actor_list.Add (PersonWithRole.Deserialize (reader));
 					break;
@@ -96,7 +96,7 @@ namespace Mono.Upnp.ContentDirectory.Av
 					break;
 				}
 			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-				switch (reader.Name) {
+				switch (reader.LocalName) {
 				case "relation":
 					relation_list.Add (new Uri (reader.ReadString ()));
 					break;

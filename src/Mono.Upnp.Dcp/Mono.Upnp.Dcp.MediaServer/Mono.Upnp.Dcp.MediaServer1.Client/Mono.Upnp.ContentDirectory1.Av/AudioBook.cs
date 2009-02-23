@@ -1,5 +1,5 @@
 // 
-// VideoBroadcast.cs
+// AudioBook.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -25,34 +25,50 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class VideoBroadcast : VideoItem
+	public class AudioBook : AudioItem
 	{
-		protected VideoBroadcast ()
+		readonly List<string> producer_list = new List<string> ();
+		readonly ReadOnlyCollection<string> producers;
+		readonly List<string> contributor_list = new List<string> ();
+		readonly ReadOnlyCollection<string> contributors;
+		
+		protected AudioBook ()
 		{
+			producers = producer_list.AsReadOnly ();
+			contributors = contributor_list.AsReadOnly ();
 		}
 		
-        public Uri Icon { get; private set; }
-        public string Region { get; private set; }
-        public int? ChannelNr { get; private set; }
+        public string StorageMedium { get; private set; }
+        public ReadOnlyCollection<string> Producers { get { return producers; } }
+        public ReadOnlyCollection<string> Contributors { get { return contributors; } }
+        public string Date { get; private set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
-				case "icon":
-					Icon = new Uri (reader.ReadString ());
+				switch (reader.LocalName) {
+				case "producer":
+					producer_list.Add (reader.ReadString ());
 					break;
-				case "region":
-					Region = reader.ReadString ();
-				 	break;
-				case "channelNr":
-					ChannelNr = reader.ReadElementContentAsInt ();
+				default:
+					base.DeserializePropertyElement (reader);
+					break;
+				}
+			} else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
+				switch (reader.LocalName) {
+				case "contributor":
+					contributor_list.Add (reader.ReadString ());
+					break;
+				case "date":
+					Date = reader.ReadString ();
 					break;
 				default:
 					base.DeserializePropertyElement (reader);

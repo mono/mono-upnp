@@ -51,35 +51,35 @@ namespace Mono.Upnp.ContentDirectory
 			Resolution resolution;
 			uint bitrate, sample_frequency, bits_per_sample, nr_audio_channels, color_depth;
 			
-			if (ulong.TryParse (reader["size", Schemas.DidlLiteSchema], out size))
+			if (ulong.TryParse (reader["size"], out size))
 				this.size = size;
 			
-			if (TimeSpan.TryParse (reader["duration", Schemas.DidlLiteSchema], out duration)) // TODO our own parsing
+			if (TimeSpan.TryParse (reader["duration"], out duration)) // TODO our own parsing
 				this.duration = duration;
 			
-			if (uint.TryParse (reader["bitrate", Schemas.DidlLiteSchema], out bitrate))
+			if (uint.TryParse (reader["bitrate"], out bitrate))
 				this.bitrate = bitrate;
 			
-			if (uint.TryParse (reader["sampleFrequency", Schemas.DidlLiteSchema], out sample_frequency))
+			if (uint.TryParse (reader["sampleFrequency"], out sample_frequency))
 				this.sample_frequency = sample_frequency;
 			
-			if (uint.TryParse (reader["bitsPerSecond", Schemas.DidlLiteSchema], out bits_per_sample))
+			if (uint.TryParse (reader["bitsPerSecond"], out bits_per_sample))
 				this.bits_per_sample = bits_per_sample;
 			
-			if (uint.TryParse (reader["nrAudioChannels", Schemas.DidlLiteSchema], out nr_audio_channels))
+			if (uint.TryParse (reader["nrAudioChannels"], out nr_audio_channels))
 				this.nr_audio_channels = nr_audio_channels;
 			
-			if (Mono.Upnp.ContentDirectory.Resolution.TryParse (reader["resolution", Schemas.DidlLiteSchema], out resolution))
+			if (Mono.Upnp.ContentDirectory.Resolution.TryParse (reader["resolution"], out resolution))
 				this.resolution = resolution;
 			
-			if (uint.TryParse (reader["colorDepth", Schemas.DidlLiteSchema], out color_depth))
+			if (uint.TryParse (reader["colorDepth"], out color_depth))
 				this.color_depth = color_depth;
 			
-			protocol_info = reader["protocolInfo", Schemas.DidlLiteSchema];
+			protocol_info = reader["protocolInfo"];
 			
-			protection = reader["protection", Schemas.DidlLiteSchema];
+			protection = reader["protection"];
 			
-			var import_uri = reader["importUri", Schemas.DidlLiteSchema];
+			var import_uri = reader["importUri"];
 			if (Uri.IsWellFormedUriString (import_uri, UriKind.Absolute)) {
 				this.import_uri = new Uri (import_uri);
 			}

@@ -1,5 +1,5 @@
 // 
-// StorageSystem.cs
+// VideoBroadcast.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -29,38 +29,30 @@ using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class StorageSystem : Container
+	public class VideoBroadcast : VideoItem
 	{
-		protected StorageSystem ()
+		protected VideoBroadcast ()
 		{
 		}
 		
-		public long StorageTotal { get; private set; }
-		public long StorageUsed { get; private set; }
-		public long StorageFree { get; private set; }
-		public long StorageMaxPartition { get; private set; }
-		public string StorageMedium { get; private set; }
+        public Uri Icon { get; private set; }
+        public string Region { get; private set; }
+        public int? ChannelNr { get; private set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
-				case "storageTotal":
-					StorageTotal = reader.ReadElementContentAsLong ();
+				switch (reader.LocalName) {
+				case "icon":
+					Icon = new Uri (reader.ReadString ());
 					break;
-				case "storageUsed":
-					StorageUsed = reader.ReadElementContentAsLong ();
-					break;
-				case "storageFree":
-					StorageFree = reader.ReadElementContentAsLong ();
-					break;
-				case "storageMaxPartition":
-					StorageMaxPartition = reader.ReadElementContentAsLong ();
-					break;
-				case "storageMedium":
-					StorageMedium = reader.ReadString ();
+				case "region":
+					Region = reader.ReadString ();
+				 	break;
+				case "channelNr":
+					ChannelNr = reader.ReadElementContentAsInt ();
 					break;
 				default:
 					base.DeserializePropertyElement (reader);

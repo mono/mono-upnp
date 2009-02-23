@@ -1,5 +1,5 @@
 // 
-// MusicAlbum.cs
+// StorageVolume.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -25,57 +25,38 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Xml;
 
 namespace Mono.Upnp.ContentDirectory.Av
 {
-	public class MusicAlbum : Album
+	public class StorageVolume : Container
 	{
-		readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
-		readonly ReadOnlyCollection<PersonWithRole> artists;
-		readonly List<string> producer_list = new List<string> ();
-		readonly ReadOnlyCollection<string> producers;
-		readonly List<string> genre_list = new List<string> ();
-		readonly ReadOnlyCollection<string> genres;
-		readonly List<Uri> album_art_uri_list = new List<Uri> ();
-		readonly ReadOnlyCollection<Uri> album_art_uris;
-		
-		protected MusicAlbum ()
+		protected StorageVolume ()
 		{
-			artists = artist_list.AsReadOnly ();
-			producers = producer_list.AsReadOnly ();
-			genres = genre_list.AsReadOnly ();
-			album_art_uris = album_art_uri_list.AsReadOnly ();
 		}
 		
-        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-		public ReadOnlyCollection<string> Genres { get { return genres; } }
-		public ReadOnlyCollection<string> Producers { get { return producers; } }
-		public ReadOnlyCollection<Uri> AlbumArtUris { get { return album_art_uris; } }
-		public string Toc { get; private set; }
+		public long StorageTotal { get; private set; }
+		public long StorageUsed { get; private set; }
+		public long StorageFree { get; private set; }
+		public string StorageMedium { get; private set; }
 		
 		protected override void DeserializePropertyElement (XmlReader reader)
 		{
 			if (reader == null) throw new ArgumentNullException ("reader");
 			
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
-				switch (reader.Name) {
-				case "artist":
-					artist_list.Add (PersonWithRole.Deserialize (reader));
+				switch (reader.LocalName) {
+				case "storageTotal":
+					StorageTotal = reader.ReadElementContentAsLong ();
 					break;
-				case "producer":
-					producer_list.Add (reader.ReadString ());
+				case "storageUsed":
+					StorageUsed = reader.ReadElementContentAsLong ();
 					break;
-				case "genre":
-					genre_list.Add (reader.ReadString ());
+				case "storageFree":
+					StorageFree = reader.ReadElementContentAsLong ();
 					break;
-				case "albumArtURI":
-					album_art_uri_list.Add (new Uri (reader.ReadString ()));
-					break;
-				case "toc":
-					Toc = reader.ReadString ();
+				case "storageMedium":
+					StorageMedium = reader.ReadString ();
 					break;
 				default:
 					base.DeserializePropertyElement (reader);
