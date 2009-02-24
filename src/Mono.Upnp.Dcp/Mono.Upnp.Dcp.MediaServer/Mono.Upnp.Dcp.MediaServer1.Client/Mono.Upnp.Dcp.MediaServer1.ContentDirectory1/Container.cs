@@ -54,22 +54,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 		
 		public Results<Object> Browse ()
 		{
-			return Browse (null);
+			return Browse (new ResultsSettings ());
 		}
 		
 		public Results<Object> Browse (ResultsSettings settings)
 		{
-			var results = settings != null
-				? new BrowseResults (ContentDirectory, Id, settings.SortCriteria,
-					settings.Filter, settings.RequestCount, settings.Offset)
-				: new BrowseResults (ContentDirectory, Id, null, null, 0, 0);
+			var results = new BrowseResults (ContentDirectory, Id, settings);
 			results.FetchResults ();
 			return results;
 		}
 		
 		public Results<Object> Search (string searchCriteria)
 		{
-			return Search (searchCriteria, null);
+			return Search (searchCriteria, new ResultsSettings ());
 		}
 		
 		public Results<Object> Search (string searchCriteria, ResultsSettings settings)
@@ -79,7 +76,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         public Results<T> SearchForType<T> () where T : Object
         {
-            return SearchForType<T> (null);
+            return SearchForType<T> (new ResultsSettings ());
         }
         
         public Results<T> SearchForType<T> (ResultsSettings settings) where T : Object
@@ -92,10 +89,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 		{
 			if (searchCriteria == null) throw new ArgumentNullException ("searchCriteria");
 			
-			var results = settings != null
-				? new SearchResults<T> (ContentDirectory, Id, searchCriteria,
-					settings.SortCriteria, settings.Filter, settings.RequestCount, settings.Offset)
-				: new SearchResults<T> (ContentDirectory, Id, searchCriteria, null, null, 0, 0);
+			var results = new SearchResults<T> (ContentDirectory, Id, searchCriteria, settings);
             results.FetchResults ();
 			return results;
 		}

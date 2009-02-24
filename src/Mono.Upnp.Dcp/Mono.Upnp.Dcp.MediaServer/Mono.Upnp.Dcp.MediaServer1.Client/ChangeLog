@@ -1,3 +1,16 @@
+2009-02-24  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/ResultsSettings.cs:
+	Changed to struct and added default values.
+
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/Container.cs:
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/SearchResults.cs:
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/BrowseResults.cs:
+	Use new ctors which take ResultsSettings
+
+	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/Results.cs: Got
+	rid of some value-checking
+
 2009-02-23  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/Item.cs:

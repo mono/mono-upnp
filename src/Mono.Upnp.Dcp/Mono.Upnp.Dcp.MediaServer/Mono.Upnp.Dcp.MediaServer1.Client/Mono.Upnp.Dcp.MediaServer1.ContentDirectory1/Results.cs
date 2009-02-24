@@ -44,8 +44,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 		{
 			this.content_directory = contentDirectory;
 			this.object_id = objectId;
-			this.sort_criteria = sortCriteria ?? "";
-			this.filter = string.IsNullOrEmpty (filter) ? "*" : filter;
+			this.sort_criteria = sortCriteria;
+			this.filter = filter;
 			this.request_count = requestCount;
 			this.offset = offset;
 		}

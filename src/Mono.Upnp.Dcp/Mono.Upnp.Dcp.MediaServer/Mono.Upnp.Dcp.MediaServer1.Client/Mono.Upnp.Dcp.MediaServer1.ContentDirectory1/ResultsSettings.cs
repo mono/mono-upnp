@@ -28,11 +28,38 @@ using System;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-	public sealed class ResultsSettings
+	public struct ResultsSettings
 	{
-		public string SortCriteria { get; set; }
-		public string Filter { get; set; }
-		public uint RequestCount { get; set; }
+        const int sort_criteria_mask = 1;
+        const int filter_mask = 2;
+        const int request_count_mask = 4;
+        
+        int field_mask;
+        string sort_criteria;
+        string filter;
+        uint request_count;
+        
+		public string SortCriteria {
+            get { return (field_mask & sort_criteria_mask) == 0 ? "" : sort_criteria; }
+            set {
+                field_mask |= sort_criteria_mask;
+                sort_criteria = value;
+            }
+        }
+		public string Filter {
+            get { return (field_mask & filter_mask) == 0 ? "*" : filter; }
+            set {
+                field_mask |= filter_mask;
+                filter = value;
+            }
+        }
+		public uint RequestCount {
+            get { return (field_mask & request_count_mask) == 0 ? 200 : request_count; }
+            set {
+                field_mask |= request_count_mask;
+                request_count = value;
+            }
+        }
 		public uint Offset { get; set; }
 	}
 }

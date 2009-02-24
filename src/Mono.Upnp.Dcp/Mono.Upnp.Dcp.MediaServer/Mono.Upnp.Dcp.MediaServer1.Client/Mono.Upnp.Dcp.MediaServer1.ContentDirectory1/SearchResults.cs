@@ -29,9 +29,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 	sealed class SearchResults<T> : Results<T> where T : Object
 	{
 		readonly string search_criteria;
+        
+        public SearchResults (ContentDirectory contentDirectory, string objectId, string searchCriteria,
+                              ResultsSettings settings)
+            : this (contentDirectory, objectId, searchCriteria,
+                    settings.SortCriteria, settings.Filter, settings.RequestCount, settings.Offset)
+        {
+        }
 		
-		public SearchResults(ContentDirectory contentDirectory, string objectId, string searchCriteria,
-		                       string sortCriteria, string filter, uint requestCount, uint offset)
+		SearchResults (ContentDirectory contentDirectory, string objectId, string searchCriteria,
+                       string sortCriteria, string filter, uint requestCount, uint offset)
 			: base (contentDirectory, objectId, sortCriteria, filter, requestCount, offset)
 		{
 			search_criteria = searchCriteria;
@@ -39,8 +46,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 		
 		protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
 		{
-			return ContentDirectory.Controller.Search (ObjectId, search_criteria, Filter, Offset, 
-				RequestCount, SortCriteria, out returnedCount, out totalCount, out updateId);
+			return ContentDirectory.Controller.Search (
+                ObjectId, search_criteria, Filter, Offset, RequestCount, SortCriteria,
+				out returnedCount, out totalCount, out updateId);
 		}
 		
 		protected override Results<T> CreateMoreResults ()
