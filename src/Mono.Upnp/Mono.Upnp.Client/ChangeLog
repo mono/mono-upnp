@@ -1,5 +1,12 @@
 2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.Client.csproj: Sign the assembly
+
+	* Mono.Upnp.Description/DeviceDescription.cs: Publically
+	expose the icons.
+
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Upnp.Client.csproj: 
 
 2009-02-23  Scott Peterson  <lunchtimemama@gmail.com>

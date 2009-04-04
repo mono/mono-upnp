@@ -66,6 +66,10 @@ namespace Mono.Upnp.Description
         public ReadOnlyCollection<DeviceDescription> Devices {
             get { return devices; }
         }
+        
+        public ReadOnlyCollection<Icon> Icons {
+            get { return icons; }
+        }
 
         public DeviceType Type { get; private set; }
         public string Udn { get; private set; }
