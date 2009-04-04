@@ -37,12 +37,12 @@ namespace Mono.Upnp
 {
 	public class UpnpClient
 	{
-        readonly Dictionary<string, DeviceDescription> descriptions =
-            new Dictionary<string, DeviceDescription> ();
         readonly Dictionary<DeviceAnnouncement, DeviceAnnouncement> devices =
             new Dictionary<DeviceAnnouncement, DeviceAnnouncement> ();
         readonly Dictionary<ServiceAnnouncement, ServiceAnnouncement> services =
             new Dictionary<ServiceAnnouncement, ServiceAnnouncement> ();
+        readonly Dictionary<string, DeviceDescription> descriptions =
+            new Dictionary<string, DeviceDescription> ();
 
         readonly Mono.Ssdp.Client client = new Mono.Ssdp.Client ();
 
@@ -55,7 +55,7 @@ namespace Mono.Upnp
 
         public UpnpClient (IDeserializerFactory deserializerFactory)
         {
-            DeserializerFactory = deserializerFactory;
+            DeserializerFactory = deserializerFactory ?? DeserializerFactory<Deserializer>.Instance;
             client.ServiceAdded += ClientServiceAdded;
             client.ServiceRemoved += ClientServiceRemoved;
         }
@@ -67,7 +67,10 @@ namespace Mono.Upnp
 
         public IDeserializerFactory DeserializerFactory {
             get { return deserializer_factory; }
-            set { deserializer_factory = value ?? DeserializerFactory<Deserializer>.Instance; }
+            set {
+                if (value == null) throw new ArgumentNullException ("value");
+                deserializer_factory = value;
+            }
         }
 
         public void BrowseAll ()

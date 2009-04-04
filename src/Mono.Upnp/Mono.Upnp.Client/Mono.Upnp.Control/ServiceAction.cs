@@ -41,10 +41,10 @@ namespace Mono.Upnp.Control
     {
         readonly static Dictionary<string, string> emptyArguments = new Dictionary<string, string> ();
         readonly ServiceController controller;
-        readonly Dictionary<string, Argument> in_argument_dict = new Dictionary<string,Argument> ();
-        readonly ReadOnlyDictionary<string, Argument> in_arguments;
-        readonly Dictionary<string, Argument> out_argument_dict = new Dictionary<string,Argument> ();
-        readonly ReadOnlyDictionary<string, Argument> out_arguments;
+        readonly ReadOnlyDictionary<string, Argument> in_arguments =
+            new ReadOnlyDictionary<string, Argument> (new Dictionary<string, Argument> ());
+        readonly ReadOnlyDictionary<string, Argument> out_arguments =
+            new ReadOnlyDictionary<string, Argument> (new Dictionary<string, Argument> ());
         bool bypass_return_argument;
 		bool verified;
 
@@ -53,8 +53,6 @@ namespace Mono.Upnp.Control
             if (serviceController == null) throw new ArgumentNullException ("serviceController");
 
             controller = serviceController;
-            in_arguments = new ReadOnlyDictionary<string, Argument> (in_argument_dict);
-            out_arguments = new ReadOnlyDictionary<string, Argument> (out_argument_dict);
         }
 
         public ServiceController Controller {
@@ -297,21 +295,21 @@ namespace Mono.Upnp.Control
             if (argument == null) throw new ArgumentNullException ("argument");
             
             if (argument.Direction == ArgumentDirection.In) {
-                in_argument_dict [argument.Name] = argument;
+                in_arguments.SetItem (argument.Name, argument);
             } else {
                 if (argument.IsReturnValue && !bypass_return_argument) {
                     if (ReturnArgument == null) {
                         ReturnArgument = argument;
                     } else {
-                        out_argument_dict [ReturnArgument.Name] = ReturnArgument;
-                        out_argument_dict [argument.Name] = argument;
+                        out_arguments.SetItem (ReturnArgument.Name, ReturnArgument);
+                        out_arguments.SetItem (argument.Name, argument);
                         ReturnArgument = null;
                         bypass_return_argument = true;
                         Log.Exception (new UpnpDeserializationException (
                             string.Format ("{0} has multiple return values.", ToString ())));
                     }
                 } else {
-                    out_argument_dict [argument.Name] = argument;
+                    out_arguments.SetItem (argument.Name, argument);
                 }
             }
         }

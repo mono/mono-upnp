@@ -47,14 +47,18 @@ namespace Mono.Upnp
         {
             throw new NotSupportedException (error);
         }
+        
+        internal void Include (TKey key, TValue value)
+        {
+            dictionary[key] = value;
+        }
 
         public bool ContainsKey (TKey key)
         {
             return dictionary.ContainsKey (key);
         }
 
-        public ICollection<TKey> Keys
-        {
+        public ICollection<TKey> Keys {
             get { return dictionary.Keys; }
         }
 
@@ -68,14 +72,23 @@ namespace Mono.Upnp
             return dictionary.TryGetValue (key, out value);
         }
 
-        public ICollection<TValue> Values
-        {
+        public ICollection<TValue> Values {
             get { return dictionary.Values; }
         }
 
+        TValue IDictionary<TKey, TValue>.this[TKey key] {
+            get { return this[key]; }
+            set { throw new NotSupportedException (error); }
+        }
+        
         public TValue this[TKey key] {
             get { return dictionary[key]; }
-            set { throw new NotSupportedException (error); }
+        }
+        
+        // FIXME this is a workaround for bug 492277
+        internal void SetItem(TKey key, TValue value)
+        {
+            dictionary[key] = value;
         }
 
         void ICollection<KeyValuePair<TKey, TValue>>.Add (KeyValuePair<TKey, TValue> item)

@@ -39,10 +39,10 @@ namespace Mono.Upnp.Control
 	public class ServiceController
 	{
         readonly ServiceDescription service_description;
-        readonly Dictionary<string, ServiceAction> action_dict = new Dictionary<string, ServiceAction> ();
-        readonly ReadOnlyDictionary<string, ServiceAction> actions;
-        readonly Dictionary<string, StateVariable> state_variable_dict = new Dictionary<string, StateVariable> ();
-        readonly ReadOnlyDictionary<string, StateVariable> state_variables;
+        readonly ReadOnlyDictionary<string, ServiceAction> actions =
+            new ReadOnlyDictionary<string, ServiceAction> (new Dictionary<string, ServiceAction> ());
+        readonly ReadOnlyDictionary<string, StateVariable> state_variables =
+            new ReadOnlyDictionary<string, StateVariable> (new Dictionary<string, StateVariable> ());
         SoapInvoker soap_adapter;
         EventSubscriber event_subscriber;
         int events_ref_count;
@@ -51,9 +51,6 @@ namespace Mono.Upnp.Control
         protected internal ServiceController (ServiceDescription service)
         {
             if (service == null) throw new ArgumentNullException ("service");
-
-            actions = new ReadOnlyDictionary<string, ServiceAction> (action_dict);
-            state_variables = new ReadOnlyDictionary<string, StateVariable> (state_variable_dict);
 
             this.service_description = service;
         }
@@ -77,13 +74,13 @@ namespace Mono.Upnp.Control
         protected void AddAction (ServiceAction action)
         {
             if (action == null) throw new ArgumentNullException ("action");
-            action_dict [action.Name] = action;
+            actions.SetItem (action.Name, action);
         }
 
         protected void AddStateVariable (StateVariable stateVariable)
         {
             if (stateVariable == null) throw new ArgumentNullException ("stateVariable");
-            state_variable_dict [stateVariable.Name] = stateVariable;
+            state_variables.SetItem (stateVariable.Name, stateVariable);
         }
 
         protected internal void Dispose ()

@@ -1,5 +1,20 @@
 2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.Control/ServiceAction.cs:
+	* Mono.Upnp.Control/ServiceController.cs: Use the new internal
+	methods in ReadOnlyDictionary so that we don't have to hold
+	references to the underlying dictionaries. Why aren't the
+	collection interfaces split into providers and consumers.
+
+	* Mono.Upnp/UpnpClient.cs: Style changes.
+
+	* Mono.Upnp/ReadOnlyDictionary.cs: Exposed some internal
+	methods so that we don't need to hold a reference to the
+	underlying dictionary in other place. Also found a bug in
+	gmcs. YEAH!
+
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Upnp.Client.csproj: Sign the assembly
 
 	* Mono.Upnp.Description/DeviceDescription.cs: Publically
