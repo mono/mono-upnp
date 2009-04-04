@@ -27,8 +27,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.Sharpener", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.Sharpener\Mono.Upnp.Dcp.Sharpener.csproj", "{EE7A8DC2-FA92-4684-A0B7-FEF71A4A45F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Server", "src\src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer\Mono.Upnp.Dcp.MediaServer1.Server\Mono.Upnp.Dcp.MediaServer1.Server.csproj", "{612068A0-1BE2-43F2-9402-5884EC0AFC57}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Linq|Any CPU = Debug Linq|Any CPU

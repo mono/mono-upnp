@@ -1,5 +1,9 @@
 2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.sln: Got rid of missing project ref.
+
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Upnp.sln: Disabled compilation of Upnp.ConsoleServer.
 	Everything should build out of the box now.
 

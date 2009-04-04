@@ -1,3 +1,7 @@
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Ssdp.csproj: Got rid of borked makefile integration.
+
 2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* ChangeLog:

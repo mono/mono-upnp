@@ -1,5 +1,10 @@
 2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Ssdp.ConsoleClient.csproj: Got rid of borked makefile
+	integration.
+
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Ssdp.ConsoleClient.csproj: 
 
 2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
