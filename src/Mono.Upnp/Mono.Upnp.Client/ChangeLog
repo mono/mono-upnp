@@ -1,3 +1,7 @@
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Client.csproj: 
+
 2009-02-23  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Control/ServiceAction.cs: Use XmlReader.LocalName

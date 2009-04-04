@@ -1,3 +1,8 @@
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.sln: Disabled compilation of Upnp.ConsoleServer.
+	Everything should build out of the box now.
+
 2009-02-24  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.sln: 

@@ -45,13 +45,13 @@ namespace Mono.Upnp.Dcp.Sharpener
             get { return optional; }
         }
 
-        protected override void DeserializeCore (XmlReader reader, string element)
+        protected override void DeserializePropertyElement (XmlReader reader)
         {
-            if (element.ToLower () == "optional") {
+            if (reader.Name.ToLower () == "optional") {
                 optional = true;
                 reader.Close ();
             } else {
-                base.DeserializeCore (reader, element);
+                base.DeserializePropertyElement (reader);
             }
         }
 	}

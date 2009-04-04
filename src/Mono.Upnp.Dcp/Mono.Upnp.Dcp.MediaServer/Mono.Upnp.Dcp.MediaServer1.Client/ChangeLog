@@ -1,3 +1,7 @@
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Dcp.MediaServer1.Client.csproj: 
+
 2009-02-24  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Dcp.MediaServer1.ContentDirectory1/ResultsSettings.cs:

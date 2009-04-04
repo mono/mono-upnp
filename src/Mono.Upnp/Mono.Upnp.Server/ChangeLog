@@ -1,3 +1,7 @@
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Server.csproj: 
+
 2009-02-08  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Server.pidb: I don't know how this got under
