@@ -194,7 +194,7 @@ namespace Mono.Upnp.Dcp.Sharpener
         private void WriteStateVariables (CodeMonkey monkey, ServiceController service)
         {
             foreach (StateVariable state_variable in service.StateVariables.Values) {
-                if (state_variable.SendEvents) {
+                if (state_variable.SendsEvents) {
                     WriteStateVariable (monkey, state_variable);
                 }
             }

@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 
 using Mono.Upnp.Control;
 
@@ -48,7 +49,10 @@ namespace Mono.Upnp.Dcp.Sharpener
         protected override void RunService ()
         {
             ServiceController service = new OfflineServiceController ();
-            service.Deserialize (Context.Reader.ReadSubtree ());
+            using (var reader = Context.Reader.ReadSubtree ()) {
+                reader.Read ();
+                service.Deserialize (reader);
+            }
             WriteServiceClient ();
             WriteEnums (service);
             WriteService (service);
@@ -72,12 +76,11 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.WriteLine ();
             monkey.WriteLine ("public event EventHandler<DiscoveryEventArgs<{0}>> {0}Added;", Context.ClassName);
             monkey.WriteLine ();
-            monkey.StartWriteBlock ("public {0}Client () : this (new UpnpClient ())", Context.ClassName);
+            monkey.StartWriteBlock ("public {0}Client () : this (null)", Context.ClassName);
             monkey.EndWriteBlock ();
             monkey.WriteLine ();
             monkey.StartWriteBlock ("public {0}Client (UpnpClient client)", Context.ClassName);
-            monkey.WriteLine (@"if (client == null) throw new ArgumentNullException (""client"");");
-            monkey.WriteLine ("this.client = client;");
+            monkey.WriteLine ("this.client = client ?? new UpnpClient ();");
             monkey.WriteLine ("client.ServiceAdded += ClientServiceAdded;");
             monkey.EndWriteBlock ();
             monkey.WriteLine ();
@@ -113,7 +116,7 @@ namespace Mono.Upnp.Dcp.Sharpener
 
         private void WriteService (ServiceController service)
         {
-            CodeMonkey monkey = new CodeMonkey (Context.ClassName + ".cs");
+            CodeMonkey monkey = new CodeMonkey (Context.ClassName + "Controller.cs");
             StartWriteService (monkey, service);
             WriteMethods (monkey, service);
             WriteEvents (monkey, service);
@@ -124,7 +127,7 @@ namespace Mono.Upnp.Dcp.Sharpener
 
         private void StartWriteService (CodeMonkey monkey, ServiceController service)
         {
-            monkey.Write ("// {0}.cs auto-generated at {1} by Sharpener", Context.ClassName, DateTime.Now);
+            monkey.Write ("// {0}Controller.cs auto-generated at {1} by Sharpener", Context.ClassName, DateTime.Now);
             monkey.WriteLine ();
             monkey.WriteUsing ("System", "System.Collections.Generic");
             monkey.WriteLine ();
@@ -136,10 +139,10 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.WriteUsing ("Mono.Upnp.Control");
             monkey.WriteLine ();
             monkey.StartWriteBlock ("namespace {0}", Context.Namespace);
-            monkey.StartWriteBlock ("public class {0}", Context.ClassName);
+            monkey.StartWriteBlock ("public class {0}Controller", Context.ClassName);
             monkey.WriteLine (@"public static readonly ServiceType ServiceType = new ServiceType (""{0}"");", Context.Type);
             monkey.WriteLine ("readonly ServiceController controller;");
-            monkey.StartWriteBlock ("public {0} (ServiceAnnouncement announcement)", Context.ClassName);
+            monkey.StartWriteBlock ("public {0}Controller (ServiceAnnouncement announcement)", Context.ClassName);
             monkey.WriteLine (@"if (announcement == null) throw new ArgumentNullException (""announcement"");");
             monkey.WriteLine ("ServiceDescription description = announcement.GetDescription ();");
             monkey.WriteLine ("controller = description.GetController ();");
@@ -170,6 +173,7 @@ namespace Mono.Upnp.Dcp.Sharpener
                 ? "string" : "void";
             monkey.WriteLine ("public {0} {1} (", return_type, action.Name);
             bool first = true;
+            List<Argument> enums = new List<Argument>();
             foreach (Argument argument in action.InArguments.Values) {
                 if (first) {
                     first = false;
@@ -178,6 +182,9 @@ namespace Mono.Upnp.Dcp.Sharpener
                 }
                 // TODO proper typing
                 WriteArgumentParameterDefinition (monkey, argument);
+                if(argument.RelatedStateVariable.AllowedValues != null) {
+                    enums.Add(argument);
+                }
             }
             if (action.OutArguments.Count > 0 && !return_single_out_arg) {
                 foreach (Argument argument in action.OutArguments.Values) {
@@ -193,6 +200,10 @@ namespace Mono.Upnp.Dcp.Sharpener
             monkey.StartWriteBlock ();
             if (action.IsOptional) {
                 monkey.WriteLine ("if (!Can{0}) throw new NotImplementedException ();", action.Name);
+            }
+            foreach (Argument argument in enums) {
+                IList<string> values = argument.RelatedStateVariable.AllowedValues;
+                monkey.WriteLine (@"if ({0} < {1}.{2} || {1}.{3} < {0}) throw new ArgumentOutOfRangeException (""{0}"");", ToCamelCase(argument.Name), EnumerationNames[argument.RelatedStateVariable], values[0], values[values.Count - 1]);
             }
             if (action.InArguments.Count > 0) {
                 monkey.WriteLine ("Dictionary<string, string> in_arguments = new Dictionary<string, string> ({0});", action.InArguments.Count);
@@ -243,7 +254,7 @@ namespace Mono.Upnp.Dcp.Sharpener
         private void WriteEvents (CodeMonkey monkey, ServiceController service)
         {
             foreach (OfflineStateVariable variable in service.StateVariables.Values) {
-                if (variable.SendEvents) {
+                if (variable.SendsEvents) {
                     if (variable.IsOptional) {
                         monkey.WriteLine (@"public bool Has{0} {{ get {{ return controller.StateVariables.ContainsKey (""{0}""); }} }}", variable.Name);
                     }
@@ -272,16 +283,35 @@ namespace Mono.Upnp.Dcp.Sharpener
         {
             monkey.StartWriteBlock ("void Verify ()");
             foreach (OfflineAction action in service.Actions.Values) {
-                if (!action.IsOptional) {
-                    monkey.WriteLine (@"if (!controller.Actions.ContainsKey (""{0}"")) throw new UpnpDeserializationException (string.Format (""The service {{0}} claims to be of type {1} but it does not have the required action {0}."", controller.Description.Id));", action.Name, Context.Type);
-                }
+                WriteVerifyAction (monkey, action);
             }
             foreach (OfflineStateVariable state_variable in service.StateVariables.Values) {
-                if (state_variable.SendEvents && !state_variable.IsOptional) {
+                if (state_variable.SendsEvents && !state_variable.IsOptional) {
                     monkey.WriteLine (@"if (!controller.StateVariables.ContainsKey (""{0}"")) throw new UpnpDeserializationException (string.Format (""The service {{0}} claims to be of type {1} but it does not have the required state variable {0}."", controller.Description.Id));", state_variable.Name, Context.Type);
                 }
             }
             monkey.EndWriteBlock ();
+        }
+        
+        private void WriteVerifyAction (CodeMonkey monkey, OfflineAction action)
+        {
+            if (!action.IsOptional) {
+                monkey.WriteLine (@"if (!controller.Actions.ContainsKey (""{0}"")) throw new UpnpDeserializationException (string.Format (""The service {{0}} claims to be of type {1} but it does not have the required action {0}."", controller.Description.Id));", action.Name, Context.Type);
+            } else {
+                monkey.StartWriteBlock ("if (Can{0})", action.Name);
+            }
+            foreach (Argument argument in action.InArguments.Values) {
+                monkey.WriteLine (@"if (!controller.Actions[""{0}""].InArguments.ContainersKey (""{1}"")) throw new UpnpDeserializationException (string.Format (""The service {{0}} claims to be of type {2} but it does not have the required argument {1} in action {0}."", controller.Description.Id));", action.Name, argument.Name, Context.Type);
+            }
+            foreach (Argument argument in action.OutArguments.Values) {
+                monkey.WriteLine (@"if (!controller.Actions[""{0}""].OutArguments.ContainersKey (""{1}"")) throw new UpnpDeserializationException (string.Format (""The service {{0}} claims to be of type {2} but it does not have the required argument {1} in action {0}."", controller.Description.Id));", action.Name, argument.Name, Context.Type);
+            }
+            if (action.ReturnArgument != null) {
+                monkey.WriteLine (@"if (controller.Actions[""{0}""].ReturnArgument == null || controller.Actions[""{0}""].ReturnArgument.Name != ""{1}"") throw new UpnpDeserializationException (string.Format (""The service {{0}} claims to be of type {2} but it does not have the required return argument {1} in action {0}."", controller.Description.Id));", action.Name, action.ReturnArgument.Name, Context.Type);
+            }
+            if (action.IsOptional) {
+                monkey.EndWriteBlock ();
+            }
         }
 
         private void EndWriteService (CodeMonkey monkey)

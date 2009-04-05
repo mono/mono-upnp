@@ -34,16 +34,16 @@ namespace Mono.Upnp.Dcp.Sharpener
         {
             var context1 = new RunnerContext (
                 "urn:schemas-upnp-org:service:ContentDirectory:1",
-                "ContentDirectory1",
-                "Mono.Upnp.Dcp.MediaServer1",
-                @"C:\Users\Scott\Desktop\ContentDirectory1.xml");
-            var context2 = new RunnerContext (
-                "urn:schemas-upnp-org:service:ConnectionManager:1",
-                "ConnectionManager1",
-                "Mono.Upnp.Dcp.MediaServer1",
-                @"C:\Users\Scott\Desktop\ConnectionManager1.xml");
+                "ContentDirectory",
+                "Mono.Upnp.Dcp.MediaServer1.ContentDirectory1",
+                "/home/scott/Desktop/upnpresources/standardizeddcps/MediaServer_1 and MediaRenderer_1/xml data files/service/ContentDirectory1.xml");
+//            var context2 = new RunnerContext (
+//                "urn:schemas-upnp-org:service:ConnectionManager:1",
+//                "ConnectionManager",
+//                "Mono.Upnp.Dcp.MediaServer1",
+//                "/home/scott/Desktop/upnpresources/standardizeddcps/MediaServer_1 and MediaRenderer_1/xml data files/service/ConnectionManager1.xml");
             new ClientRunner (context1).Run ();
-            new ClientRunner (context2).Run ();
+            //new ClientRunner (context2).Run ();
             return 0;
         }
 	}

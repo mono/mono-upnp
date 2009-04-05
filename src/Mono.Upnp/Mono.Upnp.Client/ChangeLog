@@ -1,5 +1,10 @@
 2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.Control/StateVariable.cs: Changed SendEvents to
+	SendsEvents because it's just better grammar.
+
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Upnp.Control/ServiceAction.cs:
 	* Mono.Upnp.Control/ServiceController.cs: Use the new internal
 	methods in ReadOnlyDictionary so that we don't have to hold

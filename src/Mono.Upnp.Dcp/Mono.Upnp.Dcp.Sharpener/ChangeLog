@@ -1,5 +1,13 @@
 2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.Dcp.Sharpener/Sharpener.cs:
+	* Mono.Upnp.Dcp.Sharpener/ClientRunner.cs:
+	* Mono.Upnp.Dcp.Sharpener/ServerRunner.cs:
+	* Mono.Upnp.Dcp.Sharpener/OfflineStateVariable.cs: Made some
+	improvements to verification and other API update stuff.
+
+2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Upnp.Dcp.Sharpener/OfflineAction.cs:
 	* Mono.Upnp.Dcp.Sharpener/OfflineStateVariable.cs: Brought up
 	to speed with the API.

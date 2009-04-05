@@ -39,17 +39,17 @@ namespace Mono.Upnp.Dcp.Sharpener
         {
         }
 
-        private bool optional;
-        public bool IsOptional
-        {
-            get { return optional; }
-        }
+        public bool IsOptional { get; private set; }
+        
+        public new bool SendsEvents { get; private set; }
 
         protected override void DeserializePropertyElement (XmlReader reader)
         {
             if (reader.Name.ToLower () == "optional") {
-                optional = true;
+                IsOptional = true;
                 reader.Close ();
+            } else if (reader.Name.ToLower () == "sendeventsattribute") {
+                SendsEvents = reader.ReadString ().Trim () == "yes";
             } else {
                 base.DeserializePropertyElement (reader);
             }

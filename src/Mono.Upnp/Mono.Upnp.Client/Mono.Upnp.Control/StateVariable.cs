@@ -58,7 +58,7 @@ namespace Mono.Upnp.Control
 
         public Type Type { get; private set; }
         
-        public bool SendEvents { get; private set; }
+        public bool SendsEvents { get; private set; }
 
         public string DefaultValue { get; private set; }
 
@@ -73,7 +73,7 @@ namespace Mono.Upnp.Control
         public event EventHandler<StateVariableChangedArgs<string>> Changed {
             add {
                 CheckDisposed ();
-                if (!SendEvents) {
+                if (!SendsEvents) {
                     throw new InvalidOperationException ("This state variable does not send events.");
                 } else if (value == null) {
                     return;
@@ -83,7 +83,7 @@ namespace Mono.Upnp.Control
             }
             remove {
                 CheckDisposed ();
-                if (!SendEvents) {
+                if (!SendsEvents) {
                     throw new InvalidOperationException ("This state variable does not send events.");
                 } else if (value == null) {
                     return;
@@ -125,7 +125,7 @@ namespace Mono.Upnp.Control
             if (reader == null) throw new ArgumentNullException ("reader");
 
             try {
-                SendEvents = reader["sendEvents"] != "no";
+                SendsEvents = reader["sendEvents"] != "no";
                 while (Helper.ReadToNextElement (reader)) {
 					var property_reader = reader.ReadSubtree ();
 					property_reader.Read ();
