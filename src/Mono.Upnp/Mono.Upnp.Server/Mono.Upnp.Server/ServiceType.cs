@@ -33,12 +33,12 @@ namespace Mono.Upnp.Server
     public sealed class ServiceType : TypeInfo
 	{
         public ServiceType (string type, Version version)
-            : base (type, version)
+            : base (type, version, null)
         {
         }
 
-        public ServiceType (string domainName, string type, Version version)
-            : base (domainName, type, version)
+        public ServiceType (string type, Version version, string domainName)
+            : base (type, version, domainName)
         {
         }
 

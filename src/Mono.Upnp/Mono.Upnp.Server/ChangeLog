@@ -1,3 +1,19 @@
+2009-04-05  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Server.Internal/Helper.cs: Made method
+	non-extension again.
+
+	* Mono.Upnp.Server.csproj: 
+
+	* Mono.Upnp.Server/TypeInfo.cs: Refactored and used sentinel
+	null for default value on the domain name.
+
+	* Mono.Upnp.Server/Device.cs: Started switch to C# 3 and
+	refactored some stuff.
+
+	* Mono.Upnp.Server/DeviceType.cs:
+	* Mono.Upnp.Server/ServiceType.cs: Refactored.
+
 2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Server.csproj: 

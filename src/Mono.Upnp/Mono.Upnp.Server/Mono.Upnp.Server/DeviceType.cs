@@ -33,12 +33,12 @@ namespace Mono.Upnp.Server
     public sealed class DeviceType : TypeInfo
     {
         public DeviceType (string type, Version version)
-            : base (type, version)
+            : base (type, version, null)
         {
         }
 
-        public DeviceType (string domainName, string type, Version version)
-            : base (domainName, type, version)
+        public DeviceType (string type, Version version, string domainName)
+            : base (type, version, domainName)
         {
         }
 

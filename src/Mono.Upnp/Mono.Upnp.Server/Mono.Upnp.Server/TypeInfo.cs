@@ -35,16 +35,12 @@ namespace Mono.Upnp.Server
 {
 	public abstract class TypeInfo
 	{
-        internal TypeInfo (string type, Version version)
-            : this ("schemas-upnp-org", type, version)
+        readonly string type;
+        readonly Version version;
+        readonly string domain_name;
+        
+        internal TypeInfo (string type, Version version, string domainName)
         {
-        }
-
-        internal TypeInfo (string domainName, string type, Version version)
-        {
-            if (domainName == null) {
-                throw new ArgumentNullException ("domainName");
-            }
             if (type == null) {
                 throw new ArgumentNullException ("type");
             }
@@ -52,56 +48,52 @@ namespace Mono.Upnp.Server
                 throw new ArgumentNullException ("version");
             }
 
-            this.domain_name = domainName;
             this.type = type;
             this.version = version;
+            this.domain_name = domainName ?? "schemas-upnp-org";
         }
 
         protected abstract string Kind { get; }
 
-        private string domain_name;
         public string DomainName {
             get { return domain_name; }
         }
 
-        private string type;
         public string Type {
             get { return type; }
         }
 
-        private Version version;
         public Version Version {
             get { return version; }
         }
 
-        private string to_string;
+        string to_string;
         public override string ToString ()
         {
             if (to_string == null) {
-                string version = this.version.Minor == 0
+                var version = this.version.Minor == 0
                     ? this.version.Major.ToString ()
-                    : String.Format ("{0}.{1}", this.version.Major, this.version.Minor);
-                to_string = String.Format ("urn:{0}:{1}:{2}:{3}", domain_name, Kind, type, version);
+                    : string.Format ("{0}.{1}", this.version.Major, this.version.Minor);
+                to_string = string.Format ("urn:{0}:{1}:{2}:{3}", domain_name, Kind, type, version);
             }
             return to_string;
         }
 
-        private string to_url_string;
+        string to_url_string;
         public string ToUrlString ()
         {
             if (to_url_string == null) {
-                string version = this.version.Minor == 0
+                var version = this.version.Minor == 0
                     ? this.version.Major.ToString ()
-                    : String.Format ("{0}.{1}", this.version.Major, this.version.Minor);
-                to_url_string = String.Format ("{0}/{1}/{2}", domain_name, type, version);
+                    : string.Format ("{0}.{1}", this.version.Major, this.version.Minor);
+                to_url_string = string.Format ("{0}/{1}/{2}", domain_name, type, version);
             }
             return to_url_string;
         }
 
         public override bool Equals (object obj)
         {
-            TypeInfo type_info = obj as TypeInfo;
-            return type_info != null && this == type_info;
+            return this == obj as TypeInfo;
         }
 
         public override int GetHashCode ()

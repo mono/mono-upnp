@@ -12,9 +12,10 @@ namespace Mono.Upnp.ConsoleClient
     {
         static void Main (string[] args)
         {
-            var client = new ContentDirectoryClient ();
-            client.ContentDirectoryAdded += client_ContentDirectoryAdded;
-            client.Browse ();
+            var client = new UpnpClient ();
+            client.ServiceAdded += HandleServiceAdded;
+            //client.ContentDirectoryAdded += client_ContentDirectoryAdded;
+            client.BrowseAll ();
 
             while (true) {
                 System.Threading.Thread.Sleep (1000);

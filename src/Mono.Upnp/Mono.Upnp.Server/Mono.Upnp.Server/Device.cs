@@ -36,26 +36,32 @@ namespace Mono.Upnp.Server
 {
 	public class Device
 	{
-        private IconServer icon_server;
-        private bool initialized;
+        IconServer icon_server;
+        bool initialized;
 
+        readonly DeviceType type;
+        readonly string id;
+        readonly string udn;
+        readonly string friendly_name;
+        readonly string manufacturer;
+        readonly string model_name;
+        readonly IEnumerable<Service> services;
+        Uri manufacturer_url;
+        string model_description;
+        string model_number;
+        Uri model_uri;
+        string serial_number;
+        string upc;
+        IList<Icon> icons;
+        
         public Device (DeviceType type, IEnumerable<Service> services, string id, string friendlyName, string manufacturer, string modelName)
         {
-            if (type == null) {
-                throw new ArgumentNullException ("type");
-            }
-            if (String.IsNullOrEmpty (id)) {
-                throw new ArgumentNullException ("id");
-            }
-            if (friendlyName == null) {
-                throw new ArgumentNullException ("friendlyName");
-            }
-            if (manufacturer == null) {
-                throw new ArgumentNullException ("manufacturer");
-            }
-            if (modelName == null) {
-                throw new ArgumentNullException ("modelName");
-            }
+            if (type == null) throw new ArgumentNullException ("type");
+            if (id == null) throw new ArgumentNullException ("id");
+            if (id.Length == 0) throw new ArgumentException ("The id cannot be an empty string.", "id");
+            if (friendlyName == null) throw new ArgumentNullException ("friendlyName");
+            if (manufacturer == null) throw new ArgumentNullException ("manufacturer");
+            if (modelName == null) throw new ArgumentNullException ("modelName");
 
             if (id.StartsWith ("uuid:")) {
                 id = id.Substring (5);
@@ -70,43 +76,32 @@ namespace Mono.Upnp.Server
             this.model_name = modelName;
         }
 
-        private readonly DeviceType type;
         public DeviceType Type {
             get { return type; }
         }
 
-        private readonly string id;
         public string Id {
             get { return id; }
         }
 
-        private readonly string udn;
         public string Udn {
             get { return udn; }
         }
 
-        private readonly IEnumerable<Service> services;
         public IEnumerable<Service> Services {
             get { return services; }
         }
 
-        private IEnumerable<Device> devices;
-        public IEnumerable<Device> Devices {
-            get { return devices; }
-            internal set { devices = value; }
-        }
+        public IEnumerable<Device> Devices { get; internal set;}
 
-        private readonly string friendly_name;
         public string FriendlyName {
             get { return friendly_name; }
         }
 
-        private readonly string manufacturer;
         public string Manufacturer {
             get { return manufacturer; }
         }
 
-        private Uri manufacturer_url;
         public Uri ManufacturerUrl {
             get { return manufacturer_url; }
             set {
@@ -115,7 +110,6 @@ namespace Mono.Upnp.Server
             }
         }
 
-        private string model_description;
         public string ModelDescription {
             get { return model_description; }
             set {
@@ -124,7 +118,6 @@ namespace Mono.Upnp.Server
             }
         }
 
-        private readonly string model_name;
         public string ModelName {
             get {
                 CheckInitialized ();
@@ -132,7 +125,6 @@ namespace Mono.Upnp.Server
             }
         }
 
-        private string model_number;
         public string ModelNumber {
             get { return model_number; }
             set {
@@ -141,7 +133,6 @@ namespace Mono.Upnp.Server
             }
         }
 
-        private Uri model_uri;
         public Uri ModelUrl {
             get { return model_uri; }
             set {
@@ -150,7 +141,6 @@ namespace Mono.Upnp.Server
             }
         }
 
-        private string serial_number;
         public string SerialNumber {
             get { return serial_number; }
             set {
@@ -159,7 +149,6 @@ namespace Mono.Upnp.Server
             }
         }
 
-        private string upc;
         public string Upc {
             get { return upc; }
             set {
@@ -168,7 +157,6 @@ namespace Mono.Upnp.Server
             }
         }
 
-        private IList<Icon> icons;
         public IList<Icon> Icons {
             get { return icons; }
             set {
@@ -185,8 +173,8 @@ namespace Mono.Upnp.Server
                     service.Initialize (url);
                 }
             }
-            if (devices != null) {
-                foreach (Device device in devices) {
+            if (Devices != null) {
+                foreach (Device device in Devices) {
                     device.Initialize (url);
                 }
             }
@@ -214,8 +202,8 @@ namespace Mono.Upnp.Server
                     service.Start ();
                 }
             }
-            if (devices != null) {
-                foreach (Device device in devices) {
+            if (Devices != null) {
+                foreach (Device device in Devices) {
                     device.Start ();
                 }
             }
@@ -231,8 +219,8 @@ namespace Mono.Upnp.Server
                     service.Stop ();
                 }
             }
-            if (devices != null) {
-                foreach (Device device in devices) {
+            if (Devices != null) {
+                foreach (Device device in Devices) {
                     device.Stop ();
                 }
             }
@@ -269,9 +257,9 @@ namespace Mono.Upnp.Server
                 }
                 writer.WriteEndElement ();
             }
-            if (devices != null) {
+            if (Devices != null) {
                 writer.WriteStartElement ("deviceList");
-                foreach (Device device in devices) {
+                foreach (Device device in Devices) {
                     device.Serialize (writer);
                 }
                 writer.WriteEndElement ();
@@ -303,8 +291,8 @@ namespace Mono.Upnp.Server
 
             Stop ();
 
-            if (devices != null) {
-                foreach (Device device in devices) {
+            if (Devices != null) {
+                foreach (Device device in Devices) {
                     device.Dispose ();
                 }
             }
