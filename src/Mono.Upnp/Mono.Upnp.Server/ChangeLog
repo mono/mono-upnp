@@ -1,3 +1,15 @@
+2009-04-06  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Server.Serialization:
+	* Mono.Upnp.Server.Serialization/Serializer.cs:
+	* Mono.Upnp.Server.Serialization/SerializeTypeAttribute.cs:
+	* Mono.Upnp.Server.Serialization/SerializeElementAttribute.cs:
+	* Mono.Upnp.Server.Serialization/SerializeAttributeAttribute.cs:
+	* Mono.Upnp.Server.Serialization/SerializeEnumerableAttribute.cs:
+	Adding custom serialization code.
+
+	* Mono.Upnp.Server.csproj: 
+
 2009-04-05  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Server.Internal/Helper.cs: Made method

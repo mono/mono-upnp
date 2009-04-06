@@ -62,7 +62,7 @@
     <Compile Include="Mono.Upnp.Server.Internal\TimeoutDispatcher.cs" />
     <Compile Include="Mono.Upnp.Server\UpnpControlException.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\UpnpServer.cs" />
-    <Compile Include="Mono.Upnp.Server\Action.cs" />
+    <Compile Include="Mono.Upnp.Server\ServiceAction.cs" />
     <Compile Include="Mono.Upnp.Server\AllowedValueRange.cs" />
     <Compile Include="Mono.Upnp.Server\ArgumentDirection.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\Helper.cs" />
@@ -77,9 +77,15 @@
     <Compile Include="Mono.Upnp.Server\UpnpActionAttribute.cs" />
     <Compile Include="Mono.Upnp.Server\Argument.cs" />
     <Compile Include="Mono.Upnp.Server\UpnpArgumentAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server\Service.cs" />
+    <Compile Include="Mono.Upnp.Server\ServiceDescription.cs" />
     <Compile Include="Mono.Upnp.Server\UpnpStateVariableAttribute.cs" />
     <Compile Include="Mono.Upnp.Server\UpnpServerException.cs" />
+    <Compile Include="Mono.Upnp.Server\Service.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\Serializer.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\SerializeTypeAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\SerializeEnumerableAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\SerializeElementAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\SerializeAttributeAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mono-upnp-server.snk" />
@@ -98,4 +104,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Mono.Upnp.Server.Serialization\" />
+  </ItemGroup>
 </Project>
