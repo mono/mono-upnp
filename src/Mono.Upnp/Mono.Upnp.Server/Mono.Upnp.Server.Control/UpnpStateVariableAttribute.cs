@@ -1,5 +1,5 @@
 ﻿//
-// IconServer.cs
+// UpnpStateVariableAttribute.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -27,33 +27,21 @@
 //
 
 using System;
-using System.IO;
-using System.Net;
 
-namespace Mono.Upnp.Server.Internal
+namespace Mono.Upnp.Server
 {
-	internal class IconServer : UpnpServer
+    [AttributeUsage (AttributeTargets.Event)]
+	public class UpnpStateVariableAttribute : Attribute
 	{
-        private readonly Device device;
-        private readonly Uri baseUrl;
+        readonly string name;
 
-        public IconServer (Device device, Uri url)
-            : base (url.ToString ())
+        public UpnpStateVariableAttribute (string name)
         {
-            this.device = device;
-            this.baseUrl = url;
+            this.name = name;
         }
 
-        protected override void HandleContext (HttpListenerContext context)
-        {
-            string id = baseUrl.MakeRelativeUri (context.Request.Url).ToString ().Trim ('/');
-            Icon icon = device.Icons[int.Parse (id)];
-            context.Response.ContentType = icon.MimeType;
-            Stream stream = context.Response.OutputStream;
-            byte[] data = icon.GetData();
-            context.Response.ContentLength64 = data.Length;
-            stream.Write (data, 0, data.Length);
-            stream.Close ();
+        public string Name {
+            get { return name; }
         }
 	}
 }

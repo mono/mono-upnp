@@ -1,5 +1,5 @@
 // 
-// SerializeEnumerable.cs
+// XmlFlagAttribute.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -29,17 +29,22 @@ using System;
 namespace Mono.Upnp.Server.Serialization
 {
     [AttributeUsage (AttributeTargets.Property)]
-    public sealed class SerializeEnumerableAttribute : Attribute
+    public sealed class XmlFlagAttribute : Attribute
     {
         readonly string name;
         readonly string @namespace;
         
-        public SerializeEnumerableAttribute (string name)
+        public XmlFlagAttribute ()
+            : this (null)
+        {
+        }
+        
+        public XmlFlagAttribute (string name)
             : this (name, null)
         {
         }
         
-        public SerializeEnumerableAttribute (string name, string @namespace)
+        public XmlFlagAttribute (string name, string @namespace)
         {
             this.name = name;
             this.@namespace = @namespace;

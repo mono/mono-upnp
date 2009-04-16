@@ -52,12 +52,12 @@ namespace Mono.Upnp.Server.Internal
             }
         }
 
-        private readonly Service service;
+        private readonly ServiceDescription service;
         private readonly object mutex = new object ();
         private readonly Dictionary<string, Subscriber> subscribers = new Dictionary<string, Subscriber> ();
         private readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
 
-        public EventServer (Service service, Uri url)
+        public EventServer (ServiceDescription service, Uri url)
             : base (url)
         {
             this.service = service;

@@ -70,7 +70,7 @@ namespace Mono.Upnp.Server.Internal
             } else if (type.IsEnum) {
                 return "string";
             } else {
-                throw new UpnpServerException (String.Format ("The type {0} is not a supported UPnP type.", type));
+                throw new UpnpServerException (string.Format ("The type {0} is not a supported UPnP type.", type));
             }
         }
 

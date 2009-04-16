@@ -37,7 +37,8 @@ namespace Mono.Upnp.Server.Internal
         {
         }
 
-        private readonly HttpListener listener;
+        readonly HttpListener listener;
+        readonly Uri url;
 
         protected UpnpServer (Uri url)
             : this (url.ToString ())
@@ -80,7 +81,6 @@ namespace Mono.Upnp.Server.Internal
             listener.Stop ();
         }
 
-        private Uri url;
         public Uri Url {
             get { return url; }
         }

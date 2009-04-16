@@ -28,38 +28,37 @@
 
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Serialization;
 
 namespace Mono.Upnp.Server
 {
+    [XmlType ("icon")]
 	public class Icon
 	{
-        private readonly int width;
-        private readonly int height;
-        private readonly int depth;
-        private readonly string format;
-        private readonly string path;
-        private byte[] data;
-        private Uri url;
+        readonly string mimetype;
+        readonly int width;
+        readonly int height;
+        readonly int depth;
+        Uri url;
+        string filename;
+        byte[] data;
+        
 
         public Icon (int width, int height, int depth, string format, byte[] data)
              : this (width, height, depth, format)
         {
-            if (data == null) {
-                throw new ArgumentNullException ("data");
-            }
+            if (data == null) throw new ArgumentNullException ("data");
+            
             this.data = data;
         }
 
-        public Icon (int width, int height, int depth, string format, string path)
+        public Icon (int width, int height, int depth, string format, string filename)
             : this (width, height, depth, format)
         {
-            this.path = path;
-        }
-
-        protected internal virtual void Initialize (Uri iconUrl)
-        {
-            url = iconUrl;
+            if (filename == null) throw new ArgumentNullException ("filename");
+            if (!File.Exists (filename)) throw new ArgumentException ("The specified filename does not exist on the file system.", "path");
+            
+            this.filename = filename;
         }
 
         protected Icon (int width, int height, int depth, string format)
@@ -69,54 +68,63 @@ namespace Mono.Upnp.Server
             }
 
             if (format.StartsWith ("image/")) {
-                format = format.Substring (6);
+                mimetype = format;
+            } else {
+                mimetype = string.Format ("image/{0}", format);
             }
 
             this.width = width;
             this.height = height;
             this.depth = depth;
-            this.format = format;
         }
-
-        protected internal virtual byte[] Data {
-            get {
-                if (data == null) {
-                    data = File.ReadAllBytes (path);
-                }
-                return data;
-            }
-        }
-
-        private string mimetype;
-        internal string MimeType {
-            get {
-                if (mimetype == null) {
-                    mimetype = String.Format ("image/{0}", format);
-                }
-                return mimetype;
-            }
-        }
-
-        protected internal virtual void Serialize (XmlWriter writer)
+        
+        internal void Initialize (Uri iconUrl)
         {
-            writer.WriteStartElement ("icon");
-            writer.WriteStartElement ("mimetype");
-            writer.WriteValue (MimeType);
-            writer.WriteEndElement ();
-            WriteElement (writer, "width", width);
-            WriteElement (writer, "height", height);
-            WriteElement (writer, "depth", depth);
-            writer.WriteStartElement ("url");
-            writer.WriteValue (url);
-            writer.WriteEndElement ();
-            writer.WriteEndElement ();
+            url = iconUrl;
+            Initialize ();
+        }
+        
+        protected virtual void Initialize ()
+        {
+        }
+        
+        [XmlElement ("mimetype")]
+        public string MimeType {
+            get { return mimetype; }
+        }
+        
+        [XmlElement ("width")]
+        public int Width {
+            get { return width; }
+        }
+        
+        [XmlElement ("height")]
+        public int Height {
+            get { return height; }
+        }
+        
+        [XmlElement ("depth")]
+        public int Depth {
+            get { return depth; }
+        }
+        
+        [XmlElement ("url")]
+        public Uri Url {
+            get { return url; }
+        }
+        
+        internal byte[] GetData ()
+        {
+            return GetDataCore ();
         }
 
-        private static void WriteElement (XmlWriter writer, string name, int value)
+        protected virtual byte[] GetDataCore ()
         {
-            writer.WriteStartElement (name);
-            writer.WriteValue (value);
-            writer.WriteEndElement ();
+            if (data == null) {
+                data = File.ReadAllBytes (filename);
+                filename = null;
+            }
+            return data;
         }
 	}
 }

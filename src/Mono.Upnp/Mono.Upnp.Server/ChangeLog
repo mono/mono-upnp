@@ -1,3 +1,57 @@
+2009-04-16  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Server.csproj:
+	* Mono.Upnp.Server.Control:
+	* Mono.Upnp.Server/Icon.cs:
+	* Mono.Upnp.Server/Server.cs:
+	* Mono.Upnp.Server/Device.cs:
+	* Mono.Upnp.Server/Action.cs:
+	* Mono.Upnp.Server/Service.cs:
+	* Mono.Upnp.Server/TypeInfo.cs:
+	* Mono.Upnp.Server/Argument.cs:
+	* Mono.Upnp.Server/StateVariable.cs:
+	* Mono.Upnp.Server.Internal/Helper.cs:
+	* Mono.Upnp.Server.Control/Argument.cs:
+	* Mono.Upnp.Server/ArgumentDirection.cs:
+	* Mono.Upnp.Server/AllowedValueRange.cs:
+	* Mono.Upnp.Server.Serialization/Xml.cs:
+	* Mono.Upnp.Server.Internal/UpnpServer.cs:
+	* Mono.Upnp.Server.Internal/IconServer.cs:
+	* Mono.Upnp.Server/UpnpActionAttribute.cs:
+	* Mono.Upnp.Server/UpnpControlException.cs:
+	* Mono.Upnp.Server.Internal/EventServer.cs:
+	* Mono.Upnp.Server.Control/ServiceAction.cs:
+	* Mono.Upnp.Server.Control/StateVariable.cs:
+	* Mono.Upnp.Server/UpnpArgumentAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlEnum.cs:
+	* Mono.Upnp.Server.Internal/ActionServer.cs:
+	* Mono.Upnp.Server.Serialization/Serializer.cs:
+	* Mono.Upnp.Server/StateVariableChangedArgs.cs:
+	* Mono.Upnp.Server.Control/AllowedValueRange.cs:
+	* Mono.Upnp.Server.Control/ArgumentDirection.cs:
+	* Mono.Upnp.Server/UpnpStateVariableAttribute.cs:
+	* Mono.Upnp.Server.Internal/DescriptionServer.cs:
+	* Mono.Upnp.Server.Control/IServiceController.cs:
+	* Mono.Upnp.Server.Control/UpnpActionAttribute.cs:
+	* Mono.Upnp.Server.Control/EventedStateVariable.cs:
+	* Mono.Upnp.Server.Control/UpnpControlException.cs:
+	* Mono.Upnp.Server.Control/AllowedValueAttribute.cs:
+	* Mono.Upnp.Server.Control/UpnpArgumentAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlFlagAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlTypeAttribute.cs:
+	* Mono.Upnp.Server.Control/RelatedServiceVariable.cs:
+	* Mono.Upnp.Server.Serialization/XmlArrayAttribute.cs:
+	* Mono.Upnp.Server.Control/StateVariableChangedArgs.cs:
+	* Mono.Upnp.Server.Serialization/XmlElementAttribute.cs:
+	* Mono.Upnp.Server.Control/UpnpStateVariableAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlArrayItemAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlAttributeAttribute.cs:
+	* Mono.Upnp.Server.Serialization/SerializeTypeAttribute.cs:
+	* Mono.Upnp.Server.Serialization/SerializeElementAttribute.cs:
+	* Mono.Upnp.Server.Serialization/SerializeAttributeAttribute.cs:
+	* Mono.Upnp.Server.Serialization/SerializeEnumerableAttribute.cs:
+
+
 2009-04-06  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Server.Serialization:

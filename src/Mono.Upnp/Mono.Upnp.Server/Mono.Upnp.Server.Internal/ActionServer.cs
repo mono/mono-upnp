@@ -36,9 +36,9 @@ namespace Mono.Upnp.Server.Internal
 {
 	internal class ActionServer : UpnpServer
 	{
-        private Service service;
+        private ServiceDescription service;
 
-        public ActionServer (Service service, Uri url)
+        public ActionServer (ServiceDescription service, Uri url)
             : base (url)
         {
             this.service = service;
@@ -61,7 +61,7 @@ namespace Mono.Upnp.Server.Internal
                 if (!service.Actions.ContainsKey (reader.LocalName)) {
                     throw UpnpControlException.InvalidAction ();
                 }
-                Action action = service.Actions[reader.LocalName];
+                ServiceAction action = service.Actions[reader.LocalName];
                 BriefAction (reader.ReadSubtree (), action);
                 try {
                     action.Execute ();
@@ -80,7 +80,7 @@ namespace Mono.Upnp.Server.Internal
             }
         }
 
-        private void BriefAction (XmlReader reader, Action action)
+        private void BriefAction (XmlReader reader, ServiceAction action)
         {
             reader.Read ();
             foreach (Argument argument in action.Arguments.Values) {
@@ -109,7 +109,7 @@ namespace Mono.Upnp.Server.Internal
             reader.Close ();
         }
 
-        private void DebriefAction (HttpListenerContext context, Action action)
+        private void DebriefAction (HttpListenerContext context, ServiceAction action)
         {
             context.Response.ContentType = @"text/xml; charset=""utf-8""";
             context.Response.Headers.Add ("Date", DateTime.Now.ToString ("r"));

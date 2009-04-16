@@ -60,32 +60,38 @@
     <Compile Include="Mono.Upnp.Server.Internal\IconServer.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\Protocol.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\TimeoutDispatcher.cs" />
-    <Compile Include="Mono.Upnp.Server\UpnpControlException.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\UpnpServer.cs" />
-    <Compile Include="Mono.Upnp.Server\ServiceAction.cs" />
-    <Compile Include="Mono.Upnp.Server\AllowedValueRange.cs" />
-    <Compile Include="Mono.Upnp.Server\ArgumentDirection.cs" />
     <Compile Include="Mono.Upnp.Server.Internal\Helper.cs" />
     <Compile Include="Mono.Upnp.Server\Icon.cs" />
     <Compile Include="Mono.Upnp.Server\Server.cs" />
-    <Compile Include="Mono.Upnp.Server\StateVariable.cs" />
     <Compile Include="Mono.Upnp.Server\Device.cs" />
     <Compile Include="Mono.Upnp.Server\DeviceType.cs" />
     <Compile Include="Mono.Upnp.Server\ServiceType.cs" />
-    <Compile Include="Mono.Upnp.Server\StateVariableChangedArgs.cs" />
     <Compile Include="Mono.Upnp.Server\TypeInfo.cs" />
-    <Compile Include="Mono.Upnp.Server\UpnpActionAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server\Argument.cs" />
-    <Compile Include="Mono.Upnp.Server\UpnpArgumentAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server\ServiceDescription.cs" />
-    <Compile Include="Mono.Upnp.Server\UpnpStateVariableAttribute.cs" />
     <Compile Include="Mono.Upnp.Server\UpnpServerException.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\Xml.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\XmlTypeAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\XmlArrayAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\XmlElementAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\XmlAttributeAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\XmlFlagAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\XmlEnum.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\ServiceAction.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\StateVariable.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\Argument.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\ArgumentDirection.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\AllowedValueRange.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\StateVariableChangedArgs.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\UpnpActionAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\UpnpArgumentAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\UpnpStateVariableAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\UpnpControlException.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\AllowedValueAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Serialization\XmlArrayItemAttribute.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\RelatedServiceVariable.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\EventedStateVariable.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\IServiceController.cs" />
     <Compile Include="Mono.Upnp.Server\Service.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\Serializer.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\SerializeTypeAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\SerializeEnumerableAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\SerializeElementAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\SerializeAttributeAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mono-upnp-server.snk" />
@@ -106,5 +112,6 @@
   -->
   <ItemGroup>
     <Folder Include="Mono.Upnp.Server.Serialization\" />
+    <Folder Include="Mono.Upnp.Server.Control\" />
   </ItemGroup>
 </Project>

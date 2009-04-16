@@ -1,120 +1,130 @@
-﻿//
+// 
 // Service.cs
-//
+//  
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
-//
-// Copyright (C) 2008 S&S Black Ltd.
-//
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to
-// permit persons to whom the Software is furnished to do so, subject to
-// the following conditions:
-//
-// The above copyright notice and this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
+//       Scott Peterson <lunchtimemama@gmail.com>
+// 
+// Copyright (c) 2009 Scott Peterson
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Xml;
 
-using Mono.Upnp.Server.Internal;
+using Mono.Upnp.Server.Control;
+using Mono.Upnp.Server.Serialization;
 
 namespace Mono.Upnp.Server
 {
-	public abstract class Service
-	{
-        private readonly string id;
-        private ActionServer action_server;
-        private EventServer event_server;
-        private DescriptionServer description_server;
-
-        protected Service (ServiceType type, string id)
+    [XmlType ("service")]
+    public abstract class Service : IServiceController
+    {
+        static readonly MethodInfo on_event = typeof (ServiceController).
+            GetMethod ("OnEvent", BindingFlags.Instance | BindingFlags.NonPublic);
+        
+        readonly ServiceType type;
+        readonly string id;
+        DescriptionServer description_server;
+        ActionServer action_server;
+        EventServer event_server;
+        
+        protected ServiceDescription (ServiceType type, string id)
         {
-            if (type == null) {
-                throw new ArgumentNullException ("type");
-            }
-            if (String.IsNullOrEmpty (id)) {
-                throw new ArgumentNullException ("id");
-            }
+            if (type == null) throw new ArgumentNullException ("type");
+            if (id == null) throw new ArgumentNullException ("id");
+            if (id.Length == 0) throw new ArgumentException ("The id cannot be an empty string.", "id");
 
             this.type = type;
             this.id = id;
         }
-
-        private Dictionary<string, Action> actions = new Dictionary<string, Action> ();
-        internal IDictionary<string, Action> Actions {
-            get { return actions; }
+        
+        internal void Initialize (Uri baseUrl)
+        {
+            var url = new Uri (baseUrl, string.Format ("{0}/{1}/", type.ToUrlString (), id));
+            description_server = new DescriptionServer (this, new Uri (url, "description/"));
+            action_server = new ActionServer (this, new Uri (url, "control/"));
+            event_server = new EventServer (this, new Uri (url, "event/"));
         }
-
-        private Dictionary<string, StateVariable> state_variables = new Dictionary<string, StateVariable> ();
-        internal IDictionary<string, StateVariable> StateVariables {
-            get { return state_variables; }
-        }
-
-        private readonly ServiceType type;
+        
+        [XmlElement ("serviceType")]
         public ServiceType Type {
             get { return type; }
         }
-
-        protected internal virtual void Initialize (Uri baseUrl)
-        {
-            if (description_server != null) {
-                throw new InvalidOperationException ("The service has already been initialized. Services may only be used with one device.");
+        
+        [XmlElement ("serviceId")]
+        public string Id {
+            get { return id; }
+        }
+        
+        [XmlElement ("SCPDURL")]
+        public Uri DescriptionUrl {
+            get { return description_server.Url; }
+        }
+        
+        [XmlElement ("controlURL")]
+        public Uri ActionUrl {
+            get { return action_server.Url; }
+        }
+        
+        [XmlElement ("eventSubURL")]
+        public Uri EventUrl {
+            get { return event_server.Url; }
+        }
+        
+        protected internal abstract IDictionary<string, ServiceAction> ServiceActions { get; }
+        protected abstract IDictionary<string, RelatedStateVariable> RelatedStateVariables { get; }
+        protected abstract IDictionary<string, EventedStateVariable> EventedStateVariables { get; }
+        
+        public IEnumerable<ServiceAction> Actions {
+            get { return ServiceActions.Values; }
+        }
+        
+        public IEnumerable<StateVariable> StateVariables {
+            get {
+                foreach (var state_variable in RelatedStateVariables.Values) {
+                    yield return state_variable;
+                }
+                foreach (var state_variable in EventedStateVariables.Values) {
+                    yield return state_variable;
+                }
             }
-
-            Uri url = new Uri (baseUrl, String.Format ("{0}/{1}/", type.ToUrlString (), id));
-            description_server = new DescriptionServer (SerializeForServiceDescription, url);
-            action_server = new ActionServer (this, new Uri (url, "actions/"));
-            event_server = new EventServer (this, new Uri (url, "events/"));
-            ProcessActions ();
-            ProcessStateVariables ();
         }
-
-        protected internal virtual void Start ()
+        
+        protected virtual void ProcessActions (Type type)
         {
-            action_server.Start ();
-            event_server.Start ();
-            description_server.Start ();
-        }
-
-        protected internal virtual void Stop ()
-        {
-            action_server.Stop ();
-            event_server.Stop ();
-            description_server.Stop ();
-        }
-
-        protected virtual void ProcessActions ()
-        {
-            foreach (MethodInfo method in GetType ().GetMethods ()) {
+            if (type == null) throw new ArgumentNullException ("type");
+            
+            foreach (MethodInfo method in type.GetMethods ()) {
                 ProcessAction (method);
             }
-            foreach (MethodInfo method in GetType ().GetMethods (BindingFlags.Instance | BindingFlags.NonPublic)) {
-                ProcessAction (method);
-            }
         }
 
-        protected virtual void ProcessAction (MethodInfo method)
+        protected virtual void ProcessAction (MethodInfo methodInfo)
         {
+            if (method == null) throw new ArgumentNullException ("methodInfo");
+            
             string name = null;
-            foreach (object attribute in method.GetCustomAttributes (true)) {
-                UpnpActionAttribute action_attribute = attribute as UpnpActionAttribute;
+            foreach (var custom_attribute in methodInfo.GetCustomAttributes (true)) {
+                var action_attribute = custom_attribute as UpnpActionAttribute;
                 if (action_attribute != null) {
-                    name = String.IsNullOrEmpty (action_attribute.Name) ? method.Name : action_attribute.Name;
+                    name = string.IsNullOrEmpty (action_attribute.Name) ? method.Name : action_attribute.Name;
                     break;
                 }
             }
@@ -122,106 +132,138 @@ namespace Mono.Upnp.Server
                 return;
             }
 
-            Action action = new Action (this, name);
-            AddAction (action);
-            action.Initialize (method);
+            AddServiceAction (CreateServiceAction (name, methodInfo));
+        }
+        
+        protected virtual ServiceAction CreateAction (string name, MethodInfo methodInfo)
+        {
+            var action = new ReflectedServiceAction (name);
+            action.Initialize (this, methodInfo);
+            return action;
+        }
+        
+        protected virtual void AddServiceAction (ServiceAction serviceAction)
+        {
+            if (serviceAction != null) {
+                if (ServiceActions.ContainsKey (serviceAction.Name))
+                    throw new UpnpServerException (string.Format ("The service already contains an action named '{0}'.", action.Name));
+                
+                ServiceActions.Add (serviceAction.Name, serviceAction);
+            }
         }
 
-        protected virtual void ProcessStateVariables ()
+        protected virtual void ProcessEventedStateVariables (Type type)
         {
-            foreach (EventInfo @event in GetType ().GetEvents ()) {
-                ProcessStateVariable (@event);
+            if (type == null) throw new ArgumentNullException ("type");
+            
+            foreach (var @event in type.GetEvents ()) {
+                ProcessEventedStateVariable (@event);
             }
-            foreach (EventInfo @event in GetType ().GetEvents (BindingFlags.Instance | BindingFlags.NonPublic)) {
-                foreach (object attribute in @event.GetCustomAttributes (true)) {
-                    UpnpStateVariableAttribute state_variable_attribute = attribute as UpnpStateVariableAttribute;
-                    if (state_variable_attribute != null) {
+            
+            foreach (var @event in GetType ().GetEvents (BindingFlags.Instance | BindingFlags.NonPublic)) {
+                foreach (var custom_attribute in @event.GetCustomAttributes (true)) {
+                    if (custom_attribute is UpnpStateVariableAttribute) {
                         throw new UpnpServerException ("State variable events must be public.");
                     }
                 }
             }
         }
 
-        protected virtual void ProcessStateVariable (EventInfo @event)
+        protected virtual void ProcessEventedStateVariable (EventInfo eventInfo)
         {
+            if (eventInfo == null) throw new ArgumentNullException ("eventInfo");
+            
             string name = null;
-            foreach (object attribute in @event.GetCustomAttributes (true)) {
-                UpnpStateVariableAttribute state_variable_attribute = attribute as UpnpStateVariableAttribute;
+            foreach (var custom_attribute in eventInfo.GetCustomAttributes (true)) {
+                var state_variable_attribute = custom_attribute as UpnpStateVariableAttribute;
                 if (state_variable_attribute != null) {
                     name = state_variable_attribute.Name;
                 }
             }
+            
             if (name == null) {
                 return;
             }
 
-            StateVariable state_variable = new StateVariable (this, name);
-            AddStateVariable (state_variable);
-            state_variable.Initialize (@event);
+            AddEventedStateVariable (CreateEventedStateVariable (name, eventInfo));
         }
-
-        protected void AddAction (Action action)
+        
+        protected virtual EventedStateVariable CreateEventedStateVariable (string name, EventInfo eventInfo)
         {
-            if (actions.ContainsKey (action.Name)) {
-                // TODO add service type name
-                throw new UpnpServerException (String.Format ("The service already contains an action named '{0}'.", action.Name));
+            return new EventedStateVariable (name, eventInfo);
+        }
+        
+        protected virtual void AddEventedStateVariable (EventedStateVariable eventedStateVariable)
+        {
+            if (eventedStateVariable != null) {
+                if (EventedStateVariables.ContainsKey (eventedStateVariable.Name))
+                    throw new UpnpServerException (string.Format ("The service already contains an state variable named '{0}'.", stateVariable.Name));
+                
+                EventedStateVariables.Add (eventedStateVariable.Name, eventedStateVariable);
             }
-            actions.Add (action.Name, action);
         }
-
-        protected void AddStateVariable (StateVariable stateVariable)
+        
+        protected internal virtual StateVariable GetRelatedStateVariable (string argumentName,
+                                                                          Type dataType, object defaultValue,
+                                                                          AllowedValueRange allowedValueRange)
         {
-            if (state_variables.ContainsKey (stateVariable.Name)) {
-                // TODO add service type name
-                throw new UpnpServerException (String.Format ("The service already contains an state variable named '{0}'.", stateVariable.Name));
+            var name = "A_ARG_TYPE_" + argumentName;
+            if (related_state_variables.ContainsKey (name)) {
+                var count = 1;
+                while (StateVariableNameConflict (name, dataType)) {
+                    name = string.Format ("A_ARG_TYPE_{0}_{1}", argumentName, count);
+                    count++;
+                }
+                if (related_state_variables.ContainsKey (name)) {
+                    return related_state_variables[name];
+                }
             }
-            state_variables.Add (stateVariable.Name, stateVariable);
+            
+            var state_variable = CreateStateVariable (name, dataType, defaultValue, allowedValueRange);
+            AddRelatedStateVariable (state_variable);
+            return state_variable;
         }
-
-        internal void PublishStateVariableChange ()
+        
+        protected virtual StateVariable CreateRelatedStateVariable (string name, Type dataType, object defaultValue, AllowedValueRange allowedValueRange)
         {
-            event_server.PublishUpdates ();
+            return new RelatedStateVariable (name, dataType, defaultValue, allowedValueRange);
         }
-
-        protected internal void SerializeForDeviceDescription (XmlWriter writer)
+        
+        protected virtual void AddRelatedStateVariable (RelatedStateVariable relatedStateVariable)
         {
-            writer.WriteStartElement ("service");
-            writer.WriteStartElement ("serviceType");
-            writer.WriteValue (Type.ToString ());
-            writer.WriteEndElement ();
-            writer.WriteStartElement ("serviceId");
-            writer.WriteValue (String.Format ("urn:{0}:serviceId:{1}", Type.DomainName, id));
-            writer.WriteEndElement ();
-            writer.WriteStartElement ("SCPDURL");
-            writer.WriteValue (description_server.Url.ToString ());
-            writer.WriteEndElement ();
-            writer.WriteStartElement ("controlURL");
-            writer.WriteValue (action_server.Url.ToString ());
-            writer.WriteEndElement ();
-            writer.WriteStartElement ("eventSubURL");
-            writer.WriteValue (event_server.Url);
-            writer.WriteEndElement ();
-            writer.WriteEndElement ();
-        }
-
-        protected internal void SerializeForServiceDescription (XmlWriter writer)
-        {
-            writer.WriteStartElement ("scpd", "urn:schemas-upnp-org:service-1-0");
-            Helper.WriteSpecVersion (writer);
-
-            writer.WriteStartElement ("actionList");
-            foreach (Action action in actions.Values) {
-                action.Serialize (writer);
+            if (relatedStateVariable != null) {
+                if (RelatedStateVariables.ContainsKey (relatedStateVariable.Name))
+                    throw new UpnpServerException (string.Format ("The service already contains an state variable named '{0}'.", stateVariable.Name));
+                
+                RelatedStateVariables.Add (relatedStateVariable.Name, relatedStateVariable);
             }
-            writer.WriteEndElement ();
-            writer.WriteStartElement ("serviceStateTable");
-            foreach (StateVariable variable in state_variables.Values) {
-                variable.Serialize (writer);
-            }
-            writer.WriteEndElement ();
-            writer.WriteEndElement ();
         }
-
+        
+        bool StateVariableNameConflict (string name, Type dataType)
+        {
+            if (!RelatedStateVariables.ContainsKey (name)) {
+                return false;
+            }
+            var variable = RelatedStateVariables[name];
+            return variable.DataType != dataType || variable.SendEvents == true;
+        }
+        
+        protected virtual void RegisterEvents (object service)
+        {
+            foreach (var service_variable in EventedStateVariables.Values) {
+                var del = Delegate.CreateDelegate (
+                    service_variable.EventInfo.EventHandlerType, this, on_event.MakeGenericMethod (
+                    service_variable.Type));
+                service_variable.EventInfo.AddEventHandler (service, del);
+            }
+        }
+        
+        void OnEvent<T> (object sender, StateVariableChangedArgs<T> args)
+        {
+            //value = args.NewValue;
+            //service_controller.PublishStateVariableChange ();
+        }
+        
         internal void Dispose ()
         {
             Dispose (true);
@@ -238,6 +280,46 @@ namespace Mono.Upnp.Server
                     description_server.Dispose ();
                 }
             }
+        }
+    }
+    
+    public class ServiceController<T> : ServiceController
+    {
+        static readonly Dictionary<string, ServiceAction> actions;
+        static readonly Dictionary<string, RelatedStateVariable> related_state_variables;
+        static readonly Dictionary<string, EventedStateVariable> evented_state_variables;        
+        
+        readonly T service;
+        
+        protected internal ServiceController (T service)
+        {
+            if (service == null) throw new ArgumentNullException ("service");
+            
+            this.service = service;
+        }
+        
+        public override IDictionary<string, ServiceAction> ServiceActions {
+            get { return actions; }
+        }
+        
+        public override IDictionary<string, RelatedStateVariable> RelatedStateVariables {
+            get { return related_state_variables; }
+        }
+        
+        protected override IDictionary<string, EventedStateVariable> EventedStateVariables {
+            get { return evented_state_variables; }
+        }
+
+        internal void Initialize ()
+        {
+            if (actions == null) {
+                actions = new Dictionary<string, ServiceAction> ();
+                related_state_variables = new Dictionary<string, RelatedStateVariable> ();
+                evented_state_variables = new Dictionary<string, EventedStateVariable> ();
+                ProcessActions (typeof (T));
+                ProcessEventedStateVariables (typeof (T));
+            }
+            RegisterEvents (service);
         }
     }
 }

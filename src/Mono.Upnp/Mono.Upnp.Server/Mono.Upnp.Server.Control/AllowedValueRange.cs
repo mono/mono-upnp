@@ -26,29 +26,35 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Mono.Upnp.Server.Serialization;
+
 namespace Mono.Upnp.Server
 {
+    [XmlType ("allowedValueRange")]
 	public class AllowedValueRange
 	{
-        private readonly object max_value;
-        private readonly object min_value;
-        private readonly object steps;
+        readonly object minimum;
+        readonly object maximum;
+        readonly object steps;
 
-        public AllowedValueRange (object maxValue, object minValue, object steps)
+        public AllowedValueRange (object minimum, object maximum, object steps)
         {
-            max_value = maxValue;
-            min_value = minValue;
+            this.minimum = minimum;
+            this.maximum = maximum;
             this.steps = steps;
         }
-
-        public object MaxValue {
-            get { return max_value; }
+        
+        [XmlElement ("minimum")]
+        public object Minimum {
+            get { return minimum; }
         }
 
-        public object MinValue {
-            get { return min_value; }
+        [XmlElement ("maximum")]
+        public object Maximum {
+            get { return maximum; }
         }
 
+        [XmlElement ("steps")]
         public object Steps {
             get { return steps; }
         }

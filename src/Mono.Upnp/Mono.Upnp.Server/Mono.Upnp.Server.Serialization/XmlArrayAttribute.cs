@@ -1,5 +1,5 @@
 // 
-// SerializeTypeAttribute.cs
+// SerializeEnumerable.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -28,18 +28,23 @@ using System;
 
 namespace Mono.Upnp.Server.Serialization
 {
-    [AttributeUsage (AttributeTargets.Class)]
-    public sealed class SerializeTypeAttribute : Attribute
+    [AttributeUsage (AttributeTargets.Property)]
+    public sealed class XmlArrayAttribute : Attribute
     {
         readonly string name;
         readonly string @namespace;
         
-        public SerializeTypeAttribute (string name)
+        public XmlArrayAttribute ()
+            : this (null)
+        {
+        }
+        
+        public XmlArrayAttribute (string name)
             : this (name, null)
         {
         }
         
-        public SerializeTypeAttribute (string name, string @namespace)
+        public XmlArrayAttribute (string name, string @namespace)
         {
             this.name = name;
             this.@namespace = @namespace;
@@ -52,5 +57,7 @@ namespace Mono.Upnp.Server.Serialization
         public string Namespace {
             get { return @namespace; }
         }
+        
+        public bool OmitIfNull { get; set; }
     }
 }

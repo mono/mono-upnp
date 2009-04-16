@@ -1,5 +1,5 @@
 ﻿//
-// DescriptionServer.cs
+// StateVariable.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -27,34 +27,50 @@
 //
 
 using System;
-using System.IO;
-using System.Net;
-using System.Xml;
+using System.Collections.Generic;
+using System.Reflection;
 
+using Mono.Upnp.Server.Internal;
 using Mono.Upnp.Server.Serialization;
 
-namespace Mono.Upnp.Server.Internal
+namespace Mono.Upnp.Server
 {
-    internal delegate void DescriptionSerializer (XmlWriter writer);
-
-	internal class DescriptionServer : UpnpServer
+    [XmlType ("stateVariable")]
+    public class StateVariable
 	{
-        readonly ServiceController service_controller;
-        byte[] description;
-
-        public DescriptionServer (ServiceController serviceController, Uri url)
-            : base (url)
-        {
-            this.service_controller = serviceController;
+        readonly string name;
+        readonly Type data_type;
+        readonly bool sends_events;
+        
+        [XmlAttribute ("sendEvents", OmitIfNull = true)]
+        public string SendsEvents {
+            get { return sends_events ? null : "no"; }
         }
-
-        protected override void HandleContext (HttpListenerContext context)
-        {
-            if (description == null) {
-                description = Xml<ServiceController>.GetBytes (service_controller);
-            }
-            context.Response.OutputStream.Write (description, 0, description.Length);
-            context.Response.Close ();
+        
+        [XmlElement ("name")]
+        public string Name {
+            get { return name; }
         }
-    }
+        
+        [XmlElement ("dataType")]
+        public string DataType {
+            get { return data_type; }
+        }
+        
+        public Type Type {
+            get { return data_type; }
+        }
+        
+        protected StateVariable (string name, Type dataType, bool sendsEvents)
+        {
+            if (name == null) throw new ArgumentNullException ("name");
+            if (dataType == null) throw new ArgumentNullException ("dataType");
+            
+            //this.data_type = dataType.IsByRef ? dataType.GetElementType () : dataType;
+            
+            this.name = name;
+            this.data_type = dataType;
+            this.sends_events = sendsEvents;
+        }
+	}
 }

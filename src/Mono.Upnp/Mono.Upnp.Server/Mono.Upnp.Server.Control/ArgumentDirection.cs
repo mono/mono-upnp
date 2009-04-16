@@ -26,11 +26,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using Mono.Upnp.Server.Serialization;
+
 namespace Mono.Upnp.Server
 {
     public enum ArgumentDirection
     {
-        In,
-        Out
+        [XmlEnum ("in")] In,
+        [XmlEnum ("out")] Out
     }
 }

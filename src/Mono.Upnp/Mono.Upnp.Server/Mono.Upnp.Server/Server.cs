@@ -119,13 +119,13 @@ namespace Mono.Upnp.Server
             }
 
             if (device.Services != null) {
-                foreach (Service service in device.Services) {
+                foreach (ServiceDescription service in device.Services) {
                     AnnounceService (device, service);
                 }
             }
         }
 
-        private void AnnounceService (Device device, Service service)
+        private void AnnounceService (Device device, ServiceDescription service)
         {
             ssdp_server.Announce (service.Type.ToString (), String.Format ("{0}::{1}", device.Udn,service.Type), false);
         }
@@ -134,7 +134,7 @@ namespace Mono.Upnp.Server
         {
             writer.WriteStartElement ("root", Protocol.DeviceUrn);
             Helper.WriteSpecVersion (writer);
-            root_device.Serialize (writer);
+            //root_device.Serialize (writer);
             writer.WriteEndElement ();
         }
 

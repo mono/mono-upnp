@@ -9,7 +9,7 @@ namespace Mono.Upnp.Server.ConsoleServer
         private static void Main ()
         {
             var service = new TestService ("ts");
-            var services = new List<Service> { 
+            var services = new List<ServiceDescription> { 
                 new MockService (new ServiceType ("schemas-upnp-org", "ConnectionManager", new Version (1, 0)), "cm"),
                 new MockService (new ServiceType ("schemas-upnp-org", "ConnectionDirectory", new Version (1, 0)), "cd"),
                 service

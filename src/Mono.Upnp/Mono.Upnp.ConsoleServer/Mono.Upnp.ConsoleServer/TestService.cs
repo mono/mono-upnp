@@ -2,7 +2,7 @@
 
 namespace Mono.Upnp.Server.ConsoleServer
 {
-    public class TestService : Service
+    public class TestService : ServiceDescription
     {
         public TestService (string id)
             : base (new ServiceType ("mono", "test", new Version (1, 0)), id)

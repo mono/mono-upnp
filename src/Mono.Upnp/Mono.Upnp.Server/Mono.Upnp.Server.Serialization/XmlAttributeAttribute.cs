@@ -29,17 +29,30 @@ using System;
 namespace Mono.Upnp.Server.Serialization
 {
     [AttributeUsage (AttributeTargets.Property)]
-    public sealed class SerializeAttributeAttribute : Attribute
+    public sealed class XmlAttributeAttribute : Attribute
     {
         readonly string name;
+        readonly string @namespace;
         
-        public SerializeAttributeAttribute(string name)
+        public XmlAttributeAttribute (string name)
+            : this (name, null)
+        {
+        }
+        
+        public XmlAttributeAttribute (string name, string @namespace)
         {
             this.name = name;
+            this.@namespace = @namespace;
         }
         
         public string Name {
             get { return name; }
         }
+        
+        public string Namespace {
+            get { return @namespace; }
+        }
+        
+        public bool OmitIfNull { get; set; }
     }
 }

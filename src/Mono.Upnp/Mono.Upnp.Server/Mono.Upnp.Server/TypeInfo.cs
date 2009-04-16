@@ -38,6 +38,8 @@ namespace Mono.Upnp.Server
         readonly string type;
         readonly Version version;
         readonly string domain_name;
+        string to_string;
+        string to_url_string;
         
         internal TypeInfo (string type, Version version, string domainName)
         {
@@ -67,7 +69,6 @@ namespace Mono.Upnp.Server
             get { return version; }
         }
 
-        string to_string;
         public override string ToString ()
         {
             if (to_string == null) {
@@ -79,7 +80,6 @@ namespace Mono.Upnp.Server
             return to_string;
         }
 
-        string to_url_string;
         public string ToUrlString ()
         {
             if (to_url_string == null) {

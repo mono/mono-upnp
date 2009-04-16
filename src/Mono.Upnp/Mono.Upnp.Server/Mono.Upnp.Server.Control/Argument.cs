@@ -1,5 +1,5 @@
 ﻿//
-// UpnpStateVariableAttribute.cs
+// Argument.cs
 //
 // Author:
 //   Scott Peterson <lunchtimemama@gmail.com>
@@ -28,20 +28,48 @@
 
 using System;
 
+using Mono.Upnp.Server.Serialization;
+
 namespace Mono.Upnp.Server
 {
-    [AttributeUsage (AttributeTargets.Event)]
-	public class UpnpStateVariableAttribute : Attribute
+    [XmlType ("argument")]
+    public class Argument
 	{
-        private readonly string name;
+        readonly string name;
+        readonly ArgumentDirection direction;
+        readonly bool is_return_value;
+        readonly StateVariable related_state_variable;
 
-        public UpnpStateVariableAttribute (string name)
+        protected internal Argument (string name, ArgumentDirection direction, bool isReturnValue, StateVariable relatedStateVariable)
         {
+            if (name == null) throw new ArgumentNullException ("name");
+            if (isReturnValue && direction == ArgumentDirection.In) throw new ArgumentException ("If the argument is a return value, it must have an 'Out' direction.");
+            if (relatedStateVariable == null) throw new ArgumentNullException ("relatedStateVariable");
+            
             this.name = name;
+            this.direction = direction;
+            this.is_return_value = isReturnValue;
+            this.related_state_variable = relatedStateVariable;
         }
 
+        [XmlElement ("name")]
         public string Name {
             get { return name; }
+        }
+
+        [XmlElement ("direction")]
+        public ArgumentDirection Direction {
+            get { return direction; }
+        }
+        
+        [XmlFlag ("retval")]
+        public bool IsReturnValue {
+            get { return is_return_value; }
+        }
+
+        [XmlElement ("relatedStateVariable")]
+        public string RelatedStateVariableName {
+            get { return related_state_variable.Name; }
         }
 	}
 }
