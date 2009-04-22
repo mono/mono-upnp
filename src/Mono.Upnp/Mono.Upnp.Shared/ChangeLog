@@ -1,6 +1,11 @@
 2009-04-22  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp:
+	* Mono.Upnp.Xml: 
+
+2009-04-22  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp:
 	* Mono.Upnp.Xml:
 	* Mono.Upnp.Shared.csproj:
 	* Mono.Upnp.Xml/IFactory.cs:

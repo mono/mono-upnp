@@ -1,5 +1,9 @@
 2009-04-22  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* tests: 
+
+2009-04-22  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* tests: Added custom automatic XML
 	serialization/deserialization solution to a shared assembly.
 	In the future, this assembly will also house other code shared

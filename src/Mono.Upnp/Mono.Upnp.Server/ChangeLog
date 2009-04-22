@@ -1,5 +1,18 @@
 2009-04-22  Scott Peterson  <lunchtimemama@gmail.com>
 
+	* Mono.Upnp.Server.Serialization/Xml.cs:
+	* Mono.Upnp.Server.Serialization/XmlEnum.cs:
+	* Mono.Upnp.Server.Serialization/XmlTypeAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlFlagAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlArrayAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlElementAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlAttributeAttribute.cs:
+	* Mono.Upnp.Server.Serialization/XmlArrayItemAttribute.cs:
+	Reworked server code to make use of new serialization
+	solution.
+
+2009-04-22  Scott Peterson  <lunchtimemama@gmail.com>
+
 	* Mono.Upnp.Server.csproj:
 	* Mono.Upnp.Server/Icon.cs:
 	* Mono.Upnp.Server/Root.cs:
