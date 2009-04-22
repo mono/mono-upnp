@@ -30,13 +30,14 @@ using System;
 
 namespace Mono.Upnp
 {
-    public abstract class TypeInfo
+    public class TypeInfo
     {
 		readonly string domain_name;
 		readonly string type;
 		readonly Version version;
+        readonly string kind;
 		
-        internal TypeInfo (string typeDescription)
+        internal TypeInfo (string typeDescription, string kind)
         {
             try {
                 var sections = typeDescription.Trim ().Split (':');
@@ -51,9 +52,8 @@ namespace Mono.Upnp
             } catch (Exception e) {
                 throw new UpnpDeserializationException ("There was a problem deseriailizing a type description.", e);
             }
+            this.kind = kind;
         }
-
-        protected abstract string Kind { get; }
 
         public string DomainName {
             get { return domain_name; }
@@ -72,7 +72,7 @@ namespace Mono.Upnp
             var version = this.version.Minor == 0
                 ? this.version.Major.ToString ()
                 : string.Format ("{0}.{1}", this.version.Major, this.version.Minor);
-            return string.Format ("urn:{0}:{1}:{2}:{3}", domain_name, Kind, type, version);
+            return string.Format ("urn:{0}:{1}:{2}:{3}", domain_name, kind, type, version);
         }
 
         public override bool Equals (object obj)
@@ -83,7 +83,7 @@ namespace Mono.Upnp
 
         public override int GetHashCode ()
         {
-            return domain_name.GetHashCode () ^ type.GetHashCode () ^ version.GetHashCode () ^ Kind.GetHashCode ();
+            return domain_name.GetHashCode () ^ type.GetHashCode () ^ version.GetHashCode () ^ kind.GetHashCode ();
         }
 
         public static bool operator == (TypeInfo type1, TypeInfo type2)
@@ -95,7 +95,7 @@ namespace Mono.Upnp
                 type1.domain_name == type2.domain_name &&
                 type1.type == type2.type &&
                 type1.version == type2.version &&
-                type1.Kind == type2.Kind;
+                type1.kind == type2.kind;
         }
 
         public static bool operator != (TypeInfo type1, TypeInfo type2)

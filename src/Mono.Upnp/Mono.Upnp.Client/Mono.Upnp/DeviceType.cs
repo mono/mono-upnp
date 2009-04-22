@@ -31,12 +31,8 @@ namespace Mono.Upnp
     public sealed class DeviceType : TypeInfo
     {
         public DeviceType (string typeDescription)
-            : base (typeDescription)
+            : base (typeDescription, "device")
         {
-        }
-
-        protected override string Kind {
-            get { return "device"; }
         }
     }
 }

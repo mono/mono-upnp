@@ -31,12 +31,8 @@ namespace Mono.Upnp
     public sealed class ServiceType : TypeInfo
 	{
         public ServiceType (string typeDescription)
-            : base (typeDescription)
+            : base (typeDescription, "service")
         {
-        }
-
-        protected override string Kind {
-            get { return "service"; }
         }
     }
 }
