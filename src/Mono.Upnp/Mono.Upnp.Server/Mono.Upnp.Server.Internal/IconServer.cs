@@ -27,33 +27,31 @@
 //
 
 using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Mono.Upnp.Server.Internal
 {
 	internal class IconServer : UpnpServer
 	{
-        private readonly Device device;
-        private readonly Uri baseUrl;
+        readonly Dictionary<Uri, Icon> icons = new Dictionary<Uri, Icon> ();
 
         public IconServer (Device device, Uri url)
-            : base (url.ToString ())
+            : base (url)
         {
-            this.device = device;
-            this.baseUrl = url;
+            foreach (var icon in device.Icons) {
+                icons[icon.Url] = icon;
+            }
         }
 
         protected override void HandleContext (HttpListenerContext context)
         {
-            string id = baseUrl.MakeRelativeUri (context.Request.Url).ToString ().Trim ('/');
-            Icon icon = device.Icons[int.Parse (id)];
-            context.Response.ContentType = icon.MimeType;
-            Stream stream = context.Response.OutputStream;
-            byte[] data = icon.GetData();
-            context.Response.ContentLength64 = data.Length;
-            stream.Write (data, 0, data.Length);
-            stream.Close ();
+            using (var stream = context.Response.OutputStream) {
+                var icon = icons[context.Request.Url];
+                var data = icon.GetData();
+                context.Response.ContentType = icon.MimeType;
+                stream.Write (data, 0, data.Length);
+            }
         }
 	}
 }

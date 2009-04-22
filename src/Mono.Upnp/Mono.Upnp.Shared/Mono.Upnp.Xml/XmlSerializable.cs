@@ -1,5 +1,5 @@
 // 
-// AllowedValueAttribute.cs
+// XmlSerializable.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,22 +24,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-
-namespace Mono.Upnp.Server.Control
+namespace Mono.Upnp.Xml
 {
-    [AttributeUsage (AttributeTargets.Field)]
-    public sealed class AllowedValueAttribute : Attribute
+    public abstract class XmlSerializable : IXmlSerializable
     {
-        readonly string value;
-        
-        public AllowedValueAttribute (string value)
+        void IXmlSerializable.SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            this.value = value;
+            SerializeSelfAndMembers (context);
         }
         
-        public string Value {
-            get { return value; }
+        void IXmlSerializable.SerializeMembersOnly (XmlSerializationContext context)
+        {
+            SerializeMembersOnly (context);
         }
+        
+        protected abstract void SerializeSelfAndMembers (XmlSerializationContext context);
+        
+        protected abstract void SerializeMembersOnly (XmlSerializationContext context);
     }
 }

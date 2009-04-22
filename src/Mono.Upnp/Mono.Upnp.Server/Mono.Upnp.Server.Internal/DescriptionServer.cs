@@ -39,21 +39,17 @@ namespace Mono.Upnp.Server.Internal
 
 	internal class DescriptionServer : UpnpServer
 	{
-        readonly ServiceController service_controller;
-        byte[] description;
+        readonly byte[] data;
 
         public DescriptionServer (ServiceController serviceController, Uri url)
             : base (url)
         {
-            this.service_controller = serviceController;
+            description = serviceController.Serialize ();
         }
 
         protected override void HandleContext (HttpListenerContext context)
         {
-            if (description == null) {
-                description = Xml<ServiceController>.GetBytes (service_controller);
-            }
-            context.Response.OutputStream.Write (description, 0, description.Length);
+            context.Response.OutputStream.Write (data, 0, data.Length);
             context.Response.Close ();
         }
     }

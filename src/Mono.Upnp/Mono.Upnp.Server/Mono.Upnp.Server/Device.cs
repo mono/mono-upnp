@@ -35,7 +35,7 @@ using Mono.Upnp.Server.Serialization;
 namespace Mono.Upnp.Server
 {
     [XmlType ("device")]
-	public class Device
+	public class Device : XmlAutomatable
 	{
         readonly DeviceType type;
         readonly string id;
@@ -43,18 +43,18 @@ namespace Mono.Upnp.Server
         readonly string friendly_name;
         readonly string manufacturer;
         readonly string model_name;
-        readonly IEnumerable<ServiceDescription> services;
+        readonly List<Service> services = new List<Service> ();
+        readonly List<Icon> icons = new List<Icon> ();
         Uri manufacturer_url;
         string model_description;
         string model_number;
         Uri model_uri;
         string serial_number;
         string upc;
-        IList<Icon> icons;
         IconServer icon_server;
         bool initialized;
         
-        public Device (DeviceType type, IEnumerable<ServiceDescription> services, string id, string friendlyName, string manufacturer, string modelName)
+        public Device (DeviceType type, string id, string friendlyName, string manufacturer, string modelName)
         {
             if (type == null) throw new ArgumentNullException ("type");
             if (id == null) throw new ArgumentNullException ("id");
@@ -77,22 +77,22 @@ namespace Mono.Upnp.Server
         }
 
         [XmlElement ("deviceType")]
-        public DeviceType Type {
+        public virtual DeviceType Type {
             get { return type; }
         }
         
         [XmlElement ("friendlyName")]
-        public string FriendlyName {
+        public virtual string FriendlyName {
             get { return friendly_name; }
         }
         
         [XmlElement ("manufacturer")]
-        public string Manufacturer {
+        public virtual string Manufacturer {
             get { return manufacturer; }
         }
         
-        [XmlElement ("manufacturerURL")]
-        public Uri ManufacturerUrl {
+        [XmlElement ("manufacturerURL", OmitIfNull = true)]
+        public virtual Uri ManufacturerUrl {
             get { return manufacturer_url; }
             set {
                 CheckInitialized ();
@@ -100,8 +100,8 @@ namespace Mono.Upnp.Server
             }
         }
         
-        [XmlElement ("modelDescription")]
-        public string ModelDescription {
+        [XmlElement ("modelDescription", OmitIfNull = true)]
+        public virtual string ModelDescription {
             get { return model_description; }
             set {
                 CheckInitialized ();
@@ -110,15 +110,15 @@ namespace Mono.Upnp.Server
         }
         
         [XmlElement ("modelName")]
-        public string ModelName {
+        public virtual string ModelName {
             get {
                 CheckInitialized ();
                 return model_name;
             }
         }
         
-        [XmlElement ("modelNumber")]
-        public string ModelNumber {
+        [XmlElement ("modelNumber", OmitIfNull = true)]
+        public virtual string ModelNumber {
             get { return model_number; }
             set {
                 CheckInitialized ();
@@ -126,8 +126,8 @@ namespace Mono.Upnp.Server
             }
         }
         
-        [XmlElement ("modelURL")]
-        public Uri ModelUrl {
+        [XmlElement ("modelURL", OmitIfNull = true)]
+        public virtual Uri ModelUrl {
             get { return model_uri; }
             set {
                 CheckInitialized ();
@@ -135,8 +135,8 @@ namespace Mono.Upnp.Server
             }
         }
         
-        [XmlElement ("serialNumber")]
-        public string SerialNumber {
+        [XmlElement ("serialNumber", OmitIfNull = true)]
+        public virtual string SerialNumber {
             get { return serial_number; }
             set {
                 CheckInitialized ();
@@ -145,12 +145,12 @@ namespace Mono.Upnp.Server
         }
         
         [XmlElement ("UDN")]
-        public string Udn {
+        public virtual string Udn {
             get { return udn; }
         }
         
-        [XmlElement ("UPC")]
-        public string Upc {
+        [XmlElement ("UPC", OmitIfNull = true)]
+        public virtual string Upc {
             get { return upc; }
             set {
                 CheckInitialized ();
@@ -158,25 +158,31 @@ namespace Mono.Upnp.Server
             }
         }
         
-        [XmlElement ("iconList")]
-        public IList<Icon> Icons {
+        [XmlArray ("iconList")]
+        public virtual IList<Icon> Icons {
             get { return icons; }
-            set {
-                CheckInitialized ();
-                icons = value;
-            }
         }
         
-        [XmlArray ("serviceList")]
-        public IEnumerable<ServiceDescription> Services {
+        [XmlArray ("serviceList", OmitIfEmpty = true)]
+        public virtual IEnumerable<Service> Services {
             get { return services; }
         }
-        
-        [XmlArray ("deviceList")]
-        public IEnumerable<Device> Devices { get; internal set;}
 
         public string Id {
             get { return id; }
+        }
+        
+        public virtual void AddService<T> (T service, ServiceType type, string id)
+        {
+            CheckInitialized ();
+            services.Add (CreateService (service, type, id));
+        }
+        
+        protected virtual Service CreateService<T> (T service, ServiceType type, string id)
+        {
+            var controller = new ServiceController<TService> (service);
+            controller.Initialize ();
+            return new Service (type, id, controller);
         }
         
         internal void Initialize (Uri baseUrl)
@@ -185,77 +191,58 @@ namespace Mono.Upnp.Server
             initialized = true;
         }
 
-        protected virtual void InitializeCore (Uri baseUrl)
+        protected virtual void InitializeCore (Uri deviceUrl)
         {
-            var url = new Uri (baseUrl, string.Format ("{0}/{1}/", type.ToUrlString (), id));
-            if (services != null) {
-                foreach (var service in services) {
-                    service.Initialize (url);
-                }
+            foreach (var service in services) {
+                service.Initialize (new Uri (deviceUrl, string.Format ("{0}/{1}/", service.Type.ToUrlString (), service.Id)));
             }
-            if (Devices != null) {
-                foreach (var device in Devices) {
-                    device.Initialize (url);
-                }
-            }
-            if (icons != null && icons.Count > 0) {
-                url = new Uri (url, "icons/");
-                icon_server = new IconServer (this, url);
+            
+            if (icons.Count > 0) {
+                var icons_url = new Uri (deviceUrl, "icons/");
                 for (var i = 0; i < icons.Count; i++) {
-                    icons[i].Initialize (new Uri (url, string.Format ("{0}/", i)));
+                    icons[i].Initialize (new Uri (icons_url, string.Format ("{0}/", i)));
                 }
+                icon_server = new IconServer (this, icons_url);
             }
         }
 
-        void CheckInitialized ()
+        protected void CheckInitialized ()
         {
             if (initialized) {
                 throw new InvalidOperationException ("You may not modify the device after it has been initialized.");
             }
         }
-        
-        internal void Start ()
-        {
-            StartCore ();
-        }
 
-        protected virtual void StartCore ()
+        protected virtual void Start ()
         {
-            if (services != null) {
-                foreach (var service in services) {
-                    service.Start ();
-                }
+            foreach (var service in services) {
+                service.Start ();
             }
-            if (Devices != null) {
-                foreach (var device in Devices) {
-                    device.Start ();
-                }
-            }
+            
             if (icon_server != null) {
                 icon_server.Start ();
             }
         }
-        
-        internal void Stop ()
-        {
-            StopCore ();
-        }
 
-        protected virtual void StopCore ()
+        protected virtual void Stop ()
         {
-            if (services != null) {
-                foreach (var service in services) {
-                    service.Stop ();
-                }
+            foreach (var service in services) {
+                service.Stop ();
             }
-            if (Devices != null) {
-                foreach (var device in Devices) {
-                    device.Stop ();
-                }
-            }
+                
             if (icon_server != null) {
                 icon_server.Stop ();
             }
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
 
         internal void Dispose ()
@@ -272,15 +259,12 @@ namespace Mono.Upnp.Server
 
             Stop ();
 
-            if (Devices != null) {
-                foreach (var device in Devices) {
-                    device.Dispose ();
-                }
+            foreach (var service in services) {
+                service.Dispose ();
             }
-            if (services != null) {
-                foreach (var service in services) {
-                    service.Dispose ();
-                }
+            
+            if (icon_server != null) {
+                icon_server.Dispose ();
             }
         }
     }

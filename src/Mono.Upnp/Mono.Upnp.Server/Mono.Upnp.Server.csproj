@@ -69,13 +69,6 @@
     <Compile Include="Mono.Upnp.Server\ServiceType.cs" />
     <Compile Include="Mono.Upnp.Server\TypeInfo.cs" />
     <Compile Include="Mono.Upnp.Server\UpnpServerException.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\Xml.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\XmlTypeAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\XmlArrayAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\XmlElementAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\XmlAttributeAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\XmlFlagAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\XmlEnum.cs" />
     <Compile Include="Mono.Upnp.Server.Control\ServiceAction.cs" />
     <Compile Include="Mono.Upnp.Server.Control\StateVariable.cs" />
     <Compile Include="Mono.Upnp.Server.Control\Argument.cs" />
@@ -86,12 +79,13 @@
     <Compile Include="Mono.Upnp.Server.Control\UpnpArgumentAttribute.cs" />
     <Compile Include="Mono.Upnp.Server.Control\UpnpStateVariableAttribute.cs" />
     <Compile Include="Mono.Upnp.Server.Control\UpnpControlException.cs" />
-    <Compile Include="Mono.Upnp.Server.Control\AllowedValueAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Serialization\XmlArrayItemAttribute.cs" />
-    <Compile Include="Mono.Upnp.Server.Control\RelatedServiceVariable.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\RelatedStateVariable.cs" />
     <Compile Include="Mono.Upnp.Server.Control\EventedStateVariable.cs" />
-    <Compile Include="Mono.Upnp.Server.Control\IServiceController.cs" />
     <Compile Include="Mono.Upnp.Server\Service.cs" />
+    <Compile Include="Mono.Upnp.Server.Control\ServiceController.cs" />
+    <Compile Include="Mono.Upnp.Server\RootDevice.cs" />
+    <Compile Include="Mono.Upnp.Server\Root.cs" />
+    <Compile Include="Mono.Upnp.Server\SpecVersion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mono-upnp-server.snk" />
@@ -111,7 +105,6 @@
   </Target>
   -->
   <ItemGroup>
-    <Folder Include="Mono.Upnp.Server.Serialization\" />
     <Folder Include="Mono.Upnp.Server.Control\" />
   </ItemGroup>
 </Project>

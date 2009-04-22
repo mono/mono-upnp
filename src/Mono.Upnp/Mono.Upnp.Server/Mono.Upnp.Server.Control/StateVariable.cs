@@ -27,8 +27,6 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 
 using Mono.Upnp.Server.Internal;
 using Mono.Upnp.Server.Serialization;

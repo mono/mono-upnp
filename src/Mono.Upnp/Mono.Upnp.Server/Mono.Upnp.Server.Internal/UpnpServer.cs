@@ -33,23 +33,14 @@ namespace Mono.Upnp.Server.Internal
 {
 	internal abstract class UpnpServer : IDisposable
 	{
-        static UpnpServer ()
-        {
-        }
-
         readonly HttpListener listener;
         readonly Uri url;
 
         protected UpnpServer (Uri url)
-            : this (url.ToString ())
         {
             this.url = url;
-        }
-
-        protected UpnpServer (string prefix)
-        {
             listener = new HttpListener ();
-            listener.Prefixes.Add (prefix);
+            listener.Prefixes.Add (url.ToString ());
         }
 
         public void Start ()

@@ -27,21 +27,21 @@
 //
 
 using System;
-using System.Xml;
 
 using Mono.Upnp.Server.Internal;
 
 namespace Mono.Upnp.Server
 {
-	public abstract class TypeInfo
+	public class TypeInfo
 	{
         readonly string type;
         readonly Version version;
         readonly string domain_name;
+        readonly string kind;
         string to_string;
         string to_url_string;
         
-        internal TypeInfo (string type, Version version, string domainName)
+        internal TypeInfo (string type, Version version, string domainName, string kind)
         {
             if (type == null) {
                 throw new ArgumentNullException ("type");
@@ -53,9 +53,8 @@ namespace Mono.Upnp.Server
             this.type = type;
             this.version = version;
             this.domain_name = domainName ?? "schemas-upnp-org";
+            this.kind = kind;
         }
-
-        protected abstract string Kind { get; }
 
         public string DomainName {
             get { return domain_name; }
@@ -75,7 +74,7 @@ namespace Mono.Upnp.Server
                 var version = this.version.Minor == 0
                     ? this.version.Major.ToString ()
                     : string.Format ("{0}.{1}", this.version.Major, this.version.Minor);
-                to_string = string.Format ("urn:{0}:{1}:{2}:{3}", domain_name, Kind, type, version);
+                to_string = string.Format ("urn:{0}:{1}:{2}:{3}", domain_name, kind, type, version);
             }
             return to_string;
         }
@@ -110,7 +109,7 @@ namespace Mono.Upnp.Server
                 type1.DomainName == type2.DomainName &&
                 type1.Type == type2.Type &&
                 type1.Version == type2.Version &&
-                type1.Kind == type2.Kind;
+                type1.kind == type2.kind;
         }
 
         public static bool operator != (TypeInfo type1, TypeInfo type2)
@@ -122,7 +121,7 @@ namespace Mono.Upnp.Server
                 type1.DomainName != type2.DomainName ||
                 type1.Type != type2.Type ||
                 type1.Version != type2.Version ||
-                type1.Kind != type2.Kind;
+                type1.kind != type2.kind;
         }
 
     }

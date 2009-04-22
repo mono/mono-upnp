@@ -1,5 +1,5 @@
 // 
-// IServiceController.cs
+// XmlDeserializable.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,20 +24,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
-
-using Mono.Upnp.Server.Serialization;
-
-namespace Mono.Upnp.Server.Control
+namespace Mono.Upnp.Xml
 {
-    [XmlType ("scpd")]
-    public interface IServiceController
+    public abstract class XmlDeserializable : IXmlDeserializable
     {
-        [XmlArray ("actionList")]
-        IEnumerable<ServiceAction> Actions { get; }
+        void IXmlDeserializable.Deserialize (XmlDeserializationContext context)
+        {
+            Deserialize (context);
+        }
         
-        [XmlArray ("serviceStateTable")]
-        IEnumerable<StateVariable> StateVariables { get; }
+        void IXmlDeserializable.DeserializeAttribute (XmlDeserializationContext context)
+        {
+            DeserializeAttribute (context);
+        }
+        
+        void IXmlDeserializable.DeserializeElement (XmlDeserializationContext context)
+        {
+            DeserializeElement (context);
+        }
+        
+        protected abstract void Deserialize (XmlDeserializationContext context);
+        
+        protected abstract void DeserializeAttribute (XmlDeserializationContext context);
+        
+        protected abstract void DeserializeElement (XmlDeserializationContext context);
     }
 }

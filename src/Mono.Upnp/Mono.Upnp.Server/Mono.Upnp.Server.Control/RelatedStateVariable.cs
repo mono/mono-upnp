@@ -28,7 +28,7 @@ using System;
 
 namespace Mono.Upnp.Server.Control
 {
-    public class RelatedServiceVariable : ServiceVariable
+    public class RelatedStateVariable : ServiceVariable
     {
         readonly object default_value;
         readonly AllowedValueRange allowed_value_range;
@@ -49,7 +49,7 @@ namespace Mono.Upnp.Server.Control
             get { return Type.IsEnum ? GetValues (Type) : null; }
         }
         
-        protected internal StateVariable (string name, Type dataType, object defaultValue, AllowedValueRange allowedValueRange)
+        protected internal RelatedStateVariablename, Type dataType, object defaultValue, AllowedValueRange allowedValueRange)
             : base (name, dataType, false)
         {
             // TODO check that allowedValueRange is only used with numeric types

@@ -1,3 +1,27 @@
+2009-04-22  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Server.csproj:
+	* Mono.Upnp.Server/Icon.cs:
+	* Mono.Upnp.Server/Root.cs:
+	* Mono.Upnp.Server/Device.cs:
+	* Mono.Upnp.Server/Service.cs:
+	* Mono.Upnp.Server/TypeInfo.cs:
+	* Mono.Upnp.Server/RootDevice.cs:
+	* Mono.Upnp.Server/DeviceType.cs:
+	* Mono.Upnp.Server/SpecVersion.cs:
+	* Mono.Upnp.Server/ServiceType.cs:
+	* Mono.Upnp.Server.Internal/IconServer.cs:
+	* Mono.Upnp.Server.Internal/UpnpServer.cs:
+	* Mono.Upnp.Server.Control/StateVariable.cs:
+	* Mono.Upnp.Server.Control/ServiceController.cs:
+	* Mono.Upnp.Server.Control/IServiceController.cs:
+	* Mono.Upnp.Server.Internal/DescriptionServer.cs:
+	* Mono.Upnp.Server.Control/RelatedStateVariable.cs:
+	* Mono.Upnp.Server.Control/AllowedValueAttribute.cs:
+	* Mono.Upnp.Server.Control/UpnpArgumentAttribute.cs:
+	* Mono.Upnp.Server.Control/RelatedServiceVariable.cs: Reworked
+	server code to make use of new serialization solution.
+
 2009-04-16  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Server.csproj:

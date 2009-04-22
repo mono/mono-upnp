@@ -28,12 +28,13 @@
 
 using System;
 using System.IO;
-using System.Xml.Serialization;
+
+using Mono.Upnp.Server.Serialization;
 
 namespace Mono.Upnp.Server
 {
     [XmlType ("icon")]
-	public class Icon
+	public abstract class Icon
 	{
         readonly string mimetype;
         readonly int width;
@@ -42,7 +43,6 @@ namespace Mono.Upnp.Server
         Uri url;
         string filename;
         byte[] data;
-        
 
         public Icon (int width, int height, int depth, string format, byte[] data)
              : this (width, height, depth, format)
@@ -56,7 +56,7 @@ namespace Mono.Upnp.Server
             : this (width, height, depth, format)
         {
             if (filename == null) throw new ArgumentNullException ("filename");
-            if (!File.Exists (filename)) throw new ArgumentException ("The specified filename does not exist on the file system.", "path");
+            //if (!File.Exists (filename)) throw new ArgumentException ("The specified filename does not exist on the file system.", "path");
             
             this.filename = filename;
         }
@@ -78,47 +78,37 @@ namespace Mono.Upnp.Server
             this.depth = depth;
         }
         
-        internal void Initialize (Uri iconUrl)
+        protected internal virtual void Initialize (Uri iconUrl)
         {
             url = iconUrl;
-            Initialize ();
-        }
-        
-        protected virtual void Initialize ()
-        {
         }
         
         [XmlElement ("mimetype")]
-        public string MimeType {
+        public virtual string MimeType {
             get { return mimetype; }
         }
         
         [XmlElement ("width")]
-        public int Width {
+        public virtual int Width {
             get { return width; }
         }
         
         [XmlElement ("height")]
-        public int Height {
+        public virtual int Height {
             get { return height; }
         }
         
         [XmlElement ("depth")]
-        public int Depth {
+        public virtual int Depth {
             get { return depth; }
         }
         
         [XmlElement ("url")]
-        public Uri Url {
+        public virtual Uri Url {
             get { return url; }
         }
-        
-        internal byte[] GetData ()
-        {
-            return GetDataCore ();
-        }
 
-        protected virtual byte[] GetDataCore ()
+        protected internal virtual byte[] GetData ()
         {
             if (data == null) {
                 data = File.ReadAllBytes (filename);

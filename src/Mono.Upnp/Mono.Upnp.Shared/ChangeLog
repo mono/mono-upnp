@@ -1,0 +1,28 @@
+2009-04-22  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp:
+	* Mono.Upnp.Xml:
+	* Mono.Upnp.Shared.csproj:
+	* Mono.Upnp.Xml/IFactory.cs:
+	* Mono.Upnp.Xml/XmlSerializer.cs:
+	* Mono.Upnp.Xml/XmlAutomatable.cs:
+	* Mono.Upnp.Xml/XmlDeserializer.cs:
+	* Mono.Upnp.Xml/XmlSerializable.cs:
+	* Mono.Upnp.Xml/IXmlSerializable.cs:
+	* Mono.Upnp.Xml/XmlEnumAttribute.cs:
+	* Mono.Upnp.Xml/XmlFlagAttribute.cs:
+	* Mono.Upnp.Xml/XmlTypeAttribute.cs:
+	* Mono.Upnp.Xml/XmlArrayAttribute.cs:
+	* Mono.Upnp.Xml/XmlDeserializable.cs:
+	* Mono.Upnp.Xml/IXmlDeserializable.cs:
+	* Mono.Upnp.Xml/XmlElementAttribute.cs:
+	* Mono.Upnp.Xml/XmlArrayItemAttribute.cs:
+	* Mono.Upnp.Xml/XmlAttributeAttribute.cs:
+	* Mono.Upnp.Xml/XmlSerializationContext.cs:
+	* Mono.Upnp.Xml/XmlDeserializationContext.cs: Added custom
+	automatic XML serialization/deserialization solution to a
+	shared assembly. In the future, this assembly will also house
+	other code shared between client and server.
+
+	* ChangeLog: 
+
