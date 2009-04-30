@@ -61,6 +61,10 @@
       <Project>{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}</Project>
       <Name>Mono.Ssdp</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mono.Upnp.Shared\Mono.Upnp.Shared.csproj">
+      <Project>{822858E0-34E7-4310-BF52-4E45E02B1BA9}</Project>
+      <Name>Mono.Upnp.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mono.Upnp.Control\ServiceAction.cs" />
@@ -92,13 +96,16 @@
     <Compile Include="Mono.Upnp\ServiceType.cs" />
     <Compile Include="Mono.Upnp.Control\StateVariableChangedArgs.cs" />
     <Compile Include="Mono.Upnp\UpnpEventArgs.cs" />
-    <Compile Include="Mono.Upnp.Description\Icon.cs" />
+    <Compile Include="Mono.Upnp.Description\IconDescription.cs" />
     <Compile Include="Mono.Upnp\TypeInfo.cs" />
     <Compile Include="Mono.Upnp\UpnpException.cs" />
     <Compile Include="Mono.Upnp.Description\DeviceAnnouncement.cs" />
     <Compile Include="Mono.Upnp.Description\ServiceAnnouncement.cs" />
     <Compile Include="Mono.Upnp\UpnpDeserializationException.cs" />
     <Compile Include="Mono.Upnp.Description\DisposedEventArgs.cs" />
+    <Compile Include="Mono.Upnp.Description\Factory.cs" />
+    <Compile Include="Mono.Upnp.Description\RootDescription.cs" />
+    <Compile Include="Mono.Upnp.Description\Description.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="mono-upnp-client.snk" />

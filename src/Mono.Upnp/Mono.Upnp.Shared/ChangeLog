@@ -1,3 +1,20 @@
+2009-04-29  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* ChangeLog:
+	* Mono.Upnp.Shared.csproj:
+	* Mono.Upnp.Xml/XmlSerializer.cs:
+	* Mono.Upnp.Xml/XmlDeserializer.cs:
+	* Mono.Upnp.Xml/XmlArrayAttribute.cs:
+	* Mono.Upnp.Xml/XmlTypeDeserializerAttribute.cs: 
+
+2009-04-29  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Shared.csproj:
+	* Mono.Upnp.Xml/XmlSerializer.cs:
+	* Mono.Upnp.Xml/XmlDeserializer.cs:
+	* Mono.Upnp.Xml/XmlArrayAttribute.cs:
+	* Mono.Upnp.Xml/XmlTypeDeserializerAttribute.cs: 
+
 2009-04-22  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp:

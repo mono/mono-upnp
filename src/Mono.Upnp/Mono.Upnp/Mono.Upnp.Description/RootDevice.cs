@@ -27,7 +27,7 @@
 using System;
 using System.Collections.Generic;
 
-using Mono.Upnp.Server.Serialization;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Server
 {

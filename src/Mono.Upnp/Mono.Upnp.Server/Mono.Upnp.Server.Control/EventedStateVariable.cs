@@ -33,7 +33,7 @@ namespace Mono.Upnp.Server.Control
     {
         readonly EventInfo event_info;
         
-        protected internal StateVariable (string name, EventInfo eventInfo)
+        protected internal EventedStateVariable (string name, EventInfo eventInfo)
             : base (name, GetEventType (eventInfo), true)
         {
             this.event_info = eventInfo;

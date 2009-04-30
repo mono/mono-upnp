@@ -83,7 +83,6 @@
     <Compile Include="Mono.Upnp.Server.Control\EventedStateVariable.cs" />
     <Compile Include="Mono.Upnp.Server\Service.cs" />
     <Compile Include="Mono.Upnp.Server.Control\ServiceController.cs" />
-    <Compile Include="Mono.Upnp.Server\RootDevice.cs" />
     <Compile Include="Mono.Upnp.Server\Root.cs" />
     <Compile Include="Mono.Upnp.Server\SpecVersion.cs" />
   </ItemGroup>
@@ -94,6 +93,10 @@
     <ProjectReference Include="..\..\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj">
       <Project>{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}</Project>
       <Name>Mono.Ssdp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mono.Upnp.Shared\Mono.Upnp.Shared.csproj">
+      <Project>{822858E0-34E7-4310-BF52-4E45E02B1BA9}</Project>
+      <Name>Mono.Upnp.Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

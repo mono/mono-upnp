@@ -25,10 +25,13 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Server.Control
 {
-    public class RelatedStateVariable : ServiceVariable
+    public class RelatedStateVariable : StateVariable
     {
         readonly object default_value;
         readonly AllowedValueRange allowed_value_range;
@@ -49,13 +52,24 @@ namespace Mono.Upnp.Server.Control
             get { return Type.IsEnum ? GetValues (Type) : null; }
         }
         
-        protected internal RelatedStateVariablename, Type dataType, object defaultValue, AllowedValueRange allowedValueRange)
+        protected internal RelatedStateVariable (string name, Type dataType, object defaultValue, AllowedValueRange allowedValueRange)
             : base (name, dataType, false)
         {
             // TODO check that allowedValueRange is only used with numeric types
             
             this.default_value = defaultValue;
             this.allowed_value_range = allowedValueRange;
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
         
         static IEnumerable<string> GetValues (Type enumType)

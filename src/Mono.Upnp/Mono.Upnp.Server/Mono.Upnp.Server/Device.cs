@@ -29,13 +29,13 @@
 using System;
 using System.Collections.Generic;
 
+using Mono.Upnp.Xml;
 using Mono.Upnp.Server.Internal;
-using Mono.Upnp.Server.Serialization;
 
 namespace Mono.Upnp.Server
 {
     [XmlType ("device")]
-	public class Device : XmlAutomatable
+	public class Device : XmlSerializable
 	{
         readonly DeviceType type;
         readonly string id;
@@ -44,7 +44,7 @@ namespace Mono.Upnp.Server
         readonly string manufacturer;
         readonly string model_name;
         readonly List<Service> services = new List<Service> ();
-        readonly List<Icon> icons = new List<Icon> ();
+        readonly List<IconDescription> icons = new List<IconDescription> ();
         Uri manufacturer_url;
         string model_description;
         string model_number;
@@ -159,7 +159,7 @@ namespace Mono.Upnp.Server
         }
         
         [XmlArray ("iconList")]
-        public virtual IList<Icon> Icons {
+        public virtual IList<IconDescription> Icons {
             get { return icons; }
         }
         

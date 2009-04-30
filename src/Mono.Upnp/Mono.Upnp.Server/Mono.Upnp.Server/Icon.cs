@@ -29,12 +29,12 @@
 using System;
 using System.IO;
 
-using Mono.Upnp.Server.Serialization;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Server
 {
     [XmlType ("icon")]
-	public abstract class Icon
+	public abstract class IconDescription : XmlSerializable
 	{
         readonly string mimetype;
         readonly int width;
@@ -115,6 +115,16 @@ namespace Mono.Upnp.Server
                 filename = null;
             }
             return data;
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
 	}
 }

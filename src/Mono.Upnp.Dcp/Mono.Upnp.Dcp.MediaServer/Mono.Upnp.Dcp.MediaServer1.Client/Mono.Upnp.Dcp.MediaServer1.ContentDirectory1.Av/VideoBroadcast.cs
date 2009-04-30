@@ -46,7 +46,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 			if (reader.NamespaceURI == Schemas.UpnpSchema) {
 				switch (reader.LocalName) {
 				case "icon":
-					Icon = new Uri (reader.ReadString ());
+					IconDescription = new Uri (reader.ReadString ());
 					break;
 				case "region":
 					Region = reader.ReadString ();

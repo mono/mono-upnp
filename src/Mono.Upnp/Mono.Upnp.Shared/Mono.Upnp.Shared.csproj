@@ -55,6 +55,7 @@
     <Compile Include="Mono.Upnp.Xml\IXmlDeserializable.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlSerializable.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlDeserializable.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlTypeDeserializerAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

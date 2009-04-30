@@ -30,13 +30,13 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+using Mono.Upnp.Xml;
 using Mono.Upnp.Server.Internal;
-using Mono.Upnp.Server.Serialization;
 
-namespace Mono.Upnp.Server
+namespace Mono.Upnp.Server.Control
 {
     [XmlType ("action")]
-    public class ServiceAction
+    public class ServiceAction : XmlSerializable
 	{
         readonly string name;
         readonly Dictionary<string, Argument> arguments = new Dictionary<string, Argument> ();
@@ -127,6 +127,16 @@ namespace Mono.Upnp.Server
         protected virtual Argument CreateArgument (string name, ArgumentDirection direction, bool isRetVal, StateVariable relatedStateVariable)
         {
             return new Argument (this, direction, isRetVal, relatedStateVariable);
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
 	}
 }

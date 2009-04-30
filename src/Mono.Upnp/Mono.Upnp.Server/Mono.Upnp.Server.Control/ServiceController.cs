@@ -28,18 +28,27 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+using Mono.Upnp.Xml;
 using Mono.Upnp.Server.Internal;
-using Mono.Upnp.Server.Serialization;
 
 namespace Mono.Upnp.Server.Control
 {
     [XmlType ("scdp", Protocol.ServiceUdn)]
-    public abstract class ServiceController : XmlAutomatable
+    public abstract class ServiceController : XmlSerializable
     {
         static readonly MethodInfo on_event = typeof (ServiceController).
             GetMethod ("OnEvent", BindingFlags.Instance | BindingFlags.NonPublic);
         
-        protected internal abstract IDictionary<string, ServiceAction> ServiceActions { get; }
+        readonly XmlSerializer serializer;
+        
+        protected ServiceController (Server server)
+        {
+            if (server == null) throw new ArgumentNullException ("server");
+            
+            serializer = server.Serializer;
+        }
+        
+        protected abstract IDictionary<string, ServiceAction> ServiceActions { get; }
         protected abstract IDictionary<string, RelatedStateVariable> RelatedStateVariables { get; }
         protected abstract IDictionary<string, EventedStateVariable> EventedStateVariables { get; }
         
@@ -217,7 +226,12 @@ namespace Mono.Upnp.Server.Control
             //service_controller.PublishStateVariableChange ();
         }
         
-        protected internal virtual byte[] Serialize (XmlSerializer serializer)
+        internal byte[] Serialize ()
+        {
+            return Serialize (serializer);
+        }
+        
+        protected virtual byte[] Serialize (XmlSerializer serializer)
         {
             return serializer.GetBytes (this);
         }
@@ -259,18 +273,19 @@ namespace Mono.Upnp.Server.Control
         
         readonly T service;
         
-        protected internal ServiceController (T service)
+        protected internal ServiceController (Server server, T service)
+             : base (server)
         {
             if (service == null) throw new ArgumentNullException ("service");
             
             this.service = service;
         }
         
-        public override IDictionary<string, ServiceAction> ServiceActions {
+        protected override IDictionary<string, ServiceAction> ServiceActions {
             get { return actions; }
         }
         
-        public override IDictionary<string, RelatedStateVariable> RelatedStateVariables {
+        protected override IDictionary<string, RelatedStateVariable> RelatedStateVariables {
             get { return related_state_variables; }
         }
         

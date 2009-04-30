@@ -26,13 +26,13 @@
 
 using System;
 
+using Mono.Upnp.Xml;
 using Mono.Upnp.Server.Internal;
-using Mono.Upnp.Server.Serialization;
 
 namespace Mono.Upnp.Server
 {
     [XmlType ("root", Protocol.DeviceUrn)]
-    public class Root : XmlAutomatable
+    public class Root : XmlSerializable
     {
         readonly RootDevice device;
         

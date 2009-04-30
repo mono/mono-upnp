@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D647ECD5-AC2E-4B2C-9185-53FC9F061397}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Mono.Upnp</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Mono.Upnp.Xml\IXmlDeserializable.cs" />
+    <Compile Include="Mono.Upnp.Xml\IXmlSerializable.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlArrayAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlArrayItemAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlAttributeAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlAutomatable.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlDeserializable.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlDeserializationContext.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlDeserializer.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlElementAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlEnumAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlFlagAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlSerializable.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlSerializationContext.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlSerializer.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlTypeAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlTypeDeserializerAttribute.cs" />
+    <Compile Include="Mono.Upnp\DeviceType.cs" />
+    <Compile Include="Mono.Upnp\ReadOnlyDictionary.cs" />
+    <Compile Include="Mono.Upnp\ServiceType.cs" />
+    <Compile Include="Mono.Upnp\TypeInfo.cs" />
+    <Compile Include="Mono.Upnp\UpnpClient.cs" />
+    <Compile Include="Mono.Upnp\UpnpDeserializationException.cs" />
+    <Compile Include="Mono.Upnp\UpnpEventArgs.cs" />
+    <Compile Include="Mono.Upnp\UpnpException.cs" />
+    <Compile Include="Mono.Upnp.Description\Description.cs" />
+    <Compile Include="Mono.Upnp.Description\DeviceAnnouncement.cs" />
+    <Compile Include="Mono.Upnp.Description\DeviceDescription.cs" />
+    <Compile Include="Mono.Upnp.Description\Factory.cs" />
+    <Compile Include="Mono.Upnp.Description\IconDescription.cs" />
+    <Compile Include="Mono.Upnp.Description\IDisposer.cs" />
+    <Compile Include="Mono.Upnp.Description\Root.cs" />
+    <Compile Include="Mono.Upnp.Description\ServiceAnnouncement.cs" />
+    <Compile Include="Mono.Upnp.Description\ServiceDescription.cs" />
+    <Compile Include="Mono.Upnp.Description\DisposedEventArgs.cs" />
+    <Compile Include="Mono.Upnp.Internal\ProtectedCollection.cs" />
+    <Compile Include="Mono.Upnp.Xml\DummyXmlReader.cs" />
+    <Compile Include="Mono.Upnp.Description\RootDevice.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mono.Upnp.Xml\" />
+    <Folder Include="Mono.Upnp\" />
+    <Folder Include="Mono.Upnp.Description\" />
+    <Folder Include="Mono.Upnp.Internal\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

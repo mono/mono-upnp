@@ -32,6 +32,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Xml;
 
+using Mono.Upnp.Xml;
+
 using SsdpServer = Mono.Ssdp.Server;
 using Mono.Upnp.Server.Internal;
 
@@ -44,6 +46,8 @@ namespace Mono.Upnp.Server
         private DescriptionServer description_server;
         private SsdpServer ssdp_server;
         private bool started;
+        
+        internal static readonly XmlSerializer Serializer = new XmlSerializer ();
 
         public Server (Device rootDevice)
             : this (rootDevice, null)

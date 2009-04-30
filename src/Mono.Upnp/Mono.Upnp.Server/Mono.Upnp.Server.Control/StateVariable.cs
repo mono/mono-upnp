@@ -28,13 +28,13 @@
 
 using System;
 
+using Mono.Upnp.Xml;
 using Mono.Upnp.Server.Internal;
-using Mono.Upnp.Server.Serialization;
 
 namespace Mono.Upnp.Server
 {
     [XmlType ("stateVariable")]
-    public class StateVariable
+    public class StateVariable : XmlSerializable
 	{
         readonly string name;
         readonly Type data_type;
@@ -69,6 +69,17 @@ namespace Mono.Upnp.Server
             this.name = name;
             this.data_type = dataType;
             this.sends_events = sendsEvents;
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
 	}
 }

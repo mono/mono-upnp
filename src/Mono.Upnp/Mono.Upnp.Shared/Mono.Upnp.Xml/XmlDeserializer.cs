@@ -33,12 +33,18 @@ using System.Xml;
 
 namespace Mono.Upnp.Xml
 {
-    public class XmlDeserializer
+    public sealed class XmlDeserializer
     {
         delegate void Action ();
         delegate object Factory ();
         delegate object Deserializer (XmlDeserializationContext context);
         delegate void ObjectDeserializer (object obj, XmlDeserializationContext context);
+        
+        struct TypeDeserializer
+        {
+            public bool DeserializeSubclasses;
+            public MethodInfo Method;
+        }
         
         class Deserializers
         {
@@ -48,6 +54,7 @@ namespace Mono.Upnp.Xml
             public ObjectDeserializer AttributeAutoDeserializer;
             public ObjectDeserializer ElementDeserializer;
             public ObjectDeserializer ElementAutoDeserializer;
+            public List<TypeDeserializer> TypeDeserializers;
         }
         
         readonly Dictionary<Type, Factory> factories = new Dictionary<Type, Factory> ();
@@ -178,6 +185,7 @@ namespace Mono.Upnp.Xml
         
         ObjectDeserializer CreateAutoDeserializer (Type type, Deserializers deserializers)
         {
+            deserializers.TypeDeserializers = GetTypeDeserializers (type);
             var attribute_deserializer = GetAttributeDeserializer (type, deserializers);
             var element_deserializer = GetElementDeserializer (type, deserializers);
             return (obj, context) => {
@@ -204,6 +212,34 @@ namespace Mono.Upnp.Xml
             };
         }
         
+        List<TypeDeserializer> GetTypeDeserializers (Type type)
+        {
+            List<TypeDeserializer> type_deserializers = null;
+            foreach (var method in type.GetMethods ()) {
+                var attributes =  method.GetCustomAttributes (typeof (XmlTypeDeserializerAttribute), false);
+                if (attributes.Length != 0) {
+                    if (method.ReturnType == typeof (void)) {
+                        // TODO throw
+                        continue;
+                    }
+                    var parameters = method.GetParameters ();
+                    if (parameters.Length != 1 || parameters[0].ParameterType != typeof (XmlDeserializationContext)) {
+                        // TODO throw
+                        continue;
+                    }
+                    if (type_deserializers == null) {
+                        type_deserializers = new List<TypeDeserializer> ();
+                    }
+                    var type_deserializer_attribute = (XmlTypeDeserializerAttribute)attributes[0];
+                    type_deserializers.Add (new TypeDeserializer {
+                        DeserializeSubclasses = type_deserializer_attribute.DeserializeSubclasses,
+                        Method = method
+                    }); 
+                }
+            }
+            return type_deserializers;
+        }
+        
         ObjectDeserializer GetAttributeDeserializer (Type type, Deserializers deserializers)
         {
             if (deserializers.AttributeDeserializer == null) {
@@ -224,7 +260,8 @@ namespace Mono.Upnp.Xml
         ObjectDeserializer GetAttributeAutoDeserializer (Type type, Deserializers deserializers)
         {
             if (deserializers.AttributeAutoDeserializer == null) {
-                return deserializers.AttributeAutoDeserializer = CreateAutoDeserializer (CreateAttributeAutoDeserializers (type));
+                return deserializers.AttributeAutoDeserializer = CreateAutoDeserializer (
+                    CreateAttributeAutoDeserializers (type, deserializers));
             }
             return deserializers.AttributeAutoDeserializer;
         }
@@ -243,18 +280,23 @@ namespace Mono.Upnp.Xml
             }
         }
         
-        Dictionary<string, ObjectDeserializer> CreateAttributeAutoDeserializers (Type type)
+        Dictionary<string, ObjectDeserializer> CreateAttributeAutoDeserializers (Type type, Deserializers deserializers)
         {
-            var deserializers = new Dictionary<string, ObjectDeserializer> ();
+            var object_deserializers = new Dictionary<string, ObjectDeserializer> ();
             foreach (var property in type.GetProperties ()) {
-                foreach (var attribute in property.GetCustomAttributes (typeof (XmlAttributeAttribute), false)) {
-                    var attribute_attribute = (XmlAttributeAttribute)attribute;
-                    AddDeserializer (deserializers,
+                var attributes = property.GetCustomAttributes (typeof (XmlAttributeAttribute), false);
+                if (attributes.Length != 0) {
+                    var attribute_attribute = (XmlAttributeAttribute)attributes[0];
+                    var deserialization_type = GetType (attribute_attribute.Type, property.PropertyType);
+                    var deserializer =
+                        CreateCustomDeserializer (property, deserialization_type, deserializers) ??
+                        CreateAttributeDeserializer (property, deserialization_type);
+                    AddDeserializer (object_deserializers,
                         CreateName (property.Name, attribute_attribute.Name, attribute_attribute.Namespace),
-                        CreateAttributeDeserializer (property, GetType (attribute_attribute.Type, property.PropertyType)));
+                        deserializer);
                 }
             }
-            return deserializers;
+            return object_deserializers;
         }
         
         ObjectDeserializer CreateAttributeDeserializer (PropertyInfo property, Type type)
@@ -264,6 +306,22 @@ namespace Mono.Upnp.Xml
             }
             var deserializer = CreateAttributeDeserializer (type);
             return (obj, context) => property.SetValue (obj, deserializer (context), null);
+        }
+                    
+        ObjectDeserializer CreateCustomDeserializer (PropertyInfo property, Type type, Deserializers deserializers)
+        {
+            if (!property.CanWrite) {
+                // TODO throw
+            }
+            if (deserializers.TypeDeserializers != null) {
+                foreach (var type_deserializer in deserializers.TypeDeserializers) {
+                    var method = type_deserializer.Method;
+                    if (type == method.ReturnType || (type_deserializer.DeserializeSubclasses && type.IsAssignableFrom (method.ReturnType))) {
+                        return (obj, context) => property.SetValue (obj, method.Invoke (obj, new object [] { context }), null);
+                    }
+                }
+            }
+            return null;
         }
         
         Deserializer CreateAttributeDeserializer (Type type)
@@ -309,14 +367,14 @@ namespace Mono.Upnp.Xml
         ObjectDeserializer GetElementAutoDeserializer (Type type, Deserializers deserializers)
         {
             if (deserializers.ElementAutoDeserializer == null) {
-                return deserializers.ElementAutoDeserializer = CreateAutoDeserializer (CreateElementAutoDeserializers (type));
+                return deserializers.ElementAutoDeserializer = CreateAutoDeserializer (CreateElementAutoDeserializers (type, deserializers));
             }
             return deserializers.ElementAutoDeserializer;
         }
         
-        Dictionary<string, ObjectDeserializer> CreateElementAutoDeserializers (Type type)
+        Dictionary<string, ObjectDeserializer> CreateElementAutoDeserializers (Type type, Deserializers deserializers)
         {
-            var deserializers = new Dictionary<string, ObjectDeserializer> ();
+            var object_deserializers = new Dictionary<string, ObjectDeserializer> ();
             
             foreach (var property in type.GetProperties ()) {
                 XmlElementAttribute element_attribute = null;
@@ -351,28 +409,32 @@ namespace Mono.Upnp.Xml
                 }
                 
                 if (element_attribute != null) {
-                    AddDeserializer (deserializers,
+                    var deserialization_type = GetType (element_attribute.Type, property.PropertyType);
+                    var deserializer =
+                        CreateCustomDeserializer (property, deserialization_type, deserializers) ??
+                        CreateElementDeserializer (property, deserialization_type);
+                    AddDeserializer (object_deserializers,
                         CreateName (property.Name, element_attribute.Name, element_attribute.Namespace),
-                        CreateElementDeserializer (property, GetType (element_attribute.Type, property.PropertyType)));
+                        deserializer);
                     continue;
                 }
                 
                 if (flag_attribute != null) {
-                    AddDeserializer (deserializers,
+                    AddDeserializer (object_deserializers,
                         CreateName (property.Name, flag_attribute.Name, flag_attribute.Namespace),
                         CreateElementDeserializer (property));
                     continue;
                 }
                 
                 if (array_attribute != null) {
-                    AddDeserializer (deserializers,
+                    AddDeserializer (object_deserializers,
                         CreateName (property.Name, array_attribute.Name, array_attribute.Namespace),
-                        CreateElementDeserializer (property, GetType (array_attribute.Type, property.PropertyType), array_item_attribute));
+                        CreateElementDeserializer (property, array_item_attribute));
                     continue;
                 }
             }
             
-            return deserializers;
+            return object_deserializers;
         }
         
         ObjectDeserializer CreateElementDeserializer (PropertyInfo property, Type type)
@@ -397,16 +459,17 @@ namespace Mono.Upnp.Xml
             if (!property.CanWrite) {
                 // TODO throw
             }
-            var icollection = type.GetInterface ("ICollection'1");
+            
+            var icollection = type.GetInterface ("ICollection`1");
             if (icollection == null) {
                 // TODO throw
             }
+            
             var add = icollection.GetMethod ("Add");
             var item_type = GetType (arrayItemAttribute.Type, icollection.GetGenericArguments ()[0]);
             var item_deserializer = GetDeserializer (item_type);
             return (obj, context) => {
                 var collection = Activator.CreateInstance (type);
-                property.SetValue (obj, collection, null);
                 var depth = context.Reader.Depth;
                 while (context.Reader.Read () && context.Reader.NodeType == XmlNodeType.Element && context.Reader.Depth > depth) {
                     var item_reader = context.Reader.ReadSubtree ();

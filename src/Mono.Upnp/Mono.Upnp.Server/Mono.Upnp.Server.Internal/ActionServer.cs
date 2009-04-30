@@ -32,16 +32,18 @@ using System.Net;
 using System.Text;
 using System.Xml;
 
+using Mono.Upnp.Server.Control;
+
 namespace Mono.Upnp.Server.Internal
 {
 	internal class ActionServer : UpnpServer
 	{
-        private ServiceDescription service;
+        readonly ServiceController service_controller;
 
-        public ActionServer (ServiceDescription service, Uri url)
+        public ActionServer (ServiceController serviceController, Uri url)
             : base (url)
         {
-            this.service = service;
+            this.service_controller = serviceController;
         }
 
         protected override void HandleContext (HttpListenerContext context)
@@ -186,7 +188,7 @@ namespace Mono.Upnp.Server.Internal
         }
 
         // TODO move to Protocol.cs when it exists
-        private string ServerString {
+        static string ServerString {
             get { return String.Format ("{0}/{1} UPnP/1.1 Mono.Upnp/1.0", Environment.OSVersion.Platform, Environment.OSVersion.Version); }
         }
     }

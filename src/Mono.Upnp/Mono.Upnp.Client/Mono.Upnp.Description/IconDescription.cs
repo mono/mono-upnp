@@ -28,35 +28,31 @@
 
 using System;
 using System.Net;
-using System.Xml;
 
 using Mono.Upnp.Internal;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Description
 {
-	public class Icon
+	public class IconDescription : Description, IXmlDeserializable
 	{
         readonly DeviceDescription device;
-		bool has_width;
-		bool has_height;
-		bool has_depth;
         byte[] data;
-        IDeserializer deserializer;
-		bool verified;
 
-        protected internal Icon (DeviceDescription device)
+        protected internal IconDescription (DeviceDescription device)
         {
             if (device == null) throw new ArgumentNullException ("device");
+            
             this.device = device;
         }
 
         public DeviceDescription Device { get { return device; } }
         public bool IsDisposed { get { return device.IsDisposed; } }
-		public Uri Url { get; private set; }
-        public string MimeType { get; private set; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public int Depth { get; private set; }
+		[XmlElement ("url")] public Uri Url { get; set; }
+        [XmlElement ("mimetype")] public string MimeType { get; set; }
+        [XmlElement ("width")] public int Width { get; set; }
+        [XmlElement ("height")] public int Height { get; set; }
+        [XmlElement ("depth")] public int Depth { get; set; }
 
         public byte[] GetData ()
         {
@@ -88,7 +84,7 @@ namespace Mono.Upnp.Description
 
         public override bool Equals (object obj)
         {
-            var icon = obj as Icon;
+            var icon = obj as IconDescription;
             return icon != null && icon.Url == Url;
         }
 
@@ -96,81 +92,6 @@ namespace Mono.Upnp.Description
         {
             return ~Url.GetHashCode ();
         }
-
-        public void Deserialize (IDeserializer deserializer, XmlReader reader)
-        {
-            if (deserializer == null) throw new ArgumentNullException ("deserializer");
-
-            this.deserializer = deserializer;
-            DeserializeRootElement (reader);
-            Verify ();
-            this.deserializer = null;
-        }
-
-        protected virtual void DeserializeRootElement (XmlReader reader)
-        {
-            if (reader == null)
-				throw new ArgumentNullException ("reader");
-
-            try {
-                while (Helper.ReadToNextElement (reader)) {
-					var property_reader = reader.ReadSubtree ();
-					property_reader.Read ();
-                    try {
-                        DeserializePropertyElement (property_reader);
-                    } catch (Exception e) {
-                        Log.Exception (
-                            "There was a problem deserializing one of the icon description elements.", e);
-                    } finally {
-						property_reader.Close ();
-					}
-                }
-            } catch (Exception e) {
-                throw new UpnpDeserializationException ("There was a problem deserializing an icon.", e);
-            }
-        }
-
-        protected virtual void DeserializePropertyElement (XmlReader reader)
-        {
-            if (reader == null)
-				throw new ArgumentNullException ("reader");
-
-            switch (reader.Name) {
-            case "mimetype":
-                MimeType = reader.ReadString ();
-                break;
-            case "width":
-                reader.Read ();
-                Width = reader.ReadContentAsInt ();
-				has_width = true;
-                break;
-            case "height":
-                reader.Read ();
-                Height = reader.ReadContentAsInt ();
-				has_height = true;
-                break;
-            case "depth":
-                reader.Read ();
-                Depth = reader.ReadContentAsInt ();
-				has_depth = true;
-                break;
-            case "url":
-                Url = deserializer.DeserializeUrl (reader);
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
-            }
-        }
-		
-		void Verify ()
-		{
-			VerifyDeserialization ();
-			if (!verified) {
-				throw new UpnpDeserializationException (
-					"The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
-			}
-		}
 
         protected virtual void VerifyDeserialization ()
         {

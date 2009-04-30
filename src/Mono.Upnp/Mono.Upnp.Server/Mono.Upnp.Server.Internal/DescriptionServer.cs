@@ -27,17 +27,13 @@
 //
 
 using System;
-using System.IO;
 using System.Net;
-using System.Xml;
 
-using Mono.Upnp.Server.Serialization;
+using Mono.Upnp.Server.Control;
 
 namespace Mono.Upnp.Server.Internal
 {
-    internal delegate void DescriptionSerializer (XmlWriter writer);
-
-	internal class DescriptionServer : UpnpServer
+    class DescriptionServer : UpnpServer
 	{
         readonly byte[] data;
 

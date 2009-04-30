@@ -26,12 +26,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using Mono.Upnp.Server.Serialization;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Server
 {
     [XmlType ("allowedValueRange")]
-	public class AllowedValueRange
+	public class AllowedValueRange : XmlSerializable
 	{
         readonly object minimum;
         readonly object maximum;
@@ -57,6 +57,16 @@ namespace Mono.Upnp.Server
         [XmlElement ("steps")]
         public object Steps {
             get { return steps; }
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
 	}
 }

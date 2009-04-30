@@ -26,13 +26,13 @@
 
 using System;
 
+using Mono.Upnp.Xml;
 using Mono.Upnp.Server.Control;
-using Mono.Upnp.Server.Serialization;
 
 namespace Mono.Upnp.Server
 {
     [XmlType ("service")]
-    public class Service : XmlAutomatable
+    public class Service : XmlSerializable
     {
         readonly ServiceType type;
         readonly string id;
@@ -41,7 +41,7 @@ namespace Mono.Upnp.Server
         ActionServer action_server;
         EventServer event_server;
         
-        protected ServiceDescription (ServiceType type, string id, ServiceController controller)
+        protected Service (ServiceType type, string id, ServiceController controller)
         {
             if (type == null) throw new ArgumentNullException ("type");
             if (id == null) throw new ArgumentNullException ("id");

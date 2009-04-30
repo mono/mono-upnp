@@ -31,7 +31,7 @@ using System.Net;
 
 namespace Mono.Upnp.Server.Internal
 {
-	internal abstract class UpnpServer : IDisposable
+    abstract class UpnpServer : IDisposable
 	{
         readonly HttpListener listener;
         readonly Uri url;
@@ -49,10 +49,9 @@ namespace Mono.Upnp.Server.Internal
             listener.BeginGetContext (OnGetContext, listener);
         }
 
-        private void OnGetContext (IAsyncResult asyncResult)
+        void OnGetContext (IAsyncResult asyncResult)
         {
-            HttpListener listener = (HttpListener)asyncResult.AsyncState;
-            HttpListenerContext context = listener.EndGetContext (asyncResult);
+            var context = listener.EndGetContext (asyncResult);
             try {
                 HandleContext (context);
             } catch {

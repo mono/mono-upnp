@@ -34,7 +34,7 @@ namespace Mono.Upnp.Server.Internal
 {
 	internal class IconServer : UpnpServer
 	{
-        readonly Dictionary<Uri, Icon> icons = new Dictionary<Uri, Icon> ();
+        readonly Dictionary<Uri, IconDescription> icons = new Dictionary<Uri, IconDescription> ();
 
         public IconServer (Device device, Uri url)
             : base (url)

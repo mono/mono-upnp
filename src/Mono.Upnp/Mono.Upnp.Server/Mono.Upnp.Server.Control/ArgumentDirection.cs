@@ -26,7 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using Mono.Upnp.Server.Serialization;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Server
 {

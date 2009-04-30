@@ -28,12 +28,12 @@
 
 using System;
 
-using Mono.Upnp.Server.Serialization;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Server
 {
     [XmlType ("argument")]
-    public class Argument
+    public class Argument : XmlSerializable
 	{
         readonly string name;
         readonly ArgumentDirection direction;
@@ -70,6 +70,16 @@ namespace Mono.Upnp.Server
         [XmlElement ("relatedStateVariable")]
         public string RelatedStateVariableName {
             get { return related_state_variable.Name; }
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
 	}
 }

@@ -28,61 +28,40 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
 
-using Mono.Upnp.Internal;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Description
 {
-	public class DeviceDescription
+	public class DeviceDescription : Description, IXmlDeserializable
 	{
         readonly IDisposer disposer;
-        readonly List<ServiceDescription> service_list = new List<ServiceDescription> ();
-        readonly ReadOnlyCollection<ServiceDescription> services;
-        readonly List<DeviceDescription> device_list = new List<DeviceDescription> ();
-        readonly ReadOnlyCollection<DeviceDescription> devices;
-        readonly List<Icon> icon_list = new List<Icon> ();
-        readonly ReadOnlyCollection<Icon> icons;
-        IDeserializer deserializer;
-		bool verified;
 
-        protected internal DeviceDescription (IDisposer disposer)
+        protected internal DeviceDescription (IDisposer disposer, Root root)
+            : base (root)
         {
             if (disposer == null) throw new ArgumentNullException ("disposer");
 
             this.disposer = disposer;
-            services = service_list.AsReadOnly ();
-            devices = device_list.AsReadOnly ();
-            icons = icon_list.AsReadOnly ();
         }
         
         public event EventHandler<DisposedEventArgs> Disposed;
         
-        public ReadOnlyCollection<ServiceDescription> Services {
-            get { return services; }
-        }
-
-        public ReadOnlyCollection<DeviceDescription> Devices {
-            get { return devices; }
-        }
-        
-        public ReadOnlyCollection<Icon> Icons {
-            get { return icons; }
-        }
-
-        public DeviceType Type { get; private set; }
-        public string Udn { get; private set; }
-        public Uri PresentationUrl { get; private set; }
-        public string FriendlyName { get; private set; }
-        public string Manufacturer { get; private set; }
-        public Uri ManufacturerUrl { get; private set; }
-        public string ModelDescription { get; private set; }
-        public string ModelName { get; private set; }
-        public string ModelNumber { get; private set; }
-        public Uri ModelUrl { get; private set; }
-        public string SerialNumber { get; private set; }
-        public string Upc { get; private set; }
+        [XmlArray ("serviceList", Type = typeof (List<ServiceDescription>))] protected ICollection<ServiceDescription> ServiceCollection { get; set; }
+        [XmlArray ("deviceList", Type = typeof (List<DeviceDescription>))] protected ICollection<DeviceDescription> DeviceCollection { get; set; }
+        [XmlArray ("iconList", Type = typeof (List<IconDescription>))] protected ICollection<IconDescription> IconCollection { get; set; }
+        [XmlElement ("deviceType")] public DeviceType Type { get; set; }
+        [XmlElement ("UDN")] public string Udn { get; set; }
+        [XmlElement ("presentationURL")] public Uri PresentationUrl { get; set; }
+        [XmlElement ("friendlyName")] public string FriendlyName { get; set; }
+        [XmlElement ("manufacturer")] public string Manufacturer { get; set; }
+        [XmlElement ("manufacturerURL")] public Uri ManufacturerUrl { get; set; }
+        [XmlElement ("modelDescription")] public string ModelDescription { get; set; }
+        [XmlElement ("modelName")] public string ModelName { get; set; }
+        [XmlElement ("modelNumber")] public string ModelNumber { get; set; }
+        [XmlElement ("modelURL")] public Uri ModelUrl { get; set; }
+        [XmlElement ("serialNumber")] public string SerialNumber { get; set; }
+        [XmlElement ("UPC")] public string Upc { get; set; }
         public bool IsDisposed { get; private set; }
 
         protected internal void CheckDisposed ()
@@ -116,194 +95,6 @@ namespace Mono.Upnp.Description
             if (handler != null) {
                 handler (this, e);
             }
-        }
-
-        protected void AddService (ServiceDescription service)
-        {
-            service_list.Add (service);
-        }
-
-        protected void AddDevice (DeviceDescription device)
-        {
-            device_list.Add (device);
-        }
-
-        protected void AddIcon (Icon icon)
-        {
-            icon_list.Add (icon);
-        }
-
-        public void Deserialize (IDeserializer deserializer, XmlReader reader)
-        {
-            if (deserializer == null) throw new ArgumentNullException ("deserializer");
-
-            this.deserializer = deserializer;
-            DeserializeRootElement (reader);
-            Verify ();
-            this.deserializer = null;
-        }
-
-        protected virtual void DeserializeRootElement (XmlReader reader)
-        {
-            if (reader == null) throw new ArgumentNullException ("reader");
-
-            try {
-                while (Helper.ReadToNextElement (reader)) {
-					var property_reader = reader.ReadSubtree ();
-					property_reader.Read ();
-                    try {
-                        DeserializePropertyElement (property_reader);
-                    } catch (Exception e) {
-                        Log.Exception (
-                            "There was a problem deserializing one of the device description elements.", e);
-                    } finally {
-						property_reader.Close ();
-					}
-                }
-            } catch (Exception e) {
-                throw new UpnpDeserializationException (
-                    string.Format ("There was a problem deserializing {0}.", ToString ()), e);
-            }
-        }
-
-        protected virtual void DeserializePropertyElement (XmlReader reader)
-        {
-            if (reader == null) throw new ArgumentNullException ("reader");
-
-            switch (reader.Name) {
-            case "deviceType":
-                Type = new DeviceType (reader.ReadString ());
-                break;
-            case "friendlyName":
-                FriendlyName = reader.ReadString ();
-                break;
-            case "manufacturer":
-                Manufacturer = reader.ReadString ();
-                break;
-            case "manufacturerURL":
-                ManufacturerUrl = deserializer.DeserializeUrl (reader);
-                break;
-            case "modelDescription":
-                ModelDescription = reader.ReadString ();
-                break;
-            case "modelName":
-                ModelName = reader.ReadString ();
-                break;
-            case "modelNumber":
-                ModelNumber = reader.ReadString ();
-                break;
-            case "modelURL":
-                ModelUrl = deserializer.DeserializeUrl (reader);
-                break;
-            case "serialNumber":
-                SerialNumber = reader.ReadString ();
-                break;
-            case "UDN":
-                Udn = reader.ReadString ().Trim ();
-                break;
-            case "UPC":
-                Upc = reader.ReadString ();
-                break;
-            case "iconList":
-				using (var icons_reader = reader.ReadSubtree ()) {
-                	icons_reader.Read ();
-					DeserializeIcons (icons_reader);
-				}
-                break;
-            case "serviceList":
-				using (var services_reader = reader.ReadSubtree ()) {
-                	services_reader.Read ();
-					DeserializeServices (services_reader);
-				}
-                break;
-            case "deviceList":
-				using (var devices_reader = reader.ReadSubtree ()) {
-                	devices_reader.Read ();
-					DeserializeDevice (devices_reader);
-				}
-                break;
-            case "presentationURL":
-                PresentationUrl = deserializer.DeserializeUrl (reader);
-                break;
-            default: // This is a workaround for Mono bug 334752
-                reader.Skip ();
-                break;
-            }
-        }
-
-        protected virtual void DeserializeIcons (XmlReader reader)
-        {
-            if (reader == null) throw new ArgumentNullException ("reader");
-
-            while (reader.ReadToFollowing ("icon")) {
-				var icon_reader = reader.ReadSubtree ();
-				icon_reader.Read ();
-                try {
-                    DeserializeIcon (icon_reader);
-                } catch (Exception e) {
-                    Log.Exception ("There was a problem deserializing an icon list element.", e);
-                } finally {
-					icon_reader.Close ();
-				}
-            }
-        }
-
-        protected virtual void DeserializeIcon (XmlReader reader)
-        {
-            var icon = CreateIcon ();
-            if (icon != null) {
-                icon.Deserialize (deserializer, reader);
-                AddIcon (icon);
-            }
-        }
-
-        protected virtual Icon CreateIcon ()
-        {
-            return new Icon (this);
-        }
-
-        protected virtual void DeserializeServices (XmlReader reader)
-        {
-            if (reader == null) throw new ArgumentNullException ("reader");
-
-            while (reader.ReadToFollowing ("service")) {
-				var service_reader = reader.ReadSubtree ();
-				service_reader.Read ();
-                try {
-                    DeserializeService (service_reader);
-                } catch (Exception e) {
-                    Log.Exception ("There was a problem deserializing a service list element.", e);
-                } finally {
-					service_reader.Close ();
-				}
-            }
-        }
-
-        protected virtual void DeserializeService (XmlReader reader)
-        {
-            AddService (deserializer.DeserializeService (reader));
-        }
-
-        protected virtual void DeserializeDevices (XmlReader reader)
-        {
-            if (reader == null) throw new ArgumentNullException ("reader");
-
-            while (reader.ReadToFollowing ("device")) {
-				var device_reader = reader.ReadSubtree ();
-				device_reader.Read ();
-                try {
-                    DeserializeDevices (device_reader);
-                } catch (Exception e) {
-                    Log.Exception ("There was a problem deserializing a device list element.", e);
-                } finally {
-					device_reader.Close ();
-				}
-            }
-        }
-
-        protected virtual void DeserializeDevice (XmlReader reader)
-        {
-            AddDevice (deserializer.DeserializeDevice (reader));
         }
 		
 		void Verify ()
@@ -360,6 +151,47 @@ namespace Mono.Upnp.Description
                 }
             }
 			verified = true;
+        }
+        
+        ReadOnlyCollection<T> MakeReadOnly<T> (IList<T> list)
+        {
+            return new ReadOnlyCollection<T> (list ?? new List<T> ());
+        }
+        
+        void IXmlDeserializer.Deserialize (XmlDeserializationContext context)
+        {
+            Deserialize (context);
+            
+            services = MakeReadOnly (ServiceList);
+            devices = MakeReadOnly (DeviceList);
+            icons = MakeReadOnly (IconList);
+            
+            Verify ();
+        }
+
+        void IXmlDeserializer.DeserializeAttribute (XmlDeserializationContext context)
+        {
+            DeserializeAttribute (context);
+        }
+
+        void IXmlDeserializer.DeserializeElement (Mono.Upnp.Xml.XmlDeserializationContext context)
+        {
+            DeserializeElement (context);
+        }
+        
+        protected virtual void Deserialize (XmlDeserializationContext context)
+        {
+            context.AutoDeserialize (this);
+        }
+        
+        protected virtual void DeserializeAttribute (XmlDeserializationContext context)
+        {
+            context.AutoDeserializeAttribute (this);
+        }
+        
+        protected virtual void DeserializeElement (XmlDeserializationContext context)
+        {
+            context.AutoDeserializeElement (this);
         }
 
         public override string ToString ()

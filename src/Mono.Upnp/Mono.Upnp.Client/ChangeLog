@@ -1,3 +1,26 @@
+2009-04-29  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* ChangeLog:
+	* Mono.Upnp.Client.csproj:
+	* Mono.Upnp.Description/Icon.cs:
+	* Mono.Upnp.Description/Factory.cs:
+	* Mono.Upnp.Description/Description.cs:
+	* Mono.Upnp.Description/IconDescription.cs:
+	* Mono.Upnp.Description/RootDescription.cs:
+	* Mono.Upnp.Description/DeviceDescription.cs:
+	* Mono.Upnp.Description/ServiceDescription.cs: 
+
+2009-04-29  Scott Peterson  <lunchtimemama@gmail.com>
+
+	* Mono.Upnp.Client.csproj:
+	* Mono.Upnp.Description/Icon.cs:
+	* Mono.Upnp.Description/Factory.cs:
+	* Mono.Upnp.Description/Description.cs:
+	* Mono.Upnp.Description/IconDescription.cs:
+	* Mono.Upnp.Description/RootDescription.cs:
+	* Mono.Upnp.Description/DeviceDescription.cs:
+	* Mono.Upnp.Description/ServiceDescription.cs: 
+
 2009-04-04  Scott Peterson  <lunchtimemama@gmail.com>
 
 	* Mono.Upnp.Control/StateVariable.cs: Changed SendEvents to
