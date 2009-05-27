@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{AD422A19-BA07-4039-B843-84E386804DD1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Mono.Ssdp</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyKeyFile>mono-ssdp.snk</AssemblyKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyKeyFile>mono-ssdp.snk</AssemblyKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Mono.Ssdp\Announcer.cs" />
+    <Compile Include="Mono.Ssdp\Browser.cs" />
+    <Compile Include="Mono.Ssdp\BrowseService.cs" />
+    <Compile Include="Mono.Ssdp\Client.cs" />
+    <Compile Include="Mono.Ssdp\MulticastReader.cs" />
+    <Compile Include="Mono.Ssdp\Server.cs" />
+    <Compile Include="Mono.Ssdp\Service.cs" />
+    <Compile Include="Mono.Ssdp\ServiceArgs.cs" />
+    <Compile Include="Mono.Ssdp\ServiceHandler.cs" />
+    <Compile Include="Mono.Ssdp.Internal\AsyncReceiveBuffer.cs" />
+    <Compile Include="Mono.Ssdp.Internal\HttpDatagram.cs" />
+    <Compile Include="Mono.Ssdp.Internal\HttpDatagramType.cs" />
+    <Compile Include="Mono.Ssdp.Internal\Log.cs" />
+    <Compile Include="Mono.Ssdp.Internal\NotifyListener.cs" />
+    <Compile Include="Mono.Ssdp.Internal\Protocol.cs" />
+    <Compile Include="Mono.Ssdp.Internal\RequestListener.cs" />
+    <Compile Include="Mono.Ssdp.Internal\ServiceCache.cs" />
+    <Compile Include="Mono.Ssdp.Internal\SsdpSocket.cs" />
+    <Compile Include="Mono.Ssdp.Internal\TimeoutDispatcher.cs" />
+    <Compile Include="Mono.Ssdp\ServiceOptions.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
