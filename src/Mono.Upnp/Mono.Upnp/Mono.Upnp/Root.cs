@@ -50,7 +50,9 @@ namespace Mono.Upnp
             //this.serializer = serializer;
         }
         
-        [XmlAttribute ("configId", Protocol.DeviceUrn)]
+        public Version SpecVersion { get; protected set; }
+        
+        [XmlAttribute ("configId")]
         public virtual string ConfigurationId { get; protected set; }
         
         [XmlElement ("URLBase", Protocol.DeviceUrn, OmitIfNull = true)]
@@ -82,7 +84,14 @@ namespace Mono.Upnp
         {
             if (context == null) throw new ArgumentNullException ("context");
             
-            context.AutoDeserializeElement (this);
+            if (context.Reader.LocalName == "specVersion" && context.Reader.NamespaceURI == Protocol.DeviceUrn) {
+                context.Reader.Read ();
+                var major = context.Reader.ReadElementContentAsInt ("major", Protocol.DeviceUrn);
+                var minor = context.Reader.ReadElementContentAsInt ("minor", Protocol.DeviceUrn);
+                SpecVersion = new Version (major, minor);
+            } else {
+                context.AutoDeserializeElement (this);
+            }
         }
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
@@ -95,6 +104,15 @@ namespace Mono.Upnp
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
             if (context == null) throw new ArgumentNullException ("context");
+            
+            context.Writer.WriteStartElement ("specVersion", Protocol.DeviceUrn);
+            context.Writer.WriteStartElement ("major", Protocol.DeviceUrn);
+            context.Writer.WriteValue (SpecVersion.Major);
+            context.Writer.WriteEndElement ();
+            context.Writer.WriteStartElement ("minor", Protocol.DeviceUrn);
+            context.Writer.WriteValue (SpecVersion.Minor);
+            context.Writer.WriteEndElement ();
+            context.Writer.WriteEndElement ();
             
             context.AutoSerializeMembersOnly (this);
         }

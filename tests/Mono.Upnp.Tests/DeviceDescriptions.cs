@@ -29,7 +29,7 @@ namespace Mono.Upnp.Tests
     public static class DeviceDescriptions
     {
         public const string FullDescription =
-           @"<?xml version=""1.0""?>" +
+           @"<?xml version=""1.0"" encoding=""utf-16""?>" +
            @"<root xmlns=""urn:schemas-upnp-org:device-1-0"" configId=""1"">" +
                 "<specVersion>" +
                     "<major>1</major>" +

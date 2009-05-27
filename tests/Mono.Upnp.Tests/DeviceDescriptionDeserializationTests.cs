@@ -40,6 +40,10 @@ namespace Mono.Upnp.Tests
         public void FullDescriptionTest ()
         {
             var root = deserializer.DeserializeRoot (DeviceDescriptions.FullDescription);
+            Assert.AreEqual ("1", root.ConfigurationId);
+            Assert.IsNotNull (root.SpecVersion);
+            Assert.AreEqual (1, root.SpecVersion.Major);
+            Assert.AreEqual (1, root.SpecVersion.Minor);
             Assert.IsNotNull (root.RootDevice);
             Assert.AreEqual (new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-device:1"), root.RootDevice.Type);
             Assert.AreEqual ("Mono.Upnp.Tests Full Device", root.RootDevice.FriendlyName);
