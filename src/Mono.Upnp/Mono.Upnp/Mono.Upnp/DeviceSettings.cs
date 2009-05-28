@@ -36,8 +36,6 @@ namespace Mono.Upnp
         readonly string friendly_name;
         readonly string manufacturer;
         readonly string model_name;
-        readonly List<Service> services = new List<Service> ();
-        readonly List<Icon> icons = new List<Icon> ();
         
         protected DeviceSettings ()
         {
@@ -79,13 +77,9 @@ namespace Mono.Upnp
             get { return model_name; }
         }
         
-        public IList<Service> Services {
-            get { return services; }
-        }
+        public IEnumerable<Service> Services { get; set; }
         
-        public IList<Icon> Icons {
-            get { return icons; }
-        }
+        public IEnumerable<Icon> Icons { get; set; }
         
         public Uri ManufacturerUrl { get; set; }
         

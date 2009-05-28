@@ -139,6 +139,15 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual (0.00005, deserialized_object.Foo);
         }
         
+        // TODO DateTime test
+        
+        [Test]
+        public void UriElementTest ()
+        {
+            var deserialized_object = Deserialize<ElementTestClass<Uri>> ("<Test><Foo>http://localhost/</Foo></Test>");
+            Assert.AreEqual (new Uri ("http://localhost/"), deserialized_object.Foo);
+        }
+        
         class NestedElementTestClass
         {
             [XmlElement] public ElementTestClass Child { get; set; }
@@ -235,6 +244,15 @@ namespace Mono.Upnp.Xml.Tests
         {
             var deserialized_object = Deserialize<AttributeTestClass<decimal>> (@"<Test Foo="".00005"" />");
             Assert.AreEqual (0.00005, deserialized_object.Foo);
+        }
+        
+        // TODO DateTime test
+        
+        [Test]
+        public void UriAttributeTest ()
+        {
+            var deserialized_object = Deserialize<AttributeTestClass<Uri>> (@"<Test Foo=""http://localhost/"" />");
+            Assert.AreEqual (new Uri ("http://localhost/"), deserialized_object.Foo);
         }
         
         class FlagTestClass
@@ -665,6 +683,48 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual ("one", deserialized_object.Children[0].Bar);
             Assert.AreEqual ("two", deserialized_object.Children[1].Bar);
             Assert.AreEqual ("five", deserialized_object.Children[2].Bar);
+        }
+        
+        class NonPublicConstructorTestClass
+        {
+            NonPublicConstructorTestClass ()
+            {
+            }
+            
+            [XmlAttribute] public string Foo { get; set; }
+        }
+        
+        class NonPublicConstructorContainerClass
+        {
+            [XmlElement] public NonPublicConstructorTestClass Child { get; set; }
+        }
+        
+        [Test]
+        public void NonPublicConstructorTest ()
+        {
+            var deserialized_object = Deserialize<NonPublicConstructorContainerClass> (
+                @"<Test><Child Foo=""bar""/></Test>");
+            Assert.IsNotNull (deserialized_object.Child);
+            Assert.AreEqual ("bar", deserialized_object.Child.Foo);
+        }
+        
+        class DoNotDeserializeTestClass
+        {
+            [DoNotDeserialize, XmlAttribute] public string Foo { get; set; }
+            [DoNotDeserialize, XmlElement] public string Bar { get; set; }
+            [XmlAttribute] public string Bat { get; set; }
+            [XmlElement] public string Baz { get; set; }
+        }
+        
+        [Test]
+        public void DoNotDeserializeTest ()
+        {
+            var deserialized_object = Deserialize<DoNotDeserializeTestClass> (
+                @"<Test Foo=""foo"" Bat=""bat""><Bar>bar</Bar><Baz>baz</Baz></Test>");
+            Assert.IsNull (deserialized_object.Foo);
+            Assert.IsNull (deserialized_object.Bar);
+            Assert.AreEqual ("bat", deserialized_object.Bat);
+            Assert.AreEqual ("baz", deserialized_object.Baz);
         }
     }
 }

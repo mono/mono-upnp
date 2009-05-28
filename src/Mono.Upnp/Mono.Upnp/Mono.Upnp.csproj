@@ -39,10 +39,9 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Mono.Upnp\Client.cs" />
-    <Compile Include="Mono.Upnp\DescriptionBase.cs" />
+    <Compile Include="Mono.Upnp\Description.cs" />
     <Compile Include="Mono.Upnp\Device.cs" />
     <Compile Include="Mono.Upnp\DeviceAnnouncement.cs" />
-    <Compile Include="Mono.Upnp\DeviceDescriptionBase.cs" />
     <Compile Include="Mono.Upnp\DeviceSettings.cs" />
     <Compile Include="Mono.Upnp\DeviceType.cs" />
     <Compile Include="Mono.Upnp\DisposedEventArgs.cs" />
@@ -97,6 +96,9 @@
     <Compile Include="Mono.Upnp.Internal\TimeoutDispatcher.cs" />
     <Compile Include="Mono.Upnp\Deserializer.cs" />
     <Compile Include="Mono.Upnp\DeserializerFactory.cs" />
+    <Compile Include="Mono.Upnp\SpecVersion.cs" />
+    <Compile Include="Mono.Upnp.Xml\DoNotDeserializeAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml\DoNotSerializeAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

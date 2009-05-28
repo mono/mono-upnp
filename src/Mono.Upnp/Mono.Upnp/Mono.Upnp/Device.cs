@@ -36,7 +36,7 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp
 {
     [XmlType ("device", Protocol.DeviceUrn)]
-    public class Device : DeviceDescriptionBase, IXmlDeserializable
+    public class Device : Description, IXmlDeserializable
     {
         IList<Device> devices;
         IList<Service> services;
@@ -44,7 +44,12 @@ namespace Mono.Upnp
         IconServer icon_server;
         
         public Device (DeviceSettings settings)
-            : this (null, GetServices (settings), GetIcons (settings))
+            : this (settings, null)
+        {
+        }
+        
+        protected internal Device (DeviceSettings settings, IEnumerable<Device> devices)
+            : this (devices, GetServices (settings), GetIcons (settings))
         {
             Type = settings.Type;
             Udn = settings.Udn;
@@ -86,13 +91,13 @@ namespace Mono.Upnp
             return settings.Icons;
         }
         
-        [XmlArray ("deviceList", Protocol.DeviceUrn, OmitIfEmpty = true)]
-        protected virtual ICollection<Device> DeviceList {
-            get { return devices; }
+        [XmlArray ("iconList", Protocol.DeviceUrn)]
+        protected virtual ICollection<Icon> IconList {
+            get { return icons; }
         }
         
-        public IEnumerable<Device> Devices {
-            get { return devices; }
+        public IEnumerable<Icon> Icons {
+            get { return icons; }
         }
         
         [XmlArray ("serviceList", Protocol.DeviceUrn)]
@@ -104,20 +109,17 @@ namespace Mono.Upnp
             get { return services; }
         }
         
-        [XmlArray ("iconList", Protocol.DeviceUrn)]
-        protected virtual ICollection<Icon> IconList {
-            get { return icons; }
+        [XmlArray ("deviceList", Protocol.DeviceUrn, OmitIfEmpty = true)]
+        protected virtual ICollection<Device> DeviceList {
+            get { return devices; }
         }
         
-        public IEnumerable<Icon> Icons {
-            get { return icons; }
+        public IEnumerable<Device> Devices {
+            get { return devices; }
         }
         
         [XmlElement ("deviceType", Protocol.DeviceUrn)]
         public virtual DeviceType Type { get; protected set; }
-        
-        [XmlElement ("UDN", Protocol.DeviceUrn)]
-        public virtual string Udn { get; protected set; }
         
         [XmlElement ("friendlyName", Protocol.DeviceUrn)]
         public virtual string FriendlyName { get; protected set; }
@@ -143,26 +145,30 @@ namespace Mono.Upnp
         [XmlElement ("serialNumber", Protocol.DeviceUrn, OmitIfNull = true)]
         public virtual string SerialNumber { get; protected set; }
         
+        [XmlElement ("UDN", Protocol.DeviceUrn)]
+        public virtual string Udn { get; protected set; }
+        
         [XmlElement ("UPC", Protocol.DeviceUrn, OmitIfNull = true)]
         public virtual string Upc { get; protected set; }
 
-        protected internal virtual void Initialize (Uri deviceUrl)
+        protected internal virtual void Initialize (Server server, Root root, Uri deviceUrl)
         {
             if (deviceUrl == null) throw new ArgumentNullException ("deviceUrl");
             if (Deserializer != null) throw new InvalidOperationException ("The device was constructed for deserialization and cannot be initalized. Use one of the other constructors.");
             
+            // TODO clean up these url generations
             foreach (var device in devices) {
-                device.Initialize (new Uri (deviceUrl, string.Format ("{0}/{1}/", device.Type.ToUrlString (), device.Udn)));
+                device.Initialize (server, root, new Uri (deviceUrl, string.Format ("{0}/{1}/", device.Type.ToUrlString (), device.Udn.Substring (5))));
             }
             
             foreach (var service in services) {
-                service.Initialize (new Uri (deviceUrl, string.Format ("{0}/{1}/", service.Type.ToUrlString (), service.Id)));
+                service.Initialize (server, root, new Uri (deviceUrl, string.Format ("{0}/{1}/", service.Type.ToUrlString (), service.Id.Substring (23))));
             }
             
             if (icons.Count > 0) {
                 var icons_url = new Uri (deviceUrl, "icons/");
                 for (var i = 0; i < icons.Count; i++) {
-                    icons[i].Initialize (new Uri (icons_url, string.Format ("{0}/", i)));
+                    icons[i].Initialize (root, new Uri (icons_url, string.Format ("{0}/", i)));
                 }
                 icon_server = new IconServer (icons_url, icons);
             }

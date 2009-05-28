@@ -134,18 +134,20 @@ namespace Mono.Upnp.Xml
                 return context => context.Reader.ReadElementContentAsDecimal ();
             } else if (type == typeof (DateTime)) {
                 return context => context.Reader.ReadElementContentAsDateTime ();
+            } else if (type == typeof (Uri)) {
+                return context => new Uri (context.Reader.ReadElementContentAsString ());
             } else {
                 // TODO check for default ctor
                 if (typeof (IXmlDeserializable).IsAssignableFrom (type)) {
                     return context => {
-                        var obj = Activator.CreateInstance (type);
+                        var obj = Activator.CreateInstance (type, true);
                         ((IXmlDeserializable)obj).Deserialize (context);
                         return obj;
                     };
                 } else {
                     var deserializer = GetAutoDeserializer (type, deserializers);
                     return context => {
-                        var obj = Activator.CreateInstance (type);
+                        var obj = Activator.CreateInstance (type, true);
                         deserializer (obj, context);
                         return obj;
                     };
@@ -295,15 +297,26 @@ namespace Mono.Upnp.Xml
         void ProcessAttributeAutoDeserializers (Type type, BindingFlags flags, Deserializers deserializers, Dictionary<string, ObjectDeserializer> objectDeserializeres)
         {
             foreach (var property in type.GetProperties (flags)) {
-                var attributes = property.GetCustomAttributes (typeof (XmlAttributeAttribute), false);
-                if (attributes.Length != 0) {
-                    var attribute_attribute = (XmlAttributeAttribute)attributes[0];
+                XmlAttributeAttribute attribute_attribute = null;
+                foreach (var custom_attribute in property.GetCustomAttributes (false)) {
+                    if (custom_attribute is DoNotDeserializeAttribute) {
+                        attribute_attribute = null;
+                        break;
+                    }
+                    var attribute = custom_attribute as XmlAttributeAttribute;
+                    if (attribute != null) {
+                        attribute_attribute = attribute;
+                        continue;
+                    }
+                }
+                if (attribute_attribute != null) {
                     var deserializer =
                         CreateCustomDeserializer (property, deserializers) ??
                         CreateAttributeDeserializer (property, property.PropertyType);
                     AddDeserializer (objectDeserializeres,
                         CreateName (property.Name, attribute_attribute.Name, attribute_attribute.Namespace),
                         deserializer);
+                    break;
                 }
             }
         }
@@ -347,7 +360,9 @@ namespace Mono.Upnp.Xml
                 return context => context.Reader.ReadContentAsDecimal ();
             } else if (type == typeof (DateTime)) {
                 return context => context.Reader.ReadContentAsDateTime ();
-            } else {
+            } else if (type == typeof (Uri)) {
+                return context => new Uri (context.Reader.ReadContentAsString ());
+            }  else {
                 return context => context.Reader.ReadContentAs (type, null);
             }
         }
@@ -395,6 +410,13 @@ namespace Mono.Upnp.Xml
                 XmlArrayItemAttribute array_item_attribute = null;
                 
                 foreach (var custom_attribute in property.GetCustomAttributes (false)) {
+                    if (custom_attribute is DoNotDeserializeAttribute) {
+                        element_attribute = null;
+                        flag_attribute = null;
+                        array_attribute = null;
+                        break;
+                    }
+                    
                     var element = custom_attribute as XmlElementAttribute;
                     if (element != null) {
                         element_attribute = element;

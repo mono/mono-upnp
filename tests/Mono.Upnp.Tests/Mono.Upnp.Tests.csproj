@@ -46,6 +46,11 @@
     <Compile Include="DummyDeserializer.cs" />
     <Compile Include="DeviceDescriptionDeserializationTests.cs" />
     <Compile Include="DeviceDescriptions.cs" />
+    <Compile Include="DeviceDescriptionSerializationTests.cs" />
+    <Compile Include="DummyIcon.cs" />
+    <Compile Include="DummyService.cs" />
+    <Compile Include="DummyServiceController.cs" />
+    <Compile Include="DummyRoot.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -35,12 +35,9 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp
 {
     [XmlType ("service", Protocol.DeviceUrn)]
-    public class Service : DeviceDescriptionBase
+    public class Service : Description
     {
         ServiceController controller;
-        DataServer scpd_server;
-        ControlServer control_server;
-        EventServer event_server;
 
         protected internal Service (Deserializer deserializer)
             : base (deserializer)
@@ -68,25 +65,38 @@ namespace Mono.Upnp
         public virtual string Id { get; protected set; }
         
         [XmlElement ("SCPDURL", Protocol.DeviceUrn)]
+        protected virtual string ScpdUrlFragment {
+            get { return CollapseUrl (ScpdUrl); }
+            set { ScpdUrl = ExpandUrl (value); }
+        }
+        
         public virtual Uri ScpdUrl { get; protected set; }
         
         [XmlElement ("controlURL", Protocol.DeviceUrn)]
+        protected virtual string ControlUrlFragment {
+            get { return CollapseUrl (ControlUrl); }
+            set { ControlUrl = ExpandUrl (value); }
+        }   
+        
         public virtual Uri ControlUrl { get; protected set; }
         
         [XmlElement ("eventSubURL", Protocol.DeviceUrn)]
+        protected virtual string EventUrlFragment {
+            get { return CollapseUrl (EventUrl); }
+            set { EventUrl = ExpandUrl (value); }
+        }
+        
         public virtual Uri EventUrl { get; protected set; }
         
-        protected internal virtual void Initialize (Uri serviceUrl)
+        protected internal virtual void Initialize (Server server, Root root, Uri serviceUrl)
         {
+            Initialize (root);
             if (serviceUrl == null) throw new ArgumentNullException ("serviceUrl");
-            if (Deserializer != null) throw new InvalidOperationException ("This service has been constructred for deserialization - it cannot be initialized. Use one of the other constructor.");
             
             ScpdUrl = new Uri (serviceUrl, "scpd/");
             ControlUrl = new Uri (serviceUrl, "control/");
             EventUrl = new Uri (serviceUrl, "event/");
-            //scpd_server = new DataServer (controller, ScpdUrl);
-            control_server = new ControlServer (controller, ControlUrl);
-            event_server = new EventServer (controller, EventUrl);
+            controller.Initialize (server, this);
         }
         
         protected internal virtual void Start ()

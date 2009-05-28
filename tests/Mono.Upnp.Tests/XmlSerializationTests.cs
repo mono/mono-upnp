@@ -591,5 +591,22 @@ namespace Mono.Upnp.Xml.Tests
                 serializer.GetString<XmlSerializableTestBaseClass> (new XmlSerializableTestSubClass { Foo = "bar" })
             );
         }
+        
+        class DoNotSerializeTestClass
+        {
+            [DoNotSerialize, XmlAttribute] public string Foo { get; set; }
+            [DoNotSerialize, XmlElement] public string Bar { get; set; }
+            [XmlAttribute] public string Bat { get; set; }
+            [XmlElement] public string Baz { get; set; }
+        }
+        
+        [Test]
+        public void DoNotSerializeTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-16""?><DoNotSerializeTestClass Bat=""bat""><Baz>baz</Baz></DoNotSerializeTestClass>",
+                serializer.GetString (new DoNotSerializeTestClass { Foo = "foo", Bar = "bar", Bat = "bat", Baz = "baz" })
+            );
+        }
     }
 }

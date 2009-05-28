@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 
 using Mono.Upnp.Control;
 using Mono.Upnp.Internal;
@@ -33,9 +34,9 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp
 {
     [XmlType ("root", Protocol.DeviceUrn)]
-    public class Root : DescriptionBase
+    public class Root : Description
     {
-        internal protected Root (Deserializer deserializer, Uri url)
+        protected internal Root (Deserializer deserializer, Uri url)
             : base (deserializer)
         {
             if (url == null) throw new ArgumentNullException ("url");
@@ -43,29 +44,52 @@ namespace Mono.Upnp
             UrlBase = url;
         }
         
-        internal protected Root (XmlSerializer serializer)
+        public Root (DeviceSettings rootDeviceSettings)
+            : this (rootDeviceSettings, null)
         {
-            if (serializer == null) throw new ArgumentNullException ("serializer");
-            
-            //this.serializer = serializer;
         }
         
-        public Version SpecVersion { get; protected set; }
+        public Root (DeviceSettings rootDeviceSettings, IEnumerable<Device> embeddedDevices)
+            : this (CreateRootDevice (rootDeviceSettings, embeddedDevices))
+        {
+        }
+        
+        protected Root (Device rootDevice)
+        {
+            RootDevice = rootDevice;
+            SpecVersion = new SpecVersion (1, 1);
+        }
+        
+        static Device CreateRootDevice (DeviceSettings rootDeviceSettings, IEnumerable<Device> embeddedDevices)
+        {
+            if (rootDeviceSettings == null) throw new ArgumentNullException ("rootDeviceSettings");
+            
+            return new Device (rootDeviceSettings, embeddedDevices);
+        }
         
         [XmlAttribute ("configId")]
         public virtual string ConfigurationId { get; protected set; }
         
-        [XmlElement ("URLBase", Protocol.DeviceUrn, OmitIfNull = true)]
+        [XmlElement ("specVersion", Protocol.DeviceUrn)]
+        public virtual SpecVersion SpecVersion { get; protected set; }
+        
+        [DoNotSerialize]
+        [XmlElement ("URLBase", Protocol.DeviceUrn)]
         public virtual Uri UrlBase { get; protected set; }
         
         [XmlElement ("device", Protocol.DeviceUrn)]
         public virtual Device RootDevice { get; protected set; }
-		
-		[XmlTypeDeserializer]
-		Uri DeserializeUri (XmlDeserializationContext context)
-		{
-			return new Uri (context.Reader.ReadString ());
-		}
+        
+        protected internal virtual void Initialize (Server server, Uri url)
+        {
+            // TODO better error message
+            if (url == null) throw new ArgumentNullException ("url");
+            if (RootDevice == null) throw new InvalidOperationException ("The RootDevice is null.");
+            
+            UrlBase = url;
+            // TODO clean this up, localize it
+            RootDevice.Initialize (server, this, new Uri (url, string.Format ("{0}/{1}/", RootDevice.Type.ToUrlString (), RootDevice.Udn.Substring (5))));
+        }
         
         [XmlTypeDeserializer]
         protected virtual Device DeserializeDevice (XmlDeserializationContext context)
@@ -84,14 +108,7 @@ namespace Mono.Upnp
         {
             if (context == null) throw new ArgumentNullException ("context");
             
-            if (context.Reader.LocalName == "specVersion" && context.Reader.NamespaceURI == Protocol.DeviceUrn) {
-                context.Reader.Read ();
-                var major = context.Reader.ReadElementContentAsInt ("major", Protocol.DeviceUrn);
-                var minor = context.Reader.ReadElementContentAsInt ("minor", Protocol.DeviceUrn);
-                SpecVersion = new Version (major, minor);
-            } else {
-                context.AutoDeserializeElement (this);
-            }
+            context.AutoDeserializeElement (this);
         }
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
@@ -104,15 +121,6 @@ namespace Mono.Upnp
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
             if (context == null) throw new ArgumentNullException ("context");
-            
-            context.Writer.WriteStartElement ("specVersion", Protocol.DeviceUrn);
-            context.Writer.WriteStartElement ("major", Protocol.DeviceUrn);
-            context.Writer.WriteValue (SpecVersion.Major);
-            context.Writer.WriteEndElement ();
-            context.Writer.WriteStartElement ("minor", Protocol.DeviceUrn);
-            context.Writer.WriteValue (SpecVersion.Minor);
-            context.Writer.WriteEndElement ();
-            context.Writer.WriteEndElement ();
             
             context.AutoSerializeMembersOnly (this);
         }

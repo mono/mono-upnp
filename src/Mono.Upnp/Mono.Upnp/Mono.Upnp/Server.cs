@@ -41,26 +41,23 @@ namespace Mono.Upnp
 {
     public class Server : IDisposable
     {
-        private readonly object mutex = new object ();
-        private Device root_device;
-        private DataServer description_server;
-        private SsdpServer ssdp_server;
-        private bool started;
+        readonly object mutex = new object ();
+        Root root;
+        DataServer description_server;
+        SsdpServer ssdp_server;
+        bool started;
         
         internal static readonly XmlSerializer Serializer = new XmlSerializer ();
-
-        public Server (Device rootDevice)
-            : this (rootDevice, null)
+        
+        public Server (Root root)
         {
+            if (root == null) throw new ArgumentNullException ("root");
+            
+            this.root = root;
         }
-
-        public Server (Device rootDevice, IEnumerable<Device> embeddedDevices)
-        {
-            if (rootDevice == null) {
-                throw new ArgumentNullException ("rootDevice");
-            }
-            root_device = rootDevice;
-            //rootDevice.Devices = embeddedDevices;
+        
+        public Root Root {
+            get { return root; }
         }
 
         public virtual void Start ()
@@ -69,14 +66,14 @@ namespace Mono.Upnp
                 if (started) {
                     throw new InvalidOperationException ("The server is already started.");
                 }
-                if (root_device == null) {
+                if (root == null) {
                     throw new ObjectDisposedException (ToString ());
                 }
 
                 if (description_server == null) {
                     Initialize ();
                 }
-                root_device.Start ();
+                root.RootDevice.Start ();
                 description_server.Start ();
                 ssdp_server.Start ();
                 started = true;
@@ -90,7 +87,7 @@ namespace Mono.Upnp
                     return;
                 }
                 ssdp_server.Stop ();
-                root_device.Stop ();
+                root.RootDevice.Stop ();
                 description_server.Stop ();
                 started = false;
             }
@@ -99,16 +96,16 @@ namespace Mono.Upnp
         protected virtual void Initialize ()
         {
             Uri url = MakeUrl ();
-            root_device.Initialize (url);
+            root.Initialize (this, url);
             //description_server = new DataServer (Serialize, new Uri (url, string.Format ("{0}/{1}/", root_device.Type.ToUrlString (), root_device.Udn)));
-            Announce (new Uri (url, string.Format ("{0}/{1}/", root_device.Type.ToUrlString (), root_device.Udn)));
+            Announce (new Uri (url, string.Format ("{0}/{1}/", root.RootDevice.Type.ToUrlString (), root.RootDevice.Udn)));
         }
 
         private void Announce (Uri url)
         {
             ssdp_server = new SsdpServer (url.ToString ());
-            ssdp_server.Announce ("upnp:rootdevice", root_device.Udn + "::upnp:rootdevice", false);
-            AnnounceDevice (root_device);
+            ssdp_server.Announce ("upnp:rootdevice", root.RootDevice.Udn + "::upnp:rootdevice", false);
+            AnnounceDevice (root.RootDevice);
         }
 
         private void AnnounceDevice (Device device)
@@ -170,7 +167,7 @@ namespace Mono.Upnp
         public void Dispose ()
         {
             lock (mutex) {
-                if (root_device != null) {
+                if (root != null) {
                     Dispose (true);
                     GC.SuppressFinalize (this);
                 }
@@ -182,7 +179,7 @@ namespace Mono.Upnp
             if (disposing) {
                 Stop ();
                 //root_device.Dispose ();
-                root_device = null;
+                root = null;
                 if (description_server != null) {
                     description_server.Dispose ();
                     ssdp_server.Dispose ();

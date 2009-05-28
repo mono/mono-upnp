@@ -1,5 +1,5 @@
 // 
-// DeviceDescriptionBase.cs
+// DummyServiceController.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,27 +24,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-
-using Mono.Upnp.Xml;
-
-namespace Mono.Upnp
+namespace Mono.Upnp.Control.Tests
 {
-    public abstract class DeviceDescriptionBase : DescriptionBase
+    public class DummyServiceController : ServiceController
     {
-        internal DeviceDescriptionBase ()
+        public DummyServiceController ()
+            : base (new object (), null, null)
         {
         }
         
-        internal DeviceDescriptionBase (Deserializer deserializer)
-            : base (deserializer)
+        protected override void Initialize (Server server, Service service)
         {
-        }
-        
-        [XmlTypeDeserializer]
-        protected virtual Uri DeserializeUri (XmlDeserializationContext context)
-        {
-            return Deserializer != null ? Deserializer.DeserializeUrl (context) : null;
         }
     }
 }

@@ -43,11 +43,11 @@ namespace Mono.Upnp
             this.deserializer = xmlDeserializer;
         }
         
-        protected XmlDeserializer XmlDeserializer {
+        public XmlDeserializer XmlDeserializer {
             get { return deserializer; }
         }
         
-        protected Root Root {
+        public Root Root {
             get { return root; }
         }
         

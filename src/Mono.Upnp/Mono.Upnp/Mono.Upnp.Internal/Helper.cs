@@ -38,8 +38,12 @@ namespace Mono.Upnp.Internal
     {
         public static IList<T> MakeReadOnlyCopy<T> (IEnumerable<T> items)
         {
+            var array = items as T[];
             if (items == null) {
-                return Array.AsReadOnly (new T[0]);
+                array = new T[0];
+            }
+            if (array != null) {
+                return Array.AsReadOnly (array);
             } else {
                 var list = items as List<T>;
                 if (list == null) {

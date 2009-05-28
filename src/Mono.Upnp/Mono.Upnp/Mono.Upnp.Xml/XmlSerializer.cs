@@ -229,6 +229,14 @@ namespace Mono.Upnp.Xml
                 XmlArrayItemAttribute array_item_attribute = null;
                 
                 foreach (var custom_attribute in property.GetCustomAttributes (false)) {
+                    if (custom_attribute is DoNotSerializeAttribute) {
+                        attribute_attribute = null;
+                        element_attribute = null;
+                        flag_attribute = null;
+                        array_attribute = null;
+                        break;
+                    }
+                    
                     var attribute = custom_attribute as XmlAttributeAttribute;
                     if(attribute != null) {
                         attribute_attribute = attribute;

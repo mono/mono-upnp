@@ -35,12 +35,15 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Control
 {
     [XmlType ("scdp", Protocol.ServiceUrn)]
-    public class ServiceController : DescriptionBase, IXmlDeserializable
+    public class ServiceController : Description, IXmlDeserializable
     {
         readonly Map<string, ServiceAction> actions;
         readonly Map<string, StateVariable> state_variables;
         readonly Service service;
         readonly object service_object;
+        DataServer scpd_server;
+        ControlServer control_server;
+        EventServer event_server;
         ControlClient soap_adapter;
         EventClient event_subscriber;
         int events_ref_count;
@@ -90,6 +93,14 @@ namespace Mono.Upnp.Control
         
         public IDictionary<string, StateVariable> StateVariables {
             get { return state_variables; }
+        }
+        
+        protected internal virtual void Initialize (Server server, Service service)
+        {
+            if (service == null) throw new ArgumentNullException ("service");
+            
+            control_server = new ControlServer (this, service.ControlUrl);
+            event_server = new EventServer (this, service.EventUrl);
         }
         
         [XmlTypeDeserializer]

@@ -1,5 +1,5 @@
 // 
-// DescriptionBase.cs
+// Description.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -30,24 +30,32 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
 {
-    public abstract class DescriptionBase : XmlAutomatable
+    public abstract class Description : XmlAutomatable
     {
         readonly Deserializer deserializer;
         bool is_disposed;
         
-        internal DescriptionBase ()
+        internal Description ()
         {
         }
         
-        internal DescriptionBase (Deserializer deserializer)
+        internal Description (Deserializer deserializer)
         {
             if (deserializer == null) throw new ArgumentNullException ("deserializer");
             
             this.deserializer = deserializer;
+            Root = deserializer.Root;
         }
         
         internal Deserializer Deserializer {
             get { return deserializer; }
+        }
+        
+        internal Root Root { get; private set; }
+        
+        internal void Initialize (Root root)
+        {
+            Root = root;
         }
         
         public bool IsDisposed {
@@ -70,6 +78,28 @@ namespace Mono.Upnp
                 } else {
                     disposed -= value;
                 }
+            }
+        }
+        
+        internal Uri ExpandUrl (string urlFragment)
+        {
+            if (Uri.IsWellFormedUriString (urlFragment, UriKind.Absolute)) {
+                return new Uri (urlFragment);
+            } else if (Uri.IsWellFormedUriString (urlFragment, UriKind.Relative)) {
+                // TODO handle NREs
+                return new Uri (deserializer.Root.UrlBase, urlFragment);
+            } else {
+                throw new UpnpDeserializationException ("The URL is neither absolute nor relative: " + urlFragment);
+            }
+        }
+        
+        internal string CollapseUrl (Uri url)
+        {
+            if (Root.UrlBase.IsBaseOf (url)) {
+                return Root.UrlBase.MakeRelativeUri (url).ToString ();
+            } else {
+                // TODO throw
+                return url.ToString ();
             }
         }
     }
