@@ -51,6 +51,7 @@
     <Compile Include="DummyService.cs" />
     <Compile Include="DummyServiceController.cs" />
     <Compile Include="DummyRoot.cs" />
+    <Compile Include="DeviceDescriptionTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

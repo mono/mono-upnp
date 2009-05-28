@@ -31,7 +31,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Tests
 {
-    [TestFixture()]
+    [TestFixture]
     public class DeviceDescriptionDeserializationTests
     {
         readonly DummyDeserializer deserializer = new DummyDeserializer (new XmlDeserializer ());
@@ -56,34 +56,37 @@ namespace Mono.Upnp.Tests
             Assert.AreEqual ("12345", root.RootDevice.SerialNumber);
             Assert.AreEqual ("uuid:fd1", root.RootDevice.Udn);
             Assert.AreEqual ("67890", root.RootDevice.Upc);
+            Assert.IsNotNull (root.RootDevice.Icons);
             var icons = root.RootDevice.Icons.GetEnumerator ();
             Assert.IsTrue (icons.MoveNext ());
             Assert.AreEqual ("image/png", icons.Current.MimeType);
             Assert.AreEqual (100, icons.Current.Width);
             Assert.AreEqual (100, icons.Current.Height);
             Assert.AreEqual (32, icons.Current.Depth);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/icons/0/"), icons.Current.Url);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/icons/0/"), icons.Current.Url);
             Assert.IsTrue (icons.MoveNext ());
             Assert.AreEqual ("image/jpeg", icons.Current.MimeType);
             Assert.AreEqual (100, icons.Current.Width);
             Assert.AreEqual (100, icons.Current.Height);
             Assert.AreEqual (32, icons.Current.Depth);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/icons/1/"), icons.Current.Url);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/icons/1/"), icons.Current.Url);
             Assert.IsFalse (icons.MoveNext ());
+            Assert.IsNotNull (root.RootDevice.Services);
             var services = root.RootDevice.Services.GetEnumerator ();
             Assert.IsTrue (services.MoveNext ());
             Assert.AreEqual (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), services.Current.Type);
             Assert.AreEqual ("urn:upnp-org:serviceId:testService1", services.Current.Id);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/1/testService1/scpd/"), services.Current.ScpdUrl);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/1/testService1/control/"), services.Current.ControlUrl);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/1/testService1/event/"), services.Current.EventUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/1/testService1/scpd/"), services.Current.ScpdUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/1/testService1/control/"), services.Current.ControlUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/1/testService1/event/"), services.Current.EventUrl);
             Assert.IsTrue (services.MoveNext ());
             Assert.AreEqual (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), services.Current.Type);
             Assert.AreEqual ("urn:upnp-org:serviceId:testService2", services.Current.Id);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/2/testService2/scpd/"), services.Current.ScpdUrl);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/2/testService2/control/"), services.Current.ControlUrl);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/2/testService2/event/"), services.Current.EventUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/2/testService2/scpd/"), services.Current.ScpdUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/2/testService2/control/"), services.Current.ControlUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/2/testService2/event/"), services.Current.EventUrl);
             Assert.IsFalse (services.MoveNext ());
+            Assert.IsNotNull (root.RootDevice.Devices);
             var devices = root.RootDevice.Devices.GetEnumerator ();
             Assert.IsTrue (devices.MoveNext ());
             Assert.AreEqual (new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-embedded-device:1"), devices.Current.Type);
@@ -97,34 +100,39 @@ namespace Mono.Upnp.Tests
             Assert.AreEqual ("12345", devices.Current.SerialNumber);
             Assert.AreEqual ("uuid:fed1", devices.Current.Udn);
             Assert.AreEqual ("67890", devices.Current.Upc);
+            Assert.IsNotNull (devices.Current.Icons);
             icons = devices.Current.Icons.GetEnumerator ();
             Assert.IsTrue (icons.MoveNext ());
             Assert.AreEqual ("image/png", icons.Current.MimeType);
             Assert.AreEqual (100, icons.Current.Width);
             Assert.AreEqual (100, icons.Current.Height);
             Assert.AreEqual (32, icons.Current.Depth);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/icons/0/"), icons.Current.Url);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/icons/0/"), icons.Current.Url);
             Assert.IsTrue (icons.MoveNext ());
             Assert.AreEqual ("image/jpeg", icons.Current.MimeType);
             Assert.AreEqual (100, icons.Current.Width);
             Assert.AreEqual (100, icons.Current.Height);
             Assert.AreEqual (32, icons.Current.Depth);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/icons/1/"), icons.Current.Url);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/icons/1/"), icons.Current.Url);
             Assert.IsFalse (icons.MoveNext ());
+            Assert.IsNotNull (devices.Current.Services);
             services = devices.Current.Services.GetEnumerator ();
             Assert.IsTrue (services.MoveNext ());
             Assert.AreEqual (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), services.Current.Type);
             Assert.AreEqual ("urn:upnp-org:serviceId:testService1", services.Current.Id);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/1/testService1/scpd/"), services.Current.ScpdUrl);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/1/testService1/control/"), services.Current.ControlUrl);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/1/testService1/event/"), services.Current.EventUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/1/testService1/scpd/"), services.Current.ScpdUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/1/testService1/control/"), services.Current.ControlUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/1/testService1/event/"), services.Current.EventUrl);
             Assert.IsTrue (services.MoveNext ());
             Assert.AreEqual (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), services.Current.Type);
             Assert.AreEqual ("urn:upnp-org:serviceId:testService2", services.Current.Id);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/2/testService2/scpd/"), services.Current.ScpdUrl);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/2/testService2/control/"), services.Current.ControlUrl);
-            Assert.AreEqual (new Uri ("http://localhost/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/2/testService2/event/"), services.Current.EventUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/2/testService2/scpd/"), services.Current.ScpdUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/2/testService2/control/"), services.Current.ControlUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/2/testService2/event/"), services.Current.EventUrl);
             Assert.IsFalse (services.MoveNext ());
+            Assert.IsNotNull (devices.Current.Devices);
+            var empty_devices = devices.Current.Devices.GetEnumerator ();
+            Assert.IsFalse (empty_devices.MoveNext ());
             Assert.IsFalse (devices.MoveNext ());
         }
     }

@@ -44,7 +44,7 @@ namespace Mono.Upnp.Tests
             using (var string_reader = new StringReader (xml)) {
                 using (var xml_reader = XmlReader.Create (string_reader)) {
                     xml_reader.ReadToFollowing ("root");
-                    return XmlDeserializer.Deserialize (xml_reader, context => DeserializeRoot (new Uri ("http://localhost/"), context));
+                    return XmlDeserializer.Deserialize (xml_reader, context => DeserializeRoot (new Uri ("http://localhost:8080/"), context));
                 }
             }
         }
