@@ -88,7 +88,7 @@ namespace Mono.Upnp
             
             UrlBase = url;
             // TODO clean this up, localize it
-            RootDevice.Initialize (server, this, new Uri (url, string.Format ("{0}/{1}/", RootDevice.Type.ToUrlString (), RootDevice.Udn.Substring (5))));
+            RootDevice.Initialize (server, this, url);
         }
         
         [XmlTypeDeserializer]

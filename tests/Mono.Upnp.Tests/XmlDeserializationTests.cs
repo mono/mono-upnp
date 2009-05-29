@@ -726,5 +726,26 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual ("bat", deserialized_object.Bat);
             Assert.AreEqual ("baz", deserialized_object.Baz);
         }
+        
+        enum EnumTestEnum
+        {
+            [XmlEnum ("foo")] Foo,
+            [XmlEnum ("bar")] Bar,
+            [XmlEnum ("bat")] Bat
+        }
+        
+        class EnumTestClass
+        {
+            [XmlAttribute] public EnumTestEnum Thing { get; set; }
+            [XmlElement] public EnumTestEnum Doohicky { get; set; }
+        }
+        
+        [Test]
+        public void EnumTest ()
+        {
+            var deserialized_object = Deserialize<EnumTestClass> (@"<Test Thing=""bar""><Doohicky>bat</Doohicky></Test>");
+            Assert.AreEqual (EnumTestEnum.Bar, deserialized_object.Thing);
+            Assert.AreEqual (EnumTestEnum.Bat, deserialized_object.Doohicky);
+        }
     }
 }

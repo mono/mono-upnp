@@ -43,9 +43,9 @@ namespace Mono.Upnp.Control
         readonly object service_object;
         DataServer scpd_server;
         ControlServer control_server;
+        ControlClient control_client;
         EventServer event_server;
-        ControlClient soap_adapter;
-        EventClient event_subscriber;
+        EventClient event_client;
         int events_ref_count;
 
         protected internal ServiceController (Deserializer deserializer, Service service)
@@ -61,6 +61,7 @@ namespace Mono.Upnp.Control
             
             this.actions = Helper.MakeReadOnlyCopy<string, ServiceAction> (actions, ServiceActionMapper);
             this.state_variables = Helper.MakeReadOnlyCopy<string, StateVariable> (state_variables, StateVariableMapper);
+            SpecVersion = new SpecVersion (1, 1);
         }
         
         static string ServiceActionMapper (ServiceAction serviceAction)
@@ -77,21 +78,27 @@ namespace Mono.Upnp.Control
             get { return service; }
         }
         
-        [XmlArray ("actionList")]
-        protected ICollection<ServiceAction> ActionCollection {
+        [XmlAttribute ("configId")]
+        protected internal virtual string ConfigurationId { get; set; }
+        
+        [XmlElement ("specVersion", Protocol.ServiceUrn)]
+        public virtual SpecVersion SpecVersion { get; protected set; }
+        
+        [XmlArray ("actionList", Protocol.ServiceUrn)]
+        protected virtual ICollection<ServiceAction> ActionCollection {
             get { return actions; }
         }
         
-        public IDictionary<string, ServiceAction> Actions {
+        public IMap<string, ServiceAction> Actions {
             get { return actions; }
         }
         
-        [XmlArray ("serviceStateTable")]
+        [XmlArray ("serviceStateTable", Protocol.ServiceUrn)]
         protected ICollection<StateVariable> StateVariablesCollection {
             get { return state_variables; }
         }
         
-        public IDictionary<string, StateVariable> StateVariables {
+        public IMap<string, StateVariable> StateVariables {
             get { return state_variables; }
         }
         

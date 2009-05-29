@@ -33,7 +33,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    [XmlType ("argument")]
+    [XmlType ("argument", Protocol.ServiceUrn)]
     public class Argument : XmlAutomatable
     {
         readonly ServiceAction action;
@@ -49,16 +49,16 @@ namespace Mono.Upnp.Control
             get { return action; }
         }
 
-        [XmlElement ("name")]
+        [XmlElement ("name", Protocol.ServiceUrn)]
         public virtual string Name { get; protected set; }
         
-        [XmlElement ("relatedStateVariable")]
+        [XmlElement ("relatedStateVariable", Protocol.ServiceUrn)]
         public virtual string RelatedStateVariableName { get; protected set; }
         
-        [XmlFlag ("retval")]
+        [XmlFlag ("retval", Protocol.ServiceUrn)]
         public virtual bool IsReturnValue { get; protected set; }
 
-        [XmlElement ("direction")]
+        [XmlElement ("direction", Protocol.ServiceUrn)]
         public virtual ArgumentDirection Direction { get; protected set; }
         
         protected override void DeserializeElement (XmlDeserializationContext context)

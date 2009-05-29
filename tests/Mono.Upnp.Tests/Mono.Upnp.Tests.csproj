@@ -45,13 +45,14 @@
     <Compile Include="XmlDeserializationTests.cs" />
     <Compile Include="DummyDeserializer.cs" />
     <Compile Include="DeviceDescriptionDeserializationTests.cs" />
-    <Compile Include="DeviceDescriptions.cs" />
+    <Compile Include="Xml.cs" />
     <Compile Include="DeviceDescriptionSerializationTests.cs" />
     <Compile Include="DummyIcon.cs" />
     <Compile Include="DummyService.cs" />
     <Compile Include="DummyServiceController.cs" />
     <Compile Include="DummyRoot.cs" />
     <Compile Include="DeviceDescriptionTests.cs" />
+    <Compile Include="ServiceDescriptionDeserializationTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

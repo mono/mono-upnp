@@ -88,7 +88,7 @@ namespace Mono.Upnp.Tests
                 }
             );
             root.Initialize ();
-            Assert.AreEqual (DeviceDescriptions.FullDescription, serializer.GetString<Root> (root));
+            Assert.AreEqual (Xml.FullDeviceDescription, serializer.GetString<Root> (root));
         }
     }
 }

@@ -1,5 +1,5 @@
 // 
-// SpecVersion.cs
+// IMap.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,28 +24,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using Mono.Upnp.Internal;
-using Mono.Upnp.Xml;
+using System.Collections.Generic;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.Control
 {
-    [XmlType ("specVersion", Protocol.DeviceUrn)]
-    public class SpecVersion
+    public interface IMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
-        protected SpecVersion ()
-        {
-        }
-        
-        protected internal SpecVersion (int major, int minor)
-        {
-            Major = major;
-            Minor = minor;
-        }
-        
-        [XmlElement ("major", Protocol.DeviceUrn)]
-        public virtual int Major { get; protected set; }
-        
-        [XmlElement ("minor", Protocol.DeviceUrn)]
-        public virtual int Minor { get; protected set; }
+        int Count { get; }
+        bool ContainsKey (TKey key);
+        TValue this[TKey key] { get; }
+        IEnumerable<TKey> Keys { get; }
+        IEnumerable<TValue> Values { get; }
     }
 }

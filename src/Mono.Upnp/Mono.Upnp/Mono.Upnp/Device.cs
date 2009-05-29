@@ -157,16 +157,16 @@ namespace Mono.Upnp
             if (Deserializer != null) throw new InvalidOperationException ("The device was constructed for deserialization and cannot be initalized. Use one of the other constructors.");
             
             // TODO clean up these url generations
-            foreach (var device in devices) {
-                device.Initialize (server, root, new Uri (deviceUrl, string.Format ("{0}/{1}/", device.Type.ToUrlString (), device.Udn.Substring (5))));
+            for (var i = 0; i < devices.Count; i++) {
+                devices[i].Initialize (server, root, new Uri (deviceUrl, string.Format ("device/{0}/", i)));
             }
             
-            foreach (var service in services) {
-                service.Initialize (server, root, new Uri (deviceUrl, string.Format ("{0}/{1}/", service.Type.ToUrlString (), service.Id.Substring (23))));
+            for (var i = 0; i < services.Count; i++) {
+                services[i].Initialize (server, root, new Uri (deviceUrl, string.Format ("service/{0}/", i)));
             }
             
             if (icons.Count > 0) {
-                var icons_url = new Uri (deviceUrl, "icons/");
+                var icons_url = new Uri (deviceUrl, "icon/");
                 for (var i = 0; i < icons.Count; i++) {
                     icons[i].Initialize (root, new Uri (icons_url, string.Format ("{0}/", i)));
                 }

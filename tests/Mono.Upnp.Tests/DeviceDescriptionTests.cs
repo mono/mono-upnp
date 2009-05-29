@@ -35,7 +35,7 @@ namespace Mono.Upnp.Tests
     public class DeviceDescriptionTests
     {
         readonly XmlSerializer serializer = new XmlSerializer ();
-        readonly DummyDeserializer deserializer = new DummyDeserializer (new XmlDeserializer ());
+        readonly DummyDeserializer deserializer = new DummyDeserializer ();
         
         void AssertEquality (Root sourceRoot, Root targetRoot)
         {

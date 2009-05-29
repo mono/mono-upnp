@@ -113,11 +113,7 @@ namespace Mono.Upnp
                 if (IsDisposed) {
                     throw new ObjectDisposedException (ToString (), "The service has gone off the network.");
                 }
-                if (ScpdUrl == null) {
-                    throw new InvalidOperationException (
-                        "Attempting to get a controller from a services with no SCPDURL.");
-                }
-                //controller = deserializer.DeserializeController (this);
+                controller = Deserializer.GetServiceController (this);
             }
             
             return controller;

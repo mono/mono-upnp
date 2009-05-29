@@ -1,5 +1,5 @@
 // 
-// SpecVersion.cs
+// XmlNamespace.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,28 +24,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using Mono.Upnp.Internal;
-using Mono.Upnp.Xml;
+using System;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.Xml
 {
-    [XmlType ("specVersion", Protocol.DeviceUrn)]
-    public class SpecVersion
+    [AttributeUsage (AttributeTargets.Class | AttributeTargets.Property)]
+    public sealed class XmlNamespaceAttribute : Attribute
     {
-        protected SpecVersion ()
+        readonly string @namespace;
+        readonly string prefix;
+        
+        public XmlNamespaceAttribute (string @namespace, string prefix)
         {
+            this.@namespace = @namespace;
+            this.prefix = prefix;
         }
         
-        protected internal SpecVersion (int major, int minor)
-        {
-            Major = major;
-            Minor = minor;
+        public string Namespace {
+            get { return @namespace; }
         }
         
-        [XmlElement ("major", Protocol.DeviceUrn)]
-        public virtual int Major { get; protected set; }
-        
-        [XmlElement ("minor", Protocol.DeviceUrn)]
-        public virtual int Minor { get; protected set; }
+        public string Prefix {
+            get { return prefix; }
+        }
     }
 }

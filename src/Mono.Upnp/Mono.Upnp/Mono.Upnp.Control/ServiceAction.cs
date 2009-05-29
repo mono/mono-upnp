@@ -34,7 +34,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    [XmlType ("action")]
+    [XmlType ("action", Protocol.ServiceUrn)]
     public class ServiceAction : XmlAutomatable
     {
         readonly static Dictionary<string, string> emptyArguments = new Dictionary<string, string> ();
@@ -68,15 +68,15 @@ namespace Mono.Upnp.Control
             return argument.Name;
         }
 
-        [XmlElement ("name")]
+        [XmlElement ("name", Protocol.ServiceUrn)]
         public virtual string Name { get; protected set; }
         
-        [XmlArray ("argumentList")]
+        [XmlArray ("argumentList", Protocol.ServiceUrn)]
         protected virtual ICollection<Argument> ArgumentList {
             get { return arguments; }
         }
         
-        public IDictionary<string, Argument> Arguments {
+        public IMap<string, Argument> Arguments {
             get { return arguments; }
         }
         

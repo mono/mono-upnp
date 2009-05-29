@@ -34,11 +34,12 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    [XmlType ("stateVariable")]
+    [XmlType ("stateVariable", Protocol.ServiceUrn)]
     public class StateVariable : XmlAutomatable
     {
         readonly ServiceController controller;
-        event EventHandler<StateVariableChangedArgs<string>> changed;
+        readonly IList<string> allowed_values = new List<string> ();
+        //event EventHandler<StateVariableChangedArgs<string>> changed;
 
         protected internal StateVariable (ServiceController service)
         {
@@ -51,28 +52,35 @@ namespace Mono.Upnp.Control
             get { return controller; }
         }
         
-        [XmlElement ("name")]
+        [XmlElement ("name", Protocol.ServiceUrn)]
         public virtual string Name { get; protected set; }
 
-        [XmlElement ("dataType")]
+        [XmlElement ("dataType", Protocol.ServiceUrn)]
         public virtual string DataType { get; protected set; }
 
         public Type Type { get; private set; }
 
-        [XmlAttribute ("sendEvents")]
+        [XmlAttribute ("sendEvents", Protocol.ServiceUrn)]
         public virtual bool CanSendEvents { get; protected set; }
         
-        [XmlAttribute ("multicast")]
+        [XmlAttribute ("multicast", Protocol.ServiceUrn)]
         public virtual bool IsMulticast { get; protected set; }
 
-        [XmlElement ("defaultValue")]
+        [XmlElement ("defaultValue", Protocol.ServiceUrn)]
         public virtual string DefaultValue { get; protected set; }
 
-        [XmlElement ("allowedValueList")]
-        public virtual ICollection<string> AllowedValues { get; private set; }
+        [XmlArray ("allowedValueList", Protocol.ServiceUrn)]
+        [XmlArrayItem ("allowedValue", Protocol.ServiceUrn)]
+        protected virtual ICollection<string> AllowedValueCollection {
+            get { return allowed_values; }
+        }
+        
+        public IEnumerable<string> AllowedValues {
+            get { return allowed_values; }
+        }
 
-        [XmlElement ("allowedValueRange")]
-        public virtual AllowedValueRange AllowedValueRange { get; private set; }
+        [XmlElement ("allowedValueRange", Protocol.ServiceUrn)]
+        public virtual AllowedValueRange AllowedValueRange { get; protected set; }
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)
         {

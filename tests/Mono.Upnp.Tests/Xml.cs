@@ -1,5 +1,5 @@
 // 
-// DeviceDescriptions.cs
+// Xml.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -26,9 +26,9 @@
 
 namespace Mono.Upnp.Tests
 {
-    public static class DeviceDescriptions
+    public static class Xml
     {
-        public const string FullDescription =
+        public const string FullDeviceDescription =
            @"<?xml version=""1.0"" encoding=""utf-16""?>" +
            @"<root configId=""1"" xmlns=""urn:schemas-upnp-org:device-1-0"">" +
                 "<specVersion>" +
@@ -53,30 +53,30 @@ namespace Mono.Upnp.Tests
                             "<width>100</width>" +
                             "<height>100</height>" +
                             "<depth>32</depth>" +
-                            "<url>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/icons/0/</url>" +
+                            "<url>icon/0/</url>" +
                         "</icon>" +
                         "<icon>" +
                             "<mimetype>image/jpeg</mimetype>" +
                             "<width>100</width>" +
                             "<height>100</height>" +
                             "<depth>32</depth>" +
-                            "<url>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/icons/1/</url>" +
+                            "<url>icon/1/</url>" +
                         "</icon>" +
                     "</iconList>" +
                     "<serviceList>" +
                         "<service>" +
                             "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:1</serviceType>" +
                             "<serviceId>urn:upnp-org:serviceId:testService1</serviceId>" +
-                            "<SCPDURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/1/testService1/scpd/</SCPDURL>" +
-                            "<controlURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/1/testService1/control/</controlURL>" +
-                            "<eventSubURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/1/testService1/event/</eventSubURL>" +
+                            "<SCPDURL>service/0/scpd/</SCPDURL>" +
+                            "<controlURL>service/0/control/</controlURL>" +
+                            "<eventSubURL>service/0/event/</eventSubURL>" +
                         "</service>" +
                         "<service>" +
                             "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:2</serviceType>" +
                             "<serviceId>urn:upnp-org:serviceId:testService2</serviceId>" +
-                            "<SCPDURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/2/testService2/scpd/</SCPDURL>" +
-                            "<controlURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/2/testService2/control/</controlURL>" +
-                            "<eventSubURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-test-service/2/testService2/event/</eventSubURL>" +
+                            "<SCPDURL>service/1/scpd/</SCPDURL>" +
+                            "<controlURL>service/1/control/</controlURL>" +
+                            "<eventSubURL>service/1/event/</eventSubURL>" +
                         "</service>" +
                     "</serviceList>" +
                     "<deviceList>" +
@@ -98,35 +98,39 @@ namespace Mono.Upnp.Tests
                                     "<width>100</width>" +
                                     "<height>100</height>" +
                                     "<depth>32</depth>" +
-                                    "<url>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/icons/0/</url>" +
+                                    "<url>device/0/icon/0/</url>" +
                                 "</icon>" +
                                 "<icon>" +
                                     "<mimetype>image/jpeg</mimetype>" +
                                     "<width>100</width>" +
                                     "<height>100</height>" +
                                     "<depth>32</depth>" +
-                                    "<url>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/icons/1/</url>" +
+                                    "<url>device/0/icon/1/</url>" +
                                 "</icon>" +
                             "</iconList>" +
                             "<serviceList>" +
                                 "<service>" +
                                     "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:1</serviceType>" +
                                     "<serviceId>urn:upnp-org:serviceId:testService1</serviceId>" +
-                                    "<SCPDURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/1/testService1/scpd/</SCPDURL>" +
-                                    "<controlURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/1/testService1/control/</controlURL>" +
-                                    "<eventSubURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/1/testService1/event/</eventSubURL>" +
+                                    "<SCPDURL>device/0/service/0/scpd/</SCPDURL>" +
+                                    "<controlURL>device/0/service/0/control/</controlURL>" +
+                                    "<eventSubURL>device/0/service/0/event/</eventSubURL>" +
                                 "</service>" +
                                 "<service>" +
                                     "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:2</serviceType>" +
                                     "<serviceId>urn:upnp-org:serviceId:testService2</serviceId>" +
-                                    "<SCPDURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/2/testService2/scpd/</SCPDURL>" +
-                                    "<controlURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/2/testService2/control/</controlURL>" +
-                                    "<eventSubURL>schemas-upnp-org/mono-upnp-tests-full-device/1/fd1/schemas-upnp-org/mono-upnp-tests-full-embedded-device/1/fed1/schemas-upnp-org/mono-upnp-test-service/2/testService2/event/</eventSubURL>" +
+                                    "<SCPDURL>device/0/service/1/scpd/</SCPDURL>" +
+                                    "<controlURL>device/0/service/1/control/</controlURL>" +
+                                    "<eventSubURL>device/0/service/1/event/</eventSubURL>" +
                                 "</service>" +
                             "</serviceList>" +
                         "</device>" +
                     "</deviceList>" +
                 "</device>" +
             "</root>";
+        
+        public const string FullScpd =
+           @"<?xml version=""1.0"" encoding=""utf-16""?>" +
+           @"<scpd configId=""1"" xmlns=""urn:schemas-upnp-org:service-1-0"">" +
     }
 }

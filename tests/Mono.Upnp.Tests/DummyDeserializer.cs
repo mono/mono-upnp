@@ -28,14 +28,15 @@ using System;
 using System.IO;
 using System.Xml;
 
+using Mono.Upnp.Control;
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Tests
 {
     public class DummyDeserializer : Deserializer
     {
-        public DummyDeserializer (XmlDeserializer xmlDeserializer)
-            : base (xmlDeserializer)
+        public DummyDeserializer ()
+            : base (new XmlDeserializer ())
         {
         }
         
@@ -45,6 +46,17 @@ namespace Mono.Upnp.Tests
                 using (var xml_reader = XmlReader.Create (string_reader)) {
                     xml_reader.ReadToFollowing ("root");
                     return XmlDeserializer.Deserialize (xml_reader, context => DeserializeRoot (new Uri ("http://localhost:8080/"), context));
+                }
+            }
+        }
+        
+        public ServiceController DeserializeServiceController (string xml)
+        {
+            using (var string_reader = new StringReader (xml)) {
+                using (var xml_reader = XmlReader.Create (string_reader)) {
+                    xml_reader.ReadToFollowing ("scpd");
+                    return XmlDeserializer.Deserialize (xml_reader, context => DeserializeServiceController (
+                        new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "testService1"), context));
                 }
             }
         }

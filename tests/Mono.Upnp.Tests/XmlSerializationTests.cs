@@ -608,5 +608,41 @@ namespace Mono.Upnp.Xml.Tests
                 serializer.GetString (new DoNotSerializeTestClass { Foo = "foo", Bar = "bar", Bat = "bat", Baz = "baz" })
             );
         }
+        
+        enum EnumTestEnum
+        {
+            [XmlEnum ("foo")] Foo,
+            [XmlEnum ("bar")] Bar,
+            [XmlEnum ("bat")] Bat
+        }
+        
+        class EnumTestClass
+        {
+            [XmlAttribute] public EnumTestEnum Thing { get; set; }
+            [XmlElement] public EnumTestEnum Doohicky { get; set; }
+        }
+        
+        [Test]
+        public void EnumTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-16""?><EnumTestClass Thing=""bar""><Doohicky>bat</Doohicky></EnumTestClass>",
+                serializer.GetString (new EnumTestClass { Thing = EnumTestEnum.Bar, Doohicky = EnumTestEnum.Bat })
+            );
+        }
+        
+        [XmlNamespace ("udn:mono-upnp:tests", "test")]
+        class NamespaceTestClass
+        {
+            [XmlElement (Namespace = "udn:mono-upnp:tests")] public string Foo { get; set; }
+        }
+        
+        [Test]
+        public void NamespaceTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-16""?><NamespaceTestClass xmlns:test=""udn:mono-upnp:tests""><test:Foo>bar</test:Foo></NamespaceTestClass>",
+                serializer.GetString (new NamespaceTestClass { Foo = "bar" }));
+        }
     }
 }

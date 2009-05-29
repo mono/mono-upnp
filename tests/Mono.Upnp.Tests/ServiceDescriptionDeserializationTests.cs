@@ -1,5 +1,5 @@
 // 
-// SpecVersion.cs
+// ServiceDescriptionDeserializationTests.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,28 +24,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using Mono.Upnp.Internal;
-using Mono.Upnp.Xml;
+using System;
+using NUnit.Framework;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.Tests
 {
-    [XmlType ("specVersion", Protocol.DeviceUrn)]
-    public class SpecVersion
+    [TestFixture]
+    public class ServiceDescriptionDeserializationTests
     {
-        protected SpecVersion ()
+        readonly DummyDeserializer deserializer = new DummyDeserializer ();
+        
+        [Test]
+        public void TestCase()
         {
         }
-        
-        protected internal SpecVersion (int major, int minor)
-        {
-            Major = major;
-            Minor = minor;
-        }
-        
-        [XmlElement ("major", Protocol.DeviceUrn)]
-        public virtual int Major { get; protected set; }
-        
-        [XmlElement ("minor", Protocol.DeviceUrn)]
-        public virtual int Minor { get; protected set; }
     }
 }

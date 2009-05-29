@@ -99,6 +99,8 @@
     <Compile Include="Mono.Upnp\SpecVersion.cs" />
     <Compile Include="Mono.Upnp.Xml\DoNotDeserializeAttribute.cs" />
     <Compile Include="Mono.Upnp.Xml\DoNotSerializeAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\IMap.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlNamespaceAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
