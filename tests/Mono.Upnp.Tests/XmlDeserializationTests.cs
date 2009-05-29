@@ -704,7 +704,6 @@ namespace Mono.Upnp.Xml.Tests
         {
             var deserialized_object = Deserialize<NonPublicConstructorContainerClass> (
                 @"<Test><Child Foo=""bar""/></Test>");
-            Assert.IsNotNull (deserialized_object.Child);
             Assert.AreEqual ("bar", deserialized_object.Child.Foo);
         }
         

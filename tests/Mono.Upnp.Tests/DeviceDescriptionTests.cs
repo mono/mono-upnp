@@ -39,12 +39,9 @@ namespace Mono.Upnp.Tests
         
         void AssertEquality (Root sourceRoot, Root targetRoot)
         {
-            Assert.IsNotNull (targetRoot.SpecVersion);
             Assert.AreEqual (sourceRoot.SpecVersion.Major, targetRoot.SpecVersion.Major);
             Assert.AreEqual (sourceRoot.SpecVersion.Minor, targetRoot.SpecVersion.Minor);
-            Assert.IsNotNull (targetRoot.UrlBase);
             Assert.AreEqual (sourceRoot.UrlBase, targetRoot.UrlBase);
-            Assert.IsNotNull (targetRoot.RootDevice);
             AssertEquality (sourceRoot.RootDevice, targetRoot.RootDevice);
         }
         
@@ -61,7 +58,6 @@ namespace Mono.Upnp.Tests
             Assert.AreEqual (sourceDevice.SerialNumber, targetDevice.SerialNumber);
             Assert.AreEqual (sourceDevice.Udn, targetDevice.Udn);
             Assert.AreEqual (sourceDevice.Upc, targetDevice.Upc);
-            Assert.IsNotNull (targetDevice.Icons);
             var source_icons = sourceDevice.Icons.GetEnumerator ();
             var target_icons = targetDevice.Icons.GetEnumerator ();
             while (source_icons.MoveNext ()) {
@@ -69,7 +65,6 @@ namespace Mono.Upnp.Tests
                 AssertEquality (source_icons.Current, target_icons.Current);
             }
             Assert.IsFalse (target_icons.MoveNext ());
-            Assert.IsNotNull (targetDevice.Services);
             var source_services = sourceDevice.Services.GetEnumerator ();
             var target_services = targetDevice.Services.GetEnumerator ();
             while (source_services.MoveNext ()) {
@@ -77,7 +72,6 @@ namespace Mono.Upnp.Tests
                 AssertEquality (source_services.Current, target_services.Current);
             }
             Assert.IsFalse (target_services.MoveNext ());
-            Assert.IsNotNull (targetDevice.Devices);
             var source_devices = sourceDevice.Devices.GetEnumerator ();
             var target_devices = targetDevice.Devices.GetEnumerator ();
             while (source_devices.MoveNext ()) {
@@ -157,6 +151,151 @@ namespace Mono.Upnp.Tests
             source_root.Initialize ();
             var target_root = deserializer.DeserializeRoot (serializer.GetString<Root> (source_root));
             AssertEquality (source_root, target_root);
+        }
+        
+        [Test]
+        public void FullDescriptionDeserializationTest ()
+        {
+            var root = deserializer.DeserializeRoot (Xml.FullDeviceDescription);
+            Assert.AreEqual ("1", root.ConfigurationId);
+            Assert.AreEqual (1, root.SpecVersion.Major);
+            Assert.AreEqual (1, root.SpecVersion.Minor);
+            Assert.AreEqual (new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-device:1"), root.RootDevice.Type);
+            Assert.AreEqual ("Mono.Upnp.Tests Full Device", root.RootDevice.FriendlyName);
+            Assert.AreEqual ("Mono Project", root.RootDevice.Manufacturer);
+            Assert.AreEqual (new Uri ("http://www.mono-project.org/"), root.RootDevice.ManufacturerUrl);
+            Assert.AreEqual ("A device description with all optional information.", root.RootDevice.ModelDescription);
+            Assert.AreEqual ("Full Device", root.RootDevice.ModelName);
+            Assert.AreEqual ("1", root.RootDevice.ModelNumber);
+            Assert.AreEqual (new Uri ("http://www.mono-project.org/Mono.Upnp/"), root.RootDevice.ModelUrl);
+            Assert.AreEqual ("12345", root.RootDevice.SerialNumber);
+            Assert.AreEqual ("uuid:fd1", root.RootDevice.Udn);
+            Assert.AreEqual ("67890", root.RootDevice.Upc);
+            var icons = root.RootDevice.Icons.GetEnumerator ();
+            Assert.IsTrue (icons.MoveNext ());
+            Assert.AreEqual ("image/png", icons.Current.MimeType);
+            Assert.AreEqual (100, icons.Current.Width);
+            Assert.AreEqual (100, icons.Current.Height);
+            Assert.AreEqual (32, icons.Current.Depth);
+            Assert.AreEqual (new Uri ("http://localhost:8080/icon/0/"), icons.Current.Url);
+            Assert.IsTrue (icons.MoveNext ());
+            Assert.AreEqual ("image/jpeg", icons.Current.MimeType);
+            Assert.AreEqual (100, icons.Current.Width);
+            Assert.AreEqual (100, icons.Current.Height);
+            Assert.AreEqual (32, icons.Current.Depth);
+            Assert.AreEqual (new Uri ("http://localhost:8080/icon/1/"), icons.Current.Url);
+            Assert.IsFalse (icons.MoveNext ());
+            var services = root.RootDevice.Services.GetEnumerator ();
+            Assert.IsTrue (services.MoveNext ());
+            Assert.AreEqual (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), services.Current.Type);
+            Assert.AreEqual ("urn:upnp-org:serviceId:testService1", services.Current.Id);
+            Assert.AreEqual (new Uri ("http://localhost:8080/service/0/scpd/"), services.Current.ScpdUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/service/0/control/"), services.Current.ControlUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/service/0/event/"), services.Current.EventUrl);
+            Assert.IsTrue (services.MoveNext ());
+            Assert.AreEqual (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), services.Current.Type);
+            Assert.AreEqual ("urn:upnp-org:serviceId:testService2", services.Current.Id);
+            Assert.AreEqual (new Uri ("http://localhost:8080/service/1/scpd/"), services.Current.ScpdUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/service/1/control/"), services.Current.ControlUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/service/1/event/"), services.Current.EventUrl);
+            Assert.IsFalse (services.MoveNext ());
+            var devices = root.RootDevice.Devices.GetEnumerator ();
+            Assert.IsTrue (devices.MoveNext ());
+            Assert.AreEqual (new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-embedded-device:1"), devices.Current.Type);
+            Assert.AreEqual ("Mono.Upnp.Tests Full Embedded Device", devices.Current.FriendlyName);
+            Assert.AreEqual ("Mono Project", devices.Current.Manufacturer);
+            Assert.AreEqual (new Uri ("http://www.mono-project.org/"), devices.Current.ManufacturerUrl);
+            Assert.AreEqual ("An embedded device description with all optional information.", devices.Current.ModelDescription);
+            Assert.AreEqual ("Full Embedded Device", devices.Current.ModelName);
+            Assert.AreEqual ("1", devices.Current.ModelNumber);
+            Assert.AreEqual (new Uri ("http://www.mono-project.org/Mono.Upnp/"), devices.Current.ModelUrl);
+            Assert.AreEqual ("12345", devices.Current.SerialNumber);
+            Assert.AreEqual ("uuid:fed1", devices.Current.Udn);
+            Assert.AreEqual ("67890", devices.Current.Upc);
+            icons = devices.Current.Icons.GetEnumerator ();
+            Assert.IsTrue (icons.MoveNext ());
+            Assert.AreEqual ("image/png", icons.Current.MimeType);
+            Assert.AreEqual (100, icons.Current.Width);
+            Assert.AreEqual (100, icons.Current.Height);
+            Assert.AreEqual (32, icons.Current.Depth);
+            Assert.AreEqual (new Uri ("http://localhost:8080/device/0/icon/0/"), icons.Current.Url);
+            Assert.IsTrue (icons.MoveNext ());
+            Assert.AreEqual ("image/jpeg", icons.Current.MimeType);
+            Assert.AreEqual (100, icons.Current.Width);
+            Assert.AreEqual (100, icons.Current.Height);
+            Assert.AreEqual (32, icons.Current.Depth);
+            Assert.AreEqual (new Uri ("http://localhost:8080/device/0/icon/1/"), icons.Current.Url);
+            Assert.IsFalse (icons.MoveNext ());
+            services = devices.Current.Services.GetEnumerator ();
+            Assert.IsTrue (services.MoveNext ());
+            Assert.AreEqual (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), services.Current.Type);
+            Assert.AreEqual ("urn:upnp-org:serviceId:testService1", services.Current.Id);
+            Assert.AreEqual (new Uri ("http://localhost:8080/device/0/service/0/scpd/"), services.Current.ScpdUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/device/0/service/0/control/"), services.Current.ControlUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/device/0/service/0/event/"), services.Current.EventUrl);
+            Assert.IsTrue (services.MoveNext ());
+            Assert.AreEqual (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), services.Current.Type);
+            Assert.AreEqual ("urn:upnp-org:serviceId:testService2", services.Current.Id);
+            Assert.AreEqual (new Uri ("http://localhost:8080/device/0/service/1/scpd/"), services.Current.ScpdUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/device/0/service/1/control/"), services.Current.ControlUrl);
+            Assert.AreEqual (new Uri ("http://localhost:8080/device/0/service/1/event/"), services.Current.EventUrl);
+            Assert.IsFalse (services.MoveNext ());
+            var empty_devices = devices.Current.Devices.GetEnumerator ();
+            Assert.IsFalse (empty_devices.MoveNext ());
+            Assert.IsFalse (devices.MoveNext ());
+        }
+        
+        [Test]
+        public void FullDescriptionSerializationTest ()
+        {
+            var root = new DummyRoot (
+                new DeviceSettings (
+                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-device:1"),
+                    "uuid:fd1",
+                    "Mono.Upnp.Tests Full Device",
+                    "Mono Project",
+                    "Full Device") {
+                    ManufacturerUrl = new Uri ("http://www.mono-project.org/"),
+                    ModelDescription = "A device description with all optional information.",
+                    ModelNumber = "1",
+                    ModelUrl = new Uri ("http://www.mono-project.org/Mono.Upnp/"),
+                    SerialNumber = "12345",
+                    Upc = "67890",
+                    Icons = new Icon[] {
+                        new DummyIcon (100, 100, 32, "image/png"),
+                        new DummyIcon (100, 100, 32, "image/jpeg")
+                    },
+                    Services = new Service[] {
+                        new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
+                        new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                    }
+                }, 
+                new Device[] {
+                    new Device (new DeviceSettings (
+                        new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-embedded-device:1"),
+                        "uuid:fed1",
+                        "Mono.Upnp.Tests Full Embedded Device",
+                        "Mono Project",
+                        "Full Embedded Device") {
+                        ManufacturerUrl = new Uri ("http://www.mono-project.org/"),
+                        ModelDescription = "An embedded device description with all optional information.",
+                        ModelNumber = "1",
+                        ModelUrl = new Uri ("http://www.mono-project.org/Mono.Upnp/"),
+                        SerialNumber = "12345",
+                        Upc = "67890",
+                        Icons = new Icon[] {
+                            new DummyIcon (100, 100, 32, "image/png"),
+                            new DummyIcon (100, 100, 32, "image/jpeg")
+                        },
+                        Services = new Service[] {
+                            new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
+                            new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                        }
+                    })
+                }
+            );
+            root.Initialize ();
+            Assert.AreEqual (Xml.FullDeviceDescription, serializer.GetString<Root> (root));
         }
     }
 }
