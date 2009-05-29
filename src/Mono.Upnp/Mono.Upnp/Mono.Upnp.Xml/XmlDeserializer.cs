@@ -136,6 +136,9 @@ namespace Mono.Upnp.Xml
                 return context => context.Reader.ReadElementContentAsDateTime ();
             } else if (type == typeof (Uri)) {
                 return context => new Uri (context.Reader.ReadElementContentAsString ());
+            } else if (type.IsEnum ) {
+                var map = GetEnumMap (type);
+                return context => map[context.Reader.ReadElementContentAsString ()];
             } else {
                 // TODO check for default ctor
                 if (typeof (IXmlDeserializable).IsAssignableFrom (type)) {
@@ -153,6 +156,24 @@ namespace Mono.Upnp.Xml
                     };
                 }
             }
+        }
+        
+        // TODO we could use a trie for this and save some memory
+        static Dictionary<string, object> GetEnumMap (Type type)
+        {
+            var fields = type.GetFields (BindingFlags.Public | BindingFlags.Static);
+            var dictionary = new Dictionary<string, object> (fields.Length);
+            foreach (var field in fields) {
+                var enum_attribute = field.GetCustomAttributes (typeof (XmlEnumAttribute), false);
+                string name = null;
+                if (enum_attribute.Length != 0) {
+                    name = ((XmlEnumAttribute)enum_attribute[0]).Value;
+                } else {
+                    name = field.Name;
+                }
+                dictionary.Add (name, field.GetValue (null));
+            }
+            return dictionary;
         }
         
         ObjectDeserializer GetAutoDeserializer (Type type)
@@ -362,7 +383,10 @@ namespace Mono.Upnp.Xml
                 return context => context.Reader.ReadContentAsDateTime ();
             } else if (type == typeof (Uri)) {
                 return context => new Uri (context.Reader.ReadContentAsString ());
-            }  else {
+            } else if (type.IsEnum ) {
+                var map = GetEnumMap (type);
+                return context => map[context.Reader.ReadContentAsString ()];
+            } else {
                 return context => context.Reader.ReadContentAs (type, null);
             }
         }
