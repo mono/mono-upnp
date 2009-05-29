@@ -28,7 +28,7 @@ using System;
 
 namespace Mono.Upnp.Xml
 {
-    [AttributeUsage (AttributeTargets.Class | AttributeTargets.Property)]
+    [AttributeUsage (AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = true)]
     public sealed class XmlNamespaceAttribute : Attribute
     {
         readonly string @namespace;

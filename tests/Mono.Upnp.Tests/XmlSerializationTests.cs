@@ -631,18 +631,20 @@ namespace Mono.Upnp.Xml.Tests
             );
         }
         
-        [XmlNamespace ("udn:mono-upnp:tests", "test")]
+        [XmlNamespace ("udn:mono-upnp:foo", "f")]
+        [XmlNamespace ("udn:mono-upnp:bar", "b")]
         class NamespaceTestClass
         {
-            [XmlElement (Namespace = "udn:mono-upnp:tests")] public string Foo { get; set; }
+            [XmlElement (Namespace = "udn:mono-upnp:foo")] public string Foo { get; set; }
+            [XmlElement (Namespace = "udn:mono-upnp:bar")] public string Bar { get; set; }
         }
         
         [Test]
         public void NamespaceTest ()
         {
             Assert.AreEqual (
-                @"<?xml version=""1.0"" encoding=""utf-16""?><NamespaceTestClass xmlns:test=""udn:mono-upnp:tests""><test:Foo>bar</test:Foo></NamespaceTestClass>",
-                serializer.GetString (new NamespaceTestClass { Foo = "bar" }));
+                @"<?xml version=""1.0"" encoding=""utf-16""?><NamespaceTestClass xmlns:b=""udn:mono-upnp:bar"" xmlns:f=""udn:mono-upnp:foo""><f:Foo>foo</f:Foo><b:Bar>bar</b:Bar></NamespaceTestClass>",
+                serializer.GetString (new NamespaceTestClass { Foo = "foo", Bar = "bar" }));
         }
     }
 }

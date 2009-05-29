@@ -166,9 +166,18 @@ namespace Mono.Upnp.Xml
             string @namespace = null;
             string prefix = null;
             
-            var type_attributes = type.GetCustomAttributes (typeof (XmlTypeAttribute), false);
-            if (type_attributes.Length > 0) {
-                var type_attribute = (XmlTypeAttribute)type_attributes[0];
+            XmlTypeAttribute type_attribute = null;
+            var namespace_attributes = new List<XmlNamespaceAttribute> ();
+            foreach (var custom_attribute in type.GetCustomAttributes (false)) {
+                var xml_type = custom_attribute as XmlTypeAttribute;
+                if (xml_type != null) {
+                    type_attribute = xml_type;
+                    continue;
+                }
+                namespace_attributes.Add (custom_attribute as XmlNamespaceAttribute);
+            }
+            
+            if (type_attribute != null) {
                 name = type_attribute.Name;
                 @namespace = type_attribute.Namespace;
                 prefix = type_attribute.Prefix;
@@ -176,11 +185,23 @@ namespace Mono.Upnp.Xml
             
             var next = GetMemberSerializer (type);
             
-            return (obj, context) => {
-                context.Writer.WriteStartElement (prefix, name, @namespace);
-                next (obj, context);
-                context.Writer.WriteEndElement ();
-            };
+            if (namespace_attributes.Count != 0) {
+                var namespaces = namespace_attributes.ToArray ();
+                return (obj, context) => {
+                    context.Writer.WriteStartElement (prefix, name, @namespace);
+                    foreach (var ns in namespaces) {
+                        context.Writer.WriteAttributeString ("xmlns", ns.Prefix, null, ns.Namespace);
+                    }
+                    next (obj, context);
+                    context.Writer.WriteEndElement ();
+                };
+            } else {
+                return (obj, context) => {
+                    context.Writer.WriteStartElement (prefix, name, @namespace);
+                    next (obj, context);
+                    context.Writer.WriteEndElement ();
+                };
+            }
         }
         
         Serializer GetMemberAutoSerializer (Type type)
