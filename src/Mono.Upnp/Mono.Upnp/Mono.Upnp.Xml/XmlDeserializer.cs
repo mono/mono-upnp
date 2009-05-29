@@ -136,7 +136,7 @@ namespace Mono.Upnp.Xml
                 return context => context.Reader.ReadElementContentAsDateTime ();
             } else if (type == typeof (Uri)) {
                 return context => new Uri (context.Reader.ReadElementContentAsString ());
-            } else if (type.IsEnum ) {
+            } else if (type.IsEnum) {
                 var map = GetEnumMap (type);
                 return context => map[context.Reader.ReadElementContentAsString ()];
             } else {

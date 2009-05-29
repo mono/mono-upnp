@@ -139,6 +139,9 @@ namespace Mono.Upnp.Xml
         {
             if (typeof (IXmlSerializable).IsAssignableFrom (type)) {
                 return (obj, context) => ((IXmlSerializable)obj).SerializeMembersOnly (context);
+            } else if (type.IsEnum) {
+                var map = GetEnumMap (type);
+                return (obj, context) => context.Writer.WriteValue (map [obj]);
             } else {
                 return GetMemberAutoSerializer (type, serializers);
             }
@@ -320,9 +323,16 @@ namespace Mono.Upnp.Xml
             var name = attributeAttribute.Name ?? property.Name;
             var @namespace = attributeAttribute.Namespace;
             var prefix = attributeAttribute.Prefix;
-            return (obj, context) => {
-                context.Writer.WriteAttributeString (prefix, name, @namespace, obj != null ? obj.ToString () : string.Empty);
-            };
+            if (property.PropertyType.IsEnum) {
+                var map = GetEnumMap (property.PropertyType);
+                return (obj, context) => {
+                    context.Writer.WriteAttributeString (prefix, name, @namespace, map[obj]);
+                };
+            } else {
+                return (obj, context) => {
+                    context.Writer.WriteAttributeString (prefix, name, @namespace, obj != null ? obj.ToString () : string.Empty);
+                };
+            }
         }
         
         Serializer CreateSerializer (PropertyInfo property, XmlElementAttribute elementAttribute)
@@ -431,6 +441,23 @@ namespace Mono.Upnp.Xml
                     context.Writer.WriteEndElement ();
                 }
             };
+        }
+        
+        static Dictionary<object, string> GetEnumMap (Type type)
+        {
+            var fields = type.GetFields (BindingFlags.Public | BindingFlags.Static);
+            var dictionary = new Dictionary<object, string> (fields.Length);
+            foreach (var field in fields) {
+                var enum_attribute = field.GetCustomAttributes (typeof (XmlEnumAttribute), false);
+                string name = null;
+                if (enum_attribute.Length != 0) {
+                    name = ((XmlEnumAttribute)enum_attribute[0]).Value;
+                } else {
+                    name = field.Name;
+                }
+                dictionary.Add (field.GetValue (null), name);
+            }
+            return dictionary;
         }
     }
 }
