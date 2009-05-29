@@ -38,7 +38,7 @@ namespace Mono.Upnp.Control
     public class StateVariable : XmlAutomatable
     {
         readonly ServiceController controller;
-        readonly IList<string> allowed_values;
+        IList<string> allowed_values;
         //event EventHandler<StateVariableChangedArgs<string>> changed;
 
         protected internal StateVariable (ServiceController service)
@@ -46,7 +46,6 @@ namespace Mono.Upnp.Control
             if (service == null) throw new ArgumentNullException ("service");
 
             this.controller = service;
-            allowed_values = new List<string> ();
         }
 
         public ServiceController Controller {
@@ -99,6 +98,9 @@ namespace Mono.Upnp.Control
         {
             if (context == null) throw new ArgumentNullException ("context");
             
+            if (context.Reader.LocalName == "allowedValueList" && context.Reader.NamespaceURI == Protocol.ServiceUrn) {
+                allowed_values = new List<string> ();
+            }
             context.AutoDeserializeElement (this);
         }
 
