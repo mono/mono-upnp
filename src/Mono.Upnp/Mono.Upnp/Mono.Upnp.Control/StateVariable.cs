@@ -38,7 +38,7 @@ namespace Mono.Upnp.Control
     public class StateVariable : XmlAutomatable
     {
         readonly ServiceController controller;
-        readonly IList<string> allowed_values = new List<string> ();
+        readonly IList<string> allowed_values;
         //event EventHandler<StateVariableChangedArgs<string>> changed;
 
         protected internal StateVariable (ServiceController service)
@@ -46,6 +46,7 @@ namespace Mono.Upnp.Control
             if (service == null) throw new ArgumentNullException ("service");
 
             this.controller = service;
+            allowed_values = new List<string> ();
         }
 
         public ServiceController Controller {
