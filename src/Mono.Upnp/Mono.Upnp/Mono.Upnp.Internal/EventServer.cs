@@ -107,7 +107,7 @@ namespace Mono.Upnp.Internal
             writer.WriteStartDocument ();
             writer.WriteStartElement ("e", "propertyset", Protocol.EventUrn);
             foreach (StateVariable state_variable in controller.StateVariables.Values) {
-                if (state_variable.CanSendEvents) {
+                if (state_variable.SendsEvents) {
                     writer.WriteStartElement ("property", Protocol.EventUrn);
                     writer.WriteStartElement (state_variable.Name);
                     //writer.WriteValue (state_variable.Value);

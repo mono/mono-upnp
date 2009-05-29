@@ -123,7 +123,21 @@ namespace Mono.Upnp
         
         protected virtual ServiceAction CreateAction (ServiceController controller)
         {
-            return new ServiceAction (controller);
+            return new ServiceAction (this, controller);
+        }
+        
+        protected internal virtual Argument DeserializeArgument (XmlDeserializationContext context)
+        {
+            var argument = CreateArgument ();
+            if (argument != null) {
+                ((IXmlDeserializable)argument).Deserialize (context);
+            }
+            return argument;
+        }
+        
+        protected virtual Argument CreateArgument ()
+        {
+            return new Argument ();
         }
         
         protected internal virtual StateVariable DeserializeStateVariable (ServiceController controller, XmlDeserializationContext context)

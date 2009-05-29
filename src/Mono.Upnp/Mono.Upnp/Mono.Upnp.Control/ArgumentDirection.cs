@@ -32,7 +32,7 @@ namespace Mono.Upnp.Control
 {
     public enum ArgumentDirection
     {
-        In,
-        Out
+        [XmlEnum ("in")] In,
+        [XmlEnum ("out")] Out
     }
 }

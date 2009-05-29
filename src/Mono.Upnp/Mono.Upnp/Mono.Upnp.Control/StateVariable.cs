@@ -61,8 +61,13 @@ namespace Mono.Upnp.Control
 
         public Type Type { get; private set; }
 
-        [XmlAttribute ("sendEvents", Protocol.ServiceUrn)]
-        public virtual bool CanSendEvents { get; protected set; }
+        [XmlAttribute ("sendEvents")]
+        protected virtual string SendsEventsString {
+            get { return SendsEvents ? "yes" : "no"; }
+            set { SendsEvents = value == "yes"; }
+        }
+        
+        public bool SendsEvents { get; protected set; }
         
         [XmlAttribute ("multicast", Protocol.ServiceUrn)]
         public virtual bool IsMulticast { get; protected set; }

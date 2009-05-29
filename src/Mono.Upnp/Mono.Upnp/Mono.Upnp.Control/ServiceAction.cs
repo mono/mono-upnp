@@ -35,13 +35,14 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Control
 {
     [XmlType ("action", Protocol.ServiceUrn)]
-    public class ServiceAction : XmlAutomatable
+    public class ServiceAction : Description
     {
         readonly static Dictionary<string, string> emptyArguments = new Dictionary<string, string> ();
         readonly ServiceController controller;
         readonly Map<string, Argument> arguments;
 
-        protected internal ServiceAction (ServiceController controller)
+        protected internal ServiceAction (Deserializer deserializer, ServiceController controller)
+            : base (deserializer)
         {
             if (controller == null) throw new ArgumentNullException ("controller");
 
@@ -149,6 +150,12 @@ namespace Mono.Upnp.Control
 //                }
 //            }
 //        }
+        
+        [XmlTypeDeserializer]
+        protected virtual Argument DeserializeArgument (XmlDeserializationContext context)
+        {
+            return Deserializer != null ? Deserializer.DeserializeArgument (context) : null;
+        }
         
         protected override void DeserializeElement (XmlDeserializationContext context)
         {

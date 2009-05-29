@@ -238,7 +238,7 @@ namespace Mono.Upnp.Tests
                         "<name>A_ARG_TYPE_Result</name>" +
                         "<dataType>string</dataType>" +
                     "</stateVariable>" +
-                   @"<stateVariable sendsEvents=""yes"">" +
+                   @"<stateVariable sendEvents=""yes"">" +
                         "<name>SystemId</name>" +
                         "<dataType>ui4</dataType>" +
                     "</stateVariable>" +

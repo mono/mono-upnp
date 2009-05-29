@@ -36,17 +36,8 @@ namespace Mono.Upnp.Control
     [XmlType ("argument", Protocol.ServiceUrn)]
     public class Argument : XmlAutomatable
     {
-        readonly ServiceAction action;
-
-        protected internal Argument (ServiceAction action)
+        protected internal Argument ()
         {
-            if (action == null) throw new ArgumentNullException ("action");
-
-            this.action = action;
-        }
-
-        public ServiceAction Action {
-            get { return action; }
         }
 
         [XmlElement ("name", Protocol.ServiceUrn)]

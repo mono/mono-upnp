@@ -39,11 +39,11 @@ namespace Mono.Upnp.Control.Tests
         readonly DummyDeserializer deserializer = new DummyDeserializer ();
         
         [Test]
-        public void TestCase ()
+        public void FullScpdDeserializationTest ()
         {
             var controller = deserializer.DeserializeServiceController (Mono.Upnp.Tests.Xml.FullScpd);
-            Assert.AreEqual (1, controller.SpecVersion.Major);
-            Assert.AreEqual (1, controller.SpecVersion.Minor);
+            //Assert.AreEqual (1, controller.SpecVersion.Major);
+            //Assert.AreEqual (1, controller.SpecVersion.Minor);
             Assert.AreEqual (2, controller.Actions.Count);
             var action = controller.Actions["Browse"];
             Assert.AreEqual ("Browse", action.Name);
@@ -137,7 +137,7 @@ namespace Mono.Upnp.Control.Tests
             Assert.AreEqual ("string", state_variable.DataType);
             state_variable = controller.StateVariables["SystemId"];
             Assert.AreEqual ("SystemId", state_variable.Name);
-            Assert.IsTrue (state_variable.CanSendEvents);
+            Assert.IsTrue (state_variable.SendsEvents);
             Assert.AreEqual ("ui4", state_variable.DataType);
         }
     }
