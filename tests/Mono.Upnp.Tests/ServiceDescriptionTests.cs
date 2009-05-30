@@ -38,6 +38,110 @@ namespace Mono.Upnp.Control.Tests
         readonly XmlSerializer serializer = new XmlSerializer ();
         readonly DummyDeserializer deserializer = new DummyDeserializer ();
         
+        void AssertEquality (ServiceController sourceController, ServiceController targetController)
+        {
+            Assert.AreEqual (sourceController.SpecVersion.Major, targetController.SpecVersion.Major);
+            Assert.AreEqual (sourceController.SpecVersion.Minor, targetController.SpecVersion.Minor);
+            var source_actions = sourceController.Actions.Values.GetEnumerator ();
+            var target_actions = targetController.Actions.Values.GetEnumerator ();
+            while (source_actions.MoveNext ()) {
+                Assert.IsTrue (target_actions.MoveNext ());
+                AssertEquality (source_actions.Current, target_actions.Current);
+            }
+            Assert.IsFalse (target_actions.MoveNext ());
+            var source_state_variables = sourceController.StateVariables.Values.GetEnumerator ();
+            var target_state_variables = targetController.StateVariables.Values.GetEnumerator ();
+            while (source_state_variables.MoveNext ()) {
+                Assert.IsTrue (target_state_variables.MoveNext ());
+                AssertEquality (source_state_variables.Current, target_state_variables.Current);
+            }
+            Assert.IsFalse (target_state_variables.MoveNext ());
+        }
+        
+        void AssertEquality (ServiceAction sourceAction, ServiceAction targetAction)
+        {
+            Assert.AreEqual (sourceAction.Name, targetAction.Name);
+            var source_arguments = sourceAction.Arguments.Values.GetEnumerator ();
+            var target_arguments = targetAction.Arguments.Values.GetEnumerator ();
+            while (source_arguments.MoveNext ()) {
+                Assert.IsTrue (target_arguments.MoveNext ());
+                AssertEquality (source_arguments.Current, target_arguments.Current);
+            }
+            Assert.IsFalse (target_arguments.MoveNext ());
+        }
+        
+        void AssertEquality (Argument sourceArgument, Argument targetArgument)
+        {
+            Assert.AreEqual (sourceArgument.Name, targetArgument.Name);
+            Assert.AreEqual (sourceArgument.Direction, targetArgument.Direction);
+            Assert.AreEqual (sourceArgument.IsReturnValue, targetArgument.IsReturnValue);
+            Assert.AreEqual (sourceArgument.RelatedStateVariableName, targetArgument.RelatedStateVariableName);
+        }
+        
+        void AssertEquality (StateVariable sourceStateVariable, StateVariable targetStateVariable)
+        {
+            Assert.AreEqual (sourceStateVariable.Name, targetStateVariable.Name);
+            Assert.AreEqual (sourceStateVariable.DataType, targetStateVariable.DataType);
+            Assert.AreEqual (sourceStateVariable.SendsEvents, targetStateVariable.SendsEvents);
+            Assert.AreEqual (sourceStateVariable.IsMulticast, targetStateVariable.IsMulticast);
+            Assert.AreEqual (sourceStateVariable.DefaultValue, targetStateVariable.DefaultValue);
+            if (sourceStateVariable.AllowedValues != null) {
+                var source_values = sourceStateVariable.AllowedValues.GetEnumerator ();
+                var target_values = targetStateVariable.AllowedValues.GetEnumerator ();
+                while (source_values.MoveNext ()) {
+                    Assert.IsTrue (target_values.MoveNext ());
+                    Assert.AreEqual (source_values.Current, target_values.Current);
+                }
+                Assert.IsFalse (target_values.MoveNext ());
+            }
+            if (sourceStateVariable.AllowedValueRange != null) {
+                Assert.AreEqual (sourceStateVariable.AllowedValueRange.Minimum, targetStateVariable.AllowedValueRange.Minimum);
+                Assert.AreEqual (sourceStateVariable.AllowedValueRange.Maximum, targetStateVariable.AllowedValueRange.Maximum);
+                Assert.AreEqual (sourceStateVariable.AllowedValueRange.Step, targetStateVariable.AllowedValueRange.Step);
+            }
+        }
+        
+        [Test]
+        public void FullScpdTest ()
+        {
+            var source_controller = new ServiceController (
+                new object (),
+                new ServiceAction[] {
+                    new ServiceAction (
+                        "Browse",
+                        new Argument[] {
+                            new Argument ("browseFlag", "A_ARG_TYPE_BrowseFlag", ArgumentDirection.In),
+                            new Argument ("offset", "A_ARG_TYPE_Offset", ArgumentDirection.In),
+                            new Argument ("requestCount", "A_ARG_TYPE_RequestCount", ArgumentDirection.In),
+                            new Argument ("resultCount", "A_ARG_TYPE_ResultCount", ArgumentDirection.Out),
+                            new Argument ("result", "A_ARG_TYPE_Result", ArgumentDirection.Out, true)
+                        }
+                    ),
+                    new ServiceAction (
+                        "Search",
+                        new Argument[] {
+                            new Argument ("searchFlag", "A_ARG_TYPE_SearchFlag", ArgumentDirection.In),
+                            new Argument ("offset", "A_ARG_TYPE_Offset", ArgumentDirection.In),
+                            new Argument ("requestCount", "A_ARG_TYPE_RequestCount", ArgumentDirection.In),
+                            new Argument ("resultCount", "A_ARG_TYPE_ResultCount", ArgumentDirection.Out),
+                            new Argument ("result", "A_ARG_TYPE_Result", ArgumentDirection.Out, true)
+                        }
+                    ),
+                },
+                new StateVariable[] {
+                    new StateVariable ("A_ARG_TYPE_BrowseFlag", new string[] { "BrowseMetadata", "BrowseObjects" }),
+                    new StateVariable ("A_ARG_TYPE_SearchFlag", new string[] { "SearchMetadata", "SearchObjects" }),
+                    new StateVariable ("A_ARG_TYPE_Offset", "ui4"),
+                    new StateVariable ("A_ARG_TYPE_RequestCount", "ui4", new AllowedValueRange ("1", "100"), "50"),
+                    new StateVariable ("A_ARG_TYPE_ResultCount", "ui4"),
+                    new StateVariable ("A_ARG_TYPE_Result", "string"),
+                    new StateVariable ("SystemId", "ui4", true)
+                }
+            );
+            var target_controller = deserializer.DeserializeServiceController (serializer.GetString (source_controller));
+            AssertEquality (source_controller, target_controller);
+        }
+        
         [Test]
         public void FullScpdDeserializationTest ()
         {
