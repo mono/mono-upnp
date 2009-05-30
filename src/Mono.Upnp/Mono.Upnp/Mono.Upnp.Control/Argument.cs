@@ -39,6 +39,22 @@ namespace Mono.Upnp.Control
         protected internal Argument ()
         {
         }
+        
+        public Argument (string name, string relatedStateVariable, ArgumentDirection direction)
+        {
+            Name = name;
+            RelatedStateVariableName = relatedStateVariable;
+            Direction = direction;
+        }
+        
+        public Argument (string name, string relatedStateVariable, ArgumentDirection direction, bool isReturnValue)
+            : this (name, relatedStateVariable, direction)
+        {
+            if (direction == ArgumentDirection.In && isReturnValue)
+                throw new ArgumentException ("The direction is In, but isReturnValue is true. An IsReturnValue argument must have the direction Out.");
+            
+            IsReturnValue = isReturnValue;
+        }
 
         [XmlElement ("name", Protocol.ServiceUrn)]
         public virtual string Name { get; protected set; }

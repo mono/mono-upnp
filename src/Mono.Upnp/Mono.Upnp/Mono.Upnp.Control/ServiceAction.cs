@@ -50,7 +50,7 @@ namespace Mono.Upnp.Control
             arguments = new Map<string, Argument> (ArgumentMapper);
         }
         
-        protected internal ServiceAction (IEnumerable<Argument> arguments, ServiceController controller, string name)
+        public ServiceAction (IEnumerable<Argument> arguments, ServiceController controller, string name)
             : this (arguments, controller)
         {
             Name = name;

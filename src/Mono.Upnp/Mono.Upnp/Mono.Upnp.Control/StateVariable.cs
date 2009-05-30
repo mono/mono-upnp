@@ -40,6 +40,10 @@ namespace Mono.Upnp.Control
         readonly ServiceController controller;
         IList<string> allowed_values;
         //event EventHandler<StateVariableChangedArgs<string>> changed;
+        
+        protected StateVariable ()
+        {
+        }
 
         protected internal StateVariable (ServiceController service)
         {
@@ -49,7 +53,7 @@ namespace Mono.Upnp.Control
         }
         
         public StateVariable (string name, string dataType)
-            : this (name, dataType, null)
+            : this (name, dataType, false)
         {
         }
         
@@ -121,7 +125,7 @@ namespace Mono.Upnp.Control
         [XmlAttribute ("multicast", Protocol.ServiceUrn)]
         public virtual bool IsMulticast { get; protected set; }
 
-        [XmlElement ("defaultValue", Protocol.ServiceUrn)]
+        [XmlElement ("defaultValue", Protocol.ServiceUrn, OmitIfNull = true)]
         protected virtual string IsMulticastString {
             get { return IsMulticast ? "yes" : "no"; }
             set { IsMulticast = value == "yes"; }
@@ -129,7 +133,7 @@ namespace Mono.Upnp.Control
         
         public string DefaultValue { get; protected set; }
 
-        [XmlArray ("allowedValueList", Protocol.ServiceUrn)]
+        [XmlArray ("allowedValueList", Protocol.ServiceUrn, OmitIfNull = true)]
         [XmlArrayItem ("allowedValue", Protocol.ServiceUrn)]
         protected virtual ICollection<string> AllowedValueCollection {
             get { return allowed_values; }
@@ -139,7 +143,7 @@ namespace Mono.Upnp.Control
             get { return allowed_values; }
         }
 
-        [XmlElement ("allowedValueRange", Protocol.ServiceUrn)]
+        [XmlElement ("allowedValueRange", Protocol.ServiceUrn, OmitIfNull = true)]
         public virtual AllowedValueRange AllowedValueRange { get; protected set; }
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)
