@@ -48,7 +48,49 @@ namespace Mono.Upnp.Control
             this.controller = service;
         }
         
-        protected internal StateVariable (string name, string dataType, string defaultValue, bool sendsEvents, bool isMulticast)
+        public StateVariable (string name, string dataType)
+            : this (name, dataType, null)
+        {
+        }
+        
+        public StateVariable (string name, string dataType, string defaultValue)
+            : this (name, dataType, defaultValue, false, false)
+        {
+        }
+        
+        public StateVariable (string name, string dataType, bool sendsEvents)
+            : this (name, dataType, sendsEvents, false)
+        {
+        }
+        
+        public StateVariable (string name, string dataType, bool sendsEvents, bool isMulticast)
+            : this (name, dataType, null, sendsEvents, isMulticast)
+        {
+        }
+        
+        public StateVariable (string name, IEnumerable<string> allowedValues)
+            : this (name, allowedValues, null)
+        {
+        }
+        
+        public StateVariable (string name, IEnumerable<string> allowedValues, string defaultValue)
+            : this (name, "string", defaultValue, false, false)
+        {
+            allowed_values = Helper.MakeReadOnlyCopy (allowedValues);
+        }
+        
+        public StateVariable (string name, string dataType, AllowedValueRange allowedValueRange)
+            : this (name, dataType, allowedValueRange, null)
+        {
+        }
+        
+        public StateVariable (string name, string dataType, AllowedValueRange allowedValueRange, string defaultValue)
+            : this (name, dataType, defaultValue, false, false)
+        {
+            AllowedValueRange = allowedValueRange;
+        }
+        
+        StateVariable (string name, string dataType, string defaultValue, bool sendsEvents, bool isMulticast)
         {
             if (name == null) throw new ArgumentNullException ("name");
             if (dataType == null) throw new ArgumentNullException ("dataType");
@@ -58,18 +100,6 @@ namespace Mono.Upnp.Control
             DefaultValue = defaultValue;
             SendsEvents = sendsEvents;
             IsMulticast = isMulticast;
-        }
-        
-        protected internal StateVariable (string name, IEnumerable<string> allowedValue, string defaultValue)
-            : this (name, "string", defaultValue, false, false)
-        {
-            allowed_values = Helper.MakeReadOnlyCopy (allowedValue);
-        }
-        
-        protected internal StateVariable (string name, string dataType, AllowedValueRange allowedValueRange, string defaultValue)
-            : this (name, dataType, defaultValue, false, false)
-        {
-            AllowedValueRange = allowedValueRange;
         }
         
         [XmlElement ("name", Protocol.ServiceUrn)]
