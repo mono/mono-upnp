@@ -40,7 +40,7 @@ namespace Mono.Upnp.Control
         {
         }
         
-        internal AllowedValueRange (string minimum, string maximum, string step)
+        public AllowedValueRange (string minimum, string maximum, string step)
         {
             Minimum = minimum;
             Maximum = maximum;
