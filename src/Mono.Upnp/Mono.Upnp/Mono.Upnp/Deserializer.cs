@@ -175,22 +175,6 @@ namespace Mono.Upnp
             return new ServiceController (this, service);
         }
         
-        protected internal virtual Uri DeserializeUrl (XmlDeserializationContext context)
-        {
-            if (context == null) throw new ArgumentNullException ("context");
-            if (root == null)
-                    throw new InvalidOperationException ("You must deserialize a device description before deserializing a URL.");
-            
-            var url = context.Reader.ReadString ();
-            if (Uri.IsWellFormedUriString (url, UriKind.Absolute)) {
-                return new Uri (url);
-            } else if (Uri.IsWellFormedUriString (url, UriKind.Relative)) {
-                return new Uri (root.UrlBase, url);
-            } else {
-                throw new UpnpDeserializationException ("The URL is neither absolute nor relative: " + url);
-            }
-        }
-        
         internal bool IsDisposed { get; private set; }
         
         internal event EventHandler<DisposedEventArgs> Disposed;
