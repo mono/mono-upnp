@@ -146,8 +146,8 @@ namespace Mono.Upnp.Control.Tests
         public void FullScpdDeserializationTest ()
         {
             var controller = deserializer.DeserializeServiceController (Mono.Upnp.Tests.Xml.FullScpd);
-            //Assert.AreEqual (1, controller.SpecVersion.Major);
-            //Assert.AreEqual (1, controller.SpecVersion.Minor);
+            Assert.AreEqual (1, controller.SpecVersion.Major);
+            Assert.AreEqual (1, controller.SpecVersion.Minor);
             Assert.AreEqual (2, controller.Actions.Count);
             var action = controller.Actions["Browse"];
             Assert.AreEqual ("Browse", action.Name);
