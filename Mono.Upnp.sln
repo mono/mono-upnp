@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8D933A32
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Tests", "tests\Mono.Upnp.Tests\Mono.Upnp.Tests.csproj", "{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.Tests", "tests\Mono.Upnp.Tests\Mono.Ssdp.Tests\Mono.Ssdp.Tests.csproj", "{D6ADBD6C-8A83-4429-8975-624822AF7D3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.Tests", "tests\Mono.Ssdp.Tests\Mono.Ssdp.Tests.csproj", "{D6ADBD6C-8A83-4429-8975-624822AF7D3D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Ssdp", "Mono.Ssdp", "{10FB35F1-FBF6-42C7-85E2-9A52345FD0F3}"
 EndProject
