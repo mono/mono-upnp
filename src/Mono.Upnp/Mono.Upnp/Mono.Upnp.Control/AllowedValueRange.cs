@@ -36,8 +36,15 @@ namespace Mono.Upnp.Control
     [XmlType ("allowedValueRange", Protocol.ServiceUrn)]
     public sealed class AllowedValueRange
     {
-        internal AllowedValueRange ()
+        AllowedValueRange ()
         {
+        }
+        
+        internal AllowedValueRange (string minimum, string maximum, string step)
+        {
+            Minimum = minimum;
+            Maximum = maximum;
+            Step = step;
         }
         
         [XmlElement ("minimum", Protocol.ServiceUrn)]
