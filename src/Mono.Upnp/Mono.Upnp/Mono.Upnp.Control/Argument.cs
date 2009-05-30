@@ -59,14 +59,14 @@ namespace Mono.Upnp.Control
         [XmlElement ("name", Protocol.ServiceUrn)]
         public virtual string Name { get; protected set; }
         
-        [XmlElement ("relatedStateVariable", Protocol.ServiceUrn)]
-        public virtual string RelatedStateVariableName { get; protected set; }
+        [XmlElement ("direction", Protocol.ServiceUrn)]
+        public virtual ArgumentDirection Direction { get; protected set; }
         
         [XmlFlag ("retval", Protocol.ServiceUrn)]
         public virtual bool IsReturnValue { get; protected set; }
-
-        [XmlElement ("direction", Protocol.ServiceUrn)]
-        public virtual ArgumentDirection Direction { get; protected set; }
+        
+        [XmlElement ("relatedStateVariable", Protocol.ServiceUrn)]
+        public virtual string RelatedStateVariableName { get; protected set; }
         
         protected override void DeserializeElement (XmlDeserializationContext context)
         {

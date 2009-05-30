@@ -170,5 +170,45 @@ namespace Mono.Upnp.Control.Tests
             Assert.IsTrue (state_variable.SendsEvents);
             Assert.AreEqual ("ui4", state_variable.DataType);
         }
+        
+        [Test]
+        public void FullScpdSerializationTest ()
+        {
+            var controller = new ServiceController (
+                new object (),
+                new ServiceAction[] {
+                    new ServiceAction (
+                        "Browse",
+                        new Argument[] {
+                            new Argument ("browseFlag", "A_ARG_TYPE_BrowseFlag", ArgumentDirection.In),
+                            new Argument ("offset", "A_ARG_TYPE_Offset", ArgumentDirection.In),
+                            new Argument ("requestCount", "A_ARG_TYPE_RequestCount", ArgumentDirection.In),
+                            new Argument ("resultCount", "A_ARG_TYPE_ResultCount", ArgumentDirection.Out),
+                            new Argument ("result", "A_ARG_TYPE_Result", ArgumentDirection.Out, true)
+                        }
+                    ),
+                    new ServiceAction (
+                        "Search",
+                        new Argument[] {
+                            new Argument ("searchFlag", "A_ARG_TYPE_SearchFlag", ArgumentDirection.In),
+                            new Argument ("offset", "A_ARG_TYPE_Offset", ArgumentDirection.In),
+                            new Argument ("requestCount", "A_ARG_TYPE_RequestCount", ArgumentDirection.In),
+                            new Argument ("resultCount", "A_ARG_TYPE_ResultCount", ArgumentDirection.Out),
+                            new Argument ("result", "A_ARG_TYPE_Result", ArgumentDirection.Out, true)
+                        }
+                    ),
+                },
+                new StateVariable[] {
+                    new StateVariable ("A_ARG_TYPE_BrowseFlag", new string[] { "BrowseMetadata", "BrowseObjects" }),
+                    new StateVariable ("A_ARG_TYPE_SearchFlag", new string[] { "SearchMetadata", "SearchObjects" }),
+                    new StateVariable ("A_ARG_TYPE_Offset", "ui4"),
+                    new StateVariable ("A_ARG_TYPE_RequestCount", "ui4", new AllowedValueRange ("1", "100"), "50"),
+                    new StateVariable ("A_ARG_TYPE_ResultCount", "ui4"),
+                    new StateVariable ("A_ARG_TYPE_Result", "string"),
+                    new StateVariable ("SystemId", "ui4", true)
+                }
+            );
+            Assert.AreEqual (Mono.Upnp.Tests.Xml.FullScpd, serializer.GetString (controller));
+        }
     }
 }

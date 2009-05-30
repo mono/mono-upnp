@@ -40,8 +40,16 @@ namespace Mono.Upnp.Control
         {
         }
         
+        public AllowedValueRange (string minimum, string maximum)
+            : this (minimum, maximum, null)
+        {
+        }
+        
         public AllowedValueRange (string minimum, string maximum, string step)
         {
+            if (minimum == null) throw new ArgumentNullException ("minimum");
+            if (maximum == null) throw new ArgumentNullException ("maximum");
+            
             Minimum = minimum;
             Maximum = maximum;
             Step = step;
@@ -53,7 +61,7 @@ namespace Mono.Upnp.Control
         [XmlElement ("maximum", Protocol.ServiceUrn)]
         public string Maximum { get; private set; }
         
-        [XmlElement ("step", Protocol.ServiceUrn)]
+        [XmlElement ("step", Protocol.ServiceUrn, OmitIfNull = true)]
         public string Step { get; private set; }
         
         internal IComparable Min { get; set; }

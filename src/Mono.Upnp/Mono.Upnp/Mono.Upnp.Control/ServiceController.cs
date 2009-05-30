@@ -34,7 +34,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    [XmlType ("scdp", Protocol.ServiceUrn)]
+    [XmlType ("scpd", Protocol.ServiceUrn)]
     public class ServiceController : Description, IXmlDeserializable
     {
         readonly Map<string, ServiceAction> actions;
@@ -55,12 +55,12 @@ namespace Mono.Upnp.Control
             state_variables = new Map<string, StateVariable> (StateVariableMapper);
         }
         
-        protected internal ServiceController (object service, IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
+        public ServiceController (object service, IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
         {
             if (service == null) throw new ArgumentNullException ("service");
             
             this.actions = Helper.MakeReadOnlyCopy<string, ServiceAction> (actions, ServiceActionMapper);
-            this.state_variables = Helper.MakeReadOnlyCopy<string, StateVariable> (state_variables, StateVariableMapper);
+            this.state_variables = Helper.MakeReadOnlyCopy<string, StateVariable> (stateVariables, StateVariableMapper);
             SpecVersion = new SpecVersion (1, 1);
         }
         

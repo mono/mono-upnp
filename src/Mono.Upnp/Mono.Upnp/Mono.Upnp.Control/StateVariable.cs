@@ -114,23 +114,23 @@ namespace Mono.Upnp.Control
 
         public Type Type { get; private set; }
 
-        [XmlAttribute ("sendEvents")]
+        [XmlAttribute ("sendEvents", OmitIfNull = true)]
         protected virtual string SendsEventsString {
-            get { return SendsEvents ? "yes" : "no"; }
+            get { return SendsEvents ? "yes" : null; }
             set { SendsEvents = value == "yes"; }
         }
         
         public bool SendsEvents { get; protected set; }
         
-        [XmlAttribute ("multicast", Protocol.ServiceUrn)]
         public virtual bool IsMulticast { get; protected set; }
 
-        [XmlElement ("defaultValue", Protocol.ServiceUrn, OmitIfNull = true)]
+        [XmlAttribute ("multicast", OmitIfNull = true)]
         protected virtual string IsMulticastString {
-            get { return IsMulticast ? "yes" : "no"; }
+            get { return IsMulticast ? "yes" : null; }
             set { IsMulticast = value == "yes"; }
         }
         
+        [XmlElement ("defaultValue", Protocol.ServiceUrn, OmitIfNull = true)]
         public string DefaultValue { get; protected set; }
 
         [XmlArray ("allowedValueList", Protocol.ServiceUrn, OmitIfNull = true)]

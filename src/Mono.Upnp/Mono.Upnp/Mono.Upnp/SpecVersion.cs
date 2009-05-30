@@ -29,7 +29,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
 {
-    [XmlType ("specVersion", Protocol.DeviceUrn)]
+    [XmlType ("specVersion")]
     public class SpecVersion
     {
         protected SpecVersion ()
@@ -42,10 +42,10 @@ namespace Mono.Upnp
             Minor = minor;
         }
         
-        [XmlElement ("major", Protocol.DeviceUrn)]
+        [XmlElement ("major")]
         public virtual int Major { get; protected set; }
         
-        [XmlElement ("minor", Protocol.DeviceUrn)]
+        [XmlElement ("minor")]
         public virtual int Minor { get; protected set; }
     }
 }

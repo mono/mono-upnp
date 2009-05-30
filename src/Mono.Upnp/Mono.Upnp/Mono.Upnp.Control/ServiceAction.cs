@@ -50,18 +50,15 @@ namespace Mono.Upnp.Control
             arguments = new Map<string, Argument> (ArgumentMapper);
         }
         
-        public ServiceAction (IEnumerable<Argument> arguments, ServiceController controller, string name)
-            : this (arguments, controller)
+        public ServiceAction (string name, IEnumerable<Argument> arguments)
+            : this (arguments)
         {
             Name = name;
         }
         
-        protected ServiceAction (IEnumerable<Argument> arguments, ServiceController controller)
+        protected ServiceAction (IEnumerable<Argument> arguments)
         {
-            if (controller == null) throw new ArgumentNullException ("controller");
-            
-            this.controller = controller;
-            arguments = Helper.MakeReadOnlyCopy<string, Argument> (arguments, ArgumentMapper);
+            this.arguments = Helper.MakeReadOnlyCopy<string, Argument> (arguments, ArgumentMapper);
         }
         
         static string ArgumentMapper (Argument argument)

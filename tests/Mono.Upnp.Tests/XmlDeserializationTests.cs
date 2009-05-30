@@ -746,5 +746,12 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual (EnumTestEnum.Bar, deserialized_object.Thing);
             Assert.AreEqual (EnumTestEnum.Bat, deserialized_object.Doohicky);
         }
+        
+        [Test]
+        public void NoNamespaceTest ()
+        {
+            var deserialized_object = Deserialize<ElementTestClass> (@"<Test xmlns=""urn:mono-upnp:tests""><Foo>bar</Foo></Test>");
+            Assert.AreEqual ("bar", deserialized_object.Foo);
+        }
     }
 }

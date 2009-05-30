@@ -299,6 +299,8 @@ namespace Mono.Upnp.Xml
                     var name = CreateName (context.Reader.LocalName, context.Reader.NamespaceURI);
                     if (deserializers.ContainsKey (name)) {
                         deserializers[name] (obj, context);
+                    } else if (deserializers.ContainsKey (context.Reader.Name)) {
+                        deserializers[context.Reader.Name] (obj, context);
                     } else {
                         // TODO this is a workaround for mono bug 334752 and another problem
                         context.Reader.Skip ();
@@ -563,7 +565,11 @@ namespace Mono.Upnp.Xml
         
         static string CreateName (string backupName, string name, string @namespace)
         {
-            return string.Format ("{0}/{1}", name ?? backupName, @namespace);
+            if (string.IsNullOrEmpty (@namespace)) {
+                return name ?? backupName;
+            } else {
+                return string.Format ("{0}/{1}", name ?? backupName, @namespace);
+            }
         }
         
         static void AddDeserializer (Dictionary<string, ObjectDeserializer> deserializers, string name, ObjectDeserializer deserializer)

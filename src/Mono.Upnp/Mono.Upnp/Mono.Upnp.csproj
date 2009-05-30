@@ -58,7 +58,6 @@
     <Compile Include="Mono.Upnp.Control\ActionResult.cs" />
     <Compile Include="Mono.Upnp.Control\AllowedValueRange.cs" />
     <Compile Include="Mono.Upnp.Control\Argument.cs" />
-    <Compile Include="Mono.Upnp.Control\ArgumentDirection.cs" />
     <Compile Include="Mono.Upnp.Control\ServiceAction.cs" />
     <Compile Include="Mono.Upnp.Control\StateVariable.cs" />
     <Compile Include="Mono.Upnp.Control\StateVariableChangedArgs.cs" />
@@ -101,6 +100,7 @@
     <Compile Include="Mono.Upnp.Xml\DoNotSerializeAttribute.cs" />
     <Compile Include="Mono.Upnp.Control\IMap.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlNamespaceAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\ArgumentDirection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

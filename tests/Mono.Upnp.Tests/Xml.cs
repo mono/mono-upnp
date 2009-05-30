@@ -131,7 +131,7 @@ namespace Mono.Upnp.Tests
         
         public const string FullScpd =
            @"<?xml version=""1.0"" encoding=""utf-16""?>" +
-           @"<scpd configId=""1"" xmlns=""urn:schemas-upnp-org:service-1-0"">" +
+           @"<scpd configId="""" xmlns=""urn:schemas-upnp-org:service-1-0"">" +
                 "<specVersion>" +
                     "<major>1</major>" +
                     "<minor>1</minor>" +
