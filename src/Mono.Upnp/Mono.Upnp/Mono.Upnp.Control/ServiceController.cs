@@ -82,7 +82,7 @@ namespace Mono.Upnp.Control
         protected internal virtual string ConfigurationId { get; set; }
         
         // FIXME this doesn't get deserialize because the namespaces differ. Yeah UPnP spec!
-        [XmlElement ("specVersion", Protocol.ServiceUrn)]
+        [XmlElement ("specVersion")]
         public virtual SpecVersion SpecVersion { get; protected set; }
         
         [XmlArray ("actionList", Protocol.ServiceUrn)]

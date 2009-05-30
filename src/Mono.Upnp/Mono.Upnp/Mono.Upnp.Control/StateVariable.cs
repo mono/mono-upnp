@@ -47,9 +47,29 @@ namespace Mono.Upnp.Control
 
             this.controller = service;
         }
-
-        public ServiceController Controller {
-            get { return controller; }
+        
+        protected internal StateVariable (string name, string dataType, string defaultValue, bool sendsEvents, bool isMulticast)
+        {
+            if (name == null) throw new ArgumentNullException ("name");
+            if (dataType == null) throw new ArgumentNullException ("dataType");
+            
+            Name = name;
+            DataType = dataType;
+            DefaultValue = defaultValue;
+            SendsEvents = sendsEvents;
+            IsMulticast = isMulticast;
+        }
+        
+        protected internal StateVariable (string name, IEnumerable<string> allowedValue, string defaultValue)
+            : this (name, "string", defaultValue, false, false)
+        {
+            allowed_values = Helper.MakeReadOnlyCopy (allowedValue);
+        }
+        
+        protected internal StateVariable (string name, string dataType, AllowedValueRange allowedValueRange, string defaultValue)
+            : this (name, dataType, defaultValue, false, false)
+        {
+            AllowedValueRange = allowedValueRange;
         }
         
         [XmlElement ("name", Protocol.ServiceUrn)]
@@ -72,7 +92,12 @@ namespace Mono.Upnp.Control
         public virtual bool IsMulticast { get; protected set; }
 
         [XmlElement ("defaultValue", Protocol.ServiceUrn)]
-        public virtual string DefaultValue { get; protected set; }
+        protected virtual string IsMulticastString {
+            get { return IsMulticast ? "yes" : "no"; }
+            set { IsMulticast = value == "yes"; }
+        }
+        
+        public string DefaultValue { get; protected set; }
 
         [XmlArray ("allowedValueList", Protocol.ServiceUrn)]
         [XmlArrayItem ("allowedValue", Protocol.ServiceUrn)]
