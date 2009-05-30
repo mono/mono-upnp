@@ -35,18 +35,14 @@ namespace Mono.Ssdp
 {
     public class Client : IDisposable
     {
-        private static bool strict_protocol = true;
-        public static bool StrictProtocol {
-            get { return strict_protocol; }
-            set { strict_protocol = value; }
-        }
+        public static bool StrictProtocol { get; set; }
 
         private bool disposed;
         private readonly object mutex = new object();
         private NotifyListener notify_listener;
         private Dictionary<string, Browser> browsers;
 
-        private TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
+        private readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
         internal TimeoutDispatcher Dispatcher {
             get { return dispatcher; }
         }
@@ -56,28 +52,13 @@ namespace Mono.Ssdp
             get { lock (service_cache) { return service_cache; } }
         }
         
-        private bool started;
-        public bool Started {
-            get { return started; }
-        }
+        public bool Started { get; private set; }
         
-        private event EventHandler<ServiceArgs> service_added;
-        public event EventHandler<ServiceArgs> ServiceAdded {
-            add { service_added += value; }
-            remove { service_added -= value; }
-        }
+        public event EventHandler<ServiceArgs> ServiceAdded;
 
-        private event EventHandler<ServiceArgs> service_updated;
-        public event EventHandler<ServiceArgs> ServiceUpdated {
-            add { service_updated += value; }
-            remove { service_updated -= value; }
-        }
+        public event EventHandler<ServiceArgs> ServiceUpdated;
 
-        private event EventHandler<ServiceArgs> service_removed;
-        public event EventHandler<ServiceArgs> ServiceRemoved {
-            add { service_removed += value; }
-            remove { service_removed -= value; }
-        }
+        public event EventHandler<ServiceArgs> ServiceRemoved;
     
         public Client ()
         {
@@ -100,10 +81,10 @@ namespace Mono.Ssdp
                     throw new InvalidOperationException ("The Client is already started.");
                 }
 
-                started = true;
+                Started = true;
                 notify_listener.Start ();
                 if (startBrowsers) {
-                    foreach (Browser browser in browsers.Values) {
+                    foreach (var browser in browsers.Values) {
                         if (!browser.Started) {
                             browser.Start ();
                         }
@@ -121,10 +102,10 @@ namespace Mono.Ssdp
         {
             lock (mutex) {
                 CheckDisposed ();
-                started = false;
+                Started = false;
                 notify_listener.Stop ();
                 if (stopBrowsers) {
-                    foreach (Browser browser in browsers.Values) {
+                    foreach (var browser in browsers.Values) {
                         browser.Stop ();
                     }
                 }
@@ -173,7 +154,7 @@ namespace Mono.Ssdp
         internal void RemoveBrowser (Browser browser)
         {
             lock (mutex) {
-                foreach (KeyValuePair<string, Browser> entry in browsers) {
+                foreach (var entry in browsers) {
                     if (entry.Value == browser) {
                         browsers.Remove (entry.Key);
                         return;
@@ -207,7 +188,7 @@ namespace Mono.Ssdp
                 
         protected virtual void OnServiceAdded (Service service)
         {
-            EventHandler<ServiceArgs> handler = service_added;
+            var handler = ServiceAdded;
             if (handler != null) {
                 handler (this, new ServiceArgs (ServiceOperation.Added, service));
             }
@@ -215,7 +196,7 @@ namespace Mono.Ssdp
         
         protected virtual void OnServiceUpdated (Service service)
         {
-            EventHandler<ServiceArgs> handler = service_updated;
+            var handler = ServiceUpdated;
             if (handler != null) {
                 handler (this, new ServiceArgs (ServiceOperation.Updated, service));
             }
@@ -223,7 +204,7 @@ namespace Mono.Ssdp
         
         protected virtual void OnServiceRemoved (string usn)
         {
-            EventHandler<ServiceArgs> handler = service_removed;
+            var handler = ServiceRemoved;
             if (handler != null) {
                 handler (this, new ServiceArgs (usn));
             }
@@ -244,8 +225,8 @@ namespace Mono.Ssdp
                 }
 
                 notify_listener.Stop ();
-                foreach (Browser browser in browsers.Values) {
-                    browser.Dispose ();
+                foreach (var browser in browsers.Values) {
+                    browser.Dispose (false);
                 }
 
                 browsers.Clear ();

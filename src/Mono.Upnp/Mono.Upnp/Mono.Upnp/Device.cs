@@ -156,7 +156,6 @@ namespace Mono.Upnp
             if (deviceUrl == null) throw new ArgumentNullException ("deviceUrl");
             if (Deserializer != null) throw new InvalidOperationException ("The device was constructed for deserialization and cannot be initalized. Use one of the other constructors.");
             
-            // TODO clean up these url generations
             for (var i = 0; i < devices.Count; i++) {
                 devices[i].Initialize (server, root, new Uri (deviceUrl, string.Format ("device/{0}/", i)));
             }

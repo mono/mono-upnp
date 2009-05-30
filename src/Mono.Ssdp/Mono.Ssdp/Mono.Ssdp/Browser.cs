@@ -74,8 +74,15 @@ namespace Mono.Ssdp
         
         public void Dispose ()
         {
+            Dispose (true);
+        }
+        
+        internal void Dispose (bool removeFromClient)
+        {
             Stop ();
-            client.RemoveBrowser (this);
+            if (removeFromClient) {
+                client.RemoveBrowser (this);
+            }
             client = null;
             disposed = true;
         }

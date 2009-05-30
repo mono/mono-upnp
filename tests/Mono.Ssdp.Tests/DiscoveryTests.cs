@@ -34,22 +34,22 @@ namespace Mono.Ssdp.Tests
     public class DiscoveryTests
     {
         readonly object mutex = new object ();
-        Client client = new Client ();
-        Server server = new Server ();
         
         [Test]
         public void BrowseAllAnnouceTest ()
         {
-            client.ServiceAdded += BrowseAllAnnouceTestClientServiceAdded;
-            client.BrowseAll ();
-            lock (mutex) {
-                server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
-                if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
-                    Assert.Fail ("The announcement timed out.");
+            using (var client = new Client ()) {
+                using (var server = new Server ()) {
+                    client.ServiceAdded += BrowseAllAnnouceTestClientServiceAdded;
+                    client.BrowseAll ();
+                    lock (mutex) {
+                        server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
+                        if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
+                            Assert.Fail ("The announcement timed out.");
+                        }
+                    }
                 }
             }
-            client.ServiceAdded -= BrowseAllAnnouceTestClientServiceAdded;
-            
         }
 
         void BrowseAllAnnouceTestClientServiceAdded (object sender, ServiceArgs e)

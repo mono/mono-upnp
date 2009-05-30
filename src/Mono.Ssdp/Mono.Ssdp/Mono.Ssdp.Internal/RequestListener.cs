@@ -104,7 +104,8 @@ namespace Mono.Ssdp.Internal
 
         public void Dispose ()
         {
-            throw new NotImplementedException ();
+            // TODO more here
+            Stop ();
         }
     }
 }
