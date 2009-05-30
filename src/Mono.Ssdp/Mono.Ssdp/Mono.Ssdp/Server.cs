@@ -37,33 +37,24 @@ namespace Mono.Ssdp
 {
     public class Server : IDisposable
     {
-        private readonly object mutex = new object ();
-        private readonly string default_location;
+        readonly object mutex = new object ();
+        readonly string default_location;
 
-        private bool disposed;
+        bool disposed;
 
-        private RequestListener request_listener;
-        private Dictionary<string, Announcer> announcers;
+        readonly RequestListener request_listener;
+        readonly Dictionary<string, Announcer> announcers;
 
-        private bool started;
-        public bool Started {
-            get { return started; }
-        }
+        public bool Started { get; private set; }
 
-        private TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
+        readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
         internal TimeoutDispatcher Dispatcher {
             get { return dispatcher; }
         }
 
-        private SsdpSocket announceSocket;
-        internal SsdpSocket AnnounceSocket {
-            get { return announceSocket; }
-        }
+        internal SsdpSocket AnnounceSocket { get; private set; }
 
-        private SsdpSocket respondSocket;
-        internal SsdpSocket RespondSocket {
-            get { return respondSocket; }
-        }
+        internal SsdpSocket RespondSocket { get; private set; }
 
         public Server ()
         {
@@ -136,16 +127,16 @@ namespace Mono.Ssdp
             lock (mutex) {
                 CheckDisposed ();
 
-                if (started) {
+                if (Started) {
                     throw new InvalidOperationException ("The Server is already started.");
                 }
 
-                started = true;
+                Started = true;
                 request_listener.Start ();
-                announceSocket = new SsdpSocket ();
-                announceSocket.Bind (new IPEndPoint (IPAddress.Any, 0));
-                respondSocket = new SsdpSocket (false);
-                respondSocket.Bind (new IPEndPoint (IPAddress.Any, Protocol.Port));
+                AnnounceSocket = new SsdpSocket ();
+                AnnounceSocket.Bind (new IPEndPoint (IPAddress.Any, 0));
+                RespondSocket = new SsdpSocket (false);
+                RespondSocket.Bind (new IPEndPoint (IPAddress.Any, Protocol.Port));
 
                 if (startAnnouncers) {
                     foreach (Announcer announcer in announcers.Values) {
@@ -162,34 +153,34 @@ namespace Mono.Ssdp
             lock (mutex) {
                 CheckDisposed ();
 
-                if (!started) {
+                if (!Started) {
                     return;
                 }
 
-                WaitHandle[] handles = new WaitHandle[announcers.Count];
+                var handles = new WaitHandle[announcers.Count];
                 int i = 0;
-                foreach (Announcer announcer in announcers.Values) {
+                foreach (var announcer in announcers.Values) {
                     handles[i++] = announcer.StopAsync ();
                 }
 
                 request_listener.Stop ();
-                respondSocket.Close ();
-                respondSocket = null;
+                RespondSocket.Close ();
+                RespondSocket = null;
                 WaitHandle.WaitAll (handles);
-                announceSocket.Close ();
-                announceSocket = null;
-                started = false;
+                AnnounceSocket.Close ();
+                AnnounceSocket = null;
+                Started = false;
             }
         }
 
         internal void RequestRecieved (Request request)
         {
-            foreach (Announcer announcer in Match (request.ST)) {
+            foreach (var announcer in Match (request.ST)) {
                 announcer.Respond (request.EndPoint, request.MX);
             }
         }
 
-        private IEnumerable<Announcer> Match (string st)
+        IEnumerable<Announcer> Match (string st)
         {
             if (st == Protocol.SsdpAll) {
                 return announcers.Values;
@@ -198,16 +189,16 @@ namespace Mono.Ssdp
             }
         }
 
-        private IEnumerable<Announcer> MatchTypeOrName (string st)
+        IEnumerable<Announcer> MatchTypeOrName (string st)
         {
             if (st.StartsWith ("uuid:")) {
-                foreach (Announcer announcer in announcers.Values) {
+                foreach (var announcer in announcers.Values) {
                     if (announcer.Name.StartsWith (st)) {
                         yield return announcer;
                     }
                 }
             } else {
-                foreach (Announcer announcer in announcers.Values) {
+                foreach (var announcer in announcers.Values) {
                     if (announcer.Type == st) {
                         yield return announcer;
                     }
@@ -215,7 +206,7 @@ namespace Mono.Ssdp
             }
         }
 
-        private void CheckDisposed ()
+        void CheckDisposed ()
         {
             if (disposed) {
                 throw new ObjectDisposedException ("Browser has been Disposed");

@@ -470,7 +470,7 @@ namespace Mono.Upnp.Xml
             var dictionary = new Dictionary<object, string> (fields.Length);
             foreach (var field in fields) {
                 var enum_attribute = field.GetCustomAttributes (typeof (XmlEnumAttribute), false);
-                string name = null;
+                string name;
                 if (enum_attribute.Length != 0) {
                     name = ((XmlEnumAttribute)enum_attribute[0]).Value;
                 } else {
