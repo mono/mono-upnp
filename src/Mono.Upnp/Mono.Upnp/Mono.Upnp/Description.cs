@@ -85,9 +85,11 @@ namespace Mono.Upnp
         {
             if (Uri.IsWellFormedUriString (urlFragment, UriKind.Absolute)) {
                 return new Uri (urlFragment);
-            } else {
+            } else if (Uri.IsWellFormedUriString (urlFragment, UriKind.Relative)) {
                 // TODO handle NREs
                 return new Uri (deserializer.Root.UrlBase, urlFragment);
+            } else {
+                throw new UpnpDeserializationException ("The URL fragment is not valid.");
             }
         }
         
