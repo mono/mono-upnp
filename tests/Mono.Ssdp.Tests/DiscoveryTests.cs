@@ -38,21 +38,48 @@ namespace Mono.Ssdp.Tests
         [Test]
         public void BrowseAllAnnouceTest ()
         {
-            using (var client = new Client ()) {
-                using (var server = new Server ()) {
-                    client.ServiceAdded += BrowseAllAnnouceTestClientServiceAdded;
-                    client.BrowseAll ();
-                    lock (mutex) {
-                        server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
-                        if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
-                            Assert.Fail ("The announcement timed out.");
-                        }
+            var client = new Client ();
+            var server = new Server ();
+            client.ServiceAdded += BrowseAllTestClientServiceAdded;
+            try {
+                client.BrowseAll ();
+                lock (mutex) {
+                    server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
+                    if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
+                        Assert.Fail ("The announcement timed out.");
                     }
                 }
+            } catch {
+            } finally {
+                client.ServiceAdded -= BrowseAllTestClientServiceAdded;
+                client.Dispose ();
+                server.Dispose ();
+            }
+        }
+        
+        [Test]
+        public void BrowseAllDiscoverTest ()
+        {
+            var client = new Client ();
+            var server = new Server ();
+            server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
+            client.ServiceAdded += BrowseAllTestClientServiceAdded;
+            try {
+                client.BrowseAll ();
+                lock (mutex) {
+                    if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
+                        Assert.Fail ("The announcement timed out.");
+                    }
+                }
+            } catch {
+            } finally {
+                client.ServiceAdded -= BrowseAllTestClientServiceAdded;
+                client.Dispose ();
+                server.Dispose ();
             }
         }
 
-        void BrowseAllAnnouceTestClientServiceAdded (object sender, ServiceArgs e)
+        void BrowseAllTestClientServiceAdded (object sender, ServiceArgs e)
         {
             lock (mutex) {
                 Assert.AreEqual (ServiceOperation.Added, e.Operation);
