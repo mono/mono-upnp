@@ -41,29 +41,38 @@ namespace Mono.Upnp
 {
     public class Server : IDisposable
     {
+        static WeakReference static_serializer = new WeakReference (null);
         readonly object mutex = new object ();
         Root root;
         DataServer description_server;
         SsdpServer ssdp_server;
-        bool started;
         
-        internal static readonly XmlSerializer Serializer = new XmlSerializer ();
+        internal readonly XmlSerializer Serializer;
         
         public Server (Root root)
         {
             if (root == null) throw new ArgumentNullException ("root");
             
+            if (static_serializer.IsAlive) {
+                Serializer = (XmlSerializer)static_serializer.Target;
+            } else {
+                Serializer = new XmlSerializer ();
+                static_serializer.Target = Serializer;
+            }
+            
             this.root = root;
         }
+        
+        public bool Started { get; private set; }
         
         public Root Root {
             get { return root; }
         }
 
-        public virtual void Start ()
+        public void Start ()
         {
             lock (mutex) {
-                if (started) {
+                if (Started) {
                     throw new InvalidOperationException ("The server is already started.");
                 }
                 if (root == null) {
@@ -73,42 +82,42 @@ namespace Mono.Upnp
                 if (description_server == null) {
                     Initialize ();
                 }
-                root.RootDevice.Start ();
+                root.Start ();
                 description_server.Start ();
                 ssdp_server.Start ();
-                started = true;
+                Started = true;
             }
         }
 
-        public virtual void Stop ()
+        public void Stop ()
         {
             lock (mutex) {
-                if (!started) {
+                if (!Started) {
                     return;
                 }
                 ssdp_server.Stop ();
                 root.RootDevice.Stop ();
                 description_server.Stop ();
-                started = false;
+                Started = false;
             }
         }
 
-        protected virtual void Initialize ()
+        void Initialize ()
         {
             Uri url = MakeUrl ();
             root.Initialize (this, url);
-            //description_server = new DataServer (Serialize, new Uri (url, string.Format ("{0}/{1}/", root_device.Type.ToUrlString (), root_device.Udn)));
-            Announce (new Uri (url, string.Format ("{0}/{1}/", root.RootDevice.Type.ToUrlString (), root.RootDevice.Udn)));
+            description_server = new DataServer (Serializer.GetBytes (Root), url);
+            Announce (url);
         }
 
-        private void Announce (Uri url)
+        void Announce (Uri url)
         {
             ssdp_server = new SsdpServer (url.ToString ());
             ssdp_server.Announce ("upnp:rootdevice", root.RootDevice.Udn + "::upnp:rootdevice", false);
             AnnounceDevice (root.RootDevice);
         }
 
-        private void AnnounceDevice (Device device)
+        void AnnounceDevice (Device device)
         {
             ssdp_server.Announce (device.Udn, device.Udn, false);
             ssdp_server.Announce (device.Type.ToString (), String.Format ("{0}::{1}", device.Udn, device.Type), false);
@@ -122,25 +131,17 @@ namespace Mono.Upnp
             }
         }
 
-        private void AnnounceService (Device device, Service service)
+        void AnnounceService (Device device, Service service)
         {
             ssdp_server.Announce (service.Type.ToString (), String.Format ("{0}::{1}", device.Udn,service.Type), false);
         }
 
-        protected virtual void Serialize (XmlWriter writer)
-        {
-            //writer.WriteStartElement ("root", Protocol.DeviceUrn);
-            //Helper.WriteSpecVersion (writer);
-            //root_device.Serialize (writer);
-            //writer.WriteEndElement ();
-        }
+        static readonly Random random = new Random ();
 
-        private static readonly Random random = new Random ();
+        readonly int port = random.Next (1024, 5000);
 
-        private readonly int port = random.Next (1024, 5000);
-
-        private static IPAddress host;
-        private static IPAddress Host {
+        static IPAddress host;
+        static IPAddress Host {
             get {
                 if (host == null) {
                     foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
@@ -154,7 +155,7 @@ namespace Mono.Upnp
             }
         }
 
-        private Uri MakeUrl ()
+        Uri MakeUrl ()
         {
             foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
                 if (address.AddressFamily == AddressFamily.InterNetwork) {

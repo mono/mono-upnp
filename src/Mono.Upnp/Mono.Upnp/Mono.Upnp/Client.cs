@@ -37,15 +37,17 @@ namespace Mono.Upnp
 {
     public class Client
     {
+        static WeakReference static_deserializer = new WeakReference (null);
+        
         readonly Dictionary<DeviceAnnouncement, DeviceAnnouncement> devices =
             new Dictionary<DeviceAnnouncement, DeviceAnnouncement> ();
         readonly Dictionary<ServiceAnnouncement, ServiceAnnouncement> services =
             new Dictionary<ServiceAnnouncement, ServiceAnnouncement> ();
-        readonly Dictionary<string, Device> descriptions =
-            new Dictionary<string, Device> ();
+        readonly Dictionary<string, Root> descriptions =
+            new Dictionary<string, Root> ();
 
         readonly Mono.Ssdp.Client client = new Mono.Ssdp.Client ();
-        readonly XmlDeserializer deserializer = new XmlDeserializer ();
+        readonly XmlDeserializer deserializer;
         DeserializerFactory deserializer_facotry;
 
         public Client ()
@@ -55,6 +57,12 @@ namespace Mono.Upnp
         
         public Client (DeserializerFactory deserializerFactory)
         {
+            if (static_deserializer.IsAlive) {
+                    deserializer = (XmlDeserializer)static_deserializer.Target;
+            } else {
+                deserializer = new XmlDeserializer ();
+                static_deserializer.Target = deserializer;
+            }
             DeserializerFactory = deserializerFactory ?? new DeserializerFactory ();
             client.ServiceAdded += ClientServiceAdded;
             client.ServiceRemoved += ClientServiceRemoved;
@@ -174,7 +182,7 @@ namespace Mono.Upnp
         {
             foreach (var uri in announcement.Locations) {
                 if (descriptions.ContainsKey (uri)) {
-                    var description = GetService (announcement, descriptions[uri]);
+                    var description = GetService (announcement, descriptions[uri].RootDevice);
                     if (description != null && !description.IsDisposed) {
                         return description;
                     }
@@ -184,7 +192,7 @@ namespace Mono.Upnp
                     if (root == null) {
                         continue;
                     }
-                    descriptions[uri] = root.RootDevice;
+                    descriptions[uri] = root;
                     return GetService (announcement, root.RootDevice);
                 } catch (Exception e) {
                     Log.Exception (string.Format ("There was a problem fetching the description at {0}.", uri), e);
@@ -197,7 +205,7 @@ namespace Mono.Upnp
         {
             foreach (var uri in announcement.Locations) {
                 if (descriptions.ContainsKey (uri)) {
-                    var description = GetDevice (announcement, descriptions[uri]);
+                    var description = GetDevice (announcement, descriptions[uri].RootDevice);
                     if (description != null && !description.IsDisposed) {
                         return description;
                     }
@@ -207,7 +215,7 @@ namespace Mono.Upnp
                     if (root == null) {
                         continue;
                     }
-                    descriptions[uri] = root.RootDevice;
+                    descriptions[uri] = root;
                     return GetDevice (announcement, root.RootDevice);
                 } catch (Exception e) {
                     Log.Exception (string.Format ("There was a problem fetching the description at {0}.", uri), e);

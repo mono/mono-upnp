@@ -91,6 +91,16 @@ namespace Mono.Upnp
             RootDevice.Initialize (server, this, url);
         }
         
+        protected internal virtual void Start ()
+        {
+            RootDevice.Start ();
+        }
+        
+        protected internal virtual void Stop ()
+        {
+            RootDevice.Stop ();
+        }
+        
         [XmlTypeDeserializer]
         protected virtual Device DeserializeDevice (XmlDeserializationContext context)
         {

@@ -100,7 +100,7 @@ namespace Mono.Upnp.Tests
         }
         
         [Test]
-        public void FullDescriptionTest ()
+        public void OfflineFullDescriptionTest ()
         {
             var source_root = new DummyRoot (
                 new DeviceSettings (

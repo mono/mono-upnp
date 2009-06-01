@@ -39,6 +39,10 @@
       <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
       <Name>Mono.Upnp</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj">
+      <Project>{AD422A19-BA07-4039-B843-84E386804DD1}</Project>
+      <Name>Mono.Ssdp</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="XmlSerializationTests.cs" />
@@ -51,6 +55,7 @@
     <Compile Include="DummyRoot.cs" />
     <Compile Include="DeviceDescriptionTests.cs" />
     <Compile Include="ServiceDescriptionTests.cs" />
+    <Compile Include="ServerTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

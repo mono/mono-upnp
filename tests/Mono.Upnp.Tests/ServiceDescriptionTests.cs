@@ -102,7 +102,7 @@ namespace Mono.Upnp.Control.Tests
         }
         
         [Test]
-        public void FullScpdTest ()
+        public void OfflineFullScpdTest ()
         {
             var source_controller = new ServiceController (
                 new object (),
