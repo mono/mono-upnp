@@ -43,9 +43,9 @@ namespace Mono.Upnp
     {
         static WeakReference static_serializer = new WeakReference (null);
         readonly object mutex = new object ();
-        Root root;
         DataServer description_server;
         SsdpServer ssdp_server;
+        Root root;
         
         public Server (Root root)
         {
@@ -63,6 +63,7 @@ namespace Mono.Upnp
         public void Start ()
         {
             lock (mutex) {
+                CheckDisposed ();
                 if (Started) {
                     throw new InvalidOperationException ("The server is already started.");
                 }
@@ -83,6 +84,7 @@ namespace Mono.Upnp
         public void Stop ()
         {
             lock (mutex) {
+                CheckDisposed ();
                 if (!Started) {
                     return;
                 }
@@ -162,6 +164,11 @@ namespace Mono.Upnp
             }
             return null;
         }
+        
+        void CheckDisposed ()
+        {
+            if (root == null) throw new ObjectDisposedException (ToString ());
+        }
 
         public void Dispose ()
         {
@@ -178,12 +185,12 @@ namespace Mono.Upnp
             if (disposing) {
                 Stop ();
                 //root_device.Dispose ();
-                root = null;
                 if (description_server != null) {
                     description_server.Dispose ();
                     ssdp_server.Dispose ();
                 }
             }
+            root = null;
         }
     }
 }
