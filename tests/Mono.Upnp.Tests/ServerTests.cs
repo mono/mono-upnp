@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 
 using Mono.Ssdp;
@@ -37,6 +38,45 @@ namespace Mono.Upnp.Tests
     public class ServerTests
     {
         readonly object mutex = new object ();
+        
+        [Test]
+        public void DescriptionTest ()
+        {
+            var root = new DummyRoot (
+                new DeviceSettings (
+                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                    "uuid:d1",
+                    "Mono.Upnp.Tests Device",
+                    "Mono Project",
+                    "Device") {
+                    Services = new Service[] {
+                        new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
+                        new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                    }
+                }, 
+                new Device[] {
+                    new Device (new DeviceSettings (
+                        new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-embedded-device:1"),
+                        "uuid:ed1",
+                        "Mono.Upnp.Tests Embedded Device",
+                        "Mono Project",
+                        "Embedded Device") {
+                        Services = new Service[] {
+                            new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
+                            new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                        }
+                    })
+                }
+            );
+            using (var server = new Server (root)) {
+                server.Start ();
+                var request = WebRequest.Create (root.UrlBase);
+                using (var response = (HttpWebResponse)request.GetResponse ()) {
+                    Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                }
+            }
+        }
+        
         [Test]
         public void AnnouncementTest ()
         {
