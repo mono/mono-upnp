@@ -37,7 +37,7 @@ namespace Mono.Upnp.Tests
         readonly XmlSerializer serializer = new XmlSerializer ();
         readonly DummyDeserializer deserializer = new DummyDeserializer ();
         
-        void AssertEquality (Root sourceRoot, Root targetRoot)
+        public static void AssertEquality (Root sourceRoot, Root targetRoot)
         {
             Assert.AreEqual (sourceRoot.SpecVersion.Major, targetRoot.SpecVersion.Major);
             Assert.AreEqual (sourceRoot.SpecVersion.Minor, targetRoot.SpecVersion.Minor);
@@ -45,7 +45,7 @@ namespace Mono.Upnp.Tests
             AssertEquality (sourceRoot.RootDevice, targetRoot.RootDevice);
         }
         
-        void AssertEquality (Device sourceDevice, Device targetDevice)
+        public static void AssertEquality (Device sourceDevice, Device targetDevice)
         {
             Assert.AreEqual (sourceDevice.Type, targetDevice.Type);
             Assert.AreEqual (sourceDevice.FriendlyName, targetDevice.FriendlyName);
@@ -81,7 +81,7 @@ namespace Mono.Upnp.Tests
             Assert.IsFalse (target_services.MoveNext ());
         }
         
-        void AssertEquality (Icon sourceIcon, Icon targetIcon)
+        public static void AssertEquality (Icon sourceIcon, Icon targetIcon)
         {
             Assert.AreEqual (sourceIcon.MimeType, targetIcon.MimeType);
             Assert.AreEqual (sourceIcon.Width, targetIcon.Width);
@@ -90,7 +90,7 @@ namespace Mono.Upnp.Tests
             Assert.AreEqual (sourceIcon.Url, targetIcon.Url);
         }
         
-        void AssertEquality (Service sourceService, Service targetService)
+        public static void AssertEquality (Service sourceService, Service targetService)
         {
             Assert.AreEqual (sourceService.Type, targetService.Type);
             Assert.AreEqual (sourceService.Id, targetService.Id);

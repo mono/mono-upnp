@@ -38,7 +38,7 @@ namespace Mono.Upnp.Control.Tests
         readonly XmlSerializer serializer = new XmlSerializer ();
         readonly DummyDeserializer deserializer = new DummyDeserializer ();
         
-        void AssertEquality (ServiceController sourceController, ServiceController targetController)
+        public static void AssertEquality (ServiceController sourceController, ServiceController targetController)
         {
             Assert.AreEqual (sourceController.SpecVersion.Major, targetController.SpecVersion.Major);
             Assert.AreEqual (sourceController.SpecVersion.Minor, targetController.SpecVersion.Minor);
@@ -58,7 +58,7 @@ namespace Mono.Upnp.Control.Tests
             Assert.IsFalse (target_state_variables.MoveNext ());
         }
         
-        void AssertEquality (ServiceAction sourceAction, ServiceAction targetAction)
+        public static void AssertEquality (ServiceAction sourceAction, ServiceAction targetAction)
         {
             Assert.AreEqual (sourceAction.Name, targetAction.Name);
             var source_arguments = sourceAction.Arguments.Values.GetEnumerator ();
@@ -70,7 +70,7 @@ namespace Mono.Upnp.Control.Tests
             Assert.IsFalse (target_arguments.MoveNext ());
         }
         
-        void AssertEquality (Argument sourceArgument, Argument targetArgument)
+        public static void AssertEquality (Argument sourceArgument, Argument targetArgument)
         {
             Assert.AreEqual (sourceArgument.Name, targetArgument.Name);
             Assert.AreEqual (sourceArgument.Direction, targetArgument.Direction);
@@ -78,7 +78,7 @@ namespace Mono.Upnp.Control.Tests
             Assert.AreEqual (sourceArgument.RelatedStateVariableName, targetArgument.RelatedStateVariableName);
         }
         
-        void AssertEquality (StateVariable sourceStateVariable, StateVariable targetStateVariable)
+        public static void AssertEquality (StateVariable sourceStateVariable, StateVariable targetStateVariable)
         {
             Assert.AreEqual (sourceStateVariable.Name, targetStateVariable.Name);
             Assert.AreEqual (sourceStateVariable.DataType, targetStateVariable.DataType);
