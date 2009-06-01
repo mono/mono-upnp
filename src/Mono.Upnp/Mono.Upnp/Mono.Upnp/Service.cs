@@ -88,7 +88,7 @@ namespace Mono.Upnp
         
         public virtual Uri EventUrl { get; protected set; }
         
-        protected internal virtual void Initialize (Server server, Root root, Uri serviceUrl)
+        protected internal virtual void Initialize (XmlSerializer serializer, Root root, Uri serviceUrl)
         {
             Initialize (root);
             if (serviceUrl == null) throw new ArgumentNullException ("serviceUrl");
@@ -96,7 +96,7 @@ namespace Mono.Upnp
             ScpdUrl = new Uri (serviceUrl, "scpd/");
             ControlUrl = new Uri (serviceUrl, "control/");
             EventUrl = new Uri (serviceUrl, "event/");
-            controller.Initialize (server, this);
+            controller.Initialize (serializer, this);
         }
         
         protected internal virtual void Start ()

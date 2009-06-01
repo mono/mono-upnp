@@ -81,7 +81,6 @@ namespace Mono.Upnp.Control
         [XmlAttribute ("configId")]
         protected internal virtual string ConfigurationId { get; set; }
         
-        // FIXME this doesn't get deserialize because the namespaces differ. Yeah UPnP spec!
         [XmlElement ("specVersion")]
         public virtual SpecVersion SpecVersion { get; protected set; }
         
@@ -103,12 +102,12 @@ namespace Mono.Upnp.Control
             get { return state_variables; }
         }
         
-        protected internal virtual void Initialize (Server server, Service service)
+        protected internal virtual void Initialize (XmlSerializer serializer, Service service)
         {
-            if (server == null) throw new ArgumentNullException ("server");
+            if (serializer == null) throw new ArgumentNullException ("serializer");
             if (service == null) throw new ArgumentNullException ("service");
             
-            scpd_server = new DataServer (server.Serializer.GetBytes (this), service.ScpdUrl);
+            scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
             control_server = new ControlServer (this, service.ControlUrl);
             event_server = new EventServer (this, service.EventUrl);
         }

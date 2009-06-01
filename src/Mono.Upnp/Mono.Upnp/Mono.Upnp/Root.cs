@@ -80,7 +80,7 @@ namespace Mono.Upnp
         [XmlElement ("device", Protocol.DeviceUrn)]
         public virtual Device RootDevice { get; protected set; }
         
-        protected internal virtual void Initialize (Server server, Uri url)
+        protected internal virtual void Initialize (XmlSerializer serializer, Uri url)
         {
             // TODO better error message
             if (url == null) throw new ArgumentNullException ("url");
@@ -88,7 +88,7 @@ namespace Mono.Upnp
             
             UrlBase = url;
             // TODO clean this up, localize it
-            RootDevice.Initialize (server, this, url);
+            RootDevice.Initialize (serializer, this, url);
         }
         
         protected internal virtual void Start ()

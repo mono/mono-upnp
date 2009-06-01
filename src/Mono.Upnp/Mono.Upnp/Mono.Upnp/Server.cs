@@ -47,18 +47,9 @@ namespace Mono.Upnp
         DataServer description_server;
         SsdpServer ssdp_server;
         
-        internal readonly XmlSerializer Serializer;
-        
         public Server (Root root)
         {
             if (root == null) throw new ArgumentNullException ("root");
-            
-            if (static_serializer.IsAlive) {
-                Serializer = (XmlSerializer)static_serializer.Target;
-            } else {
-                Serializer = new XmlSerializer ();
-                static_serializer.Target = Serializer;
-            }
             
             this.root = root;
         }
@@ -104,9 +95,16 @@ namespace Mono.Upnp
 
         void Initialize ()
         {
+            XmlSerializer serializer;
+            if (static_serializer.IsAlive) {
+                serializer = (XmlSerializer)static_serializer.Target;
+            } else {
+                serializer = new XmlSerializer ();
+                static_serializer.Target = serializer;
+            }
             Uri url = MakeUrl ();
-            root.Initialize (this, url);
-            description_server = new DataServer (Serializer.GetBytes (Root), url);
+            root.Initialize (serializer, url);
+            description_server = new DataServer (serializer.GetBytes (Root), url);
             Announce (url);
         }
 

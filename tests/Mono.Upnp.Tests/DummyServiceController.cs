@@ -33,7 +33,7 @@ namespace Mono.Upnp.Control.Tests
         {
         }
         
-        protected override void Initialize (Server server, Service service)
+        protected override void Initialize (Mono.Upnp.Xml.XmlSerializer serializer, Service service)
         {
         }
     }
