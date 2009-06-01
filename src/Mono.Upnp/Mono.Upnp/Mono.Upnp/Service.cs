@@ -34,7 +34,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
 {
-    [XmlType ("service", Protocol.DeviceUrn)]
+    [XmlType ("service", Protocol.DeviceSchema)]
     public class Service : Description
     {
         ServiceController controller;
@@ -58,13 +58,13 @@ namespace Mono.Upnp
             Id = id;
         }
         
-        [XmlElement ("serviceType", Protocol.DeviceUrn)]
+        [XmlElement ("serviceType", Protocol.DeviceSchema)]
         public virtual ServiceType Type { get; protected set; }
         
-        [XmlElement ("serviceId", Protocol.DeviceUrn)]
+        [XmlElement ("serviceId", Protocol.DeviceSchema)]
         public virtual string Id { get; protected set; }
         
-        [XmlElement ("SCPDURL", Protocol.DeviceUrn)]
+        [XmlElement ("SCPDURL", Protocol.DeviceSchema)]
         protected virtual string ScpdUrlFragment {
             get { return CollapseUrl (ScpdUrl); }
             set { ScpdUrl = ExpandUrl (value); }
@@ -72,7 +72,7 @@ namespace Mono.Upnp
         
         public virtual Uri ScpdUrl { get; protected set; }
         
-        [XmlElement ("controlURL", Protocol.DeviceUrn)]
+        [XmlElement ("controlURL", Protocol.DeviceSchema)]
         protected virtual string ControlUrlFragment {
             get { return CollapseUrl (ControlUrl); }
             set { ControlUrl = ExpandUrl (value); }
@@ -80,7 +80,7 @@ namespace Mono.Upnp
         
         public virtual Uri ControlUrl { get; protected set; }
         
-        [XmlElement ("eventSubURL", Protocol.DeviceUrn)]
+        [XmlElement ("eventSubURL", Protocol.DeviceSchema)]
         protected virtual string EventUrlFragment {
             get { return CollapseUrl (EventUrl); }
             set { EventUrl = ExpandUrl (value); }

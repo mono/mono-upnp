@@ -34,7 +34,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    [XmlType ("stateVariable", Protocol.ServiceUrn)]
+    [XmlType ("stateVariable", Protocol.ServiceSchema)]
     public class StateVariable : XmlAutomatable
     {
         readonly ServiceController controller;
@@ -106,10 +106,10 @@ namespace Mono.Upnp.Control
             IsMulticast = isMulticast;
         }
         
-        [XmlElement ("name", Protocol.ServiceUrn)]
+        [XmlElement ("name", Protocol.ServiceSchema)]
         public virtual string Name { get; protected set; }
 
-        [XmlElement ("dataType", Protocol.ServiceUrn)]
+        [XmlElement ("dataType", Protocol.ServiceSchema)]
         public virtual string DataType { get; protected set; }
 
         public Type Type { get; private set; }
@@ -130,11 +130,11 @@ namespace Mono.Upnp.Control
             set { IsMulticast = value == "yes"; }
         }
         
-        [XmlElement ("defaultValue", Protocol.ServiceUrn, OmitIfNull = true)]
+        [XmlElement ("defaultValue", Protocol.ServiceSchema, OmitIfNull = true)]
         public string DefaultValue { get; protected set; }
 
-        [XmlArray ("allowedValueList", Protocol.ServiceUrn, OmitIfNull = true)]
-        [XmlArrayItem ("allowedValue", Protocol.ServiceUrn)]
+        [XmlArray ("allowedValueList", Protocol.ServiceSchema, OmitIfNull = true)]
+        [XmlArrayItem ("allowedValue", Protocol.ServiceSchema)]
         protected virtual ICollection<string> AllowedValueCollection {
             get { return allowed_values; }
         }
@@ -143,7 +143,7 @@ namespace Mono.Upnp.Control
             get { return allowed_values; }
         }
 
-        [XmlElement ("allowedValueRange", Protocol.ServiceUrn, OmitIfNull = true)]
+        [XmlElement ("allowedValueRange", Protocol.ServiceSchema, OmitIfNull = true)]
         public virtual AllowedValueRange AllowedValueRange { get; protected set; }
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)
@@ -157,7 +157,7 @@ namespace Mono.Upnp.Control
         {
             if (context == null) throw new ArgumentNullException ("context");
             
-            if (context.Reader.LocalName == "allowedValueList" && context.Reader.NamespaceURI == Protocol.ServiceUrn) {
+            if (context.Reader.LocalName == "allowedValueList" && context.Reader.NamespaceURI == Protocol.ServiceSchema) {
                 allowed_values = new List<string> ();
             }
             context.AutoDeserializeElement (this);

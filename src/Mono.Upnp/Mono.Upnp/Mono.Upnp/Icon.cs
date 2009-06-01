@@ -35,7 +35,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
 {
-    [XmlType ("icon", Protocol.DeviceUrn)]
+    [XmlType ("icon", Protocol.DeviceSchema)]
     public class Icon : Description
     {
         string filename;
@@ -77,7 +77,7 @@ namespace Mono.Upnp
             MimeType = mimetype;
         }
 
-        [XmlElement ("url", Protocol.DeviceUrn)]
+        [XmlElement ("url", Protocol.DeviceSchema)]
         protected virtual string UrlFragment {
             get { return CollapseUrl (Url); }
             set { Url = ExpandUrl (value); }
@@ -85,16 +85,16 @@ namespace Mono.Upnp
         
         public virtual Uri Url { get; protected set; }
         
-        [XmlElement ("mimetype", Protocol.DeviceUrn)]
+        [XmlElement ("mimetype", Protocol.DeviceSchema)]
         public virtual string MimeType { get; protected set; }
         
-        [XmlElement ("width", Protocol.DeviceUrn)]
+        [XmlElement ("width", Protocol.DeviceSchema)]
         public virtual int Width { get; protected set; }
         
-        [XmlElement ("height", Protocol.DeviceUrn)]
+        [XmlElement ("height", Protocol.DeviceSchema)]
         public virtual int Height { get; protected set; }
         
-        [XmlElement ("depth", Protocol.DeviceUrn)]
+        [XmlElement ("depth", Protocol.DeviceSchema)]
         public virtual int Depth { get; protected set; }
         
         protected internal virtual void Initialize (Root root, Uri iconUrl)

@@ -32,10 +32,10 @@ namespace Mono.Upnp.Internal
 {
     static class Protocol
     {
-        public const string DeviceUrn = "urn:schemas-upnp-org:device-1-0";
-        public const string ServiceUrn = "urn:schemas-upnp-org:service-1-0";
-        public const string ControlUrn = "urn:schemas-upnp-org:control-1-0";
-        public const string EventUrn = "urn:schemas-upnp-org:event-1-0";
+        public const string DeviceSchema = "urn:schemas-upnp-org:device-1-0";
+        public const string ServiceSchema = "urn:schemas-upnp-org:service-1-0";
+        public const string ControlSchema = "urn:schemas-upnp-org:control-1-0";
+        public const string EventSchema = "urn:schemas-upnp-org:event-1-0";
         public const string SoapEnvelopeSchema = "http://schemas.xmlsoap.org/soap/envelope/";
         public const string SoapEncodingSchema = "http://schemas.xmlsoap.org/soap/encoding/";
         // TODO make this better

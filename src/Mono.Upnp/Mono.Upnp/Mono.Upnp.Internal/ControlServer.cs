@@ -170,7 +170,7 @@ namespace Mono.Upnp.Internal
             writer.WriteValue ("UPnPError");
             writer.WriteEndElement ();
             writer.WriteStartElement ("detail");
-            writer.WriteStartElement ("UPnPError", Protocol.ControlUrn);
+            writer.WriteStartElement ("UPnPError", Protocol.ControlSchema);
             writer.WriteStartElement ("errorCode");
             //writer.WriteValue (e.Code);
             writer.WriteEndElement ();

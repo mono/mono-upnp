@@ -33,7 +33,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    [XmlType ("allowedValueRange", Protocol.ServiceUrn)]
+    [XmlType ("allowedValueRange", Protocol.ServiceSchema)]
     public sealed class AllowedValueRange
     {
         AllowedValueRange ()
@@ -55,13 +55,13 @@ namespace Mono.Upnp.Control
             Step = step;
         }
         
-        [XmlElement ("minimum", Protocol.ServiceUrn)]
+        [XmlElement ("minimum", Protocol.ServiceSchema)]
         public string Minimum { get; private set; }
         
-        [XmlElement ("maximum", Protocol.ServiceUrn)]
+        [XmlElement ("maximum", Protocol.ServiceSchema)]
         public string Maximum { get; private set; }
         
-        [XmlElement ("step", Protocol.ServiceUrn, OmitIfNull = true)]
+        [XmlElement ("step", Protocol.ServiceSchema, OmitIfNull = true)]
         public string Step { get; private set; }
         
         internal IComparable Min { get; set; }

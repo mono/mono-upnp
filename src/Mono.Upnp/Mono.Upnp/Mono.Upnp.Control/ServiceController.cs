@@ -34,7 +34,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    [XmlType ("scpd", Protocol.ServiceUrn)]
+    [XmlType ("scpd", Protocol.ServiceSchema)]
     public class ServiceController : Description, IXmlDeserializable
     {
         readonly Map<string, ServiceAction> actions;
@@ -84,7 +84,7 @@ namespace Mono.Upnp.Control
         [XmlElement ("specVersion")]
         public virtual SpecVersion SpecVersion { get; protected set; }
         
-        [XmlArray ("actionList", Protocol.ServiceUrn)]
+        [XmlArray ("actionList", Protocol.ServiceSchema)]
         protected virtual ICollection<ServiceAction> ActionCollection {
             get { return actions; }
         }
@@ -93,7 +93,7 @@ namespace Mono.Upnp.Control
             get { return actions; }
         }
         
-        [XmlArray ("serviceStateTable", Protocol.ServiceUrn)]
+        [XmlArray ("serviceStateTable", Protocol.ServiceSchema)]
         protected ICollection<StateVariable> StateVariablesCollection {
             get { return state_variables; }
         }

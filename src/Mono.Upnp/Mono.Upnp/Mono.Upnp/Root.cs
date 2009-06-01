@@ -33,7 +33,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
 {
-    [XmlType ("root", Protocol.DeviceUrn)]
+    [XmlType ("root", Protocol.DeviceSchema)]
     public class Root : Description
     {
         protected internal Root (Deserializer deserializer, Uri url)
@@ -70,14 +70,14 @@ namespace Mono.Upnp
         [XmlAttribute ("configId")]
         public virtual string ConfigurationId { get; protected set; }
         
-        [XmlElement ("specVersion", Protocol.DeviceUrn)]
+        [XmlElement ("specVersion", Protocol.DeviceSchema)]
         public virtual SpecVersion SpecVersion { get; protected set; }
         
         [DoNotSerialize]
-        [XmlElement ("URLBase", Protocol.DeviceUrn)]
+        [XmlElement ("URLBase", Protocol.DeviceSchema)]
         public virtual Uri UrlBase { get; protected set; }
         
-        [XmlElement ("device", Protocol.DeviceUrn)]
+        [XmlElement ("device", Protocol.DeviceSchema)]
         public virtual Device RootDevice { get; protected set; }
         
         protected internal virtual void Initialize (XmlSerializer serializer, Uri url)

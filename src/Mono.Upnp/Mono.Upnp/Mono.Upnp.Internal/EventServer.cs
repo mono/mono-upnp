@@ -105,10 +105,10 @@ namespace Mono.Upnp.Internal
             Stream stream = request.GetRequestStream ();
             XmlWriter writer = XmlWriter.Create (stream);
             writer.WriteStartDocument ();
-            writer.WriteStartElement ("e", "propertyset", Protocol.EventUrn);
+            writer.WriteStartElement ("e", "propertyset", Protocol.EventSchema);
             foreach (StateVariable state_variable in controller.StateVariables.Values) {
                 if (state_variable.SendsEvents) {
-                    writer.WriteStartElement ("property", Protocol.EventUrn);
+                    writer.WriteStartElement ("property", Protocol.EventSchema);
                     writer.WriteStartElement (state_variable.Name);
                     //writer.WriteValue (state_variable.Value);
                     writer.WriteEndElement ();

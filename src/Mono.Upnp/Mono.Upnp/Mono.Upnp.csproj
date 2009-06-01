@@ -101,6 +101,7 @@
     <Compile Include="Mono.Upnp.Control\IMap.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlNamespaceAttribute.cs" />
     <Compile Include="Mono.Upnp.Control\ArgumentDirection.cs" />
+    <Compile Include="Mono.Upnp.Internal\SoapMessage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
