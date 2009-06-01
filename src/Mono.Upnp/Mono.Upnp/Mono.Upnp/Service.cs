@@ -51,7 +51,7 @@ namespace Mono.Upnp
             this.controller = controller;
         }
         
-        protected internal Service (ServiceController controller, ServiceType type, string id)
+        public Service (ServiceController controller, ServiceType type, string id)
             : this (controller)
         {
             Type = type;

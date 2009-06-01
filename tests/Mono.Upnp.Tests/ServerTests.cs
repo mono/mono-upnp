@@ -29,8 +29,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Xml;
 
 using Mono.Ssdp;
+using Mono.Upnp.Control;
+
 using NUnit.Framework;
 
 namespace Mono.Upnp.Tests
@@ -84,6 +87,34 @@ namespace Mono.Upnp.Tests
             using (var server = new Server (root)) {
                 server.Start ();
                 var request = WebRequest.Create (root.UrlBase);
+                using (var response = (HttpWebResponse)request.GetResponse ()) {
+                    Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                }
+            }
+        }
+        
+        [Test]
+        public void ScpdTest ()
+        {
+            var root = new DummyRoot (
+                new DeviceSettings (
+                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                    "uuid:d1",
+                    "Mono.Upnp.Tests Device",
+                    "Mono Project",
+                    "Device") {
+                    Services = new Service[] {
+                        new Service (
+                            new ServiceController (new object (), null, null),
+                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            "urn:upnp-org:serviceId:testService1"
+                        )
+                    }
+                }
+            );
+            using (var server = new Server (root)) {
+                server.Start ();
+                var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/scpd/"));
                 using (var response = (HttpWebResponse)request.GetResponse ()) {
                     Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
                 }

@@ -105,8 +105,10 @@ namespace Mono.Upnp.Control
         
         protected internal virtual void Initialize (Server server, Service service)
         {
+            if (server == null) throw new ArgumentNullException ("server");
             if (service == null) throw new ArgumentNullException ("service");
             
+            scpd_server = new DataServer (server.Serializer.GetBytes (this), service.ScpdUrl);
             control_server = new ControlServer (this, service.ControlUrl);
             event_server = new EventServer (this, service.EventUrl);
         }

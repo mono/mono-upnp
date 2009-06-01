@@ -31,6 +31,11 @@ namespace Mono.Upnp.Tests
 {
     public class DummyRoot : Root
     {
+        public DummyRoot (DeviceSettings rootDeviceSettings)
+            : this (rootDeviceSettings, null)
+        {
+        }
+        
         public DummyRoot (DeviceSettings rootDeviceSettings, IEnumerable<Device> embeddedDevices)
             : base (rootDeviceSettings, embeddedDevices)
         {
