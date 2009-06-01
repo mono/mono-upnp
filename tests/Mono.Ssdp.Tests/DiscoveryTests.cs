@@ -36,46 +36,36 @@ namespace Mono.Ssdp.Tests
         readonly object mutex = new object ();
         
         [Test]
-        public void BrowseAllAnnouceTest ()
+        public void BrowseAllAnnoucementTest ()
         {
-            var client = new Client ();
-            var server = new Server ();
-            client.ServiceAdded += BrowseAllTestClientServiceAdded;
-            try {
-                client.BrowseAll ();
-                lock (mutex) {
-                    server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
-                    if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
-                        Assert.Fail ("The announcement timed out.");
+            using (var client = new Client ()) {
+                using (var server = new Server ()) {
+                    client.ServiceAdded += BrowseAllTestClientServiceAdded;
+                    client.BrowseAll ();
+                    lock (mutex) {
+                        server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
+                        if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
+                            Assert.Fail ("The announcement timed out.");
+                        }
                     }
                 }
-            } catch {
-            } finally {
-                client.ServiceAdded -= BrowseAllTestClientServiceAdded;
-                client.Dispose ();
-                server.Dispose ();
             }
         }
         
         [Test]
-        public void BrowseAllDiscoverTest ()
+        public void BrowseAllDiscoveryTest ()
         {
-            var client = new Client ();
-            var server = new Server ();
-            server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
-            client.ServiceAdded += BrowseAllTestClientServiceAdded;
-            try {
-                client.BrowseAll ();
-                lock (mutex) {
-                    if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
-                        Assert.Fail ("The announcement timed out.");
+            using (var client = new Client ()) {
+                using (var server = new Server ()) {
+                    server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
+                    client.ServiceAdded += BrowseAllTestClientServiceAdded;
+                    client.BrowseAll ();
+                    lock (mutex) {
+                        if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
+                            Assert.Fail ("The announcement timed out.");
+                        }
                     }
                 }
-            } catch {
-            } finally {
-                client.ServiceAdded -= BrowseAllTestClientServiceAdded;
-                client.Dispose ();
-                server.Dispose ();
             }
         }
 
