@@ -31,12 +31,20 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Internal
 {
     [XmlType ("Envelope")]
-    class SoapMessage<T>
+    class SoapMessage<THeader, TBody>
+        where THeader : class
     {
-        readonly T body;
+        readonly THeader header;
+        readonly TBody body;
         
-        public SoapMessage (T body)
+        public SoapMessage (TBody body)
+            : this (null, body)
         {
+        }
+        
+        public SoapMessage (THeader header, TBody body)
+        {
+            this.header = header;
             this.body = body;
         }
         
@@ -45,8 +53,13 @@ namespace Mono.Upnp.Internal
             get { return Protocol.SoapEncodingSchema; }
         }
         
+        [XmlElement (OmitIfNull = true)]
+        public THeader Header {
+            get { return header; }
+        }
+        
         [XmlElement]
-        public T Body {
+        public TBody Body {
             get { return body; }
         }
     }
