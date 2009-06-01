@@ -55,10 +55,6 @@ namespace Mono.Upnp
         }
         
         public bool Started { get; private set; }
-        
-        public Root Root {
-            get { return root; }
-        }
 
         public void Start ()
         {
@@ -106,7 +102,7 @@ namespace Mono.Upnp
             }
             Uri url = MakeUrl ();
             root.Initialize (serializer, url);
-            description_server = new DataServer (serializer.GetBytes (Root), url);
+            description_server = new DataServer (serializer.GetBytes (root), url);
             Announce (url);
         }
 
