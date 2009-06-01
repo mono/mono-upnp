@@ -48,7 +48,7 @@ namespace Mono.Upnp.Internal
                 var url = context.Request.Url.ToString ();
                 var slash = url.LastIndexOf ('/', 1);
                 var index = int.Parse (url.Substring (slash, url.Length - slash - 1));
-                var data = icons[index].GetData ();
+                var data = icons[index].Data;
                 context.Response.ContentType = icons[index].MimeType;
                 stream.Write (data, 0, data.Length);
             }

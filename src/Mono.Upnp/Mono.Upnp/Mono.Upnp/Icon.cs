@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.IO;
 using System.Net;
 
 using Mono.Upnp.Internal;
@@ -123,6 +124,15 @@ namespace Mono.Upnp
             var copy = new byte [data.Length];
             Array.Copy (data, copy, data.Length);
             return copy;
+        }
+        
+        protected internal virtual byte[] Data {
+            get {
+                if (data == null && filename != null) {
+                    data = File.ReadAllBytes (filename);
+                }
+                return data;
+            }
         }
 
         protected override void DeserializeElement (XmlDeserializationContext context)
