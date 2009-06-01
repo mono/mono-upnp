@@ -44,21 +44,36 @@ namespace Mono.Upnp.Tests
         {
             using (var string_reader = new StringReader (xml)) {
                 using (var xml_reader = XmlReader.Create (string_reader)) {
-                    xml_reader.ReadToFollowing ("root");
-                    return XmlDeserializer.Deserialize (xml_reader, context => DeserializeRoot (new Uri ("http://localhost:8080/"), context));
+                    return DeserializeRoot (xml_reader);
                 }
             }
+        }
+        
+        public Root DeserializeRoot (XmlReader reader)
+        {
+            return DeserializeRoot (reader, new Uri ("http://localhost:8080/"));
+        }
+        
+        public Root DeserializeRoot (XmlReader reader, Uri url)
+        {
+            reader.ReadToFollowing ("root");
+            return XmlDeserializer.Deserialize (reader, context => DeserializeRoot (url, context));
         }
         
         public ServiceController DeserializeServiceController (string xml)
         {
             using (var string_reader = new StringReader (xml)) {
                 using (var xml_reader = XmlReader.Create (string_reader)) {
-                    xml_reader.ReadToFollowing ("scpd");
-                    return XmlDeserializer.Deserialize (xml_reader, context => DeserializeServiceController (
-                        new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "testService1"), context));
+                    return DeserializeServiceController (xml_reader);
                 }
             }
+        }
+        
+        public ServiceController DeserializeServiceController (XmlReader reader)
+        {
+            reader.ReadToFollowing ("scpd");
+            return XmlDeserializer.Deserialize (reader, context => DeserializeServiceController (
+                new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "testService1"), context));
         }
     }
 }

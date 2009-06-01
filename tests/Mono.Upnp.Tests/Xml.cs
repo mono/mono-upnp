@@ -29,7 +29,7 @@ namespace Mono.Upnp.Tests
     public static class Xml
     {
         public const string FullDeviceDescription =
-           @"<?xml version=""1.0"" encoding=""utf-16""?>" +
+           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
            @"<root configId=""1"" xmlns=""urn:schemas-upnp-org:device-1-0"">" +
                 "<specVersion>" +
                     "<major>1</major>" +
@@ -130,7 +130,7 @@ namespace Mono.Upnp.Tests
             "</root>";
         
         public const string FullScpd =
-           @"<?xml version=""1.0"" encoding=""utf-16""?>" +
+           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
            @"<scpd configId="""" xmlns=""urn:schemas-upnp-org:service-1-0"">" +
                 "<specVersion>" +
                     "<major>1</major>" +

@@ -42,6 +42,7 @@ namespace Mono.Upnp.Tests
     public class ServerTests
     {
         readonly object mutex = new object ();
+        readonly DummyDeserializer deserializer = new DummyDeserializer ();
         
         Root CreateRoot ()
         {
@@ -89,6 +90,10 @@ namespace Mono.Upnp.Tests
                 var request = WebRequest.Create (root.UrlBase);
                 using (var response = (HttpWebResponse)request.GetResponse ()) {
                     Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                    using (var reader = XmlReader.Create (response.GetResponseStream ())) {
+                        var target_root = deserializer.DeserializeRoot (reader, root.UrlBase);
+                        DeviceDescriptionTests.AssertEquality (root, target_root);
+                    }
                 }
             }
         }
@@ -117,6 +122,10 @@ namespace Mono.Upnp.Tests
                 var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/scpd/"));
                 using (var response = (HttpWebResponse)request.GetResponse ()) {
                     Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                    using (var reader = XmlReader.Create (response.GetResponseStream ())) {
+                        var controller = deserializer.DeserializeServiceController (reader);
+                        Assert.IsNotNull (controller);
+                    }
                 }
             }
         }
