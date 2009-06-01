@@ -127,6 +127,7 @@ namespace Mono.Upnp.Tests
                 }
             }
         }
+        
         [Test]
         public void GetServiceTest ()
         {
@@ -137,6 +138,29 @@ namespace Mono.Upnp.Tests
                         lock (mutex) {
                             var service = args.Service.GetService ();
                             Assert.AreEqual ("urn:upnp-org:serviceId:testService1", service.Id);
+                            Monitor.Pulse (mutex);
+                        }
+                    };
+                    lock (mutex) {
+                        server.Start ();
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                            Assert.Fail ("The UPnP server announcement timed out.");
+                        }
+                    }
+                }
+            }
+        }
+        
+        [Test]
+        public void GetServiceControllerTest ()
+        {
+            using (var server = new Server (CreateRoot ())) {
+                using (var client = new Client ()) {
+                    client.BrowseAll ();
+                    client.ServiceAdded += (obj, args) => {
+                        lock (mutex) {
+                            var controller = args.Service.GetService ().GetController ();
+                            Assert.IsNotNull (controller);
                             Monitor.Pulse (mutex);
                         }
                     };

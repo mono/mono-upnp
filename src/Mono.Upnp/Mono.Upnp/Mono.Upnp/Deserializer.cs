@@ -58,7 +58,7 @@ namespace Mono.Upnp
         {
             // TODO retry fallback
             var request = WebRequest.Create (url);
-            using (var response = (HttpWebResponse)request.GetResponse ()) {
+            using (var response = request.GetResponse ()) {
                 using (var stream = response.GetResponseStream ()) {
                     using (var reader = XmlReader.Create (stream)) {
                         reader.ReadToFollowing ("root", Protocol.DeviceUrn);
@@ -169,8 +169,18 @@ namespace Mono.Upnp
         protected internal virtual ServiceController GetServiceController (Service service)
         {
             if (service == null) throw new ArgumentNullException ("service");
+            if (service.ScpdUrl == null) throw new ArgumentException ("The service has no ScpdUrl", "service");
             
-            return deserializer.Deserialize<ServiceController> (null, (context) => DeserializeServiceController (service, context));
+            // TODO retry fallback
+            var request = WebRequest.Create (service.ScpdUrl);
+            using (var response = request.GetResponse ()) {
+                using (var stream = response.GetResponseStream ()) {
+                    using (var reader = XmlReader.Create (stream)) {
+                        reader.ReadToFollowing ("scpd", Protocol.ServiceUrn);
+                        return deserializer.Deserialize (reader, context => DeserializeServiceController (service, context));
+                    }
+                }
+            }
         }
         
         protected virtual ServiceController DeserializeServiceController (Service service, XmlDeserializationContext context)
