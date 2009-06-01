@@ -44,7 +44,7 @@ namespace Mono.Ssdp.Tests
                     client.BrowseAll ();
                     lock (mutex) {
                         server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
-                        if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
                             Assert.Fail ("The announcement timed out.");
                         }
                     }
@@ -61,7 +61,7 @@ namespace Mono.Ssdp.Tests
                     client.ServiceAdded += BrowseAllTestClientServiceAdded;
                     client.BrowseAll ();
                     lock (mutex) {
-                        if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
                             Assert.Fail ("The announcement timed out.");
                         }
                     }

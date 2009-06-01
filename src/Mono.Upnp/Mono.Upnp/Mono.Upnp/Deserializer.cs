@@ -25,8 +25,11 @@
 // THE SOFTWARE.
 
 using System;
+using System.Net;
+using System.Xml;
 
 using Mono.Upnp.Control;
+using Mono.Upnp.Internal;
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
@@ -53,7 +56,16 @@ namespace Mono.Upnp
         
         protected internal virtual Root DeserializeRoot (Uri url)
         {
-            return null;
+            // TODO retry fallback
+            var request = WebRequest.Create (url);
+            using (var response = (HttpWebResponse)request.GetResponse ()) {
+                using (var stream = response.GetResponseStream ()) {
+                    using (var reader = XmlReader.Create (stream)) {
+                        reader.ReadToFollowing ("root", Protocol.DeviceUrn);
+                        return deserializer.Deserialize (reader, context => DeserializeRoot (url, context));
+                    }
+                }
+            }
         }
         
         protected virtual Root DeserializeRoot (Uri url, XmlDeserializationContext context)

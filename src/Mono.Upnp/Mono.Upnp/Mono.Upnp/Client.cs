@@ -35,7 +35,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
 {
-    public class Client
+    public class Client : IDisposable
     {
         static WeakReference static_deserializer = new WeakReference (null);
         
@@ -252,6 +252,12 @@ namespace Mono.Upnp
                 }
             }
             return null;
+        }
+        
+        public void Dispose ()
+        {
+            // TODO proper dispose pattern
+            client.Dispose ();
         }
     }
 }

@@ -29,6 +29,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Xml;
 
 namespace Mono.Upnp.Xml
@@ -45,6 +46,8 @@ namespace Mono.Upnp.Xml
             public Serializer MemberAutoSerializer;
         }
         
+        static UTF8Encoding utf8 = new UTF8Encoding (false);
+        
         readonly Dictionary<Type, Serializers> serializers = new Dictionary<Type, Serializers> ();
         
         public void Serialize<T> (T obj, XmlWriter writer)
@@ -57,8 +60,9 @@ namespace Mono.Upnp.Xml
         public byte[] GetBytes<T> (T obj)
         {
             using (var stream = new MemoryStream ()) {
-                using (var writer = XmlWriter.Create (stream)) {
+                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
                     SerializeCore (obj, writer);
+                    writer.Flush ();
                     return stream.ToArray ();
                 }
             }
@@ -66,12 +70,7 @@ namespace Mono.Upnp.Xml
         
         public string GetString<T> (T obj)
         {
-            using (var string_writer = new StringWriter ()) {
-                using (var xml_writer = XmlWriter.Create (string_writer)) {
-                    SerializeCore (obj, xml_writer);
-                    return string_writer.ToString ();
-                }
-            }
+            return utf8.GetString (GetBytes (obj));
         }
         
         void SerializeCore<T> (T obj, XmlWriter writer)

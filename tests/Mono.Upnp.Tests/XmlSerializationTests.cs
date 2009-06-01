@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 using NUnit.Framework;
 
@@ -47,6 +48,15 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-16""?><EmptyTestClass>Blarg!</EmptyTestClass>",
                 serializer.GetString (new EmptyTestClass ())
+            );
+        }
+        
+        [Test]
+        public void GetBytesTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><EmptyTestClass>Blarg!</EmptyTestClass>",
+                Encoding.UTF8.GetString (serializer.GetBytes (new EmptyTestClass ()))
             );
         }
         

@@ -102,6 +102,7 @@ namespace Mono.Upnp
             }
             Uri url = MakeUrl ();
             root.Initialize (serializer, url);
+            Console.WriteLine (serializer.GetBytes (root).Length);
             description_server = new DataServer (serializer.GetBytes (root), url);
             Announce (url);
         }
@@ -140,7 +141,7 @@ namespace Mono.Upnp
         static IPAddress Host {
             get {
                 if (host == null) {
-                    foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
+                    foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
                         if (address.AddressFamily == AddressFamily.InterNetwork) {
                             host = address;
                             break;

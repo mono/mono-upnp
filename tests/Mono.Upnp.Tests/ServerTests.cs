@@ -160,8 +160,7 @@ namespace Mono.Upnp.Tests
         [Test]
         public void AnnouncementTest ()
         {
-            var root = CreateRoot ();
-            using (var server = new Server (root)) {
+            using (var server = new Server (CreateRoot ())) {
                 using (var client = new Mono.Ssdp.Client ()) {
                     var announcements = new Dictionary<string,string> ();
                     announcements.Add ("upnp:rootdevice/uuid:d1::upnp:rootdevice", null);
@@ -188,7 +187,7 @@ namespace Mono.Upnp.Tests
                     client.BrowseAll ();
                     lock (mutex) {
                         server.Start ();
-                        if (!Monitor.Wait (mutex, new TimeSpan (0, 0, 5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
                             Assert.Fail ("The UPnP server announcement timed out.");
                         }
                     }
