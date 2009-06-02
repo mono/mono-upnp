@@ -78,33 +78,38 @@ namespace Mono.Upnp.Control
             get { return arguments; }
         }
         
-        public ActionResult Invoke ()
+        public IMap<string, string> Invoke ()
         {
             return Invoke (0);
         }
 
-        public ActionResult Invoke (int retryAttempts)
+        public IMap<string, string> Invoke (int retryAttempts)
         {
             return Invoke (emptyArguments, retryAttempts);
         }
         
-        public ActionResult Invoke (IDictionary<string, string> arguments)
+        public IMap<string, string> Invoke (IDictionary<string, string> arguments)
         {
             return Invoke (arguments, 0);
         }
 
-        public ActionResult Invoke (IDictionary<string, string> arguments, int retryAttempts)
+        public IMap<string, string> Invoke (IDictionary<string, string> arguments, int retryAttempts)
         {
             VerifyArguments (arguments);
             //CheckDisposed ();
             return InvokeCore (arguments, retryAttempts);
         }
 
-        protected virtual ActionResult InvokeCore (IDictionary<string, string> arguments, int retryAttempts)
+        protected virtual IMap<string, string> InvokeCore (IDictionary<string, string> arguments, int retryAttempts)
         {
             if (arguments == null) throw new ArgumentNullException ("arguments");
             
             return controller.Invoke (this, arguments, retryAttempts);
+        }
+        
+        protected internal virtual IDictionary<string, string> Execute (IDictionary<string, string> arguments)
+        {
+            return null;
         }
 
         void VerifyArguments (IDictionary<string, string> arguments)

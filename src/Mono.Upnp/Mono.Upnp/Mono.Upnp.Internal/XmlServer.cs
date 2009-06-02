@@ -1,5 +1,5 @@
 // 
-// SoapEnvelope.cs
+// XmlServer.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -25,58 +25,35 @@
 // THE SOFTWARE.
 
 using System;
+using System.Net;
 
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
-    [XmlType ("Envelope", Protocol.SoapEnvelopeSchema, "s")]
-    class SoapEnvelope<T> : SoapEnvelope<T, T>
+    class XmlServer : UpnpServer
     {
-        protected SoapEnvelope ()
+        static readonly WeakReference static_deserializer = new WeakReference (null);
+        protected readonly XmlDeserializer Deserializer;
+        protected readonly XmlSerializer Serializer;
+        
+        public XmlServer (XmlSerializer serializer, Uri url)
+            : base (url)
         {
+            if (static_deserializer.IsAlive) {
+                Deserializer = (XmlDeserializer)static_deserializer.Target;
+            } else {
+                Deserializer = new XmlDeserializer ();
+                static_deserializer.Target = Deserializer;
+            }
+            Serializer = serializer;
         }
         
-        public SoapEnvelope (T body)
-            : base (body)
+        protected override void HandleContext (HttpListenerContext context)
         {
-        }
-    }
-    
-    [XmlType ("Envelope", Protocol.SoapEnvelopeSchema, "s")]
-    class SoapEnvelope<THeader, TBody>
-    {
-        readonly SoapHeader<THeader> header;
-        readonly TBody body;
-        
-        protected SoapEnvelope ()
-        {
-        }
-        
-        public SoapEnvelope (TBody body)
-            : this (null, body)
-        {
-        }
-        
-        public SoapEnvelope (SoapHeader<THeader> header, TBody body)
-        {
-            this.header = header;
-            this.body = body;
-        }
-        
-        [XmlAttribute ("encodingStyle", Protocol.SoapEnvelopeSchema)]
-        public string EncodingStyle {
-            get { return Protocol.SoapEncodingSchema; }
-        }
-        
-        [XmlElement (OmitIfNull = true, Namespace = Protocol.SoapEnvelopeSchema)]
-        public SoapHeader<THeader> Header {
-            get { return header; }
-        }
-        
-        [XmlElement (Namespace = Protocol.SoapEnvelopeSchema)]
-        public TBody Body {
-            get { return body; }
+            base.HandleContext (context);
+            
+            context.Response.ContentType = @"text/xml; charset=""utf-8""";
         }
     }
 }

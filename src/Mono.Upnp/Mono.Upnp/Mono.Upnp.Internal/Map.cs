@@ -39,12 +39,18 @@ namespace Mono.Upnp.Internal
         const string collection_error = "The collection is read-only.";
         const string dictionary_error = "The dictionary is read-only.";
         readonly Mapper mapper;
-        readonly Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue> ();
+        readonly IDictionary<TKey, TValue> dictionary;
         bool is_read_only;
         
         public Map (Mapper mapper)
         {
             this.mapper = mapper;
+            dictionary = new Dictionary<TKey, TValue> ();
+        }
+        
+        public Map (IDictionary<TKey, TValue> dictionary)
+        {
+            this.dictionary = dictionary;
         }
         
         public void Add (TValue value)
@@ -94,6 +100,11 @@ namespace Mono.Upnp.Internal
         bool IMap<TKey, TValue>.ContainsKey (TKey key)
         {
             return dictionary.ContainsKey (key);
+        }
+        
+        bool IMap<TKey, TValue>.TryGetValue (TKey key, out TValue value)
+        {
+            return dictionary.TryGetValue (key, out value);
         }
         
         IEnumerable<TKey> IMap<TKey, TValue>.Keys {

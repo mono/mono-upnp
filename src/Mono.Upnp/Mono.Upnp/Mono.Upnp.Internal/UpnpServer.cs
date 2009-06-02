@@ -62,7 +62,11 @@ namespace Mono.Upnp.Internal
             listener.BeginGetContext (OnGetContext, listener);
         }
 
-        protected abstract void HandleContext (HttpListenerContext context);
+        protected virtual void HandleContext (HttpListenerContext context)
+        {
+            context.Response.AppendHeader ("SERVER", Protocol.UserAgent);
+            context.Response.AppendHeader ("DATE", DateTime.Now.ToUniversalTime ().ToString ("r"));
+        }
 
         public void Stop ()
         {

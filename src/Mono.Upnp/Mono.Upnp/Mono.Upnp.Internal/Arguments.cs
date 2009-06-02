@@ -1,5 +1,5 @@
 // 
-// ActionArguments.cs
+// Arguments.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -26,23 +26,42 @@
 
 using System;
 using System.Collections.Generic;
+using System.Xml;
 
 using Mono.Upnp.Control;
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
-    class ActionArguments : XmlAutomatable
+    sealed class Arguments : XmlAutomatable
     {
-        readonly string service_type;
-        readonly string action_name;
         readonly IDictionary<string, string> arguments;
+        readonly bool response;
         
-        public ActionArguments (string serviceType, string actionName, IDictionary<string, string> arguments)
+        Arguments ()
         {
-            this.service_type = serviceType;
-            this.action_name = actionName;
+            arguments = new Dictionary<string, string> ();
+        }
+        
+        public Arguments (string serviceType, string actionName, IDictionary<string, string> arguments)
+            : this (serviceType, actionName, arguments, false)
+        {
+        }
+        
+        public Arguments (string serviceType, string actionName, IDictionary<string, string> arguments, bool response)
+        {
+            ServiceType = serviceType;
+            actionName = actionName;
             this.arguments = arguments;
+            this.response = response;
+        }
+        
+        public string ServiceType { get; private set; }
+        
+        public string ActionName { get; private set; }
+        
+        public IDictionary<string, string> Values {
+            get { return arguments; }
         }
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
@@ -52,11 +71,26 @@ namespace Mono.Upnp.Internal
         
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
-            context.Writer.WriteStartAttribute ("u", action_name, service_type);
+            var writer = context.Writer;
+            writer.WriteStartAttribute ("u", ActionName, response ? ServiceType + "Response" : ServiceType);
             foreach (var argument in arguments) {
-                context.Writer.WriteElementString (argument.Key, argument.Value);
+                writer.WriteElementString (argument.Key, argument.Value);
             }
-            context.Writer.WriteEndElement ();
+            writer.WriteEndElement ();
+        }
+        
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            var reader = context.Reader;
+            reader.Read ();
+            ActionName = reader.LocalName;
+            ServiceType = reader.NamespaceURI;
+            var depth = reader.Depth;
+            while (reader.Read () && reader.Depth > depth) {
+                if (reader.NodeType == XmlNodeType.Element) {
+                    arguments.Add (reader.LocalName, reader.ReadElementContentAsString ());
+                }
+            }
         }
     }
 }

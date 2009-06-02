@@ -113,11 +113,11 @@ namespace Mono.Upnp.Control
             if (service == null) throw new ArgumentNullException ("service");
             
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
-            control_server = new ControlServer (this, service.ControlUrl);
+            control_server = new ControlServer (this, service.Type.ToString (), serializer, service.ControlUrl);
             event_server = new EventServer (this, service.EventUrl);
         }
         
-        protected internal virtual ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments, int retryAttempts)
+        protected internal virtual IMap<string, string> Invoke (ServiceAction action, IDictionary<string, string> arguments, int retryAttempts)
         {
             // TODO try dispose on timeout
             // TODO retry attempts

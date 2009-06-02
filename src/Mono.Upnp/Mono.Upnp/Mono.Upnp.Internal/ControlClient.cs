@@ -48,20 +48,20 @@ namespace Mono.Upnp.Internal
             service_type = serviceType;
         }
         
-        public ActionResult Invoke (string actionName, IDictionary<string, string> arguments)
+        public IMap<string, string> Invoke (string actionName, IDictionary<string, string> arguments)
         {
             var request = (HttpWebRequest)WebRequest.Create (url);
             request.Method = "POST";
             request.ContentType = @"text/xml; charset=""utf-8""";
             request.UserAgent = Protocol.UserAgent;
             request.Headers.Add ("SOAPACTION", string.Format ("{0}#{1}", service_type, actionName));
-            Serializer.Serialize (new SoapEnvelope<ActionArguments> (new ActionArguments (service_type, actionName, arguments)), request.GetRequestStream ());
+            Serializer.Serialize (new SoapEnvelope<Arguments> (new Arguments (service_type, actionName, arguments)), request.GetRequestStream ());
             using (var response = (HttpWebResponse)request.GetResponse ()) {
                 if (response.StatusCode == HttpStatusCode.OK) {
                     using (var reader = XmlReader.Create (response.GetResponseStream ())) {
                         reader.ReadToFollowing ("Envelope", Protocol.SoapEnvelopeSchema);
-                        var envelope = Deserializer.Deserialize<SoapEnvelope<ActionResult>> (reader);
-                        return envelope.Body;
+                        var envelope = Deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
+                        return new Map<string, string> (envelope.Body.Values);
                     }
                 } else {
                     // TODO handle else

@@ -27,169 +27,45 @@
 //
 
 using System;
-using System.IO;
 using System.Net;
-using System.Text;
 using System.Xml;
 
 using Mono.Upnp.Control;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
-    sealed class ControlServer : UpnpServer
+    sealed class ControlServer : XmlServer
     {
         readonly ServiceController controller;
+        readonly string service_type;
 
-        public ControlServer (ServiceController controller, Uri url)
-            : base (url)
+        public ControlServer (ServiceController controller, string serviceType, XmlSerializer serializer, Uri url)
+            : base (serializer, url)
         {
             this.controller = controller;
+            this.service_type = serviceType;
         }
-
+        
         protected override void HandleContext (HttpListenerContext context)
         {
-            try {
-                HandleContextCore (context);
-            } catch (UpnpControlException e) {
-                HandleFault (context, e);
-            }
-        }
-
-        private void HandleContextCore (HttpListenerContext context)
-        {
-            XmlReader reader = XmlReader.Create (context.Request.InputStream);
-            reader.ReadToFollowing ("Body", Protocol.SoapEnvelopeSchema);
-            while (Helper.ReadToNextElement (reader)) {
-                if (!controller.Actions.ContainsKey (reader.LocalName)) {
-                   // throw UpnpControlException.InvalidAction ();
+            base.HandleContext (context);
+            
+            using (var reader = XmlReader.Create (context.Request.InputStream)) {
+                reader.ReadToFollowing ("Envelope", Protocol.SoapEnvelopeSchema);
+                var requestEnvelope = Deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
+                var arguments = requestEnvelope.Body;
+                ServiceAction action;
+                if (controller.Actions.TryGetValue (arguments.ActionName, out action)) {
+                    try {
+                        Serializer.Serialize (
+                            new SoapEnvelope<Arguments> (new Arguments (service_type, action.Name, action.Execute (arguments.Values))),
+                            context.Response.OutputStream
+                        );
+                    } catch (Exception e) {
+                    }
                 }
-                ServiceAction action = controller.Actions[reader.LocalName];
-                BriefAction (reader.ReadSubtree (), action);
-                try {
-                    //action.Execute ();
-                } catch (UpnpControlException) {
-                    throw;
-                } catch (ArgumentOutOfRangeException e) {
-                    //throw UpnpControlException.ArgumentValueOutOfRange (e.Message);
-                } catch (ArgumentException e) {
-                    //throw UpnpControlException.ArgumentValueInvalid (e.Message);
-                } catch (NotImplementedException e) {
-                    //throw UpnpControlException.OptionalActionNotImplimented (e.Message);
-                } catch (Exception e) {
-                    //throw UpnpControlException.ActionFailed (e.Message);
-                }
-                DebriefAction (context, action);
             }
-        }
-
-        private void BriefAction (XmlReader reader, ServiceAction action)
-        {
-//            reader.Read ();
-//            foreach (Argument argument in action.Arguments.Values) {
-//                argument.Value = argument.RelatedStateVariable.DefaultValue;
-//            }
-//            while (Helper.ReadToNextElement (reader)) {
-//                if (!action.Arguments.ContainsKey (reader.Name)) {
-//                    throw UpnpControlException.InvalidArgs ();
-//                }
-//                Argument argument = action.Arguments[reader.Name];
-//                if (argument.RelatedStateVariable.DataType.IsEnum) {
-//                    try {
-//                        argument.Value = Enum.Parse (argument.RelatedStateVariable.DataType, reader.ReadString ());
-//                    } catch {
-//                        throw UpnpControlException.ArgumentValueOutOfRange ();
-//                    }
-//                } else {
-//                    try {
-//                        argument.Value = Convert.ChangeType (reader.ReadString (), argument.RelatedStateVariable.DataType);
-//                    } catch {
-//                        throw UpnpControlException.InvalidArgs ();
-//                    }
-//                    // TODO handle min, max, and step
-//                }
-//            }
-//            reader.Close ();
-        }
-
-        private void DebriefAction (HttpListenerContext context, ServiceAction action)
-        {
-//            context.Response.ContentType = @"text/xml; charset=""utf-8""";
-//            context.Response.Headers.Add ("Date", DateTime.Now.ToString ("r"));
-//            context.Response.Headers.Add ("EXT:");
-//            context.Response.AddHeader ("SERVER", ServerString);
-//
-//            Stream stream = context.Response.OutputStream;
-//            XmlWriterSettings settings = new XmlWriterSettings ();
-//            settings.Encoding = Encoding.UTF8;
-//            XmlWriter writer = XmlWriter.Create (stream, settings);
-//            Helper.WriteStartSoapBody (writer);
-//            writer.WriteStartElement (action.Name + "Response", action.Service.Type.ToString ());
-//
-//            foreach (Argument argument in action.Arguments.Values) {
-//                if (argument.Direction == ArgumentDirection.Out) {
-//                    DebriefArgument (writer, argument);
-//                }
-//            }
-//            if (action.ReturnArgument != null) {
-//                DebriefArgument (writer, action.ReturnArgument);
-//            }
-//
-//            writer.WriteEndElement ();
-//            Helper.WriteEndSoapBody (writer);
-//            writer.Flush ();
-//            context.Response.ContentLength64 = stream.Length;
-        }
-
-        private void DebriefArgument (XmlWriter writer, Argument argument)
-        {
-//            writer.WriteStartElement (argument.Name);
-//            writer.WriteValue (argument.Value);
-//            writer.WriteEndElement ();
-        }
-
-        private void HandleFault (HttpListenerContext context, UpnpControlException e)
-        {
-            context.Response.StatusCode = 500;
-            context.Response.StatusDescription = "Internal Server Error";
-            context.Response.ContentType = @"text/xml; charset=""utf-8""";
-            context.Response.Headers.Add ("Date", DateTime.Now.ToString ("r"));
-            context.Response.Headers.Add ("EXT:");
-            context.Response.AddHeader ("SERVER", Protocol.UserAgent);
-
-            Stream stream = context.Response.OutputStream;
-            XmlWriterSettings settings = new XmlWriterSettings ();
-            settings.Encoding = Encoding.UTF8;
-            XmlWriter writer = XmlWriter.Create (stream, settings);
-            //Helper.WriteStartSoapBody (writer);
-            writer.WriteStartElement ("Fault", Protocol.SoapEnvelopeSchema);
-
-            writer.WriteStartElement ("faultcode");
-            writer.WriteValue (String.Format ("{0}:Client", writer.LookupPrefix (Protocol.SoapEnvelopeSchema)));
-            writer.WriteEndElement ();
-            writer.WriteStartElement ("faultstring");
-            writer.WriteValue ("UPnPError");
-            writer.WriteEndElement ();
-            writer.WriteStartElement ("detail");
-            writer.WriteStartElement ("UPnPError", Protocol.ControlSchema);
-            writer.WriteStartElement ("errorCode");
-            //writer.WriteValue (e.Code);
-            writer.WriteEndElement ();
-            writer.WriteStartElement ("errorDescription");
-            writer.WriteValue (e.Message);
-            writer.WriteEndElement ();
-            writer.WriteEndElement ();
-            writer.WriteEndElement ();
-            writer.WriteEndElement ();
-
-            writer.WriteEndElement ();
-            //Helper.WriteEndSoapBody (writer);
-            writer.Flush ();
-            context.Response.ContentLength64 = stream.Length;
-        }
-
-        // TODO move to Protocol.cs when it exists
-        static string ServerString {
-            get { return String.Format ("{0}/{1} UPnP/1.1 Mono.Upnp/1.0", Environment.OSVersion.Platform, Environment.OSVersion.Version); }
         }
     }
 }
