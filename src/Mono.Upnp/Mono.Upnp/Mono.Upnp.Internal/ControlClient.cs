@@ -57,8 +57,16 @@ namespace Mono.Upnp.Internal
             request.Headers.Add ("SOAPACTION", string.Format ("{0}#{1}", service_type, actionName));
             Serializer.Serialize (new SoapEnvelope<ActionArguments> (new ActionArguments (service_type, actionName, arguments)), request.GetRequestStream ());
             using (var response = (HttpWebResponse)request.GetResponse ()) {
-                // TODO do stuff here
-                return null;
+                if (response.StatusCode == HttpStatusCode.OK) {
+                    using (var reader = XmlReader.Create (response.GetResponseStream ())) {
+                        reader.ReadToFollowing ("Envelope", Protocol.SoapEnvelopeSchema);
+                        var envelope = Deserializer.Deserialize<SoapEnvelope<ActionResult>> (reader);
+                        return envelope.Body;
+                    }
+                } else {
+                    // TODO handle else
+                    return null;
+                }
             }
         }
     }
