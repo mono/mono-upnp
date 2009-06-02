@@ -160,7 +160,7 @@ namespace Mono.Upnp.Internal
             XmlWriterSettings settings = new XmlWriterSettings ();
             settings.Encoding = Encoding.UTF8;
             XmlWriter writer = XmlWriter.Create (stream, settings);
-            Helper.WriteStartSoapBody (writer);
+            //Helper.WriteStartSoapBody (writer);
             writer.WriteStartElement ("Fault", Protocol.SoapEnvelopeSchema);
 
             writer.WriteStartElement ("faultcode");
@@ -182,7 +182,7 @@ namespace Mono.Upnp.Internal
             writer.WriteEndElement ();
 
             writer.WriteEndElement ();
-            Helper.WriteEndSoapBody (writer);
+            //Helper.WriteEndSoapBody (writer);
             writer.Flush ();
             context.Response.ContentLength64 = stream.Length;
         }

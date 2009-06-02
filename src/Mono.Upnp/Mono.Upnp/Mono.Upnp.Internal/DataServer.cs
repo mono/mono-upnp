@@ -33,7 +33,7 @@ using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Internal
 {
-    class DataServer : UpnpServer
+    sealed class DataServer : UpnpServer
     {
         readonly byte[] data;
 

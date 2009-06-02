@@ -1,5 +1,5 @@
 // 
-// SoapMessage.cs
+// UpnpClient.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -30,37 +30,23 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
-    [XmlType ("Envelope")]
-    class SoapMessage<THeader, TBody>
-        where THeader : class
+    class UpnpClient
     {
-        readonly THeader header;
-        readonly TBody body;
+        readonly static WeakReference static_serializer = new WeakReference (null);
         
-        public SoapMessage (TBody body)
-            : this (null, body)
+        protected readonly XmlSerializer Serializer;
+        protected readonly XmlDeserializer Deserializer;
+        
+        protected UpnpClient (XmlDeserializer deserializer)
         {
-        }
-        
-        public SoapMessage (THeader header, TBody body)
-        {
-            this.header = header;
-            this.body = body;
-        }
-        
-        [XmlAttribute ("encodingStyle")]
-        public string EncodingStyle {
-            get { return Protocol.SoapEncodingSchema; }
-        }
-        
-        [XmlElement (OmitIfNull = true)]
-        public THeader Header {
-            get { return header; }
-        }
-        
-        [XmlElement]
-        public TBody Body {
-            get { return body; }
+            if (static_serializer.IsAlive) {
+                Serializer = (XmlSerializer)static_serializer.Target;
+            } else {
+                Serializer = new XmlSerializer ();
+                static_serializer.Target = Serializer;
+            }
+            
+            Deserializer = deserializer;
         }
     }
 }

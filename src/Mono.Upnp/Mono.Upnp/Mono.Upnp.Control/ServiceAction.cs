@@ -103,8 +103,8 @@ namespace Mono.Upnp.Control
         protected virtual ActionResult InvokeCore (IDictionary<string, string> arguments, int retryAttempts)
         {
             if (arguments == null) throw new ArgumentNullException ("arguments");
-            return null;
-            //return controller.Invoke (this, arguments, retryAttempts);
+            
+            return controller.Invoke (this, arguments, retryAttempts);
         }
 
         void VerifyArguments (IDictionary<string, string> arguments)

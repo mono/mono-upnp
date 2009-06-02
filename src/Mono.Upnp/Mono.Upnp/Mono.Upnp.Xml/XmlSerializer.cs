@@ -56,6 +56,15 @@ namespace Mono.Upnp.Xml
 
             SerializeCore (obj, writer);
         }
+        
+        public void Serialize<T> (T obj, Stream stream)
+        {
+            if (stream == null) throw new ArgumentNullException ("stream");
+            
+            using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
+                SerializeCore (obj, writer);
+            }
+        }
                 
         public byte[] GetBytes<T> (T obj)
         {

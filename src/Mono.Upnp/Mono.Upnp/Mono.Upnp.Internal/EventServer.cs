@@ -37,7 +37,7 @@ using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Internal
 {
-    class EventServer : UpnpServer
+    sealed class EventServer : UpnpServer
     {
         class Subscription
         {

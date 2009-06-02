@@ -32,9 +32,9 @@ using System.Threading;
 
 namespace Mono.Upnp.Internal
 {
-    internal delegate bool TimeoutHandler (object state, ref TimeSpan interval);
+    delegate bool TimeoutHandler (object state, ref TimeSpan interval);
 
-    internal class TimeoutDispatcher : IDisposable
+    sealed class TimeoutDispatcher : IDisposable
     {
         private static uint timeout_ids = 1;
 

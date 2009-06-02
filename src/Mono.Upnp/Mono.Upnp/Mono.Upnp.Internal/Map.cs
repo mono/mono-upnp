@@ -32,7 +32,7 @@ using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Internal
 {
-    class Map<TKey, TValue> : ICollection<TValue>, IMap<TKey, TValue>
+    sealed class Map<TKey, TValue> : ICollection<TValue>, IMap<TKey, TValue>
     {
         public delegate TKey Mapper (TValue value);
         

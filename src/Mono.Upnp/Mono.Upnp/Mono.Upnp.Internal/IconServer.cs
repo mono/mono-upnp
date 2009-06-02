@@ -32,7 +32,7 @@ using System.Net;
 
 namespace Mono.Upnp.Internal
 {
-    internal class IconServer : UpnpServer
+    sealed class IconServer : UpnpServer
     {
         readonly IList<Icon> icons;
 

@@ -51,8 +51,13 @@ namespace Mono.Upnp.Control
         protected internal ServiceController (Deserializer deserializer, Service service)
             : base (deserializer)
         {
+            if (service == null) throw new ArgumentNullException ("service");
+            if (service.ControlUrl == null) throw new ArgumentException ("The service has no ControlUrl.", "service");
+            if (service.EventUrl == null) throw new ArgumentException ("The service has no EventUrl.", "service");
+            
             actions = new Map<string, ServiceAction> (ServiceActionMapper);
             state_variables = new Map<string, StateVariable> (StateVariableMapper);
+            control_client = new ControlClient (deserializer.XmlDeserializer, service.Type.ToString (), service.ControlUrl);
         }
         
         public ServiceController (object service, IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
@@ -110,6 +115,13 @@ namespace Mono.Upnp.Control
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
             control_server = new ControlServer (this, service.ControlUrl);
             event_server = new EventServer (this, service.EventUrl);
+        }
+        
+        protected internal virtual ActionResult Invoke (ServiceAction action, IDictionary<string, string> arguments, int retryAttempts)
+        {
+            // TODO try dispose on timeout
+            // TODO retry attempts
+            return control_client.Invoke (action.Name, arguments);
         }
         
         [XmlTypeDeserializer]

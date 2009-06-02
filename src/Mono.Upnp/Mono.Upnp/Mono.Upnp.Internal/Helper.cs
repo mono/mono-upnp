@@ -64,36 +64,6 @@ namespace Mono.Upnp.Internal
             map.MakeReadOnly ();
             return map;
         }
-        
-        //public static string HostAddress
-        //{
-        //    get
-        //    {
-        //        foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
-        //            if (address.AddressFamily == AddressFamily.InterNetwork) {
-        //                return address;
-        //            }
-        //        }
-        //    }
-        //}
-
-        public static Version DeserializeSpecVersion (XmlReader reader)
-        {
-            try {
-                // We assume the elements appear in this order
-                reader.ReadToFollowing ("major");
-                reader.Read ();
-                var major = reader.ReadContentAsInt ();
-                reader.ReadToFollowing ("minor");
-                reader.Read ();
-                var minor = reader.ReadContentAsInt ();
-                return new Version (major, minor);
-            } catch (Exception e) {
-                throw new UpnpDeserializationException ("There was a problem deserializing a spec version.", e);
-            } finally {
-                reader.Close ();
-            }
-        }
 
         public static bool ReadToNextElement (XmlReader reader)
         {
@@ -140,21 +110,6 @@ namespace Mono.Upnp.Internal
                     }
                 }
             }
-        }
-
-        public static void WriteStartSoapBody (XmlWriter writer)
-        {
-            writer.WriteStartDocument ();
-            writer.WriteStartElement ("s", "Envelope", Protocol.SoapEnvelopeSchema);
-            writer.WriteAttributeString ("encodingStyle", Protocol.SoapEnvelopeSchema, Protocol.SoapEncodingSchema);
-            writer.WriteStartElement ("Body", Protocol.SoapEnvelopeSchema);
-        }
-
-        public static void WriteEndSoapBody (XmlWriter writer)
-        {
-            writer.WriteEndElement ();
-            writer.WriteEndElement ();
-            writer.WriteEndDocument ();
         }
     }
 }
