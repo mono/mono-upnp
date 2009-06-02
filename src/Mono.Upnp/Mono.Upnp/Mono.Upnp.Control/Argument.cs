@@ -42,6 +42,9 @@ namespace Mono.Upnp.Control
         
         public Argument (string name, string relatedStateVariable, ArgumentDirection direction)
         {
+            if (direction < ArgumentDirection.In || direction > ArgumentDirection.Out)
+                throw new ArgumentOutOfRangeException ("direction");
+            
             Name = name;
             RelatedStateVariableName = relatedStateVariable;
             Direction = direction;

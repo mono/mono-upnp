@@ -34,6 +34,14 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
 {
+    public class Service<T> : Service
+    {
+        public Service (T service)
+            : base (ServiceControllerBuilder.Build<T> (service))
+        {
+        }
+    }
+    
     [XmlType ("service", Protocol.DeviceSchema)]
     public class Service : Description
     {

@@ -105,6 +105,11 @@
     <Compile Include="Mono.Upnp.Internal\UpnpClient.cs" />
     <Compile Include="Mono.Upnp.Internal\Arguments.cs" />
     <Compile Include="Mono.Upnp.Internal\XmlServer.cs" />
+    <Compile Include="Mono.Upnp.Internal\ServiceControllerBuilder.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpActionAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpArgumentAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpRelatedStateVariableAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpEnumAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -63,6 +63,7 @@ namespace Mono.Upnp.Internal
                             context.Response.OutputStream
                         );
                     } catch (Exception e) {
+                        // TODO handle faults
                     }
                 }
             }

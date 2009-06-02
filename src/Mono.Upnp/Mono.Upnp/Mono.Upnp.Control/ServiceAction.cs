@@ -34,12 +34,16 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
+    public delegate IDictionary<string, string> ActionExecutor (IDictionary<string, string> arguments);
+    
     [XmlType ("action", Protocol.ServiceSchema)]
     public class ServiceAction : Description
     {
         readonly static Dictionary<string, string> emptyArguments = new Dictionary<string, string> ();
+        
         readonly ServiceController controller;
         readonly Map<string, Argument> arguments;
+        readonly ActionExecutor executor;
 
         protected internal ServiceAction (Deserializer deserializer, ServiceController controller)
             : base (deserializer)
@@ -50,15 +54,18 @@ namespace Mono.Upnp.Control
             arguments = new Map<string, Argument> (ArgumentMapper);
         }
         
-        public ServiceAction (string name, IEnumerable<Argument> arguments)
-            : this (arguments)
+        public ServiceAction (string name, IEnumerable<Argument> arguments, ActionExecutor executor)
+            : this (arguments, executor)
         {
             Name = name;
         }
         
-        protected ServiceAction (IEnumerable<Argument> arguments)
+        protected ServiceAction (IEnumerable<Argument> arguments, ActionExecutor executor)
         {
+            if (executor == null) throw new ArgumentNullException ("executor");
+            
             this.arguments = Helper.MakeReadOnlyCopy<string, Argument> (arguments, ArgumentMapper);
+            this.executor = executor;
         }
         
         static string ArgumentMapper (Argument argument)
@@ -109,7 +116,9 @@ namespace Mono.Upnp.Control
         
         protected internal virtual IDictionary<string, string> Execute (IDictionary<string, string> arguments)
         {
-            return null;
+            if (executor == null) throw new InvalidOperationException ("This ServiceAction was create for deserialization and cannot be executed locally. Use the Invoke method to invoke the action across the network.");
+            
+            return executor (arguments);
         }
 
         void VerifyArguments (IDictionary<string, string> arguments)

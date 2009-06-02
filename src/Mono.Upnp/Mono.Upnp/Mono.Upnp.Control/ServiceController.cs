@@ -39,8 +39,6 @@ namespace Mono.Upnp.Control
     {
         readonly Map<string, ServiceAction> actions;
         readonly Map<string, StateVariable> state_variables;
-        readonly Service service;
-        readonly object service_object;
         DataServer scpd_server;
         ControlServer control_server;
         ControlClient control_client;
@@ -60,10 +58,8 @@ namespace Mono.Upnp.Control
             control_client = new ControlClient (deserializer.XmlDeserializer, service.Type.ToString (), service.ControlUrl);
         }
         
-        public ServiceController (object service, IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
+        public ServiceController (IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
         {
-            if (service == null) throw new ArgumentNullException ("service");
-            
             this.actions = Helper.MakeReadOnlyCopy<string, ServiceAction> (actions, ServiceActionMapper);
             this.state_variables = Helper.MakeReadOnlyCopy<string, StateVariable> (stateVariables, StateVariableMapper);
             SpecVersion = new SpecVersion (1, 1);
@@ -80,7 +76,7 @@ namespace Mono.Upnp.Control
         }
         
         internal Service Service {
-            get { return service; }
+            get { return null; }
         }
         
         [XmlAttribute ("configId")]
