@@ -34,8 +34,6 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    public delegate IDictionary<string, string> ActionExecutor (IDictionary<string, string> arguments);
-    
     [XmlType ("action", Protocol.ServiceSchema)]
     public class ServiceAction : Description
     {
@@ -43,7 +41,7 @@ namespace Mono.Upnp.Control
         
         readonly ServiceController controller;
         readonly Map<string, Argument> arguments;
-        readonly ActionExecutor executor;
+        readonly ServiceActionExecutor executor;
 
         protected internal ServiceAction (Deserializer deserializer, ServiceController controller)
             : base (deserializer)
@@ -54,13 +52,13 @@ namespace Mono.Upnp.Control
             arguments = new Map<string, Argument> (ArgumentMapper);
         }
         
-        public ServiceAction (string name, IEnumerable<Argument> arguments, ActionExecutor executor)
+        public ServiceAction (string name, IEnumerable<Argument> arguments, ServiceActionExecutor executor)
             : this (arguments, executor)
         {
             Name = name;
         }
         
-        protected ServiceAction (IEnumerable<Argument> arguments, ActionExecutor executor)
+        protected ServiceAction (IEnumerable<Argument> arguments, ServiceActionExecutor executor)
         {
             if (executor == null) throw new ArgumentNullException ("executor");
             

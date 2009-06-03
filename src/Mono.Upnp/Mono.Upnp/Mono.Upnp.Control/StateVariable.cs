@@ -38,6 +38,7 @@ namespace Mono.Upnp.Control
     public class StateVariable : XmlAutomatable
     {
         readonly ServiceController controller;
+        readonly StateVariableEventer eventer;
         IList<string> allowed_values;
         //event EventHandler<StateVariableChangedArgs<string>> changed;
         
@@ -52,23 +53,25 @@ namespace Mono.Upnp.Control
             this.controller = service;
         }
         
+        public StateVariable (string name, string dataType, StateVariableEventer eventer)
+            : this (name, dataType, eventer, false)
+        {
+        }
+        
+        public StateVariable (string name, string dataType, StateVariableEventer eventer, bool isMulticast)
+            : this (name, dataType, null, true, isMulticast)
+        {
+            this.eventer = eventer;
+            eventer.StateVariableUpdated += OnStateVariableUpdated;
+        }
+        
         public StateVariable (string name, string dataType)
-            : this (name, dataType, false)
+            : this (name, dataType, null, false, false)
         {
         }
         
         public StateVariable (string name, string dataType, string defaultValue)
             : this (name, dataType, defaultValue, false, false)
-        {
-        }
-        
-        public StateVariable (string name, string dataType, bool sendsEvents)
-            : this (name, dataType, sendsEvents, false)
-        {
-        }
-        
-        public StateVariable (string name, string dataType, bool sendsEvents, bool isMulticast)
-            : this (name, dataType, null, sendsEvents, isMulticast)
         {
         }
         
@@ -112,8 +115,6 @@ namespace Mono.Upnp.Control
         [XmlElement ("dataType", Protocol.ServiceSchema)]
         public virtual string DataType { get; protected set; }
 
-        public Type Type { get; private set; }
-
         [XmlAttribute ("sendEvents", OmitIfNull = true)]
         protected virtual string SendsEventsString {
             get { return SendsEvents ? "yes" : null; }
@@ -145,6 +146,10 @@ namespace Mono.Upnp.Control
 
         [XmlElement ("allowedValueRange", Protocol.ServiceSchema, OmitIfNull = true)]
         public virtual AllowedValueRange AllowedValueRange { get; protected set; }
+        
+        protected virtual void OnStateVariableUpdated (object sender, StateVariableChangedArgs<string> args)
+        {
+        }
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)
         {

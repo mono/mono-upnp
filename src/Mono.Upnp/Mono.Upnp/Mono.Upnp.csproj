@@ -110,6 +110,9 @@
     <Compile Include="Mono.Upnp.Control\UpnpArgumentAttribute.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpRelatedStateVariableAttribute.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpEnumAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpStateVariableAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\ServiceActionExecutor.cs" />
+    <Compile Include="Mono.Upnp.Control\StateVariableEventer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

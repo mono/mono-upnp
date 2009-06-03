@@ -34,6 +34,16 @@ namespace Mono.Upnp.Internal
 {
     static class ServiceControllerBuilder
     {
+        static readonly MethodInfo handler = typeof (Eventer).GetMethod ("Handler");
+        
+        class Eventer : StateVariableEventer
+        {
+            public void Handler<T> (object sender, StateVariableChangedArgs<T> args)
+            {
+                OnStateVariableUpdated (args.NewValue.ToString ());
+            }
+        }
+        
         class ArgumentInfo
         {
             public Argument Argument;
@@ -137,7 +147,9 @@ namespace Mono.Upnp.Internal
                         attribute.MinimumValue != state_variable.AllowedValueRange.Minimum ||
                         attribute.MaximumValue != state_variable.AllowedValueRange.Maximum ||
                         attribute.StepValue != state_variable.AllowedValueRange.Step))) {
-                    name = CreateRelatedStateVariableName (actionName, parameterInfo.Name);
+                    if (attribute == null || string.IsNullOrEmpty (attribute.Name)) {
+                        name = CreateRelatedStateVariableName (actionName, parameterInfo.Name);
+                    }
                 } else {
                     return state_variable_info;
                 }
@@ -149,8 +161,7 @@ namespace Mono.Upnp.Internal
                     StateVariable = new StateVariable (name, allowed_values, default_value),
                     Type = parameterInfo.ParameterType
                 };
-            }
-            if (attribute != null && !string.IsNullOrEmpty (attribute.MinimumValue)) {
+            } else if (attribute != null && !string.IsNullOrEmpty (attribute.MinimumValue)) {
                 var allowed_value_range = new AllowedValueRange (attribute.MinimumValue, attribute.MaximumValue, attribute.StepValue);
                 state_variable_info = new StateVariableInfo {
                     StateVariable = new StateVariable (name, data_type, allowed_value_range, default_value)
@@ -212,7 +223,41 @@ namespace Mono.Upnp.Internal
             foreach (var state_variable_info in stateVariables.Values) {
                 yield return state_variable_info.StateVariable;
             }
+            foreach (var event_info in typeof (T).GetEvents (BindingFlags.Public | BindingFlags.Instance)) {
+                var state_variable = BuildStateVariable (event_info, service);
+                if (state_variable != null) {
+                    yield return state_variable;
+                }
+            }
         }
+            
+            static StateVariable BuildStateVariable (EventInfo eventInfo, object service)
+            {
+                var attributes = eventInfo.GetCustomAttributes (typeof (UpnpStateVariableAttribute), false);
+                if (attributes.Length != 0) {
+                    var type = eventInfo.EventHandlerType;
+                    if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (EventHandler<>)) {
+                        // TODO throw
+                        return null;
+                    }
+                    type = type.GetGenericArguments ()[0];
+                    if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (StateVariableChangedArgs<>)) {
+                        // TODO throw
+                        return null;
+                    }
+                    type = type.GetGenericArguments ()[0];
+                    var eventer = new Eventer ();
+                    var method = ServiceControllerBuilder.handler.MakeGenericMethod (new Type[] { type });
+                    var handler = Delegate.CreateDelegate (eventInfo.EventHandlerType, eventer, method);
+                    eventInfo.AddEventHandler (service, handler);
+                    var attribute = (UpnpStateVariableAttribute)attributes[0];
+                    var name = string.IsNullOrEmpty (attribute.Name) ? eventInfo.Name : attribute.Name;
+                    var data_type = string.IsNullOrEmpty (attribute.DataType) ? GetDataType (type) : attribute.DataType;
+                    return new StateVariable (name, data_type, eventer);
+                } else {
+                    return null;
+                }
+            }
         
         static IEnumerable<Argument> Combine (IEnumerable<ArgumentInfo> arguments, ArgumentInfo return_argument)
         {
