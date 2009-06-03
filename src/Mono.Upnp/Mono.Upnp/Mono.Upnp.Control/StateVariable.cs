@@ -61,6 +61,8 @@ namespace Mono.Upnp.Control
         public StateVariable (string name, string dataType, StateVariableEventer eventer, bool isMulticast)
             : this (name, dataType, null, true, isMulticast)
         {
+            if (eventer == null) throw new ArgumentNullException ("eventer");
+            
             this.eventer = eventer;
             eventer.StateVariableUpdated += OnStateVariableUpdated;
         }

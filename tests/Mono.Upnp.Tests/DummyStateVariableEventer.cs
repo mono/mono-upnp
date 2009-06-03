@@ -1,5 +1,5 @@
 // 
-// DummyServiceController.cs
+// DummyStateVariableEventer.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,19 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Collections.Generic;
-
 namespace Mono.Upnp.Control.Tests
 {
-    public class DummyServiceController : ServiceController
+    public class DummyStateVariableEventer : StateVariableEventer
     {
-        public DummyServiceController ()
-            : base ((IEnumerable<ServiceAction>)null, null)
-        {
-        }
-        
-        protected override void Initialize (Mono.Upnp.Xml.XmlSerializer serializer, Service service)
-        {
-        }
     }
 }

@@ -1,5 +1,5 @@
 // 
-// DummyServiceController.cs
+// DummyServiceAction.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,18 +24,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 
 namespace Mono.Upnp.Control.Tests
 {
-    public class DummyServiceController : ServiceController
+    public class DummyServiceAction : ServiceAction
     {
-        public DummyServiceController ()
-            : base ((IEnumerable<ServiceAction>)null, null)
+        static IDictionary<string, string> Executor (IDictionary<string, string> arguments)
         {
+            return arguments;
         }
         
-        protected override void Initialize (Mono.Upnp.Xml.XmlSerializer serializer, Service service)
+        public DummyServiceAction (string name, IEnumerable<Argument> arguments)
+            : base (name, arguments, Executor)
         {
         }
     }

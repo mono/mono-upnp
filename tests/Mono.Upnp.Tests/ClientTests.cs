@@ -28,7 +28,7 @@ using System;
 using System.Threading;
 using NUnit.Framework;
 
-using Mono.Upnp.Control;
+using Mono.Upnp.Control.Tests;
 
 namespace Mono.Upnp.Tests
 {
@@ -49,7 +49,7 @@ namespace Mono.Upnp.Tests
                     "Device") {
                     Services = new Service[] {
                         new Service (
-                            new ServiceController (new object (), null, null),
+                            new DummyServiceController (),
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
                             "urn:upnp-org:serviceId:testService1"
                         )

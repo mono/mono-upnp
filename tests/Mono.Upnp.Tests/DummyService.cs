@@ -24,6 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 using Mono.Upnp.Control.Tests;
 
 namespace Mono.Upnp.Tests
@@ -33,6 +35,7 @@ namespace Mono.Upnp.Tests
         public DummyService (ServiceType type, string id)
             : base (new DummyServiceController (), type, id)
         {
+            ScpdUrl = ControlUrl = EventUrl = new Uri ("http://localhost/");
         }
     }
 }

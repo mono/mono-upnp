@@ -34,10 +34,10 @@ namespace Mono.Upnp.Internal
 {
     static class ServiceControllerBuilder
     {
-        static readonly MethodInfo handler = typeof (Eventer).GetMethod ("Handler");
-        
         class Eventer : StateVariableEventer
         {
+            public static readonly MethodInfo handler = typeof (Eventer).GetMethod ("Handler");
+            
             public void Handler<T> (object sender, StateVariableChangedArgs<T> args)
             {
                 OnStateVariableUpdated (args.NewValue.ToString ());
@@ -230,34 +230,34 @@ namespace Mono.Upnp.Internal
                 }
             }
         }
-            
-            static StateVariable BuildStateVariable (EventInfo eventInfo, object service)
-            {
-                var attributes = eventInfo.GetCustomAttributes (typeof (UpnpStateVariableAttribute), false);
-                if (attributes.Length != 0) {
-                    var type = eventInfo.EventHandlerType;
-                    if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (EventHandler<>)) {
-                        // TODO throw
-                        return null;
-                    }
-                    type = type.GetGenericArguments ()[0];
-                    if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (StateVariableChangedArgs<>)) {
-                        // TODO throw
-                        return null;
-                    }
-                    type = type.GetGenericArguments ()[0];
-                    var eventer = new Eventer ();
-                    var method = ServiceControllerBuilder.handler.MakeGenericMethod (new Type[] { type });
-                    var handler = Delegate.CreateDelegate (eventInfo.EventHandlerType, eventer, method);
-                    eventInfo.AddEventHandler (service, handler);
-                    var attribute = (UpnpStateVariableAttribute)attributes[0];
-                    var name = string.IsNullOrEmpty (attribute.Name) ? eventInfo.Name : attribute.Name;
-                    var data_type = string.IsNullOrEmpty (attribute.DataType) ? GetDataType (type) : attribute.DataType;
-                    return new StateVariable (name, data_type, eventer);
-                } else {
+        
+        static StateVariable BuildStateVariable (EventInfo eventInfo, object service)
+        {
+            var attributes = eventInfo.GetCustomAttributes (typeof (UpnpStateVariableAttribute), false);
+            if (attributes.Length != 0) {
+                var type = eventInfo.EventHandlerType;
+                if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (EventHandler<>)) {
+                    // TODO throw
                     return null;
                 }
+                type = type.GetGenericArguments ()[0];
+                if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (StateVariableChangedArgs<>)) {
+                    // TODO throw
+                    return null;
+                }
+                type = type.GetGenericArguments ()[0];
+                var eventer = new Eventer ();
+                var method = Eventer.handler.MakeGenericMethod (new Type[] { type });
+                var handler = Delegate.CreateDelegate (eventInfo.EventHandlerType, eventer, method);
+                eventInfo.AddEventHandler (service, handler);
+                var attribute = (UpnpStateVariableAttribute)attributes[0];
+                var name = string.IsNullOrEmpty (attribute.Name) ? eventInfo.Name : attribute.Name;
+                var data_type = string.IsNullOrEmpty (attribute.DataType) ? GetDataType (type) : attribute.DataType;
+                return new StateVariable (name, data_type, eventer);
+            } else {
+                return null;
             }
+        }
         
         static IEnumerable<Argument> Combine (IEnumerable<ArgumentInfo> arguments, ArgumentInfo return_argument)
         {

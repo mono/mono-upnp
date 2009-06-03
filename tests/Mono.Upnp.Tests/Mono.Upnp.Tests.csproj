@@ -57,6 +57,8 @@
     <Compile Include="ServiceDescriptionTests.cs" />
     <Compile Include="ServerTests.cs" />
     <Compile Include="ClientTests.cs" />
+    <Compile Include="DummyServiceAction.cs" />
+    <Compile Include="DummyStateVariableEventer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
