@@ -47,7 +47,6 @@ namespace Mono.Upnp
             new Dictionary<string, Root> ();
 
         readonly Mono.Ssdp.Client client = new Mono.Ssdp.Client ();
-        readonly XmlDeserializer deserializer;
         DeserializerFactory deserializer_facotry;
 
         public Client ()
@@ -57,12 +56,6 @@ namespace Mono.Upnp
         
         public Client (DeserializerFactory deserializerFactory)
         {
-            if (static_deserializer.IsAlive) {
-                    deserializer = (XmlDeserializer)static_deserializer.Target;
-            } else {
-                deserializer = new XmlDeserializer ();
-                static_deserializer.Target = deserializer;
-            }
             DeserializerFactory = deserializerFactory ?? new DeserializerFactory ();
             client.ServiceAdded += ClientServiceAdded;
             client.ServiceRemoved += ClientServiceRemoved;
@@ -89,6 +82,15 @@ namespace Mono.Upnp
         public void Browse (TypeInfo type)
         {
             client.Browse (type.ToString ());
+        }
+        
+        XmlDeserializer Deserializer {
+            get {
+                if (!static_deserializer.IsAlive) {
+                    static_deserializer.Target = new XmlDeserializer ();
+                }
+                return (XmlDeserializer)static_deserializer.Target;
+            }
         }
 
         void ClientServiceAdded (object sender, Mono.Ssdp.ServiceArgs args)
@@ -188,7 +190,7 @@ namespace Mono.Upnp
                     }
                 }
                 try {
-                    var root = DeserializerFactory.CreateDeserializer (deserializer).DeserializeRoot (new Uri (uri));
+                    var root = DeserializerFactory.CreateDeserializer (Deserializer).DeserializeRoot (new Uri (uri));
                     if (root == null) {
                         continue;
                     }
@@ -211,7 +213,7 @@ namespace Mono.Upnp
                     }
                 }
                 try {
-                    var root = DeserializerFactory.CreateDeserializer (deserializer).DeserializeRoot (new Uri (uri));
+                    var root = DeserializerFactory.CreateDeserializer (Deserializer).DeserializeRoot (new Uri (uri));
                     if (root == null) {
                         continue;
                     }
