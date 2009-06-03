@@ -36,8 +36,13 @@ namespace Mono.Upnp
 {
     public class Service<T> : Service
     {
-        public Service (T service)
-            : base (ServiceControllerBuilder.Build<T> (service))
+        protected Service (T service)
+            : this (null, null, service)
+        {
+        }
+        
+        public Service (ServiceType type, string id, T service)
+            : base (type, id, ServiceControllerBuilder.Build<T> (service))
         {
         }
     }
@@ -53,15 +58,15 @@ namespace Mono.Upnp
         }
         
         protected Service (ServiceController controller)
+            : this (null, null, controller)
+        {
+        }
+        
+        public Service (ServiceType type, string id, ServiceController controller)
         {
             if (controller == null) throw new ArgumentNullException ("controller");
             
             this.controller = controller;
-        }
-        
-        public Service (ServiceController controller, ServiceType type, string id)
-            : this (controller)
-        {
             Type = type;
             Id = id;
         }

@@ -48,8 +48,7 @@ namespace Mono.Upnp.Tests
                     "Mono Project",
                     "Device") {
                     Services = new Service[] {
-                        new Service (
-                            new DummyServiceController (),
+                        new DummyService (
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
                             "urn:upnp-org:serviceId:testService1"
                         )

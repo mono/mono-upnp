@@ -35,7 +35,7 @@ namespace Mono.Upnp.Tests
         static readonly DummyServiceController controller = new DummyServiceController ();
         
         public DummyService (ServiceType type, string id)
-            : base (controller, type, id)
+            : base (type, id, controller)
         {
             ScpdUrl = ControlUrl = EventUrl = new Uri ("http://localhost/");
         }

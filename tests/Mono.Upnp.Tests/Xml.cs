@@ -244,5 +244,15 @@ namespace Mono.Upnp.Tests
                     "</stateVariable>" +
                 "</serviceStateTable>" +
             "</scpd>";
+        
+        public const string SimpleSoapRequest =
+           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/"" s:encodingStyle=""http://schemas.xmlsoap.org/soap/encoding/"">" +
+                "<s:Body>" +
+                   @"<u:Foo xmlns:u=""urn:schemas-upnp-org:service:mono-upnp-test-service:1"">" +
+                        "<bar>hello world!</bar>" +
+                    "</u:Foo>" +
+                "</s:Body>" +
+            "</s:Envelope>";
     }
 }

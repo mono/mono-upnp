@@ -37,13 +37,13 @@ namespace Mono.Upnp.Internal
 {
     sealed class ControlServer : XmlServer
     {
-        readonly ServiceController controller;
+        readonly IMap<string, ServiceAction> actions;
         readonly string service_type;
 
         public ControlServer (ServiceController controller, string serviceType, XmlSerializer serializer, Uri url)
             : base (serializer, url)
         {
-            this.controller = controller;
+            this.actions = controller.Actions;
             this.service_type = serviceType;
         }
         
@@ -56,7 +56,7 @@ namespace Mono.Upnp.Internal
                 var requestEnvelope = Deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
                 var arguments = requestEnvelope.Body;
                 ServiceAction action;
-                if (controller.Actions.TryGetValue (arguments.ActionName, out action)) {
+                if (actions.TryGetValue (arguments.ActionName, out action)) {
                     try {
                         Serializer.Serialize (
                             new SoapEnvelope<Arguments> (new Arguments (service_type, action.Name, action.Execute (arguments.Values))),

@@ -62,7 +62,7 @@ namespace Mono.Upnp.Tests
         [Test]
         public void ActionNameTest ()
         {
-            var service = new Service<ActionNameTestClass> (new ActionNameTestClass ());
+            var service = new DummyService<ActionNameTestClass> ();
             var controller = new ServiceController (new ServiceAction[] { new DummyServiceAction ("foo") }, null);
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
         }

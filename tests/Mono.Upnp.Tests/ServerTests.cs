@@ -32,6 +32,7 @@ using System.Threading;
 using System.Xml;
 
 using Mono.Ssdp;
+using Mono.Upnp.Control;
 using Mono.Upnp.Control.Tests;
 
 using NUnit.Framework;
@@ -43,6 +44,64 @@ namespace Mono.Upnp.Tests
     {
         readonly object mutex = new object ();
         readonly DummyDeserializer deserializer = new DummyDeserializer ();
+        
+        [Test]
+        public void ControlTest ()
+        {
+            var root = new DummyRoot (
+                new DeviceSettings (
+                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                    "uuid:d1",
+                    "Mono.Upnp.Tests Device",
+                    "Mono Project",
+                    "Device") {
+                    Services = new Service[] {
+                        new Service (
+                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            "urn:upnp-org:serviceId:testService1",
+                            new ServiceController (
+                                new ServiceAction[] {
+                                    new ServiceAction (
+                                        "Foo",
+                                        new Argument[] {
+                                            new Argument ("bar", "X_ARG_bar", ArgumentDirection.In),
+                                            new Argument ("result", "X_ARG_result", ArgumentDirection.Out)
+                                        },
+                                        arguments => {
+                                            var out_arguments = new Dictionary<string, string> (1);
+                                            out_arguments["result"] = string.Format ("You said {0}", arguments["bar"]);
+                                            return out_arguments;
+                                        }
+                                    )
+                                },
+                                new StateVariable[] {
+                                    new StateVariable ("X_ARG_bar", "string"),
+                                    new StateVariable ("X_ARG_result", "string")
+                                }
+                            )
+                        )
+                    }
+                }
+            );
+            
+            using (var server = new Server (root)) {
+                server.Start ();
+                var request = (HttpWebRequest)WebRequest.Create (new Uri (root.UrlBase, "device/0/service/0/control/"));
+                request.Method = "POST";
+                request.Headers.Add ("SOAPACTION", "urn:schemas-upnp-org:service:mono-upnp-test-service:1#Foo");
+                request.ContentType = @"text/xml; charset=""utf-8""";
+                var bytes = System.Text.Encoding.UTF8.GetBytes (Xml.SimpleSoapRequest);
+                using (var stream = request.GetRequestStream ()) {
+                    stream.Write (bytes, 0, bytes.Length);
+                }
+                using (var response = request.GetResponse ()) {
+                    using (var reader = XmlReader.Create (response.GetResponseStream ())) {
+                        reader.ReadToFollowing ("result");
+                        Assert.AreEqual ("You said hello world!", reader.ReadElementContentAsString ());
+                    }
+                }
+            }
+        }
         
         Root CreateRoot ()
         {
@@ -109,8 +168,7 @@ namespace Mono.Upnp.Tests
                     "Mono Project",
                     "Device") {
                     Services = new Service[] {
-                        new Service (
-                            new DummyServiceController (),
+                        new DummyService (
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
                             "urn:upnp-org:serviceId:testService1"
                         )
