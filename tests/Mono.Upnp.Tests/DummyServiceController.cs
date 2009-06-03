@@ -26,6 +26,8 @@
 
 using System.Collections.Generic;
 
+using Mono.Upnp.Xml;
+
 namespace Mono.Upnp.Control.Tests
 {
     public class DummyServiceController : ServiceController
@@ -35,7 +37,7 @@ namespace Mono.Upnp.Control.Tests
         {
         }
         
-        protected override void Initialize (Mono.Upnp.Xml.XmlSerializer serializer, Service service)
+        protected override void Initialize (XmlSerializer serializer, Service service)
         {
         }
     }

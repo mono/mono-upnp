@@ -1,5 +1,5 @@
 // 
-// UpnpActionAttribute.cs
+// DummyStateVariable.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -26,20 +26,20 @@
 
 using System;
 
-namespace Mono.Upnp.Control
+namespace Mono.Upnp.Control.Tests
 {
-    [AttributeUsage (AttributeTargets.Method)]
-    public sealed class UpnpActionAttribute : Attribute
+    public class DummyStateVariable : StateVariable
     {
-        public UpnpActionAttribute ()
+        static readonly DummyStateVariableEventer eventer = new DummyStateVariableEventer ();
+        
+        public DummyStateVariable (string name, string dataType)
+            : this (name, dataType, false)
         {
         }
         
-        public UpnpActionAttribute (string name)
+        public DummyStateVariable (string name, string dataType, bool isMulticast)
+            : base (name, dataType, eventer, isMulticast)
         {
-            Name = name;
         }
-        
-        public string Name { get; set; }
     }
 }

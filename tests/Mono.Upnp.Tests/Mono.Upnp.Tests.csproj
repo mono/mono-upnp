@@ -59,6 +59,8 @@
     <Compile Include="ClientTests.cs" />
     <Compile Include="DummyServiceAction.cs" />
     <Compile Include="DummyStateVariableEventer.cs" />
+    <Compile Include="ServiceTests.cs" />
+    <Compile Include="DummyStateVariable.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

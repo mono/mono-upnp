@@ -32,10 +32,21 @@ namespace Mono.Upnp.Tests
 {
     public class DummyService : Service
     {
+        static readonly DummyServiceController controller = new DummyServiceController ();
+        
         public DummyService (ServiceType type, string id)
-            : base (new DummyServiceController (), type, id)
+            : base (controller, type, id)
         {
             ScpdUrl = ControlUrl = EventUrl = new Uri ("http://localhost/");
+        }
+    }
+    
+    public class DummyService<T> : Service<T>
+        where T : new ()
+    {
+        public DummyService ()
+            : base (new T ())
+        {
         }
     }
 }

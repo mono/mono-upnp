@@ -36,6 +36,11 @@ namespace Mono.Upnp.Control.Tests
             return arguments;
         }
         
+        public DummyServiceAction (string name)
+            : this (name, null)
+        {
+        }
+        
         public DummyServiceAction (string name, IEnumerable<Argument> arguments)
             : base (name, arguments, Executor)
         {

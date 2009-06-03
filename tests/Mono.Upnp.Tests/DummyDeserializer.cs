@@ -35,8 +35,10 @@ namespace Mono.Upnp.Tests
 {
     public class DummyDeserializer : Deserializer
     {
+        static readonly XmlDeserializer deserializer = new XmlDeserializer ();
+        
         public DummyDeserializer ()
-            : base (new XmlDeserializer ())
+            : base (deserializer)
         {
         }
         

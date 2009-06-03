@@ -70,7 +70,7 @@ namespace Mono.Upnp.Control.Tests
                     new StateVariable ("A_ARG_TYPE_RequestCount", "ui4", new AllowedValueRange ("1", "100"), "50"),
                     new StateVariable ("A_ARG_TYPE_ResultCount", "ui4"),
                     new StateVariable ("A_ARG_TYPE_Result", "string"),
-                    new StateVariable ("SystemId", "ui4", new DummyStateVariableEventer ())
+                    new DummyStateVariable ("SystemId", "ui4")
                 }
             );
         }

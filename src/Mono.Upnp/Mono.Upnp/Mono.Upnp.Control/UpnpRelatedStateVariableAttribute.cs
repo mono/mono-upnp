@@ -38,8 +38,19 @@ namespace Mono.Upnp.Control
         {
         }
         
-        public UpnpRelatedStateVariableAttribute (string minimumValue, string maximumValue)
+        public UpnpRelatedStateVariableAttribute (string name)
+            : this (name, null, null)
         {
+        }
+        
+        public UpnpRelatedStateVariableAttribute (string minimumValue, string maximumValue)
+            : this (null, minimumValue, maximumValue)
+        {
+        }
+        
+        public UpnpRelatedStateVariableAttribute (string name, string minimumValue, string maximumValue)
+        {
+            Name = name;
             this.minimum_value = minimumValue;
             this.maximum_value = maximumValue;
         }

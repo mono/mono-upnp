@@ -35,6 +35,11 @@ namespace Mono.Upnp.Control
         {
         }
         
+        public UpnpArgumentAttribute (string name)
+        {
+            Name = name;
+        }
+        
         public string Name { get; set; }
     }
 }
