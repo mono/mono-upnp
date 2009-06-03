@@ -40,32 +40,38 @@ namespace Mono.Upnp.Internal
             public ParameterInfo ParameterInfo;
         }
         
+        class StateVariableInfo
+        {
+            public StateVariable StateVariable;
+            public Type Type;
+        }
+        
         public static ServiceController Build<T> (T service)
         {
-            var actions = BuildActions (service);
-            var state_variables = BuildStateVariables (service);
-            return new ServiceController (actions, state_variables);
+            var state_variables = new Dictionary<string, StateVariableInfo> ();
+            return new ServiceController (BuildActions (service, state_variables), BuildStateVariables (service, state_variables));
         }
         
-        static IEnumerable<ServiceAction> BuildActions<T> (T service)
+        static IEnumerable<ServiceAction> BuildActions<T> (T service, Dictionary<string, StateVariableInfo> stateVariables)
         {
-            var actions = new List<ServiceAction> ();
             foreach (var method in typeof (T).GetMethods (BindingFlags.Public | BindingFlags.Instance)) {
-                actions.Add (BuildAction (method, service));
+                var action = BuildAction (method, service, stateVariables);
+                if (action != null) {
+                    yield return action;
+                }
             }
-            return actions;
         }
         
-        static ServiceAction BuildAction (MethodInfo method, object service)
+        static ServiceAction BuildAction (MethodInfo method, object service, Dictionary<string, StateVariableInfo> stateVariables)
         {
             var attributes = method.GetCustomAttributes (typeof (UpnpActionAttribute), false);
             if (attributes.Length != 0) {
                 var parameters = method.GetParameters ();
                 var arguments = new ArgumentInfo[parameters.Length];
                 for (var i = 0; i < parameters.Length; i++) {
-                    arguments[i] = BuildArgumentInfo (parameters[i]);
+                    arguments[i] = BuildArgumentInfo (parameters[i], stateVariables);
                 }
-                var return_argument = BuildArgumentInfo (method.ReturnParameter);
+                var return_argument = BuildArgumentInfo (method.ReturnParameter, stateVariables);
                 var attribute = (UpnpActionAttribute)attributes[0];
                 var name = string.IsNullOrEmpty (attribute.Name) ? method.Name : attribute.Name;
                 return new ServiceAction (name, Combine (arguments, return_argument), args => {
@@ -99,46 +105,78 @@ namespace Mono.Upnp.Internal
             }
         }
         
-        static ArgumentInfo BuildArgumentInfo (ParameterInfo parameterInfo)
+        static ArgumentInfo BuildArgumentInfo (ParameterInfo parameterInfo, Dictionary<string, StateVariableInfo> stateVariables)
         {
             var attributes = parameterInfo.GetCustomAttributes (typeof (UpnpArgumentAttribute), false);
             var attribute = attributes.Length != 0 ? (UpnpArgumentAttribute)attributes[0] : (UpnpArgumentAttribute)null;
             var name = attribute != null && !string.IsNullOrEmpty (attribute.Name) ? attribute.Name : parameterInfo.Name;
-            var related_state_variable = BuildRelatedStateVariable (parameterInfo);
+            var related_state_variable = BuildRelatedStateVariable (parameterInfo, name, stateVariables);
             var direction = parameterInfo.IsIn ? ArgumentDirection.In : ArgumentDirection.Out;
             return new ArgumentInfo {
                 ParameterInfo = parameterInfo,
-                Argument = new Argument (name, related_state_variable.Name, direction, parameterInfo.IsRetval)
+                Argument = new Argument (name, related_state_variable.StateVariable.Name, direction, parameterInfo.IsRetval)
             };
         }
         
-        static StateVariable BuildRelatedStateVariable (ParameterInfo parameterInfo)
+        static StateVariableInfo BuildRelatedStateVariable (ParameterInfo parameterInfo, string actionName, Dictionary<string, StateVariableInfo> stateVariables)
         {
             var attributes = parameterInfo.GetCustomAttributes (typeof (UpnpRelatedStateVariableAttribute), false);
             var attribute = attributes.Length != 0 ? (UpnpRelatedStateVariableAttribute)attributes[0] : (UpnpRelatedStateVariableAttribute)null;
             var name = attribute != null && !string.IsNullOrEmpty (attribute.Name) ? attribute.Name : CreateRelatedStateVariableName (parameterInfo.Name);
+            var data_type = attribute != null && !string.IsNullOrEmpty (attribute.DataType) ? attribute.DataType : GetDataType (parameterInfo.ParameterType);
             var default_value = attribute != null && !string.IsNullOrEmpty (attribute.DefaultValue) ? attribute.DefaultValue : null;
+            
+            StateVariableInfo state_variable_info;
+            if (stateVariables.TryGetValue (name, out state_variable_info)) {
+                var state_variable = state_variable_info.StateVariable;
+                if (state_variable.DataType != data_type ||
+                    state_variable.DefaultValue != default_value ||
+                    (state_variable.AllowedValues != null && state_variable_info.Type != parameterInfo.ParameterType) ||
+                    (state_variable.AllowedValueRange != null &&
+                        (attribute == null ||
+                        attribute.MinimumValue != state_variable.AllowedValueRange.Minimum ||
+                        attribute.MaximumValue != state_variable.AllowedValueRange.Maximum ||
+                        attribute.StepValue != state_variable.AllowedValueRange.Step))) {
+                    name = CreateRelatedStateVariableName (actionName, parameterInfo.Name);
+                } else {
+                    return state_variable_info;
+                }
+            }
+            
             if (parameterInfo.ParameterType.IsEnum) {
                 var allowed_values = BuildAllowedValues (parameterInfo.ParameterType);
-                return new StateVariable  (name, allowed_values, default_value);
+                state_variable_info = new StateVariableInfo {
+                    StateVariable = new StateVariable (name, allowed_values, default_value),
+                    Type = parameterInfo.ParameterType
+                };
             }
-            var data_type = attribute != null && !string.IsNullOrEmpty (attribute.DataType) ? attribute.DataType : GetDataType (parameterInfo.ParameterType);
             if (attribute != null && !string.IsNullOrEmpty (attribute.MinimumValue)) {
                 var allowed_value_range = new AllowedValueRange (attribute.MinimumValue, attribute.MaximumValue, attribute.StepValue);
-                return new StateVariable (name, data_type, allowed_value_range, default_value);
+                state_variable_info = new StateVariableInfo {
+                    StateVariable = new StateVariable (name, data_type, allowed_value_range, default_value)
+                };
             } else {
-                return new StateVariable (name, data_type, default_value);
+                state_variable_info = new StateVariableInfo {
+                    StateVariable = new StateVariable (name, data_type, default_value)
+                };
             }
+            stateVariables[name] = state_variable_info;
+            return state_variable_info;
         }
         
         static string CreateRelatedStateVariableName (string name)
         {
             return string.Format ("A_ARG_{0}", name);
         }
+        
+        static string CreateRelatedStateVariableName (string actionName, string argumentName)
+        {
+            return string.Format ("A_ARG_{0}_{1}", actionName, argumentName);
+        }
             
         static string GetDataType (Type type)
         {
-            if (type == typeof (string)) return "string";
+            if (type.IsEnum || type == typeof (string)) return "string";
             if (type == typeof (int)) return "i4";
             if (type == typeof (byte)) return "ui1";
             if (type == typeof (ushort)) return "ui2";
@@ -169,9 +207,11 @@ namespace Mono.Upnp.Internal
             }
         }
         
-        static IEnumerable<StateVariable> BuildStateVariables<T> (T service)
+        static IEnumerable<StateVariable> BuildStateVariables<T> (T service, Dictionary<string, StateVariableInfo> stateVariables)
         {
-            return null;
+            foreach (var state_variable_info in stateVariables.Values) {
+                yield return state_variable_info.StateVariable;
+            }
         }
         
         static IEnumerable<Argument> Combine (IEnumerable<ArgumentInfo> arguments, ArgumentInfo return_argument)
