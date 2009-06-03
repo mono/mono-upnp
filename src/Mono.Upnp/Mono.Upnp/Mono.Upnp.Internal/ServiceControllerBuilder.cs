@@ -122,9 +122,9 @@ namespace Mono.Upnp.Internal
             }
             var attributes = parameterInfo.GetCustomAttributes (typeof (UpnpArgumentAttribute), false);
             var attribute = attributes.Length != 0 ? (UpnpArgumentAttribute)attributes[0] : null;
-            var name = attribute != null && !string.IsNullOrEmpty (attribute.Name) ? attribute.Name : parameterInfo.Name;
+            var name = attribute != null && !string.IsNullOrEmpty (attribute.Name) ? attribute.Name : (string.IsNullOrEmpty (parameterInfo.Name) ? "result" : parameterInfo.Name);
             var related_state_variable = BuildRelatedStateVariable (parameterInfo, actionName, name, stateVariables);
-            var direction = parameterInfo.IsOut ? ArgumentDirection.Out : ArgumentDirection.In;
+            var direction = parameterInfo.IsRetval || parameterInfo.ParameterType.IsByRef ? ArgumentDirection.Out : ArgumentDirection.In;
             return new ArgumentInfo {
                 ParameterInfo = parameterInfo,
                 Argument = new Argument (name, related_state_variable.StateVariable.Name, direction, parameterInfo.IsRetval)
@@ -187,6 +187,9 @@ namespace Mono.Upnp.Internal
             
         static string GetDataType (Type type)
         {
+            if (type.IsByRef) {
+                type = type.GetElementType ();
+            }
             if (type.IsEnum || type == typeof (string)) return "string";
             if (type == typeof (int)) return "i4";
             if (type == typeof (byte)) return "ui1";

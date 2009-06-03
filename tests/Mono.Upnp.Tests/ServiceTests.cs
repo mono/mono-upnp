@@ -90,6 +90,77 @@ namespace Mono.Upnp.Tests
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
         }
         
+        class OutArgumentTestClass
+        {
+            [UpnpAction]
+            public void Foo (out string bar)
+            {
+                bar = string.Empty;
+            }
+        }
+        
+        [Test]
+        public void OutArgumentTest ()
+        {
+            var service = new DummyService<OutArgumentTestClass> ();
+            var controller = new ServiceController (
+                new ServiceAction[] {
+                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.Out) })
+                },
+                new StateVariable[] {
+                    new StateVariable ("A_ARG_bar", "string")
+                }
+            );
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
+        
+        class RefArgumentTestClass
+        {
+            [UpnpAction]
+            public void Foo (ref string bar)
+            {
+            }
+        }
+        
+        [Test]
+        public void RefArgumentTest ()
+        {
+            var service = new DummyService<RefArgumentTestClass> ();
+            var controller = new ServiceController (
+                new ServiceAction[] {
+                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.Out) })
+                },
+                new StateVariable[] {
+                    new StateVariable ("A_ARG_bar", "string")
+                }
+            );
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
+        
+        class ReturnArgumentTestClass
+        {
+            [UpnpAction]
+            public string Foo ()
+            {
+                return string.Empty;
+            }
+        }
+        
+        [Test]
+        public void ReturnArgumentTest ()
+        {
+            var service = new DummyService<ReturnArgumentTestClass> ();
+            var controller = new ServiceController (
+                new ServiceAction[] {
+                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("result", "A_ARG_result", ArgumentDirection.Out, true) })
+                },
+                new StateVariable[] {
+                    new StateVariable ("A_ARG_result", "string")
+                }
+            );
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
+        
         class ArgumentNameTestClass
         {
             [UpnpAction]
