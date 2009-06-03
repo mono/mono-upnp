@@ -102,7 +102,6 @@ namespace Mono.Upnp
             }
             Uri url = MakeUrl ();
             root.Initialize (serializer, url);
-            Console.WriteLine (serializer.GetBytes (root).Length);
             description_server = new DataServer (serializer.GetBytes (root), url);
             Announce (url);
         }

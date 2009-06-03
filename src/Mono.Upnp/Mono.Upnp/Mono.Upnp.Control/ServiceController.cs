@@ -110,6 +110,7 @@ namespace Mono.Upnp.Control
             
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
             control_server = new ControlServer (this, service.Type.ToString (), serializer, service.ControlUrl);
+            control_server.Start ();
             event_server = new EventServer (this, service.EventUrl);
         }
         

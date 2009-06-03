@@ -51,7 +51,7 @@ namespace Mono.Upnp.Internal
         public Arguments (string serviceType, string actionName, IDictionary<string, string> arguments, bool response)
         {
             ServiceType = serviceType;
-            actionName = actionName;
+            ActionName = actionName;
             this.arguments = arguments;
             this.response = response;
         }
@@ -72,7 +72,7 @@ namespace Mono.Upnp.Internal
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
             var writer = context.Writer;
-            writer.WriteStartAttribute ("u", ActionName, response ? ServiceType + "Response" : ServiceType);
+            writer.WriteStartElement ("u", response ? ActionName + "Response" : ActionName, ServiceType);
             foreach (var argument in arguments) {
                 writer.WriteElementString (argument.Key, argument.Value);
             }

@@ -59,7 +59,7 @@ namespace Mono.Upnp.Internal
                 if (actions.TryGetValue (arguments.ActionName, out action)) {
                     try {
                         Serializer.Serialize (
-                            new SoapEnvelope<Arguments> (new Arguments (service_type, action.Name, action.Execute (arguments.Values))),
+                            new SoapEnvelope<Arguments> (new Arguments (service_type, action.Name, action.Execute (arguments.Values), true)),
                             context.Response.OutputStream
                         );
                     } catch (Exception e) {

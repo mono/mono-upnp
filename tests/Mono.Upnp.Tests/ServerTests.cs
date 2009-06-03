@@ -86,7 +86,7 @@ namespace Mono.Upnp.Tests
             
             using (var server = new Server (root)) {
                 server.Start ();
-                var request = (HttpWebRequest)WebRequest.Create (new Uri (root.UrlBase, "device/0/service/0/control/"));
+                var request = (HttpWebRequest)WebRequest.Create (new Uri (root.UrlBase, "service/0/control/"));
                 request.Method = "POST";
                 request.Headers.Add ("SOAPACTION", "urn:schemas-upnp-org:service:mono-upnp-test-service:1#Foo");
                 request.ContentType = @"text/xml; charset=""utf-8""";
@@ -94,10 +94,13 @@ namespace Mono.Upnp.Tests
                 using (var stream = request.GetRequestStream ()) {
                     stream.Write (bytes, 0, bytes.Length);
                 }
-                using (var response = request.GetResponse ()) {
-                    using (var reader = XmlReader.Create (response.GetResponseStream ())) {
-                        reader.ReadToFollowing ("result");
-                        Assert.AreEqual ("You said hello world!", reader.ReadElementContentAsString ());
+                using (var response = (HttpWebResponse)request.GetResponse ()) {
+                    Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                    using (var stream = response.GetResponseStream ()) {
+                        using (var reader = XmlReader.Create (stream)) {
+                            reader.ReadToFollowing ("result");
+                            Assert.AreEqual ("You said hello world!", reader.ReadElementContentAsString ());
+                        }
                     }
                 }
             }

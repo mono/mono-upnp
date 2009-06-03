@@ -46,9 +46,6 @@ namespace Mono.Upnp.Internal
     [XmlType ("Envelope", Protocol.SoapEnvelopeSchema, "s")]
     class SoapEnvelope<THeader, TBody>
     {
-        readonly SoapHeader<THeader> header;
-        readonly TBody body;
-        
         protected SoapEnvelope ()
         {
         }
@@ -60,23 +57,18 @@ namespace Mono.Upnp.Internal
         
         public SoapEnvelope (SoapHeader<THeader> header, TBody body)
         {
-            this.header = header;
-            this.body = body;
+            Header = header;
+            Body = body;
+            EncodingStyle = Protocol.SoapEncodingSchema;
         }
         
         [XmlAttribute ("encodingStyle", Protocol.SoapEnvelopeSchema)]
-        public string EncodingStyle {
-            get { return Protocol.SoapEncodingSchema; }
-        }
+        public string EncodingStyle { get; set; }
         
         [XmlElement (OmitIfNull = true, Namespace = Protocol.SoapEnvelopeSchema)]
-        public SoapHeader<THeader> Header {
-            get { return header; }
-        }
+        public SoapHeader<THeader> Header { get; set; }
         
         [XmlElement (Namespace = Protocol.SoapEnvelopeSchema)]
-        public TBody Body {
-            get { return body; }
-        }
+        public TBody Body { get; set; }
     }
 }
