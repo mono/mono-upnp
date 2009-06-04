@@ -41,7 +41,6 @@ namespace Mono.Upnp
         IList<Device> devices;
         IList<Service> services;
         IList<Icon> icons;
-        IconServer icon_server;
         
         public Device (DeviceSettings settings)
             : this (settings, null)
@@ -164,12 +163,8 @@ namespace Mono.Upnp
                 services[i].Initialize (serializer, root, new Uri (deviceUrl, string.Format ("service/{0}/", i)));
             }
             
-            if (icons.Count > 0) {
-                var icons_url = new Uri (deviceUrl, "icon/");
-                for (var i = 0; i < icons.Count; i++) {
-                    icons[i].Initialize (root, new Uri (icons_url, string.Format ("{0}/", i)));
-                }
-                icon_server = new IconServer (icons_url, icons);
+            for (var i = 0; i < icons.Count; i++) {
+                icons[i].Initialize (root, new Uri (deviceUrl, string.Format ("icon/{0}/", i)));
             }
         }
 
@@ -179,12 +174,12 @@ namespace Mono.Upnp
                 device.Start ();
             }
             
-            foreach (var service in Services) {
+            foreach (var service in services) {
                 service.Start ();
             }
             
-            if (icon_server != null) {
-                icon_server.Start ();
+            foreach (var icon in icons) {
+                icon.Start ();
             }
         }
 
@@ -194,12 +189,12 @@ namespace Mono.Upnp
                 device.Stop ();
             }
             
-            foreach (var service in Services) {
+            foreach (var service in services) {
                 service.Stop ();
             }
-                
-            if (icon_server != null) {
-                icon_server.Stop ();
+            
+            foreach (var icon in icons) {
+                icon.Stop ();
             }
         }
         

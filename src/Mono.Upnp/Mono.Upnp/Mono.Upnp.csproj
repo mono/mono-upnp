@@ -65,7 +65,6 @@
     <Compile Include="Mono.Upnp.Internal\ControlServer.cs" />
     <Compile Include="Mono.Upnp.Internal\DataServer.cs" />
     <Compile Include="Mono.Upnp.Internal\EventServer.cs" />
-    <Compile Include="Mono.Upnp.Internal\IconServer.cs" />
     <Compile Include="Mono.Upnp.Internal\UpnpServer.cs" />
     <Compile Include="Mono.Upnp.Xml\IXmlDeserializable.cs" />
     <Compile Include="Mono.Upnp.Xml\IXmlSerializable.cs" />

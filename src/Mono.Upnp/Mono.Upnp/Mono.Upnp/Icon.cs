@@ -36,8 +36,9 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp
 {
     [XmlType ("icon", Protocol.DeviceSchema)]
-    public class Icon : Description
+    public class Icon : Description, IDisposable
     {
+        DataServer server;
         string filename;
         byte[] data;
         
@@ -62,7 +63,6 @@ namespace Mono.Upnp
             : this (width, height, depth, format)
         {
             if (filename == null) throw new ArgumentNullException ("filename");
-            //if (!File.Exists (filename)) throw new ArgumentException ("The specified filename does not exist on the file system.", "path");
             
             this.filename = filename;
         }
@@ -101,6 +101,21 @@ namespace Mono.Upnp
         {
             Initialize (root);
             Url = iconUrl;
+            server = new DataServer (Data, Url);
+        }
+        
+        protected internal virtual void Start ()
+        {
+            if (server == null) throw new InvalidOperationException ("The icon has not been initialized");
+            
+            server.Start ();
+        }
+        
+        protected internal virtual void Stop ()
+        {
+            if (server == null) throw new InvalidOperationException ("The icon has not been initialized");
+            
+            server.Stop ();
         }
 
         public virtual byte[] GetData ()
@@ -159,6 +174,12 @@ namespace Mono.Upnp
         public override string ToString ()
         {
             return string.Format ("Icon {{ {0}, {1}x{2}x{3}, {4} }}", MimeType, Width, Height, Depth, Url);
+        }
+        
+        void IDisposable.Dispose ()
+        {
+            // TODO proper dispose pattern
+            server.Dispose ();
         }
     }
 }

@@ -214,21 +214,21 @@ namespace Mono.Upnp.Tests
             using (var server = new Server (root)) {
                 server.Start ();
                 var url = new Uri (root.UrlBase, "icon/");
-                AssertEquality (url, 0);
-                AssertEquality (url, 1);
+                AssertEquality (url, 0, 0);
+                AssertEquality (url, 1, 1);
                 url = new Uri (root.UrlBase, "device/0/icon/");
-                AssertEquality (url, 2);
-                AssertEquality (url, 3);
+                AssertEquality (url, 0, 2);
+                AssertEquality (url, 1, 3);
             }
         }
                     
-        void AssertEquality (Uri url, int iconIndex)
+        void AssertEquality (Uri url, int iconIndex, int iconValue)
         {
             var request = WebRequest.Create (new Uri (url, iconIndex.ToString ()));
             using (var response = (HttpWebResponse)request.GetResponse ()) {
                 Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
                 using (var stream = response.GetResponseStream ()) {
-                    Assert.AreNotEqual (iconIndex, stream.ReadByte ());
+                    Assert.AreEqual (iconValue, stream.ReadByte ());
                     Assert.AreEqual (-1, stream.ReadByte ());
                 }
             }
