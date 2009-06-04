@@ -40,5 +40,13 @@ namespace Mono.Upnp.Control.Tests
         protected override void Initialize (XmlSerializer serializer, Service service)
         {
         }
+        
+        protected override void Start ()
+        {
+        }
+        
+        protected override void Stop ()
+        {
+        }
     }
 }

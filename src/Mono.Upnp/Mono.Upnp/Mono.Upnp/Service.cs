@@ -105,6 +105,7 @@ namespace Mono.Upnp
         {
             Initialize (root);
             if (serviceUrl == null) throw new ArgumentNullException ("serviceUrl");
+            if (controller == null) throw new InvalidOperationException ("The service was created for deserialization and cannot be initialized.");
             
             ScpdUrl = new Uri (serviceUrl, "scpd/");
             ControlUrl = new Uri (serviceUrl, "control/");
@@ -114,10 +115,16 @@ namespace Mono.Upnp
         
         protected internal virtual void Start ()
         {
+            if (controller == null) throw new InvalidOperationException ("The service was created for deserialization and cannot be started.");
+            
+            controller.Start ();
         }
         
         protected internal virtual void Stop ()
         {
+            if (controller == null) throw new InvalidOperationException ("The service was created for deserialization and cannot be stopped.");
+            
+            controller.Stop ();
         }
 
         public ServiceController GetController ()

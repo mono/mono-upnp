@@ -25,9 +25,11 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 
+using Mono.Upnp.Control;
 using Mono.Upnp.Control.Tests;
 
 namespace Mono.Upnp.Tests
@@ -167,6 +169,59 @@ namespace Mono.Upnp.Tests
                         server.Start ();
                         if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
                             Assert.Fail ("The UPnP server announcement timed out.");
+                        }
+                    }
+                }
+            }
+        }
+        
+        class ControlTestClass
+        {
+            [UpnpAction]
+            public string Foo (string bar)
+            {
+                return string.Format ("You said {0}", bar);
+            }
+        }
+        
+        [Test]
+        public void ControlTest ()
+        {
+            var root = new Root (
+                new DeviceSettings (
+                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                    "uuid:d1",
+                    "Mono.Upnp.Tests Device",
+                    "Mono Project",
+                    "Device") {
+                    Services = new Service [] {
+                        new Service<ControlTestClass> (
+                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            "urn:upnp-org:serviceId:testService1",
+                            new ControlTestClass ()
+                        )
+                    }
+                }
+            );
+            
+            using (var client = new Client ()) {
+                client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
+                client.ServiceAdded += (sender, args) => {
+                    lock (mutex) {
+                        var controller = args.Service.GetService ().GetController ();
+                        var arguments = new Dictionary<string, string> (1);
+                        arguments["bar"] = "hello world!";
+                        var results = controller.Actions["Foo"].Invoke (arguments);
+                        Assert.AreEqual ("You said hello world!", results["result"]);
+                        Monitor.Pulse (mutex);
+                    }
+                };
+                
+                using (var server = new Server (root)) {
+                    lock (mutex) {
+                        server.Start ();
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                            Assert.Fail ("The server control timed out.");
                         }
                     }
                 }

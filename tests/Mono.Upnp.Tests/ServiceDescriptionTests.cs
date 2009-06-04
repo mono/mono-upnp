@@ -77,6 +77,7 @@ namespace Mono.Upnp.Control.Tests
         
         public static void AssertEquality (ServiceController sourceController, ServiceController targetController)
         {
+            Assert.IsNotNull (targetController);
             Assert.AreEqual (sourceController.SpecVersion.Major, targetController.SpecVersion.Major);
             Assert.AreEqual (sourceController.SpecVersion.Minor, targetController.SpecVersion.Minor);
             var source_actions = sourceController.Actions.Values.GetEnumerator ();

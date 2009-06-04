@@ -55,7 +55,9 @@ namespace Mono.Upnp.Internal
             request.ContentType = @"text/xml; charset=""utf-8""";
             request.UserAgent = Protocol.UserAgent;
             request.Headers.Add ("SOAPACTION", string.Format ("{0}#{1}", service_type, actionName));
-            Serializer.Serialize (new SoapEnvelope<Arguments> (new Arguments (service_type, actionName, arguments)), request.GetRequestStream ());
+            using (var stream = request.GetRequestStream ()) {
+                Serializer.Serialize (new SoapEnvelope<Arguments> (new Arguments (service_type, actionName, arguments)), stream);
+            }
             using (var response = (HttpWebResponse)request.GetResponse ()) {
                 if (response.StatusCode == HttpStatusCode.OK) {
                     using (var reader = XmlReader.Create (response.GetResponseStream ())) {

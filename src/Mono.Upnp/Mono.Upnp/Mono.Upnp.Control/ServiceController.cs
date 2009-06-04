@@ -110,8 +110,21 @@ namespace Mono.Upnp.Control
             
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
             control_server = new ControlServer (this, service.Type.ToString (), serializer, service.ControlUrl);
-            control_server.Start ();
             event_server = new EventServer (this, service.EventUrl);
+        }
+        
+        protected internal virtual void Start ()
+        {
+            scpd_server.Start ();
+            control_server.Start ();
+            //event_server.Start ();
+        }
+        
+        protected internal virtual void Stop ()
+        {
+            scpd_server.Stop ();
+            control_server.Stop ();
+            //event_server.Stop ();
         }
         
         protected internal virtual IMap<string, string> Invoke (ServiceAction action, IDictionary<string, string> arguments, int retryAttempts)

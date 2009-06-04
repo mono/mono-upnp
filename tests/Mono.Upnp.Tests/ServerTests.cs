@@ -45,6 +45,30 @@ namespace Mono.Upnp.Tests
         readonly object mutex = new object ();
         readonly DummyDeserializer deserializer = new DummyDeserializer ();
         
+        static ServiceController CreateServiceController ()
+        {
+            return new ServiceController (
+                new ServiceAction[] {
+                    new ServiceAction (
+                        "Foo",
+                        new Argument[] {
+                            new Argument ("bar", "X_ARG_bar", ArgumentDirection.In),
+                            new Argument ("result", "X_ARG_result", ArgumentDirection.Out)
+                        },
+                        arguments => {
+                            var out_arguments = new Dictionary<string, string> (1);
+                            out_arguments["result"] = string.Format ("You said {0}", arguments["bar"]);
+                            return out_arguments;
+                        }
+                    )
+                },
+                new StateVariable[] {
+                    new StateVariable ("X_ARG_bar", "string"),
+                    new StateVariable ("X_ARG_result", "string")
+                }
+            );
+        }
+        
         [Test]
         public void ControlTest ()
         {
@@ -59,26 +83,7 @@ namespace Mono.Upnp.Tests
                         new Service (
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
                             "urn:upnp-org:serviceId:testService1",
-                            new ServiceController (
-                                new ServiceAction[] {
-                                    new ServiceAction (
-                                        "Foo",
-                                        new Argument[] {
-                                            new Argument ("bar", "X_ARG_bar", ArgumentDirection.In),
-                                            new Argument ("result", "X_ARG_result", ArgumentDirection.Out)
-                                        },
-                                        arguments => {
-                                            var out_arguments = new Dictionary<string, string> (1);
-                                            out_arguments["result"] = string.Format ("You said {0}", arguments["bar"]);
-                                            return out_arguments;
-                                        }
-                                    )
-                                },
-                                new StateVariable[] {
-                                    new StateVariable ("X_ARG_bar", "string"),
-                                    new StateVariable ("X_ARG_result", "string")
-                                }
-                            )
+                            CreateServiceController ()
                         )
                     }
                 }
@@ -163,6 +168,7 @@ namespace Mono.Upnp.Tests
         [Test]
         public void ScpdTest ()
         {
+            var controller = CreateServiceController ();
             var root = new DummyRoot (
                 new DeviceSettings (
                     new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
@@ -171,9 +177,10 @@ namespace Mono.Upnp.Tests
                     "Mono Project",
                     "Device") {
                     Services = new Service[] {
-                        new DummyService (
+                        new Service (
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
-                            "urn:upnp-org:serviceId:testService1"
+                            "urn:upnp-org:serviceId:testService1",
+                            controller
                         )
                     }
                 }
@@ -184,8 +191,8 @@ namespace Mono.Upnp.Tests
                 using (var response = (HttpWebResponse)request.GetResponse ()) {
                     Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
                     using (var reader = XmlReader.Create (response.GetResponseStream ())) {
-                        var controller = deserializer.DeserializeServiceController (reader);
-                        Assert.IsNotNull (controller);
+                        var target_controller = deserializer.DeserializeServiceController (reader);
+                        ServiceDescriptionTests.AssertEquality (controller, target_controller);
                     }
                 }
             }
