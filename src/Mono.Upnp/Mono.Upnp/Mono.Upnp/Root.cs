@@ -82,13 +82,10 @@ namespace Mono.Upnp
         
         protected internal virtual void Initialize (XmlSerializer serializer, Uri url)
         {
-            // TODO better error message
-            if (url == null) throw new ArgumentNullException ("url");
-            if (RootDevice == null) throw new InvalidOperationException ("The RootDevice is null.");
-            
             UrlBase = url;
-            // TODO clean this up, localize it
-            RootDevice.Initialize (serializer, this, url);
+            if (RootDevice != null) {
+                RootDevice.Initialize (serializer, this, url);
+            }
         }
         
         protected internal virtual void Start ()

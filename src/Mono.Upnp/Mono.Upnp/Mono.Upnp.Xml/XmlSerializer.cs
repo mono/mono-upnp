@@ -71,9 +71,8 @@ namespace Mono.Upnp.Xml
             using (var stream = new MemoryStream ()) {
                 using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
                     SerializeCore (obj, writer);
-                    writer.Flush ();
-                    return stream.ToArray ();
                 }
+                return stream.ToArray ();
             }
         }
         

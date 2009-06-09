@@ -48,10 +48,32 @@ namespace Mono.Upnp
         Root root;
         
         public Server (Root root)
+            : this (root, null)
+        {
+        }
+        
+        public Server (Root root, Uri url)
         {
             if (root == null) throw new ArgumentNullException ("root");
             
             this.root = root;
+            Initialize (url ?? MakeUrl ());
+        }
+        
+        XmlSerializer Serializer {
+            get {
+                if (!static_serializer.IsAlive) {
+                    static_serializer.Target = new XmlSerializer ();
+                }
+                return (XmlSerializer)static_serializer.Target;
+            }
+        }
+        
+        void Initialize (Uri url)
+        {
+            root.Initialize (Serializer, url);
+            description_server = new DataServer (Serializer.GetBytes (root), url);
+            Announce (url);
         }
         
         public bool Started { get; private set; }
@@ -60,16 +82,8 @@ namespace Mono.Upnp
         {
             lock (mutex) {
                 CheckDisposed ();
-                if (Started) {
-                    throw new InvalidOperationException ("The server is already started.");
-                }
-                if (root == null) {
-                    throw new ObjectDisposedException (ToString ());
-                }
+                if (Started) throw new InvalidOperationException ("The server is already started.");
 
-                if (description_server == null) {
-                    Initialize ();
-                }
                 root.Start ();
                 description_server.Start ();
                 ssdp_server.Start ();
@@ -81,29 +95,16 @@ namespace Mono.Upnp
         {
             lock (mutex) {
                 CheckDisposed ();
+                
                 if (!Started) {
                     return;
                 }
+                
                 ssdp_server.Stop ();
-                root.RootDevice.Stop ();
+                root.Stop ();
                 description_server.Stop ();
                 Started = false;
             }
-        }
-
-        void Initialize ()
-        {
-            XmlSerializer serializer;
-            if (static_serializer.IsAlive) {
-                serializer = (XmlSerializer)static_serializer.Target;
-            } else {
-                serializer = new XmlSerializer ();
-                static_serializer.Target = serializer;
-            }
-            Uri url = MakeUrl ();
-            root.Initialize (serializer, url);
-            description_server = new DataServer (serializer.GetBytes (root), url);
-            Announce (url);
         }
 
         void Announce (Uri url)

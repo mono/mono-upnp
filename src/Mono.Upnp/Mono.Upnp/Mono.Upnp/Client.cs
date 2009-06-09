@@ -37,6 +37,8 @@ namespace Mono.Upnp
 {
     public class Client : IDisposable
     {
+        delegate TResult Func<T1, T2, TResult> (T1 t1, T2 t2);
+        
         static WeakReference static_deserializer = new WeakReference (null);
         
         readonly Dictionary<DeviceAnnouncement, DeviceAnnouncement> devices =
@@ -82,15 +84,6 @@ namespace Mono.Upnp
         public void Browse (TypeInfo type)
         {
             client.Browse (type.ToString ());
-        }
-        
-        XmlDeserializer Deserializer {
-            get {
-                if (!static_deserializer.IsAlive) {
-                    static_deserializer.Target = new XmlDeserializer ();
-                }
-                return (XmlDeserializer)static_deserializer.Target;
-            }
         }
 
         void ClientServiceAdded (object sender, Mono.Ssdp.ServiceArgs args)
@@ -173,7 +166,8 @@ namespace Mono.Upnp
             OnEvent (ServiceRemoved, e);
         }
         
-        void OnEvent<T> (EventHandler<T> handler, T e) where T : EventArgs
+        void OnEvent<T> (EventHandler<T> handler, T e)
+            where T : EventArgs
         {
             if (handler != null) {
                 handler (this, e);
@@ -182,45 +176,45 @@ namespace Mono.Upnp
 
         internal Service GetService (ServiceAnnouncement announcement)
         {
-            foreach (var uri in announcement.Locations) {
-                if (descriptions.ContainsKey (uri)) {
-                    var description = GetService (announcement, descriptions[uri].RootDevice);
-                    if (description != null && !description.IsDisposed) {
-                        return description;
-                    }
-                }
-                try {
-                    var root = DeserializerFactory.CreateDeserializer (Deserializer).DeserializeRoot (new Uri (uri));
-                    if (root == null) {
-                        continue;
-                    }
-                    descriptions[uri] = root;
-                    return GetService (announcement, root.RootDevice);
-                } catch (Exception e) {
-                    Log.Exception (string.Format ("There was a problem fetching the description at {0}.", uri), e);
-                }
-            }
-            return null;
+            return GetDescription<ServiceAnnouncement, Service> (announcement.Locations, announcement, GetService);
         }
 
         internal Device GetDevice (DeviceAnnouncement announcement)
         {
-            foreach (var uri in announcement.Locations) {
-                if (descriptions.ContainsKey (uri)) {
-                    var description = GetDevice (announcement, descriptions[uri].RootDevice);
-                    if (description != null && !description.IsDisposed) {
-                        return description;
+            return GetDescription<DeviceAnnouncement, Device> (announcement.Locations, announcement, GetDevice);
+        }
+        
+        TResult GetDescription<TAnnouncement, TResult> (IEnumerable<string> urls, TAnnouncement announcement, Func<TAnnouncement, Device, TResult> getter)
+            where TResult : class
+        {
+            foreach (var url in urls) {
+                if (descriptions.ContainsKey (url)) {
+                    var root = descriptions[url];
+                    if (!root.IsDisposed) {
+                        var result = getter (announcement, root.RootDevice);
+                        if (result != null) {
+                            return result;
+                        }
                     }
                 }
+                var deserializer = (XmlDeserializer)static_deserializer.Target;
+                if (deserializer == null) {
+                    deserializer = new XmlDeserializer ();
+                    static_deserializer.Target = deserializer;
+                }
                 try {
-                    var root = DeserializerFactory.CreateDeserializer (Deserializer).DeserializeRoot (new Uri (uri));
+                    var root = DeserializerFactory.CreateDeserializer (deserializer).DeserializeRoot (new Uri (url));
                     if (root == null) {
                         continue;
                     }
-                    descriptions[uri] = root;
-                    return GetDevice (announcement, root.RootDevice);
+                    descriptions[url] = root;
+                    var result = getter (announcement, root.RootDevice);
+                    if (result == null) {
+                        continue;
+                    }
+                    return result;
                 } catch (Exception e) {
-                    Log.Exception (string.Format ("There was a problem fetching the description at {0}.", uri), e);
+                    Log.Exception (string.Format ("There was a problem fetching the description at {0}.", url), e);
                 }
             }
             return null;

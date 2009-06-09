@@ -34,6 +34,7 @@ namespace Mono.Upnp.Internal
 {
     static class ServiceControllerBuilder
     {
+        // TODO this file could use some clean-up (mainly readability)
         class Eventer : StateVariableEventer
         {
             public static readonly MethodInfo handler = typeof (Eventer).GetMethod ("Handler");

@@ -107,6 +107,9 @@ namespace Mono.Upnp.Control
         {
             if (serializer == null) throw new ArgumentNullException ("serializer");
             if (service == null) throw new ArgumentNullException ("service");
+            if (service.ScpdUrl == null) throw new ArgumentException ("The service has no ScpdUrl.", "service");
+            if (service.ControlUrl == null) throw new ArgumentException ("The service has no ControlUrl.", "service");
+            if (service.EventUrl == null) throw new ArgumentException ("The service has no EventUrl.", "service");
             
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
             control_server = new ControlServer (this, service.Type.ToString (), serializer, service.ControlUrl);
@@ -132,6 +135,10 @@ namespace Mono.Upnp.Control
             // TODO try dispose on timeout
             // TODO retry attempts
             return control_client.Invoke (action.Name, arguments);
+        }
+        
+        protected internal virtual void UpdateStateVariable (StateVariable stateVariable, string newValue)
+        {
         }
         
         [XmlTypeDeserializer]
@@ -182,39 +189,6 @@ namespace Mono.Upnp.Control
             if (context == null) throw new ArgumentNullException ("context");
             
             context.AutoSerializeMembersOnly (this);
-        }
-        
-        protected internal virtual Type DeserializeDataType (string dataType)
-        {
-            // I'd love to do a switch here, but some UPnP services define
-            // custom data types that begin with a legal data type. That
-            // would probably only ever happen with string, but why risk
-            // the exception.
-
-            if (dataType.StartsWith ("ui1")) return typeof (byte);
-            else if (dataType.StartsWith ("ui2")) return typeof (ushort);
-            else if (dataType.StartsWith ("ui4")) return typeof (uint);
-            else if (dataType.StartsWith ("i1")) return typeof (sbyte);
-            else if (dataType.StartsWith ("i2")) return typeof (short);
-            else if (dataType.StartsWith ("i4")) return typeof (int);
-            else if (dataType.StartsWith ("int")) return typeof (long); // Is this right? The UPnP docs are vague
-            else if (dataType.StartsWith ("r4")) return typeof (float);
-            else if (
-                dataType.StartsWith ("r8") ||
-                dataType.StartsWith ("number") ||
-                dataType.StartsWith ("fixed.14.4") ||
-                dataType.StartsWith ("float")) return typeof (double);
-            else if (dataType.StartsWith ("char")) return typeof (char);
-            else if (dataType.StartsWith ("string")) return typeof (string);
-            else if ( // TODO handle all of the variations
-                dataType.StartsWith ("date") ||
-                dataType.StartsWith ("time")) return typeof (DateTime);
-            else if (dataType.StartsWith ("boolean")) return typeof (bool);
-            else if (dataType.StartsWith ("bin")) return typeof (byte[]);
-            else if (
-                dataType.StartsWith ("uri") ||
-                dataType.StartsWith ("uuid")) return typeof (Uri);
-            else return null;
         }
     }
 }

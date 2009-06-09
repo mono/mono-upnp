@@ -46,18 +46,12 @@ namespace Mono.Upnp.Internal
             public uint TimeoutId;
             public uint Seq;
             public int ConnectFailures;
-
-            public Subscription (Uri callback, string uuid)
-            {
-                Callback = callback;
-                Sid = uuid;
-            }
         }
 
-        private readonly ServiceController controller;
-        private readonly object mutex = new object ();
-        private readonly Dictionary<string, Subscription> subscribers = new Dictionary<string, Subscription> ();
-        private readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
+        readonly ServiceController controller;
+        readonly object mutex = new object ();
+        readonly Dictionary<string, Subscription> subscribers = new Dictionary<string, Subscription> ();
+        readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
 
         public EventServer (ServiceController service, Uri url)
             : base (url)
@@ -65,12 +59,12 @@ namespace Mono.Upnp.Internal
             this.controller = service;
         }
 
-        private readonly Stack<Subscription> dead_subscribers = new Stack<Subscription> ();
+        readonly Stack<Subscription> dead_subscribers = new Stack<Subscription> ();
 
         public void PublishUpdates ()
         {
             lock (mutex) {
-                foreach (Subscription subscriber in subscribers.Values) {
+                foreach (var subscriber in subscribers.Values) {
                     try {
                         PublishUpdates (subscriber);
                         subscriber.ConnectFailures = 0;
@@ -91,9 +85,9 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private void PublishUpdates (Subscription subscriber)
+        void PublishUpdates (Subscription subscriber)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create (subscriber.Callback);
+            var request = (HttpWebRequest)WebRequest.Create (subscriber.Callback);
             request.Method = "NOTIFY";
             request.ContentType = "text/xml";
             request.Headers.Add ("NT", "upnp:event");
@@ -102,32 +96,31 @@ namespace Mono.Upnp.Internal
             request.Headers.Add ("SEQ", subscriber.Seq.ToString ());
             request.KeepAlive = false;
             subscriber.Seq++;
-            Stream stream = request.GetRequestStream ();
-            XmlWriter writer = XmlWriter.Create (stream);
-            writer.WriteStartDocument ();
-            writer.WriteStartElement ("e", "propertyset", Protocol.EventSchema);
-            foreach (StateVariable state_variable in controller.StateVariables.Values) {
-                if (state_variable.SendsEvents) {
-                    writer.WriteStartElement ("property", Protocol.EventSchema);
-                    writer.WriteStartElement (state_variable.Name);
-                    //writer.WriteValue (state_variable.Value);
+            using (var stream = request.GetRequestStream ()) {
+                using (var writer = XmlWriter.Create (stream)) {
+                    writer.WriteStartDocument ();
+                    writer.WriteStartElement ("e", "propertyset", Protocol.EventSchema);
+                    foreach (var state_variable in controller.StateVariables.Values) {
+                        if (state_variable.SendsEvents) {
+                            writer.WriteStartElement ("property", Protocol.EventSchema);
+                            writer.WriteStartElement (state_variable.Name);
+                            //writer.WriteValue (state_variable.Value);
+                            writer.WriteEndElement ();
+                            writer.WriteEndElement ();
+                        }
+                    }
                     writer.WriteEndElement ();
-                    writer.WriteEndElement ();
+                    writer.WriteEndDocument ();
                 }
             }
-            writer.WriteEndElement ();
-            writer.WriteEndDocument ();
-            writer.Close ();
-            stream.Close ();
             request.BeginGetResponse (OnGotResponse, request);
         }
 
-        private void OnGotResponse (IAsyncResult async)
+        void OnGotResponse (IAsyncResult async)
         {
-            HttpWebRequest request = (HttpWebRequest)async.AsyncState;
+            var request = (HttpWebRequest)async.AsyncState;
             try {
-                HttpWebResponse response = (HttpWebResponse)request.EndGetResponse (async);
-                response.Close ();
+                request.EndGetResponse (async).Close ();
             } catch {
             }
         }
@@ -136,17 +129,17 @@ namespace Mono.Upnp.Internal
         {
             lock (mutex) {
                 if (context.Request.HttpMethod.ToUpper () == "SUBSCRIBE") {
-                    string callback = context.Request.Headers["CALLBACK"];
+                    var callback = context.Request.Headers["CALLBACK"];
                     if (callback != null) {
-                        string uuid = GenerateUuid ();
+                        var uuid = GenerateUuid ();
                         // TODO try/catch
-                        Subscription subscriber = new Subscription (new Uri (callback.Substring (1, callback.Length - 2)), uuid);
+                        var subscriber = new Subscription { Callback = new Uri (callback.Substring (1, callback.Length - 2)), Sid = uuid };
                         subscribers.Add (uuid, subscriber);
                         HandleSubscription (context, subscriber);
                         context.Response.Close ();
                         PublishUpdates (subscriber);
                     } else {
-                        string sid = context.Request.Headers["SID"];
+                        var sid = context.Request.Headers["SID"];
                         if (sid == null || !subscribers.ContainsKey (sid)) {
                             // TODO stuff here
                         }
@@ -154,7 +147,7 @@ namespace Mono.Upnp.Internal
                         context.Response.Close ();
                     }
                 } else if (context.Request.HttpMethod.ToUpper () == "UNSUBSCRIBE") {
-                    string sid = context.Request.Headers["SID"];
+                    var sid = context.Request.Headers["SID"];
                     if (sid == null || !subscribers.ContainsKey (sid)) {
                         // TODO stuff here
                     }
@@ -165,7 +158,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private bool OnTimeout (object state, ref TimeSpan interval)
+        bool OnTimeout (object state, ref TimeSpan interval)
         {
             lock (mutex) {
                 subscribers.Remove ((string)state);
@@ -173,11 +166,11 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        private void HandleSubscription (HttpListenerContext context, Subscription subscriber)
+        void HandleSubscription (HttpListenerContext context, Subscription subscriber)
         {
             dispatcher.Remove (subscriber.TimeoutId);
-            string timeout = context.Request.Headers["TIMEOUT"] ?? "Second-1800";
-            TimeSpan time = timeout == "infinate" ? TimeSpan.MaxValue : TimeSpan.FromSeconds (int.Parse (timeout.Substring (7)));
+            var timeout = context.Request.Headers["TIMEOUT"] ?? "Second-1800";
+            var time = timeout == "infinate" ? TimeSpan.MaxValue : TimeSpan.FromSeconds (int.Parse (timeout.Substring (7)));
             subscriber.TimeoutId = dispatcher.Add (time, OnTimeout, subscriber.Sid);
             context.Response.AddHeader ("DATE", DateTime.Now.ToString ("r"));
             context.Response.AddHeader ("SERVER", Protocol.UserAgent);
@@ -187,10 +180,10 @@ namespace Mono.Upnp.Internal
             context.Response.StatusDescription = "OK";
         }
 
-        private static readonly Random random = new Random ();
-        private static string GenerateUuid ()
+        static readonly Random random = new Random ();
+        static string GenerateUuid ()
         {
-            StringBuilder builder = new StringBuilder (37);
+            var builder = new StringBuilder (37);
             builder.Append ("uuid:");
             for (int i = 0; i < 32; i++) {
                 int r = random.Next (65, 100);

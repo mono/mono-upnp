@@ -40,7 +40,6 @@ namespace Mono.Upnp.Control
         readonly ServiceController controller;
         readonly StateVariableEventer eventer;
         IList<string> allowed_values;
-        //event EventHandler<StateVariableChangedArgs<string>> changed;
         
         protected StateVariable ()
         {
@@ -151,6 +150,7 @@ namespace Mono.Upnp.Control
         
         protected virtual void OnStateVariableUpdated (object sender, StateVariableChangedArgs<string> args)
         {
+            controller.UpdateStateVariable (this, args.NewValue);
         }
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)

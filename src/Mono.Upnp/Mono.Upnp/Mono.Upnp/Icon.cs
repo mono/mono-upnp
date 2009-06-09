@@ -99,9 +99,11 @@ namespace Mono.Upnp
         
         protected internal virtual void Initialize (Root root, Uri iconUrl)
         {
+            if (iconUrl == null) throw new ArgumentNullException ("iconUrl");
+            
             Initialize (root);
             Url = iconUrl;
-            server = new DataServer (Data, Url);
+            server = new DataServer (Data, iconUrl);
         }
         
         protected internal virtual void Start ()
