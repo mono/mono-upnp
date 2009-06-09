@@ -40,23 +40,35 @@ namespace Mono.Upnp.Tests
         readonly object mutex = new object ();
         volatile bool flag;
         
-        Root CreateRoot ()
+        [Test]
+        public void DescriptionCacheTest()
         {
-            return new DummyRoot (
-                new DeviceSettings (
-                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
-                    "uuid:d1",
-                    "Mono.Upnp.Tests Device",
-                    "Mono Project",
-                    "Device") {
-                    Services = new Service[] {
-                        new DummyService (
-                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
-                            "urn:upnp-org:serviceId:testService1"
-                        )
+            var factory = new DummyDeserializerFactory ();
+            using (var server = new Server (CreateRoot ())) {
+                using (var client = new Client (factory)) {
+                    client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
+                    client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"));
+                    flag = false;
+                    client.ServiceAdded += (sender, args) => {
+                        lock (mutex) {
+                            var service = args.Service.GetService ();
+                            Assert.IsNotNull (service);
+                            if (flag) {
+                                Monitor.Pulse (mutex);
+                            } else {
+                                flag = true;
+                            }
+                        }
+                    };
+                    lock (mutex) {
+                        server.Start ();
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                            Assert.Fail ("The server announcement timed out.");
+                        }
+                        Assert.AreEqual (1, factory.InstantiationCount);
                     }
                 }
-            );
+            }
         }
         
         [Test]
@@ -226,6 +238,29 @@ namespace Mono.Upnp.Tests
                     }
                 }
             }
+        }
+        
+        static Root CreateRoot ()
+        {
+            return new DummyRoot (
+                new DeviceSettings (
+                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                    "uuid:d1",
+                    "Mono.Upnp.Tests Device",
+                    "Mono Project",
+                    "Device") {
+                    Services = new Service[] {
+                        new DummyService (
+                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            "urn:upnp-org:serviceId:testService1"
+                        ),
+                        new DummyService (
+                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"),
+                            "urn:upnp-org:serviceId:testService2"
+                        )
+                    }
+                }
+            );
         }
     }
 }
