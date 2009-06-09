@@ -60,19 +60,15 @@ namespace Mono.Upnp
             Initialize (url ?? MakeUrl ());
         }
         
-        XmlSerializer Serializer {
-            get {
-                if (!static_serializer.IsAlive) {
-                    static_serializer.Target = new XmlSerializer ();
-                }
-                return (XmlSerializer)static_serializer.Target;
-            }
-        }
-        
         void Initialize (Uri url)
         {
-            root.Initialize (Serializer, url);
-            description_server = new DataServer (Serializer.GetBytes (root), url);
+            var serializer = (XmlSerializer)static_serializer.Target;
+            if (serializer == null) {
+                serializer = new XmlSerializer ();
+                static_serializer.Target = serializer;
+            }
+            root.Initialize (serializer, url);
+            description_server = new DataServer (serializer.GetBytes (root), url);
             Announce (url);
         }
         
