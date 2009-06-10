@@ -258,6 +258,7 @@ namespace Mono.Upnp.Xml
                 XmlFlagAttribute flag_attribute = null;
                 XmlArrayAttribute array_attribute = null;
                 XmlArrayItemAttribute array_item_attribute = null;
+                XmlValueAttribute value_attribute = null;
                 
                 foreach (var custom_attribute in property.GetCustomAttributes (false)) {
                     if (custom_attribute is DoNotSerializeAttribute) {
@@ -265,6 +266,7 @@ namespace Mono.Upnp.Xml
                         element_attribute = null;
                         flag_attribute = null;
                         array_attribute = null;
+                        value_attribute = null;
                         break;
                     }
                     
@@ -297,6 +299,12 @@ namespace Mono.Upnp.Xml
                         array_item_attribute = array_item;
                         continue;
                     }
+                    
+                    var value = custom_attribute as XmlValueAttribute;
+                    if (value != null) {
+                        value_attribute = value;
+                        continue;
+                    }
                 }
                 
                 if (attribute_attribute != null) {
@@ -316,6 +324,10 @@ namespace Mono.Upnp.Xml
                 
                 if (array_attribute != null) {
                     elementSerializers.Add (CreateSerializer (property, CreateSerializer (property, array_attribute, array_item_attribute)));
+                }
+                
+                if (value_attribute != null) {
+                    elementSerializers.Add (CreateSerializer (property, CreateSerializer (property)));
                 }
             }
         }
@@ -467,6 +479,15 @@ namespace Mono.Upnp.Xml
                 if ((bool)obj) {
                     context.Writer.WriteStartElement (prefix, name, @namespace);
                     context.Writer.WriteEndElement ();
+                }
+            };
+        }
+        
+        static Serializer CreateSerializer (PropertyInfo property)
+        {
+            return (obj, context) => {
+                if (obj != null) {
+                    context.Writer.WriteString (obj.ToString ());
                 }
             };
         }

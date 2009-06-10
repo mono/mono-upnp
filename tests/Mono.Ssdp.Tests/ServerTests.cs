@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -37,7 +38,7 @@ namespace Mono.Ssdp.Tests
     {
         const string address = "239.255.255.250";
         static readonly IPAddress ipaddress = IPAddress.Parse (address);
-        static readonly IPEndPoint endpoint = new IPEndPoint (address, 1900);
+        static readonly IPEndPoint endpoint = new IPEndPoint (ipaddress, 1900);
         
         readonly object mutex = new object ();
         

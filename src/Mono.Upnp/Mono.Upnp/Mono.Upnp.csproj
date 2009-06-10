@@ -112,6 +112,7 @@
     <Compile Include="Mono.Upnp.Control\UpnpStateVariableAttribute.cs" />
     <Compile Include="Mono.Upnp.Control\ServiceActionExecutor.cs" />
     <Compile Include="Mono.Upnp.Control\StateVariableEventer.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlValueAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

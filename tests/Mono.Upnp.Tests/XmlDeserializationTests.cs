@@ -753,5 +753,17 @@ namespace Mono.Upnp.Xml.Tests
             var deserialized_object = Deserialize<ElementTestClass> (@"<Test xmlns=""urn:mono-upnp:tests""><Foo>bar</Foo></Test>");
             Assert.AreEqual ("bar", deserialized_object.Foo);
         }
+        
+        class ValueTestClass
+        {
+            [XmlValue] public string Foo { get; set; }
+        }
+        
+        [Test]
+        public void ValueTest ()
+        {
+            var deserialized_object = Deserialize<ValueTestClass> (@"<Test>bar</Test>");
+            Assert.AreEqual ("bar", deserialized_object.Foo);
+        }
     }
 }

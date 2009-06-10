@@ -656,5 +656,18 @@ namespace Mono.Upnp.Xml.Tests
                 @"<?xml version=""1.0"" encoding=""utf-8""?><NamespaceTestClass xmlns:b=""udn:mono-upnp:bar"" xmlns:f=""udn:mono-upnp:foo""><f:Foo>foo</f:Foo><b:Bar>bar</b:Bar></NamespaceTestClass>",
                 serializer.GetString (new NamespaceTestClass { Foo = "foo", Bar = "bar" }));
         }
+        
+        class ValueTestClass
+        {
+            [XmlValue] public string Foo { get; set; }
+        }
+        
+        [Test]
+        public void ValueTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><ValueTestClass>bar</ValueTestClass>",
+                serializer.GetString (new ValueTestClass { Foo = "bar" }));
+        }
     }
 }
