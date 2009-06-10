@@ -59,8 +59,8 @@ namespace Mono.Ssdp.Tests
                 using (var server = new Server ()) {
                     server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
                     client.ServiceAdded += BrowseAllTestClientServiceAdded;
-                    client.BrowseAll ();
                     lock (mutex) {
+                        client.BrowseAll ();
                         if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
                             Assert.Fail ("The announcement timed out.");
                         }
@@ -76,6 +76,31 @@ namespace Mono.Ssdp.Tests
                 Assert.AreEqual ("upnp:test", e.Service.ServiceType);
                 Assert.AreEqual ("uuid:mono-upnp-tests:test", e.Usn);
                 Monitor.Pulse (mutex);
+            }
+        }
+        
+        [Test]
+        public void BrowseExclusionTest ()
+        {
+            using (var client = new Client ()) {
+                using (var server = new Server ()) {
+                    client.ServiceAdded += (sender, args) => {
+                        lock (mutex) {
+                            if (args.Service.ServiceType != "upnp:test") {
+                                Monitor.Pulse (mutex);
+                            }
+                        }
+                    };
+                    client.Browse ("upnp:test");
+                    lock (mutex) {
+                        server.Announce ("upnp:test:fail", "uuid:mono-upnp-tests:test1", "http://localhost/");
+                        server.Announce ("upnp", "uuid:mono-upnp-tests:test2", "http://localhost/");
+                        server.Announce ("upnp:test", "uuid:mono-upnp-tests:test3", "http://localhost/");
+                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                            Assert.Fail ("The client recieved invalid announcements.");
+                        }
+                    }
+                }
             }
         }
     }
