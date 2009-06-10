@@ -40,7 +40,7 @@ namespace Mono.Ssdp.Tests
         {
             using (var client = new Client ()) {
                 using (var server = new Server ()) {
-                    client.ServiceAdded += BrowseAllTestClientServiceAdded;
+                    client.ServiceAdded += ClientServiceAdded;
                     client.BrowseAll ();
                     lock (mutex) {
                         server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
@@ -58,7 +58,7 @@ namespace Mono.Ssdp.Tests
             using (var client = new Client ()) {
                 using (var server = new Server ()) {
                     server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
-                    client.ServiceAdded += BrowseAllTestClientServiceAdded;
+                    client.ServiceAdded += ClientServiceAdded;
                     lock (mutex) {
                         client.BrowseAll ();
                         if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
@@ -69,13 +69,30 @@ namespace Mono.Ssdp.Tests
             }
         }
 
-        void BrowseAllTestClientServiceAdded (object sender, ServiceArgs e)
+        void ClientServiceAdded (object sender, ServiceArgs e)
         {
             lock (mutex) {
                 Assert.AreEqual (ServiceOperation.Added, e.Operation);
                 Assert.AreEqual ("upnp:test", e.Service.ServiceType);
                 Assert.AreEqual ("uuid:mono-upnp-tests:test", e.Usn);
                 Monitor.Pulse (mutex);
+            }
+        }
+        
+        [Test]
+        public void BrowseInclusionTest ()
+        {
+            using (var client = new Client ()) {
+                using (var server = new Server ()) {
+                    client.ServiceAdded += ClientServiceAdded;
+                    client.Browse ("upnp:test");
+                    lock (mutex) {
+                        server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                            Assert.Fail ("The announcement timed out.");
+                        }
+                    }
+                }
             }
         }
         
