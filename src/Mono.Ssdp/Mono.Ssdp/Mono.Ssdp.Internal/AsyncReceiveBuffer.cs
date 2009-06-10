@@ -32,12 +32,12 @@ using System.Net.Sockets;
 
 namespace Mono.Ssdp.Internal
 {
-    internal class AsyncReceiveBuffer
+    class AsyncReceiveBuffer
     {
-        private const int length = 1024;
-        private byte[] buffer = new byte[length];
-        private int bytes_received;
-        private SsdpSocket socket;
+        const int length = 1024;
+        readonly SsdpSocket socket;
+        readonly byte[] buffer = new byte[length];
+        int bytes_received;
         
         // a field because it gets passed as ref; internal API anyway
         public EndPoint SenderEndPoint = new IPEndPoint (IPAddress.Any, Protocol.Port);
@@ -54,8 +54,8 @@ namespace Mono.Ssdp.Internal
         public int BytesReceived {
             get { return bytes_received; }
             set {
-                byte[] buffer = this.buffer;
-                for (int i = value; i < length; i++) {
+                var buffer = this.buffer;
+                for (var i = value; i < length; i++) {
                     buffer[i] = 0;
                 }
                 bytes_received = value;

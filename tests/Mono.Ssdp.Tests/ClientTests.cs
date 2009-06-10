@@ -1,5 +1,5 @@
 // 
-// DiscoveryTests.cs
+// ClientTests.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -31,7 +31,7 @@ using NUnit.Framework;
 namespace Mono.Ssdp.Tests
 {
     [TestFixture]
-    public class DiscoveryTests
+    public class ClientTests
     {
         readonly object mutex = new object ();
         
@@ -53,7 +53,7 @@ namespace Mono.Ssdp.Tests
         }
         
         [Test]
-        public void BrowseAllDiscoveryTest ()
+        public void BrowseAllSearchTest ()
         {
             using (var client = new Client ()) {
                 using (var server = new Server ()) {
@@ -80,7 +80,7 @@ namespace Mono.Ssdp.Tests
         }
         
         [Test]
-        public void BrowseInclusionTest ()
+        public void BrowseAnnouncementInclusionTest ()
         {
             using (var client = new Client ()) {
                 using (var server = new Server ()) {
@@ -97,7 +97,7 @@ namespace Mono.Ssdp.Tests
         }
         
         [Test]
-        public void BrowseExclusionTest ()
+        public void BrowseAnnouncementExclusionTest ()
         {
             using (var client = new Client ()) {
                 using (var server = new Server ()) {

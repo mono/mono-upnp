@@ -32,30 +32,22 @@ using System.Text;
 
 namespace Mono.Ssdp.Internal
 {   
-    internal class HttpDatagram
+    class HttpDatagram
     {
-        private HttpDatagramType type;
-        private WebHeaderCollection headers;
-        
         public HttpDatagram (HttpDatagramType type)
         {
-            this.type = type;
+            Type = type;
         }
         
-        public HttpDatagramType Type {
-            get { return type; }
-            set { type = value; }
-        }
+        public HttpDatagramType Type { get; set; }
         
-        public WebHeaderCollection Headers {
-            get { return headers; }
-        }
+        public WebHeaderCollection Headers { get; private set; }
 
 #region Static Datagram Parser
     
-        private static byte [] fingerprint_discover_response = Encoding.ASCII.GetBytes ("HTTP/1.1 200 OK\r\n");
-        private static byte [] fingerprint_msearch = Encoding.ASCII.GetBytes ("M-SEARCH * HTTP/1.1\r\n");
-        private static byte [] fingerprint_notify = Encoding.ASCII.GetBytes ("NOTIFY * HTTP/1.1\r\n");
+        static readonly byte [] fingerprint_discover_response = Encoding.ASCII.GetBytes ("HTTP/1.1 200 OK\r\n");
+        static readonly byte [] fingerprint_msearch = Encoding.ASCII.GetBytes ("M-SEARCH * HTTP/1.1\r\n");
+        static readonly byte [] fingerprint_notify = Encoding.ASCII.GetBytes ("NOTIFY * HTTP/1.1\r\n");
     
         public static HttpDatagram Parse (byte [] rawDgram)
         {
@@ -63,13 +55,13 @@ namespace Mono.Ssdp.Internal
                 return null;
             }
             
-            int headers_offset = 0;
-            HttpDatagramType type = DetectDatagramType (rawDgram, out headers_offset);
+            var headers_offset = 0;
+            var type = DetectDatagramType (rawDgram, out headers_offset);
             if (type == HttpDatagramType.Unknown) {
                 return null;
             }
             
-            HttpDatagram dgram = new HttpDatagram (type);
+            var dgram = new HttpDatagram (type);
             if (ParseHeaders (dgram, rawDgram, headers_offset)) {
                 return dgram;
             }
@@ -77,7 +69,7 @@ namespace Mono.Ssdp.Internal
             return null;
         }
         
-        private static HttpDatagramType DetectDatagramType (byte [] rawDgram, out int offset)
+        static HttpDatagramType DetectDatagramType (byte [] rawDgram, out int offset)
         {
             switch (ToUpper (rawDgram[0])) {
                 case (byte)'H':
@@ -101,7 +93,7 @@ namespace Mono.Ssdp.Internal
             return HttpDatagramType.Unknown;
         }
         
-        private static bool ParseHeaders (HttpDatagram dgram, byte [] raw, int offset)
+        static bool ParseHeaders (HttpDatagram dgram, byte [] raw, int offset)
         {
             for (int i = offset, line_start = offset, sep_start = -1, n = raw.Length - 1; i < n; i++) {
                 if (sep_start < 0 && raw[i] == ':') {
@@ -109,22 +101,21 @@ namespace Mono.Ssdp.Internal
                     sep_start = i;
                 } else if (raw[i] == '\r' && raw[i + 1] == '\n') {
                     // Process on the line boundary
-                    int line_length = i - line_start - 1;
-                    int sep_length = sep_start - line_start;
+                    var line_length = i - line_start - 1;
+                    var sep_length = sep_start - line_start;
                     
                     if (line_length > 0 && sep_length > 0) {
                         // Encode the kvp
-                        string key = Encoding.ASCII.GetString (raw, line_start, sep_length);
-                        string value = Encoding.ASCII.GetString (raw, line_start + sep_length + 1, 
-                            line_length - sep_length);
+                        var key = Encoding.ASCII.GetString (raw, line_start, sep_length);
+                        var value = Encoding.ASCII.GetString (raw, line_start + sep_length + 1, line_length - sep_length);
                         
                         // Save the header
-                        if (!String.IsNullOrEmpty (key)) {
-                            if (dgram.headers == null) {
-                                dgram.headers = new WebHeaderCollection ();
+                        if (!string.IsNullOrEmpty (key)) {
+                            if (dgram.Headers == null) {
+                                dgram.Headers = new WebHeaderCollection ();
                             }
                             
-                            dgram.headers.Add (key.Trim (), value.Trim ());
+                            dgram.Headers.Add (key.Trim (), value.Trim ());
                         }
                     }
                     
@@ -134,10 +125,10 @@ namespace Mono.Ssdp.Internal
                 }
             }
             
-            return dgram.headers != null;
+            return dgram.Headers != null;
         }
         
-        private static bool Check (byte [] check, byte [] fingerprint, out int offset)
+        static bool Check (byte [] check, byte [] fingerprint, out int offset)
         {
             offset = -1;
             
@@ -145,7 +136,7 @@ namespace Mono.Ssdp.Internal
                 return false;
             }
             
-            for (int i = 0; i < fingerprint.Length; i++) {
+            for (var i = 0; i < fingerprint.Length; i++) {
                 if (ToUpper (check[i]) != fingerprint[i]) {
                     return false;
                 }
@@ -155,7 +146,7 @@ namespace Mono.Ssdp.Internal
             return true;
         }
         
-        private static byte ToUpper (byte b)
+        static byte ToUpper (byte b)
         {
             return (b >= 'a' && b <= 'z') ? (byte)(b - 0x20) : b;
         }

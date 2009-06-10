@@ -32,22 +32,23 @@ using System.Net.Sockets;
 
 namespace Mono.Ssdp.Internal
 {
-    internal class SsdpSocket : Socket
+    class SsdpSocket : Socket
     {
-        private static IPEndPoint ssdp_endpoint = new IPEndPoint (Protocol.IPAddress, Protocol.Port);
+        static readonly IPEndPoint ssdp_endpoint = new IPEndPoint (Protocol.IPAddress, Protocol.Port);
         
-        public SsdpSocket () : this (true)
+        public SsdpSocket ()
+            : this (true)
         {
         }
         
-        public SsdpSocket (bool multicast) : base (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
+        public SsdpSocket (bool multicast)
+            : base (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
         {
             SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             if (multicast) {
                 SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                 SetSocketOption (SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, Protocol.SocketTtl);
-                SetSocketOption (SocketOptionLevel.IP, SocketOptionName.AddMembership,
-                    new MulticastOption (Protocol.IPAddress, 0));
+                SetSocketOption (SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption (Protocol.IPAddress, 0));
             } 
         }
         
