@@ -31,7 +31,6 @@ namespace Mono.Upnp.Xml
     [AttributeUsage (AttributeTargets.Property)]
     public sealed class XmlAttributeAttribute : Attribute
     {
-        
         public XmlAttributeAttribute ()
         {
         }

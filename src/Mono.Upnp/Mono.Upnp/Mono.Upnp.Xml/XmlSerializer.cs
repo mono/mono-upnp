@@ -185,7 +185,9 @@ namespace Mono.Upnp.Xml
             }
             
             if (type_attribute != null) {
-                name = type_attribute.Name;
+                if (!string.IsNullOrEmpty (type_attribute.Name)) {
+                    name = type_attribute.Name;
+                }
                 @namespace = type_attribute.Namespace;
                 prefix = type_attribute.Prefix;
             }
@@ -324,6 +326,8 @@ namespace Mono.Upnp.Xml
                 
                 if (array_attribute != null) {
                     elementSerializers.Add (CreateSerializer (property, CreateSerializer (property, array_attribute, array_item_attribute)));
+                } else if (array_item_attribute != null) {
+                    elementSerializers.Add (CreateSerializer (property, CreateSerializer (property, array_item_attribute)));
                 }
                 
                 if (value_attribute != null) {
@@ -360,7 +364,7 @@ namespace Mono.Upnp.Xml
             if (!property.CanRead) {
                 // TODO throw
             }
-            var name = attributeAttribute.Name ?? property.Name;
+            var name = string.IsNullOrEmpty (attributeAttribute.Name) ? property.Name : attributeAttribute.Name;
             var @namespace = attributeAttribute.Namespace;
             var prefix = attributeAttribute.Prefix;
             if (property.PropertyType.IsEnum) {
@@ -386,7 +390,7 @@ namespace Mono.Upnp.Xml
                 // TODO throw
             }
             var next = GetMemberSerializer (property.PropertyType);
-            var name = elementAttribute.Name ?? property.Name;
+            var name = string.IsNullOrEmpty (elementAttribute.Name) ? property.Name : elementAttribute.Name;
             var @namespace = elementAttribute.Namespace;
             var prefix = elementAttribute.Prefix;
             return (obj, context) => {
@@ -406,21 +410,12 @@ namespace Mono.Upnp.Xml
             if (!property.CanRead) {
                 // TODO throw
             }
-            Type ienumerable;
-            if (property.PropertyType.IsGenericType &&
-                property.PropertyType.GetGenericTypeDefinition () == typeof (IEnumerable<>)) {
-                ienumerable = property.PropertyType;
-            } else {
-                ienumerable = property.PropertyType.GetInterface ("IEnumerable`1");
-            }
-            if (ienumerable == null) {
-                // TODO throw
-            }
             
-            var name = arrayAttribute.Name ?? property.Name;
+            var item_type = GetIEnumerable (property.PropertyType).GetGenericArguments ()[0];
+            var name = string.IsNullOrEmpty (arrayAttribute.Name) ? property.Name : arrayAttribute.Name;
             var @namespace = arrayAttribute.Namespace;
             var prefix = arrayAttribute.Prefix;
-            var next = CreateSerializer (ienumerable.GetGenericArguments ()[0], arrayItemAttribute);
+            var next = CreateSerializer (item_type, arrayItemAttribute);
             if (arrayAttribute.OmitIfEmpty) {
                 return (obj, context) => {
                     if (obj != null) {
@@ -452,7 +447,7 @@ namespace Mono.Upnp.Xml
         
         Serializer CreateSerializer (Type type, XmlArrayItemAttribute arrayItemAttribute)
         {
-            if (arrayItemAttribute == null) {
+            if (arrayItemAttribute == null || string.IsNullOrEmpty (arrayItemAttribute.Name)) {
                 return GetTypeSerializer (type);
             } else {
                 var name = arrayItemAttribute.Name;
@@ -467,12 +462,60 @@ namespace Mono.Upnp.Xml
             }
         }
         
+        Serializer CreateSerializer (PropertyInfo property, XmlArrayItemAttribute arrayItemAttribute)
+        {
+            if (!property.CanRead) {
+                // TODO throw
+            }
+            
+            var item_type = GetIEnumerable (property.PropertyType).GetGenericArguments ()[0];
+            if (string.IsNullOrEmpty (arrayItemAttribute.Name)) {
+                var serializer = GetTypeSerializer (item_type);
+                return (obj, context) => {
+                    if (obj != null) {
+                        foreach (var item in (IEnumerable)obj)  {
+                            serializer (item, context);
+                        }
+                    }
+                };
+            } else {
+                var name = arrayItemAttribute.Name;
+                var @namespace = arrayItemAttribute.Namespace;
+                var prefix = arrayItemAttribute.Prefix;
+                var serializer = GetMemberSerializer (item_type);
+                return (obj, context) => {
+                    if (obj != null) {
+                        foreach (var item in (IEnumerable)obj) {
+                            context.Writer.WriteStartElement (prefix, name, @namespace);
+                            serializer (item, context);
+                            context.Writer.WriteEndElement ();
+                        }
+                    }
+                };
+            }
+        }
+        
+        static Type GetIEnumerable (Type type)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition () == typeof (IEnumerable<>)) {
+                return type;
+            } else {
+                var ienumerable = type.GetInterface ("IEnumerable`1");
+                if (ienumerable != null) {
+                    return ienumerable;
+                } else {
+                    // TODO throw
+                    return null;
+                }
+            }
+        }
+        
         static Serializer CreateSerializer (PropertyInfo property, XmlFlagAttribute flagAttribute)
         {
             if (property.PropertyType != typeof (bool)) {
                 // TODO throw
             }
-            var name = flagAttribute.Name ?? property.Name;
+            var name = string.IsNullOrEmpty (flagAttribute.Name) ? property.Name : flagAttribute.Name;
             var @namespace = flagAttribute.Namespace;
             var prefix = flagAttribute.Prefix;
             return (obj, context) => {

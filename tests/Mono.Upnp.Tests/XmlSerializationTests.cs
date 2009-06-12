@@ -669,5 +669,18 @@ namespace Mono.Upnp.Xml.Tests
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ValueTestClass>bar</ValueTestClass>",
                 serializer.GetString (new ValueTestClass { Foo = "bar" }));
         }
+        
+        class FreeArrayItemTestClass
+        {
+            [XmlArrayItem ("Foo")] public IEnumerable<string> Foos { get; set; }
+        }
+        
+        [Test]
+        public void FreeArrayItemTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><FreeArrayItemTestClass><Foo>foo</Foo><Foo>bar</Foo><Foo>bat</Foo></FreeArrayItemTestClass>",
+                serializer.GetString (new FreeArrayItemTestClass { Foos = new string[] { "foo", "bar", "bat" } }));
+        }
     }
 }

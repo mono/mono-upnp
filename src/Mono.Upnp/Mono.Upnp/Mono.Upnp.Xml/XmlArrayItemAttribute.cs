@@ -32,6 +32,8 @@ namespace Mono.Upnp.Xml
     public sealed class XmlArrayItemAttribute : Attribute
     {
         readonly string name;
+        readonly string @namespace;
+        readonly string prefix;
         
         public XmlArrayItemAttribute (string name)
             : this (name, null)
@@ -46,16 +48,20 @@ namespace Mono.Upnp.Xml
         public XmlArrayItemAttribute (string name, string @namespace, string prefix)
         {
             this.name = name;
-            Namespace = @namespace;
-            Prefix = prefix;
+            this.@namespace = @namespace;
+            this.prefix = prefix;
         }
         
         public string Name {
             get { return name; }
         }
         
-        public string Namespace { get; set; }
+        public string Namespace {
+            get { return @namespace; }
+        }
         
-        public string Prefix { get; set; }
+        public string Prefix {
+            get { return prefix; }
+        }
     }
 }

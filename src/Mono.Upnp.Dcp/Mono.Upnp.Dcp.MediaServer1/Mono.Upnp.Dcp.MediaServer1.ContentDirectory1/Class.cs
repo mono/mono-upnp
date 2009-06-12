@@ -24,22 +24,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Xml;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public struct Class
+    public sealed class Class
     {
-        readonly string friendly_class_name;
-        readonly string full_class_name;
+        [XmlAttribute ("name")]
+        public string FriendlyClassName { get; private set; }
         
-        internal Class (XmlReader reader)
-        {
-            friendly_class_name = reader["name"];
-            full_class_name = reader.ReadString ();
-        }
-        
-        public string FriendlyClassName { get { return friendly_class_name; } }
-        public string FullClassName { get { return full_class_name; } }
+        [XmlValue]
+        public string FullClassName { get; private set; }
     }
 }

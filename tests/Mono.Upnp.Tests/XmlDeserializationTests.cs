@@ -632,7 +632,7 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual ("Child", deserialized_object.Child.ElementName);
         }
         
-        class XmlDeserializableTyeDeserializerTestClass : XmlDeserializable
+        class XmlDeserializableTypeDeserializerTestClass : XmlDeserializable
         {
             [XmlElement] public DeserializerTestClass Child { get; private set; }
             
@@ -651,10 +651,10 @@ namespace Mono.Upnp.Xml.Tests
         }
         
         [Test]
-        public void XmlDeserializableTyeDeserializerTest ()
+        public void XmlDeserializableTypeDeserializerTest ()
         {
-            var deserialized_object = Deserialize<XmlDeserializableTyeDeserializerTestClass> (
-                @"<Test><Child Bar=""bat""></Test>");
+            var deserialized_object = Deserialize<XmlDeserializableTypeDeserializerTestClass> (
+                @"<Test><Child Bar=""bat""/></Test>");
             
             Assert.AreEqual ("blah", deserialized_object.Child.Foo);
             Assert.AreEqual ("bat", deserialized_object.Child.Bar);
@@ -764,6 +764,23 @@ namespace Mono.Upnp.Xml.Tests
         {
             var deserialized_object = Deserialize<ValueTestClass> (@"<Test>bar</Test>");
             Assert.AreEqual ("bar", deserialized_object.Foo);
+        }
+        
+        class FreeArrayItemTestClass
+        {
+            readonly List<string> foos = new List<string> ();
+            
+            [XmlArrayItem ("Foo")] public IList<string> Foos { get { return foos; } }
+        }
+        
+        [Test]
+        public void FreeArrayItemTest ()
+        {
+            var deserialized_object = Deserialize<FreeArrayItemTestClass> (@"<Test><Foo>foo</Foo><Foo>bar</Foo><Foo>bat</Foo></Test>");
+            Assert.AreEqual (3, deserialized_object.Foos.Count);
+            Assert.AreEqual ("foo", deserialized_object.Foos[0]);
+            Assert.AreEqual ("bar", deserialized_object.Foos[1]);
+            Assert.AreEqual ("bat", deserialized_object.Foos[2]);
         }
     }
 }

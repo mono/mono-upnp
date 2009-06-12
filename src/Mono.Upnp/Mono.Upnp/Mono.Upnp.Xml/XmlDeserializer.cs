@@ -52,6 +52,21 @@ namespace Mono.Upnp.Xml
             public ElementDeserializer ElementDeserializer;
             public ObjectDeserializer ElementAutoDeserializer;
             public Dictionary<Type, MethodInfo> TypeDeserializers;
+            public TypeInfo TypeInfo;
+        }
+        
+        class TypeInfo
+        {
+            public readonly PropertyInfo ValueProperty;
+            public readonly Dictionary<string, ObjectDeserializer> AttributeDeserializers;
+            public readonly Dictionary<string, ObjectDeserializer> ElementDeserializers;
+            
+            public TypeInfo (PropertyInfo valueProperty, Dictionary<string, ObjectDeserializer> attributeDeserializers, Dictionary<string, ObjectDeserializer> elementDeserializer)
+            {
+                this.ValueProperty = valueProperty;
+                this.AttributeDeserializers = attributeDeserializers;
+                this.ElementDeserializers = elementDeserializer;
+            }
         }
         
         readonly Dictionary<Type, Deserializers> deserializers = new Dictionary<Type, Deserializers> ();
@@ -141,6 +156,7 @@ namespace Mono.Upnp.Xml
                 var map = GetEnumMap (type);
                 return context => map[context.Reader.ReadElementContentAsString ()];
             } else {
+                deserializers.TypeDeserializers = GetTypeDeserializers (type);
                 // TODO check for default ctor
                 if (typeof (IXmlDeserializable).IsAssignableFrom (type)) {
                     return context => {
@@ -200,7 +216,7 @@ namespace Mono.Upnp.Xml
                     while (context.Reader.MoveToNextAttribute ()) {
                         try {
                             attribute_deserializer (obj, context);
-                        } catch (Exception exception) {
+                        } catch {
                         }
                     }
                     element_deserializer (obj, context, depth);
@@ -209,17 +225,10 @@ namespace Mono.Upnp.Xml
             };
         }
         
-        Dictionary<Type, MethodInfo> GetTypeDeserializers (Type type)
+        static Dictionary<Type, MethodInfo> GetTypeDeserializers (Type type)
         {
             Dictionary<Type, MethodInfo> type_deserializers = null;
-            type_deserializers = ProcessTypeDeserializers (type, BindingFlags.Instance | BindingFlags.Public, type_deserializers);
-            type_deserializers = ProcessTypeDeserializers (type, BindingFlags.Instance | BindingFlags.NonPublic, type_deserializers);
-            return type_deserializers;
-        }
-        
-        Dictionary<Type, MethodInfo> ProcessTypeDeserializers (Type type, BindingFlags flags, Dictionary<Type, MethodInfo> typeDeserializers)
-        {
-            foreach (var method in type.GetMethods (flags)) {
+            foreach (var method in GetMethods (type)) {
                 var attributes =  method.GetCustomAttributes (typeof (XmlTypeDeserializerAttribute), false);
                 if (attributes.Length != 0) {
                     if (method.ReturnType == typeof (void)) {
@@ -231,15 +240,115 @@ namespace Mono.Upnp.Xml
                         // TODO throw
                         continue;
                     }
-                    if (typeDeserializers == null) {
-                        typeDeserializers = new Dictionary<Type, MethodInfo> ();
-                    } else if (typeDeserializers.ContainsKey (method.ReturnType)) {
+                    if (type_deserializers == null) {
+                        type_deserializers = new Dictionary<Type, MethodInfo> ();
+                    } else if (type_deserializers.ContainsKey (method.ReturnType)) {
                         // TODO throw
                     }
-                    typeDeserializers[method.ReturnType] = method;
+                    type_deserializers[method.ReturnType] = method;
                 }
             }
-            return typeDeserializers;
+            return type_deserializers;
+        }
+        
+        TypeInfo GetTypeInfo (Type type, Deserializers deserializers)
+        {
+            PropertyInfo value_property = null;
+            var attribute_deserializers = new Dictionary<string, ObjectDeserializer> ();
+            var element_deserializers = new Dictionary<string, ObjectDeserializer> ();
+            
+            foreach (var property in GetProperties (type)) {
+                XmlElementAttribute element_attribute = null;
+                XmlFlagAttribute flag_attribute = null;
+                XmlArrayAttribute array_attribute = null;
+                XmlArrayItemAttribute array_item_attribute = null;
+                XmlAttributeAttribute attribute_attribute = null;
+                
+                foreach (var custom_attribute in property.GetCustomAttributes (false)) {
+                    if (custom_attribute is DoNotDeserializeAttribute) {
+                        element_attribute = null;
+                        flag_attribute = null;
+                        array_attribute = null;
+                        attribute_attribute = null;
+                        value_property = null;
+                        break;
+                    }
+                    
+                    var element = custom_attribute as XmlElementAttribute;
+                    if (element != null) {
+                        element_attribute = element;
+                        continue;
+                    }
+                    
+                    var flag = custom_attribute as XmlFlagAttribute;
+                    if (flag != null) {
+                        flag_attribute = flag;
+                        continue;
+                    }
+                    
+                    var array = custom_attribute as XmlArrayAttribute;
+                    if (array != null) {
+                        array_attribute = array;
+                        continue;
+                    }
+                    
+                    var array_item = custom_attribute as XmlArrayItemAttribute;
+                    if (array_item != null) {
+                        array_item_attribute = array_item;
+                        continue;
+                    }
+                    
+                    var attribute = custom_attribute as XmlAttributeAttribute;
+                    if (attribute != null) {
+                        attribute_attribute = attribute;
+                        continue;
+                    }
+                    
+                    if (custom_attribute is XmlValueAttribute) {
+                        value_property = property;
+                        continue;
+                    }
+                }
+                
+                if (element_attribute != null) {
+                    var deserializer =
+                        CreateCustomDeserializer (property, deserializers) ??
+                        CreateSubElementDeserializer (property);
+                    AddDeserializer (element_deserializers,
+                        CreateName (property.Name, element_attribute.Name, element_attribute.Namespace),
+                        deserializer);
+                    continue;
+                }
+                
+                if (flag_attribute != null) {
+                    AddDeserializer (element_deserializers,
+                        CreateName (property.Name, flag_attribute.Name, flag_attribute.Namespace),
+                        CreateFlagDeserializer (property));
+                    continue;
+                }
+                
+                if (array_attribute != null) {
+                    AddDeserializer (element_deserializers,
+                        CreateName (property.Name, array_attribute.Name, array_attribute.Namespace),
+                        CreateArrayElementDeserializer (property, array_item_attribute, deserializers));
+                    continue;
+                } else if (array_item_attribute != null) {
+                    AddDeserializer (element_deserializers,
+                        CreateName (property.Name, array_item_attribute.Name, array_item_attribute.Namespace),
+                        CreateArrayItemElementDeserializer (property, array_item_attribute, deserializers));
+                }
+                
+                if (attribute_attribute != null) {
+                    var deserializer =
+                        CreateCustomDeserializer (property, deserializers) ??
+                        CreateAttributeDeserializer (property, property.PropertyType);
+                    AddDeserializer (attribute_deserializers,
+                        CreateName (property.Name, attribute_attribute.Name, attribute_attribute.Namespace),
+                        deserializer);
+                    continue;
+                }
+            }
+            return new TypeInfo (value_property, attribute_deserializers, element_deserializers);
         }
         
         ObjectDeserializer GetAttributeDeserializer (Type type, Deserializers deserializers)
@@ -269,30 +378,12 @@ namespace Mono.Upnp.Xml
         
         ObjectDeserializer CreateAttributeAutoDeserializer (Type type, Deserializers deserializers)
         {
-            var object_deserializers = new Dictionary<string, ObjectDeserializer> ();
-            foreach (var property in GetProperties (type)) {
-                XmlAttributeAttribute attribute_attribute = null;
-                foreach (var custom_attribute in property.GetCustomAttributes (false)) {
-                    if (custom_attribute is DoNotDeserializeAttribute) {
-                        attribute_attribute = null;
-                        break;
-                    }
-                    var attribute = custom_attribute as XmlAttributeAttribute;
-                    if (attribute != null) {
-                        attribute_attribute = attribute;
-                        continue;
-                    }
-                }
-                if (attribute_attribute != null) {
-                    var deserializer =
-                        CreateCustomDeserializer (property, deserializers) ??
-                        CreateAttributeDeserializer (property, property.PropertyType);
-                    AddDeserializer (object_deserializers,
-                        CreateName (property.Name, attribute_attribute.Name, attribute_attribute.Namespace),
-                        deserializer);
-                    break;
-                }
+            if (deserializers.TypeInfo == null) {
+                deserializers.TypeInfo = GetTypeInfo (type, deserializers);
             }
+            
+            var object_deserializers = deserializers.TypeInfo.AttributeDeserializers;
+            
             if (object_deserializers.Count == 0) {
                 return (obj, context) => {};
             } else {
@@ -364,13 +455,16 @@ namespace Mono.Upnp.Xml
         
         ElementDeserializer CreateElementDeserializer (Type type, Deserializers deserializers)
         {
-            foreach (var property in GetProperties (type)) {
-                var value_attribute = property.GetCustomAttributes (typeof (XmlValueAttribute), false);
-                if (value_attribute.Length != 0) {
-                    var deserializer = GetDeserializer (property.PropertyType);
-                    return (obj, context, depth) => property.SetValue (obj, deserializer (context), null);
-                }
+            if (deserializers.TypeInfo == null) {
+                deserializers.TypeInfo = GetTypeInfo (type, deserializers);
             }
+            
+            if (deserializers.TypeInfo.ValueProperty != null) {
+                var property = deserializers.TypeInfo.ValueProperty;
+                var deserializer = GetDeserializer (property.PropertyType);
+                return (obj, context, depth) => property.SetValue (obj, deserializer (context), null);
+            }
+            
             var element_deserializer = CreateSubElementDeserializer (type, deserializers);
             return (obj, context, depth) => {
                 while (context.Reader.Read () && context.Reader.NodeType == XmlNodeType.Element && context.Reader.Depth > depth) {
@@ -378,7 +472,7 @@ namespace Mono.Upnp.Xml
                     element_reader.Read ();
                     try {
                         element_deserializer (obj, new XmlDeserializationContext (this, element_reader));
-                    } catch (Exception exception) {
+                    } catch {
                     } finally {
                         element_reader.Close ();
                     }
@@ -403,7 +497,6 @@ namespace Mono.Upnp.Xml
         ObjectDeserializer GetElementAutoDeserializer (Type type, Deserializers deserializers)
         {
             if (deserializers.ElementAutoDeserializer == null) {
-                deserializers.TypeDeserializers = GetTypeDeserializers (type);
                 deserializers.ElementAutoDeserializer = CreateSubElementAutoDeserializer (type, deserializers);
             }
             return deserializers.ElementAutoDeserializer;
@@ -411,70 +504,11 @@ namespace Mono.Upnp.Xml
         
         ObjectDeserializer CreateSubElementAutoDeserializer (Type type, Deserializers deserializers)
         {
-            var object_deserializers = new Dictionary<string, ObjectDeserializer> ();
-            foreach (var property in GetProperties (type)) {
-                XmlElementAttribute element_attribute = null;
-                XmlFlagAttribute flag_attribute = null;
-                XmlArrayAttribute array_attribute = null;
-                XmlArrayItemAttribute array_item_attribute = null;
-                
-                foreach (var custom_attribute in property.GetCustomAttributes (false)) {
-                    if (custom_attribute is DoNotDeserializeAttribute) {
-                        element_attribute = null;
-                        flag_attribute = null;
-                        array_attribute = null;
-                        break;
-                    }
-                    
-                    var element = custom_attribute as XmlElementAttribute;
-                    if (element != null) {
-                        element_attribute = element;
-                        continue;
-                    }
-                    
-                    var flag = custom_attribute as XmlFlagAttribute;
-                    if (flag != null) {
-                        flag_attribute = flag;
-                        continue;
-                    }
-                    
-                    var array = custom_attribute as XmlArrayAttribute;
-                    if (array != null) {
-                        array_attribute = array;
-                        continue;
-                    }
-                    
-                    var array_item = custom_attribute as XmlArrayItemAttribute;
-                    if (array_item != null) {
-                        array_item_attribute = array_item;
-                        continue;
-                    }
-                }
-                
-                if (element_attribute != null) {
-                    var deserializer =
-                        CreateCustomDeserializer (property, deserializers) ??
-                        CreateSubElementDeserializer (property);
-                    AddDeserializer (object_deserializers,
-                        CreateName (property.Name, element_attribute.Name, element_attribute.Namespace),
-                        deserializer);
-                    continue;
-                }
-                
-                if (flag_attribute != null) {
-                    AddDeserializer (object_deserializers,
-                        CreateName (property.Name, flag_attribute.Name, flag_attribute.Namespace),
-                        CreateFlagDeserializer (property));
-                    continue;
-                }
-                
-                if (array_attribute != null) {
-                    AddDeserializer (object_deserializers,
-                        CreateName (property.Name, array_attribute.Name, array_attribute.Namespace),
-                        CreateElementDeserializer (property, array_item_attribute, deserializers));
-                    continue;
-                }
+            if (deserializers.TypeInfo == null) {
+                deserializers.TypeInfo = GetTypeInfo (type, deserializers);
             }
+            
+            var object_deserializers = deserializers.TypeInfo.ElementDeserializers;
             
             if (object_deserializers.Count == 0) {
                 return (obj, context) => {};
@@ -521,24 +555,14 @@ namespace Mono.Upnp.Xml
             }
         }
         
-        ObjectDeserializer CreateElementDeserializer (PropertyInfo property, XmlArrayItemAttribute arrayItemAttribute, Deserializers deserializers)
+        ObjectDeserializer CreateArrayElementDeserializer (PropertyInfo property, XmlArrayItemAttribute arrayItemAttribute, Deserializers deserializers)
         {
-            if (!property.CanWrite) {
+            if (!property.CanRead) {
                 // TODO throw
             }
 			
-			Type icollection;
-			if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition () == typeof (ICollection<>)) {
-				icollection = property.PropertyType;
-			} else {
-				icollection = property.PropertyType.GetInterface ("ICollection`1");
-			}
-            
-            if (icollection == null) {
-                // TODO throw
-            }
-            
-            var add = icollection.GetMethod ("Add");
+            var icollection = GetICollection (property.PropertyType);
+			var add = icollection.GetMethod ("Add");
             var item_type = icollection.GetGenericArguments ()[0];
             var item_deserializer = CreateItemDeserializer (item_type, deserializers);
             return (obj, context) => {
@@ -555,6 +579,37 @@ namespace Mono.Upnp.Xml
                     }
                 }
             };
+        }
+        
+        ObjectDeserializer CreateArrayItemElementDeserializer (PropertyInfo property, XmlArrayItemAttribute arrayItemAttribute, Deserializers deserializers)
+        {
+            if (!property.CanRead) {
+                // TODO throw
+            }
+            
+            var icollection = GetICollection (property.PropertyType);
+            var add = icollection.GetMethod ("Add");
+            var item_type = icollection.GetGenericArguments ()[0];
+            var item_deserializer = CreateItemDeserializer (item_type, deserializers);
+            return (obj, context) => {
+                var collection = property.GetValue (obj, null);
+                add.Invoke (collection, new object[] { item_deserializer (obj, context) });
+            };
+        }
+        
+        static Type GetICollection (Type type)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition () == typeof (ICollection<>)) {
+                return type;
+            } else {
+               var icollection = type.GetInterface ("ICollection`1");
+                if (icollection != null) {
+                    return icollection;
+                } else {
+                    // TODO throw
+                    return null;
+                }
+            }
         }
         
         static string CreateName (string name, string @namespace)
@@ -587,6 +642,17 @@ namespace Mono.Upnp.Xml
             
             foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.NonPublic)) {
                 yield return property;
+            }
+        }
+        
+        static IEnumerable<MethodInfo> GetMethods (Type type)
+        {
+            foreach (var method in type.GetMethods (BindingFlags.Instance | BindingFlags.Public)) {
+                yield return method;
+            }
+            
+            foreach (var method in type.GetMethods (BindingFlags.Instance | BindingFlags.NonPublic)) {
+                yield return method;
             }
         }
     }
