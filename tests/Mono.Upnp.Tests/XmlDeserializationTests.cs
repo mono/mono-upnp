@@ -568,6 +568,18 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual ("bat", deserialized_object.Child.Bar);
         }
         
+        [Test]
+        public void TypeDeserializerDeserializerTest ()
+        {
+            var deserialized_object = Deserialize (@"<Test><Child Bar=""bat""/></Test>", (context) => {
+                var obj = new TypeDeserializerTestClass ();
+                context.AutoDeserialize (obj);
+                return obj;
+            });
+            Assert.AreEqual ("hello world", deserialized_object.Child.Foo);
+            Assert.AreEqual ("bat", deserialized_object.Child.Bar);
+        }
+        
         class XmlDeserializableTestBaseClass : XmlDeserializable
         {
             [XmlAttribute] public virtual string Foo { get; protected set; }

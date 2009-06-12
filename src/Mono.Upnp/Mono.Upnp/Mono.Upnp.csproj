@@ -113,6 +113,8 @@
     <Compile Include="Mono.Upnp.Control\ServiceActionExecutor.cs" />
     <Compile Include="Mono.Upnp.Control\StateVariableEventer.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlValueAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml.Internal\DeserializationInfo.cs" />
+    <Compile Include="Mono.Upnp.Xml.Internal\DeserializationCompiler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -120,5 +122,8 @@
       <Project>{AD422A19-BA07-4039-B843-84E386804DD1}</Project>
       <Name>Mono.Ssdp</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mono.Upnp.Xml.Internal\" />
   </ItemGroup>
 </Project>
