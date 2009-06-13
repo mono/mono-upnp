@@ -197,11 +197,13 @@ namespace Mono.Upnp
                         }
                     }
                 }
+                
                 var deserializer = (XmlDeserializer)static_deserializer.Target;
                 if (deserializer == null) {
                     deserializer = new XmlDeserializer ();
                     static_deserializer.Target = deserializer;
                 }
+                
                 try {
                     var root = DeserializerFactory.CreateDeserializer (deserializer).DeserializeRoot (new Uri (url));
                     if (root == null) {
