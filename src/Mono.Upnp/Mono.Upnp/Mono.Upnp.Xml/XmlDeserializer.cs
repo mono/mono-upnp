@@ -56,7 +56,7 @@ namespace Mono.Upnp.Xml
             if (typeDeserializer != null) {
                 return typeDeserializer (context);
             } else {
-                var deserializer = GetInfo (typeof (T)).Deserializer;
+                var deserializer = GetDeserializer (typeof (T));
                 return (T) deserializer (context);
             }
         }
@@ -79,7 +79,12 @@ namespace Mono.Upnp.Xml
             deserializer (obj, context);
         }
         
-        internal DeserializationInfo GetInfo (Type type)
+        internal Mono.Upnp.Xml.Internal.Deserializer GetDeserializer (Type type)
+        {
+            return GetInfo (type).Deserializer;
+        }
+        
+        DeserializationInfo GetInfo (Type type)
         {
             DeserializationInfo info;
             if (!infos.TryGetValue (type, out info)) {

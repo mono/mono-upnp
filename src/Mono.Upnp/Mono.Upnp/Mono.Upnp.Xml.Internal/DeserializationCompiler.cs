@@ -25,21 +25,19 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
 
 namespace Mono.Upnp.Xml.Internal
 {
-    class DeserializationCompiler
+    class DeserializationCompiler : Compiler
     {
         delegate object ItemDeserializer (object obj, XmlDeserializationContext context);
         delegate void ElementDeserializer (object obj, XmlDeserializationContext context, int depth);
         
         readonly XmlDeserializer xml_deserializer;
         readonly DeserializationInfo info;
-        readonly Type type;
         
         Dictionary<Type, MethodInfo> type_deserializers;
         bool has_processed_type_deserializers;
@@ -49,10 +47,10 @@ namespace Mono.Upnp.Xml.Internal
         Dictionary<string, ObjectDeserializer> element_deserializers;
         
         public DeserializationCompiler (XmlDeserializer xmlDeserializer, DeserializationInfo info, Type type)
+            : base (type)
         {
             this.xml_deserializer = xmlDeserializer;
             this.info = info;
-            this.type = type;
         }
         
         Dictionary<Type, MethodInfo> TypeDeserializers {
@@ -94,39 +92,39 @@ namespace Mono.Upnp.Xml.Internal
         
         public Deserializer CreateDeserializer ()
         {
-            if (type == typeof (string)) {
+            if (Type == typeof (string)) {
                 return context => context.Reader.ReadElementContentAsString ();
-            } else if (type == typeof (int)) {
+            } else if (Type == typeof (int)) {
                 return context => context.Reader.ReadElementContentAsInt ();
-            } else if (type == typeof (double)) {
+            } else if (Type == typeof (double)) {
                 return context => context.Reader.ReadElementContentAsDouble ();
-            } else if (type == typeof (bool)) {
+            } else if (Type == typeof (bool)) {
                 return context => context.Reader.ReadElementContentAsBoolean ();
-            } else if (type == typeof (long)) {
+            } else if (Type == typeof (long)) {
                 return context => context.Reader.ReadElementContentAsLong ();
-            } else if (type == typeof (float)) {
+            } else if (Type == typeof (float)) {
                 return context => context.Reader.ReadElementContentAsFloat ();
-            } else if (type == typeof (decimal)) {
+            } else if (Type == typeof (decimal)) {
                 return context => context.Reader.ReadElementContentAsDecimal ();
-            } else if (type == typeof (DateTime)) {
+            } else if (Type == typeof (DateTime)) {
                 return context => context.Reader.ReadElementContentAsDateTime ();
-            } else if (type == typeof (Uri)) {
+            } else if (Type == typeof (Uri)) {
                 return context => new Uri (context.Reader.ReadElementContentAsString ());
-            } else if (type.IsEnum) {
-                var map = GetEnumMap (type);
+            } else if (Type.IsEnum) {
+                var map = GetEnumMap (Type);
                 return context => map[context.Reader.ReadElementContentAsString ()];
             } else {
                 // TODO check for default ctor
-                if (typeof (IXmlDeserializable).IsAssignableFrom (type)) {
+                if (typeof (IXmlDeserializable).IsAssignableFrom (Type)) {
                     return context => {
-                        var obj = Activator.CreateInstance (type, true);
+                        var obj = Activator.CreateInstance (Type, true);
                         ((IXmlDeserializable)obj).Deserialize (context);
                         return obj;
                     };
                 } else {
                     var deserializer = info.AutoDeserializer;
                     return context => {
-                        var obj = Activator.CreateInstance (type, true);
+                        var obj = Activator.CreateInstance (Type, true);
                         deserializer (obj, context);
                         return obj;
                     };
@@ -157,7 +155,7 @@ namespace Mono.Upnp.Xml.Internal
         
         ObjectDeserializer CreateAttributeDeserializer ()
         {
-            if (typeof (IXmlDeserializable).IsAssignableFrom (type)) {
+            if (typeof (IXmlDeserializable).IsAssignableFrom (Type)) {
                 return (obj, context) => ((IXmlDeserializable)obj).DeserializeAttribute (context);
             } else {
                 return info.AttributeAutoDeserializer;
@@ -184,7 +182,7 @@ namespace Mono.Upnp.Xml.Internal
         {
             if (ValueProperty != null) {
                 var property = ValueProperty;
-                var deserializer = xml_deserializer.GetInfo (property.PropertyType).Deserializer;
+                var deserializer = xml_deserializer.GetDeserializer (property.PropertyType);
                 return (obj, context, depth) => property.SetValue (obj, deserializer (context), null);
             }
             
@@ -206,7 +204,7 @@ namespace Mono.Upnp.Xml.Internal
         
         ObjectDeserializer CreateSubElementDeserializer ()
         {
-            if (typeof (IXmlDeserializable).IsAssignableFrom (type)) {
+            if (typeof (IXmlDeserializable).IsAssignableFrom (Type)) {
                 return (obj, context) => ((IXmlDeserializable)obj).DeserializeElement (context);
             } else {
                 return info.ElementAutoDeserializer;
@@ -432,7 +430,7 @@ namespace Mono.Upnp.Xml.Internal
             if (!property.CanWrite) {
                 // TODO throw
             }
-            var next = xml_deserializer.GetInfo (property.PropertyType).Deserializer;
+            var next = xml_deserializer.GetDeserializer (property.PropertyType);
             return (obj, context) => property.SetValue (obj, next (context), null);
         }
         
@@ -450,7 +448,7 @@ namespace Mono.Upnp.Xml.Internal
                 var method = TypeDeserializers[type];
                 return (obj, context) => method.Invoke (obj, new object [] { context });
             } else {
-                var deserializer = xml_deserializer.GetInfo (type).Deserializer;
+                var deserializer = xml_deserializer.GetDeserializer (type);
                 return (obj, context) => deserializer (context);
             }
         }
@@ -494,30 +492,6 @@ namespace Mono.Upnp.Xml.Internal
                 var collection = property.GetValue (obj, null);
                 add.Invoke (collection, new object[] { item_deserializer (obj, context) });
             };
-        }
-        
-        IEnumerable<PropertyInfo> Properties {
-            get {
-                foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public)) {
-                    yield return property;
-                }
-                
-                foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.NonPublic)) {
-                    yield return property;
-                }
-            }
-        }
-        
-        IEnumerable<MethodInfo> Methods {
-            get {
-                foreach (var method in type.GetMethods (BindingFlags.Instance | BindingFlags.Public)) {
-                    yield return method;
-                }
-                
-                foreach (var method in type.GetMethods (BindingFlags.Instance | BindingFlags.NonPublic)) {
-                    yield return method;
-                }
-            }
         }
         
         static string CreateName (string name, string @namespace)

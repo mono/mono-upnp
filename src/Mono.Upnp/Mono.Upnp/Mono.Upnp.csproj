@@ -115,6 +115,9 @@
     <Compile Include="Mono.Upnp.Xml\XmlValueAttribute.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\DeserializationInfo.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\DeserializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Internal\SerializationInfo.cs" />
+    <Compile Include="Mono.Upnp.Xml.Internal\SerializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Internal\Compiler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
