@@ -54,7 +54,8 @@ namespace Mono.Upnp.Control
             
             actions = new Map<string, ServiceAction> (ServiceActionMapper);
             state_variables = new Map<string, StateVariable> (StateVariableMapper);
-            control_client = new ControlClient (deserializer.XmlDeserializer, service.Type.ToString (), service.ControlUrl);
+            control_client = new ControlClient (service.ControlUrl, deserializer.XmlDeserializer, service.Type.ToString ());
+            event_client = new EventClient (service.EventUrl, deserializer.XmlDeserializer);
         }
         
         public ServiceController (IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
@@ -72,10 +73,6 @@ namespace Mono.Upnp.Control
         static string StateVariableMapper (StateVariable stateVariable)
         {
             return stateVariable.Name;
-        }
-        
-        internal Service Service {
-            get { return null; }
         }
         
         [XmlAttribute ("configId")]
@@ -119,14 +116,14 @@ namespace Mono.Upnp.Control
         {
             scpd_server.Start ();
             control_server.Start ();
-            //event_server.Start ();
+            event_server.Start ();
         }
         
         protected internal virtual void Stop ()
         {
             scpd_server.Stop ();
             control_server.Stop ();
-            //event_server.Stop ();
+            event_server.Stop ();
         }
         
         protected internal virtual IMap<string, string> Invoke (ServiceAction action, IDictionary<string, string> arguments, int retryAttempts)

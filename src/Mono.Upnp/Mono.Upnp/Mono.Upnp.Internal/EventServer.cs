@@ -128,12 +128,16 @@ namespace Mono.Upnp.Internal
         protected override void HandleContext (HttpListenerContext context)
         {
             lock (mutex) {
-                if (context.Request.HttpMethod.ToUpper () == "SUBSCRIBE") {
+                var method = context.Request.HttpMethod.ToUpper ();
+                if (method == "SUBSCRIBE") {
                     var callback = context.Request.Headers["CALLBACK"];
                     if (callback != null) {
                         var uuid = GenerateUuid ();
                         // TODO try/catch
-                        var subscriber = new Subscription { Callback = new Uri (callback.Substring (1, callback.Length - 2)), Sid = uuid };
+                        var subscriber = new Subscription {
+                            Callback = new Uri (callback.Substring (1, callback.Length - 2)),
+                            Sid = uuid
+                        };
                         subscribers.Add (uuid, subscriber);
                         HandleSubscription (context, subscriber);
                         context.Response.Close ();
@@ -146,7 +150,7 @@ namespace Mono.Upnp.Internal
                         HandleSubscription (context, subscribers[sid]);
                         context.Response.Close ();
                     }
-                } else if (context.Request.HttpMethod.ToUpper () == "UNSUBSCRIBE") {
+                } else if (method == "UNSUBSCRIBE") {
                     var sid = context.Request.Headers["SID"];
                     if (sid == null || !subscribers.ContainsKey (sid)) {
                         // TODO stuff here

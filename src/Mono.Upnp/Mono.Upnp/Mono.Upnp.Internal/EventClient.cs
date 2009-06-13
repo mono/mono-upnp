@@ -31,16 +31,16 @@ using System.Net;
 using System.Net.Sockets;
 
 using Mono.Upnp.Control;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
-    class EventClient : IDisposable
+    class EventClient : UpnpClient, IDisposable
     {
         static readonly Random random = new Random ();
         static int id;
 
         readonly object mutex = new object ();
-        readonly ServiceController controller;
         readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher();
         volatile bool started;
         volatile bool confidently_subscribed;
@@ -50,10 +50,10 @@ namespace Mono.Upnp.Internal
         string prefix;
         string subscription_uuid;
 
-        public EventClient (ServiceController serviceController)
+        public EventClient (Uri url, XmlDeserializer deserializer)
+            : base (url, deserializer)
         {
-            controller = serviceController;
-            prefix = GeneratePrefix ();
+            this.prefix = GeneratePrefix ();
         }
 
         static string GeneratePrefix ()
@@ -108,7 +108,7 @@ namespace Mono.Upnp.Internal
 
         void Subscribe ()
         {
-            var request = WebRequest.Create (controller.Service.EventUrl);
+            var request = CreateRequest ();
             request.Method = "SUBSCRIBE";
             request.Headers.Add ("USERAGENT", Protocol.UserAgent);
             request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
@@ -192,7 +192,7 @@ namespace Mono.Upnp.Internal
         void Renew ()
         {
             lock (mutex) {
-                var request = WebRequest.Create (controller.Service.EventUrl);
+                var request = CreateRequest ();
                 request.Method = "SUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
                 request.Headers.Add ("TIMEOUT", "Second-1800");
@@ -205,7 +205,7 @@ namespace Mono.Upnp.Internal
         void Unsubscribe ()
         {
             lock (mutex) {
-                var request = WebRequest.Create (controller.Service.EventUrl);
+                var request = CreateRequest ();
                 request.Method = "UNSUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
                 request.BeginGetResponse (OnUnsubscribeResponse, request);

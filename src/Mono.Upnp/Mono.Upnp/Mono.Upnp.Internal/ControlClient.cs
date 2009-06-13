@@ -41,8 +41,8 @@ namespace Mono.Upnp.Internal
         readonly Uri url;
         readonly string service_type;
         
-        public ControlClient (XmlDeserializer deserializer, string serviceType, Uri url)
-            : base (deserializer)
+        public ControlClient (Uri url, XmlDeserializer deserializer, string serviceType)
+            : base (url, deserializer)
         {
             this.url = url;
             service_type = serviceType;
@@ -50,7 +50,7 @@ namespace Mono.Upnp.Internal
         
         public IMap<string, string> Invoke (string actionName, IDictionary<string, string> arguments)
         {
-            var request = (HttpWebRequest)WebRequest.Create (url);
+            var request = CreateRequest ();
             request.Method = "POST";
             request.ContentType = @"text/xml; charset=""utf-8""";
             request.UserAgent = Protocol.UserAgent;

@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Net;
 
 using Mono.Upnp.Xml;
 
@@ -34,10 +35,11 @@ namespace Mono.Upnp.Internal
     {
         readonly static WeakReference static_serializer = new WeakReference (null);
         
+        readonly Uri url;
         protected readonly XmlSerializer Serializer;
         protected readonly XmlDeserializer Deserializer;
         
-        protected UpnpClient (XmlDeserializer deserializer)
+        protected UpnpClient (Uri url, XmlDeserializer deserializer)
         {
             if (static_serializer.IsAlive) {
                 Serializer = (XmlSerializer)static_serializer.Target;
@@ -46,7 +48,13 @@ namespace Mono.Upnp.Internal
                 static_serializer.Target = Serializer;
             }
             
-            Deserializer = deserializer;
+            this.url = url;
+            this.Deserializer = deserializer;
+        }
+        
+        protected HttpWebRequest CreateRequest ()
+        {
+            return (HttpWebRequest)WebRequest.Create (url);
         }
     }
 }
