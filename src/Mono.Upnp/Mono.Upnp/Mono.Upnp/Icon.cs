@@ -145,7 +145,7 @@ namespace Mono.Upnp
         
         protected internal virtual byte[] Data {
             get {
-                if (data == null && filename != null) {
+                if (data == null && File.Exists (filename)) {
                     data = File.ReadAllBytes (filename);
                 }
                 return data;
