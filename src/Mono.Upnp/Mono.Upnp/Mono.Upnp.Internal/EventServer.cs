@@ -55,7 +55,6 @@ namespace Mono.Upnp.Internal
         
         readonly object subscription_mutex = new object ();
         readonly Dictionary<string, Subscription> subscribers = new Dictionary<string, Subscription> ();
-        readonly Stack<Subscription> dead_subscribers = new Stack<Subscription> ();
         readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
         
         readonly object publish_mutex = new object ();
@@ -102,6 +101,8 @@ namespace Mono.Upnp.Internal
                     Monitor.Wait (publish_mutex);
                     var count = 0;
                     do {
+                        // TODO what if code updates a state variable constantly at more than 1Hz?
+                        // We would never broadcast. We need to handle that.
                         count = updates.Count;
                         Monitor.Exit (publish_mutex);
                         Thread.Sleep (TimeSpan.FromSeconds (1));
@@ -118,22 +119,7 @@ namespace Mono.Upnp.Internal
             lock (subscription_mutex) {
                 WriteUpdatesToStream (map);
                 foreach (var subscriber in subscribers.Values) {
-                    try {
-                        PublishUpdates (subscriber);
-                        subscriber.ConnectFailures = 0;
-                    } catch (WebException e) {
-                        // TODO this for all exception types?
-                        if (e.Status == WebExceptionStatus.ConnectFailure) {
-                            subscriber.ConnectFailures++;
-                        }
-                        if (subscriber.ConnectFailures == 2) {
-                            dead_subscribers.Push (subscriber);
-                        }
-                    } catch {
-                    }
-                }
-                while (dead_subscribers.Count > 0) {
-                    subscribers.Remove (dead_subscribers.Pop ().Sid);
+                    PublishUpdates (subscriber);
                 }
             }
         }
@@ -158,16 +144,20 @@ namespace Mono.Upnp.Internal
             using (var stream = request.GetRequestStream ()) {
                 update_stream.WriteTo (stream);
             }
-            request.BeginGetResponse (OnGotResponse, request);
-        }
-
-        void OnGotResponse (IAsyncResult async)
-        {
-            var request = (HttpWebRequest)async.AsyncState;
-            try {
-                request.EndGetResponse (async).Close ();
-            } catch {
-            }
+            request.BeginGetResponse (async => {
+                try {
+                    request.EndGetResponse (async).Close ();
+                } catch (WebException) {
+                    Interlocked.Increment (ref subscriber.ConnectFailures);
+                    if (subscriber.ConnectFailures == 2) {
+                        lock (subscription_mutex) {
+                            if (subscribers.ContainsKey (subscriber.Sid)) {
+                                subscribers.Remove (subscriber.Sid);
+                            }
+                        }
+                    }
+                }
+            }, null);
         }
 
         protected override void HandleContext (HttpListenerContext context)
