@@ -44,7 +44,6 @@ namespace Mono.Upnp.Control
         ControlClient control_client;
         EventServer event_server;
         EventClient event_client;
-        int events_ref_count;
 
         protected internal ServiceController (Deserializer deserializer, Service service)
             : base (deserializer)
@@ -85,7 +84,7 @@ namespace Mono.Upnp.Control
         [XmlElement ("specVersion")]
         public virtual SpecVersion SpecVersion { get; protected set; }
         
-        [XmlArray ("actionList", Protocol.ServiceSchema)]
+        [XmlArray ("actionList")]
         protected virtual ICollection<ServiceAction> ActionCollection {
             get { return actions; }
         }
@@ -94,7 +93,7 @@ namespace Mono.Upnp.Control
             get { return actions; }
         }
         
-        [XmlArray ("serviceStateTable", Protocol.ServiceSchema)]
+        [XmlArray ("serviceStateTable")]
         protected ICollection<StateVariable> StateVariablesCollection {
             get { return state_variables; }
         }

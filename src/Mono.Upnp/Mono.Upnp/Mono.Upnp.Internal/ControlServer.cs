@@ -65,6 +65,8 @@ namespace Mono.Upnp.Internal
                     } catch (Exception e) {
                         // TODO handle faults
                     }
+                } else {
+                    // TODO report fault
                 }
             }
         }

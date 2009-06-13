@@ -34,7 +34,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    [XmlType ("stateVariable", Protocol.ServiceSchema)]
+    [XmlType ("stateVariable")]
     public class StateVariable : XmlAutomatable
     {
         readonly ServiceController controller;
@@ -110,10 +110,10 @@ namespace Mono.Upnp.Control
             IsMulticast = isMulticast;
         }
         
-        [XmlElement ("name", Protocol.ServiceSchema)]
+        [XmlElement ("name")]
         public virtual string Name { get; protected set; }
 
-        [XmlElement ("dataType", Protocol.ServiceSchema)]
+        [XmlElement ("dataType")]
         public virtual string DataType { get; protected set; }
 
         [XmlAttribute ("sendEvents", OmitIfNull = true)]
@@ -132,11 +132,11 @@ namespace Mono.Upnp.Control
             set { IsMulticast = value == "yes"; }
         }
         
-        [XmlElement ("defaultValue", Protocol.ServiceSchema, OmitIfNull = true)]
+        [XmlElement ("defaultValue", OmitIfNull = true)]
         public string DefaultValue { get; protected set; }
 
-        [XmlArray ("allowedValueList", Protocol.ServiceSchema, OmitIfNull = true)]
-        [XmlArrayItem ("allowedValue", Protocol.ServiceSchema)]
+        [XmlArray ("allowedValueList", OmitIfNull = true)]
+        [XmlArrayItem ("allowedValue")]
         protected virtual ICollection<string> AllowedValueCollection {
             get { return allowed_values; }
         }
@@ -145,7 +145,7 @@ namespace Mono.Upnp.Control
             get { return allowed_values; }
         }
 
-        [XmlElement ("allowedValueRange", Protocol.ServiceSchema, OmitIfNull = true)]
+        [XmlElement ("allowedValueRange", OmitIfNull = true)]
         public virtual AllowedValueRange AllowedValueRange { get; protected set; }
         
         protected virtual void OnStateVariableUpdated (object sender, StateVariableChangedArgs<string> args)
@@ -164,7 +164,7 @@ namespace Mono.Upnp.Control
         {
             if (context == null) throw new ArgumentNullException ("context");
             
-            if (context.Reader.LocalName == "allowedValueList" && context.Reader.NamespaceURI == Protocol.ServiceSchema) {
+            if (context.Reader.Name == "allowedValueList") {
                 allowed_values = new List<string> ();
             }
             context.AutoDeserializeElement (this);

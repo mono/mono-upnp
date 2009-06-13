@@ -35,7 +35,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
 {
-    [XmlType ("device", Protocol.DeviceSchema)]
+    [XmlType ("device")]
     public class Device : Description, IXmlDeserializable
     {
         IList<Device> devices;
@@ -90,7 +90,7 @@ namespace Mono.Upnp
             return settings.Icons;
         }
         
-        [XmlArray ("iconList", Protocol.DeviceSchema)]
+        [XmlArray ("iconList")]
         protected virtual ICollection<Icon> IconList {
             get { return icons; }
         }
@@ -99,7 +99,7 @@ namespace Mono.Upnp
             get { return icons; }
         }
         
-        [XmlArray ("serviceList", Protocol.DeviceSchema)]
+        [XmlArray ("serviceList")]
         protected virtual ICollection<Service> ServiceList {
             get { return services; }
         }
@@ -108,7 +108,7 @@ namespace Mono.Upnp
             get { return services; }
         }
         
-        [XmlArray ("deviceList", Protocol.DeviceSchema, OmitIfEmpty = true)]
+        [XmlArray ("deviceList", OmitIfEmpty = true)]
         protected virtual ICollection<Device> DeviceList {
             get { return devices; }
         }
@@ -117,37 +117,37 @@ namespace Mono.Upnp
             get { return devices; }
         }
         
-        [XmlElement ("deviceType", Protocol.DeviceSchema)]
+        [XmlElement ("deviceType")]
         public virtual DeviceType Type { get; protected set; }
         
-        [XmlElement ("friendlyName", Protocol.DeviceSchema)]
+        [XmlElement ("friendlyName")]
         public virtual string FriendlyName { get; protected set; }
         
-        [XmlElement ("manufacturer", Protocol.DeviceSchema)]
+        [XmlElement ("manufacturer")]
         public virtual string Manufacturer { get; protected set; }
         
-        [XmlElement ("manufacturerURL", Protocol.DeviceSchema, OmitIfNull = true)]
+        [XmlElement ("manufacturerURL", OmitIfNull = true)]
         public virtual Uri ManufacturerUrl { get; protected set; }
         
-        [XmlElement ("modelDescription", Protocol.DeviceSchema, OmitIfNull = true)]
+        [XmlElement ("modelDescription", OmitIfNull = true)]
         public virtual string ModelDescription { get; protected set; }
         
-        [XmlElement ("modelName", Protocol.DeviceSchema)]
+        [XmlElement ("modelName")]
         public virtual string ModelName { get; protected set; }
         
-        [XmlElement ("modelNumber", Protocol.DeviceSchema, OmitIfNull = true)]
+        [XmlElement ("modelNumber", OmitIfNull = true)]
         public virtual string ModelNumber { get; protected set; }
         
-        [XmlElement ("modelURL", Protocol.DeviceSchema, OmitIfNull = true)]
+        [XmlElement ("modelURL", OmitIfNull = true)]
         public virtual Uri ModelUrl { get; protected set; }
         
-        [XmlElement ("serialNumber", Protocol.DeviceSchema, OmitIfNull = true)]
+        [XmlElement ("serialNumber", OmitIfNull = true)]
         public virtual string SerialNumber { get; protected set; }
         
-        [XmlElement ("UDN", Protocol.DeviceSchema)]
+        [XmlElement ("UDN")]
         public virtual string Udn { get; protected set; }
         
-        [XmlElement ("UPC", Protocol.DeviceSchema, OmitIfNull = true)]
+        [XmlElement ("UPC", OmitIfNull = true)]
         public virtual string Upc { get; protected set; }
 
         protected internal virtual void Initialize (XmlSerializer serializer, Root root, Uri deviceUrl)

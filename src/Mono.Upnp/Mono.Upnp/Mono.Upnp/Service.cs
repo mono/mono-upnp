@@ -47,7 +47,7 @@ namespace Mono.Upnp
         }
     }
     
-    [XmlType ("service", Protocol.DeviceSchema)]
+    [XmlType ("service")]
     public class Service : Description
     {
         ServiceController controller;
@@ -71,13 +71,13 @@ namespace Mono.Upnp
             Id = id;
         }
         
-        [XmlElement ("serviceType", Protocol.DeviceSchema)]
+        [XmlElement ("serviceType")]
         public virtual ServiceType Type { get; protected set; }
         
-        [XmlElement ("serviceId", Protocol.DeviceSchema)]
+        [XmlElement ("serviceId")]
         public virtual string Id { get; protected set; }
         
-        [XmlElement ("SCPDURL", Protocol.DeviceSchema)]
+        [XmlElement ("SCPDURL")]
         protected virtual string ScpdUrlFragment {
             get { return CollapseUrl (ScpdUrl); }
             set { ScpdUrl = ExpandUrl (value); }
@@ -85,7 +85,7 @@ namespace Mono.Upnp
         
         public virtual Uri ScpdUrl { get; protected set; }
         
-        [XmlElement ("controlURL", Protocol.DeviceSchema)]
+        [XmlElement ("controlURL")]
         protected virtual string ControlUrlFragment {
             get { return CollapseUrl (ControlUrl); }
             set { ControlUrl = ExpandUrl (value); }
@@ -93,7 +93,7 @@ namespace Mono.Upnp
         
         public virtual Uri ControlUrl { get; protected set; }
         
-        [XmlElement ("eventSubURL", Protocol.DeviceSchema)]
+        [XmlElement ("eventSubURL")]
         protected virtual string EventUrlFragment {
             get { return CollapseUrl (EventUrl); }
             set { EventUrl = ExpandUrl (value); }

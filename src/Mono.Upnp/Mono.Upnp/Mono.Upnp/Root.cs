@@ -70,14 +70,14 @@ namespace Mono.Upnp
         [XmlAttribute ("configId")]
         public virtual string ConfigurationId { get; protected set; }
         
-        [XmlElement ("specVersion", Protocol.DeviceSchema)]
+        [XmlElement ("specVersion")]
         public virtual SpecVersion SpecVersion { get; protected set; }
         
         [DoNotSerialize]
-        [XmlElement ("URLBase", Protocol.DeviceSchema)]
+        [XmlElement ("URLBase")]
         public virtual Uri UrlBase { get; protected set; }
         
-        [XmlElement ("device", Protocol.DeviceSchema)]
+        [XmlElement ("device")]
         public virtual Device RootDevice { get; protected set; }
         
         protected internal virtual void Initialize (XmlSerializer serializer, Uri url)
