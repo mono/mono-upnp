@@ -90,12 +90,16 @@ namespace Mono.Upnp
         
         protected internal virtual void Start ()
         {
-            RootDevice.Start ();
+            if (RootDevice != null) {
+                RootDevice.Start ();
+            }
         }
         
         protected internal virtual void Stop ()
         {
-            RootDevice.Stop ();
+            if (RootDevice != null) {
+                RootDevice.Stop ();
+            }
         }
         
         [XmlTypeDeserializer]

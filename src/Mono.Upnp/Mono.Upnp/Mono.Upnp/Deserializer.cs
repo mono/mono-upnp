@@ -71,9 +71,7 @@ namespace Mono.Upnp
         protected virtual Root DeserializeRoot (Uri url, XmlDeserializationContext context)
         {
             root = CreateRoot (url);
-            if (root != null) {
-                ((IXmlDeserializable)root).Deserialize (context);
-            }
+            Deserialize (root, context);
             return root;
         }
         
@@ -85,9 +83,7 @@ namespace Mono.Upnp
         protected internal virtual Device DeserializeDevice (XmlDeserializationContext context)
         {
             var device = CreateDevice ();
-            if (device != null) {
-                ((IXmlDeserializable)device).Deserialize (context);
-            }
+            Deserialize (device, context);
             return device;
         }
         
@@ -99,9 +95,7 @@ namespace Mono.Upnp
         protected internal virtual Service DeserializeService (XmlDeserializationContext context)
         {
             var service = CreateService ();
-            if (service != null) {
-                ((IXmlDeserializable)service).Deserialize (context);
-            }
+            Deserialize (service, context);
             return service;
         }
         
@@ -113,9 +107,7 @@ namespace Mono.Upnp
         protected internal virtual Icon DeserializeIcon (XmlDeserializationContext context)
         {
             var icon = CreateIcon ();
-            if (icon != null) {
-                ((IXmlDeserializable)icon).Deserialize (context);
-            }
+            Deserialize (icon, context);
             return icon;
         }
         
@@ -127,9 +119,7 @@ namespace Mono.Upnp
         protected internal virtual ServiceAction DeserializeAction (ServiceController controller, XmlDeserializationContext context)
         {
             var action = CreateAction (controller);
-            if (action != null) {
-                ((IXmlDeserializable)action).Deserialize (context);
-            }
+            Deserialize (action, context);
             return action;
         }
         
@@ -141,9 +131,7 @@ namespace Mono.Upnp
         protected internal virtual Argument DeserializeArgument (XmlDeserializationContext context)
         {
             var argument = CreateArgument ();
-            if (argument != null) {
-                ((IXmlDeserializable)argument).Deserialize (context);
-            }
+            Deserialize (argument, context);
             return argument;
         }
         
@@ -155,9 +143,7 @@ namespace Mono.Upnp
         protected internal virtual StateVariable DeserializeStateVariable (ServiceController controller, XmlDeserializationContext context)
         {
             var state_variable = CreateStateVariable (controller);
-            if (state_variable != null) {
-                ((IXmlDeserializable)state_variable).Deserialize (context);
-            }
+            Deserialize (state_variable, context);
             return state_variable;
         }
         
@@ -186,15 +172,20 @@ namespace Mono.Upnp
         protected virtual ServiceController DeserializeServiceController (Service service, XmlDeserializationContext context)
         {
             var service_controller = CreateServiceController (service);
-            if (service_controller != null) {
-                ((IXmlDeserializable)service_controller).Deserialize (context);
-            }
+            Deserialize (service_controller, context);
             return service_controller;
         }
         
         protected virtual ServiceController CreateServiceController (Service service)
         {
             return new ServiceController (this, service);
+        }
+        
+        void Deserialize (IXmlDeserializable deserializable, XmlDeserializationContext context)
+        {
+            if (deserializable != null) {
+                deserializable.Deserialize (context);
+            }
         }
         
         internal bool IsDisposed { get; private set; }
