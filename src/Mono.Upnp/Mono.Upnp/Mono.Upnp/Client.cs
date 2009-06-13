@@ -209,16 +209,19 @@ namespace Mono.Upnp
                     if (root == null) {
                         continue;
                     }
+                    
                     descriptions[url] = root;
                     var result = getter (announcement, root.RootDevice);
                     if (result == null) {
                         continue;
                     }
+                    
                     return result;
                 } catch (Exception e) {
                     Log.Exception (string.Format ("There was a problem fetching the description at {0}.", url), e);
                 }
             }
+            
             return null;
         }
 
@@ -229,12 +232,14 @@ namespace Mono.Upnp
                     return description;
                 }
             }
+            
             foreach (var childDevice in device.Devices) {
                 var description = GetService (announcement, childDevice);
                 if (description != null) {
                     return description;
                 }
             }
+            
             return null;
         }
 
@@ -243,12 +248,14 @@ namespace Mono.Upnp
             if (device.Type == announcement.Type && device.Udn == announcement.Udn) {
                 return device;
             }
+            
             foreach (var childDevice in device.Devices) {
                 var description = GetDevice (announcement, childDevice);
                 if (description != null) {
                     return description;
                 }
             }
+            
             return null;
         }
         
