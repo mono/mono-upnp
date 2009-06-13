@@ -1,5 +1,5 @@
 // 
-// XmlServer.cs
+// Properties.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -25,35 +25,47 @@
 // THE SOFTWARE.
 
 using System;
-using System.Net;
+using System.Collections.Generic;
 
+using Mono.Upnp.Control;
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
-    class XmlServer : UpnpServer
+    [XmlType ("propertyset", Protocol.EventSchema, "e")]
+    sealed class Properties : XmlAutomatable
     {
-        static readonly WeakReference static_deserializer = new WeakReference (null);
-        protected readonly XmlDeserializer Deserializer;
-        protected readonly XmlSerializer Serializer;
+        readonly IMap<string, StateVariable> map;
         
-        public XmlServer (XmlSerializer serializer, Uri url)
-            : base (url)
+        public Properties (IMap<string, StateVariable> map)
         {
-            if (static_deserializer.IsAlive) {
-                Deserializer = (XmlDeserializer)static_deserializer.Target;
-            } else {
-                Deserializer = new XmlDeserializer ();
-                static_deserializer.Target = Deserializer;
-            }
-            Serializer = serializer;
+            this.map = map;
         }
         
-        protected override void HandleContext (HttpListenerContext context)
+        protected override void Deserialize (XmlDeserializationContext context)
         {
-            base.HandleContext (context);
-            
-            context.Response.ContentType = @"text/xml; charset=""utf-8""";
+            var reader = context.Reader;
+            if (reader.ReadToDescendant ("property", Protocol.EventSchema)) {
+                do {
+                    reader.Read ();
+                    map[reader.LocalName].Value = reader.ReadElementContentAsString ();
+                } while (reader.ReadToNextSibling ("property", Protocol.EventSchema));
+            }
+        }
+
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            var writer = context.Writer;
+            foreach (var pair in map) {
+                writer.WriteStartElement ("property", Protocol.EventSchema);
+                writer.WriteElementString (pair.Key, pair.Value.Value);
+                writer.WriteEndElement ();
+            }
         }
     }
 }

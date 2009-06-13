@@ -34,7 +34,7 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Control
 {
     [XmlType ("argument")]
-    public class Argument : XmlAutomatable
+    public class Argument : XmlAutomatable, IMappable<string>
     {
         protected internal Argument ()
         {
@@ -90,6 +90,11 @@ namespace Mono.Upnp.Control
             if (context == null) throw new ArgumentNullException ("context");
             
             context.AutoSerializeMembersOnly (this);
+        }
+        
+        string IMappable<string>.Map ()
+        {
+            return Name;
         }
     }
 }

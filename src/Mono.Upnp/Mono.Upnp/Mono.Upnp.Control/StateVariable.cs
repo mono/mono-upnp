@@ -35,7 +35,7 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Control
 {
     [XmlType ("stateVariable")]
-    public class StateVariable : XmlAutomatable
+    public class StateVariable : XmlAutomatable, IMappable<string>
     {
         readonly ServiceController controller;
         readonly StateVariableEventer eventer;
@@ -148,6 +148,8 @@ namespace Mono.Upnp.Control
         [XmlElement ("allowedValueRange", OmitIfNull = true)]
         public virtual AllowedValueRange AllowedValueRange { get; protected set; }
         
+        internal string Value { get; set; }
+        
         protected virtual void OnStateVariableUpdated (object sender, StateVariableChangedArgs<string> args)
         {
             controller.UpdateStateVariable (this, args.NewValue);
@@ -182,6 +184,11 @@ namespace Mono.Upnp.Control
             if (context == null) throw new ArgumentNullException ("context");
             
             context.AutoSerializeMembersOnly (this);
+        }
+        
+        string IMappable<string>.Map ()
+        {
+            return Name;
         }
     }
 }

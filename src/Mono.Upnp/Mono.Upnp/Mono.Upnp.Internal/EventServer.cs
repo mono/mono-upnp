@@ -31,9 +31,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Xml;
 
 using Mono.Upnp.Control;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
@@ -47,23 +49,74 @@ namespace Mono.Upnp.Internal
             public uint Seq;
             public int ConnectFailures;
         }
-
+        
         readonly ServiceController controller;
-        readonly object mutex = new object ();
+        volatile bool started;
+        
+        readonly object subscription_mutex = new object ();
         readonly Dictionary<string, Subscription> subscribers = new Dictionary<string, Subscription> ();
+        readonly Stack<Subscription> dead_subscribers = new Stack<Subscription> ();
         readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
+        
+        readonly object publish_mutex = new object ();
+        readonly CollectionMap<string, StateVariable> updates = new CollectionMap<string, StateVariable> ();
+        readonly MemoryStream update_stream = new MemoryStream ();
+        readonly XmlSerializer serializer;
+        Thread publish_thread;
 
-        public EventServer (ServiceController service, Uri url)
+        public EventServer (ServiceController service, XmlSerializer serializer, Uri url)
             : base (url)
         {
             this.controller = service;
+            this.serializer = serializer;
+        }
+        
+        public void QueueUpdate (StateVariable stateVariable)
+        {
+            lock (publish_mutex) {
+                if (!updates.Contains (stateVariable)) {
+                    updates.Add (stateVariable);
+                    Monitor.Pulse (publish_mutex);
+                }
+            }
+        }
+        
+        public override void Start ()
+        {
+            started = true;
+            publish_thread = new Thread (new ThreadStart (Publish));
+            publish_thread.Start ();
+            base.Start ();
+        }
+        
+        public override void Stop ()
+        {
+            started = false;
+            base.Stop ();
+        }
+        
+        void Publish ()
+        {
+            while (started) {
+                lock (publish_mutex) {
+                    Monitor.Wait (publish_mutex);
+                    var count = 0;
+                    do {
+                        count = updates.Count;
+                        Monitor.Exit (publish_mutex);
+                        Thread.Sleep (TimeSpan.FromSeconds (1));
+                        Monitor.Enter (publish_mutex);
+                    } while (count != updates.Count);
+                    PublishUpdates (updates);
+                    updates.Clear ();
+                }
+            }
         }
 
-        readonly Stack<Subscription> dead_subscribers = new Stack<Subscription> ();
-
-        public void PublishUpdates ()
+        public void PublishUpdates (IMap<string, StateVariable> map)
         {
-            lock (mutex) {
+            lock (subscription_mutex) {
+                WriteUpdatesToStream (map);
                 foreach (var subscriber in subscribers.Values) {
                     try {
                         PublishUpdates (subscriber);
@@ -84,6 +137,12 @@ namespace Mono.Upnp.Internal
                 }
             }
         }
+        
+        void WriteUpdatesToStream (IMap<string, StateVariable> map)
+        {
+            update_stream.SetLength (0);
+            serializer.Serialize (new Properties (map), update_stream);
+        }
 
         void PublishUpdates (Subscription subscriber)
         {
@@ -97,21 +156,7 @@ namespace Mono.Upnp.Internal
             request.KeepAlive = false;
             subscriber.Seq++;
             using (var stream = request.GetRequestStream ()) {
-                using (var writer = XmlWriter.Create (stream)) {
-                    writer.WriteStartDocument ();
-                    writer.WriteStartElement ("e", "propertyset", Protocol.EventSchema);
-                    foreach (var state_variable in controller.StateVariables.Values) {
-                        if (state_variable.SendsEvents) {
-                            writer.WriteStartElement ("property", Protocol.EventSchema);
-                            writer.WriteStartElement (state_variable.Name);
-                            //writer.WriteValue (state_variable.Value);
-                            writer.WriteEndElement ();
-                            writer.WriteEndElement ();
-                        }
-                    }
-                    writer.WriteEndElement ();
-                    writer.WriteEndDocument ();
-                }
+                update_stream.WriteTo (stream);
             }
             request.BeginGetResponse (OnGotResponse, request);
         }
@@ -127,7 +172,7 @@ namespace Mono.Upnp.Internal
 
         protected override void HandleContext (HttpListenerContext context)
         {
-            lock (mutex) {
+            lock (subscription_mutex) {
                 var method = context.Request.HttpMethod.ToUpper ();
                 if (method == "SUBSCRIBE") {
                     var callback = context.Request.Headers["CALLBACK"];
@@ -141,6 +186,8 @@ namespace Mono.Upnp.Internal
                         subscribers.Add (uuid, subscriber);
                         HandleSubscription (context, subscriber);
                         context.Response.Close ();
+                        
+                        WriteUpdatesToStream (controller.StateVariables);
                         PublishUpdates (subscriber);
                     } else {
                         var sid = context.Request.Headers["SID"];
@@ -164,7 +211,7 @@ namespace Mono.Upnp.Internal
 
         bool OnTimeout (object state, ref TimeSpan interval)
         {
-            lock (mutex) {
+            lock (subscription_mutex) {
                 subscribers.Remove ((string)state);
                 return false;
             }

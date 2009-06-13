@@ -35,12 +35,12 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Control
 {
     [XmlType ("action")]
-    public class ServiceAction : Description
+    public class ServiceAction : Description, IMappable<string>
     {
         readonly static Dictionary<string, string> emptyArguments = new Dictionary<string, string> ();
         
         readonly ServiceController controller;
-        readonly Map<string, Argument> arguments;
+        readonly CollectionMap<string, Argument> arguments;
         readonly ServiceActionExecutor executor;
 
         protected internal ServiceAction (Deserializer deserializer, ServiceController controller)
@@ -49,7 +49,7 @@ namespace Mono.Upnp.Control
             if (controller == null) throw new ArgumentNullException ("controller");
 
             this.controller = controller;
-            arguments = new Map<string, Argument> (ArgumentMapper);
+            arguments = new CollectionMap<string, Argument> ();
         }
         
         public ServiceAction (string name, IEnumerable<Argument> arguments, ServiceActionExecutor executor)
@@ -62,13 +62,8 @@ namespace Mono.Upnp.Control
         {
             if (executor == null) throw new ArgumentNullException ("executor");
             
-            this.arguments = Helper.MakeReadOnlyCopy<string, Argument> (arguments, ArgumentMapper);
+            this.arguments = Helper.MakeReadOnlyCopy<string, Argument> (arguments);
             this.executor = executor;
-        }
-        
-        static string ArgumentMapper (Argument argument)
-        {
-            return argument.Name;
         }
 
         [XmlElement ("name")]
@@ -185,6 +180,11 @@ namespace Mono.Upnp.Control
             if (context == null) throw new ArgumentNullException ("context");
             
             context.AutoSerializeMembersOnly (this);
+        }
+        
+        string IMappable<string>.Map ()
+        {
+            return Name;
         }
     }
 }

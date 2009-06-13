@@ -1,5 +1,5 @@
 // 
-// Map.cs
+// CollectionMap.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -28,57 +28,68 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Mono.Upnp.Control;
-
 namespace Mono.Upnp.Internal
 {
-    class Map<TKey, TValue> : IMap<TKey, TValue>
+    sealed class CollectionMap<TKey, TValue> : Map<TKey, TValue>, ICollection<TValue>
+        where TValue : IMappable<TKey>
     {
-        readonly IDictionary<TKey, TValue> dictionary;
+        bool is_read_only;
         
-        protected IDictionary<TKey, TValue> Dictionary {
-            get { return dictionary; }
-        }
-        
-        public Map (IDictionary<TKey, TValue> dictionary)
+        public CollectionMap ()
+            : base (new Dictionary<TKey, TValue> ())
         {
-            this.dictionary = dictionary;
         }
         
-        public int Count {
-            get { return dictionary.Count; }
-        }
-        
-        public bool ContainsKey (TKey key)
+        public void Add (TValue value)
         {
-            return dictionary.ContainsKey (key);
+            CheckReadOnly ();
+            Dictionary.Add (value.Map (), value);
         }
         
-        public TValue this[TKey key] {
-            get { return dictionary[key]; }
-        }
-        
-        public bool TryGetValue (TKey key, out TValue value)
+        public void Clear ()
         {
-            return dictionary.TryGetValue (key, out value);
+            CheckReadOnly ();
+            Dictionary.Clear ();
         }
         
-        public IEnumerable<TKey> Keys {
-            get { return dictionary.Keys; }
-        }
-        
-        public IEnumerable<TValue> Values {
-            get { return dictionary.Values; }
-        }
-        
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator ()
+        public bool Remove (TValue value)
         {
-            return dictionary.GetEnumerator ();
+            CheckReadOnly ();
+            return Dictionary.Remove (value.Map ());
+        }
+        
+        public bool Contains (TValue value)
+        {
+            return Dictionary.ContainsKey (value.Map ());
+        }
+        
+        public void CopyTo (TValue[] array, int arrayIndex)
+        {
+            Dictionary.Values.CopyTo (array, arrayIndex);
+        }
+        
+        public bool IsReadOnly {
+            get { return is_read_only; }
+        }
+        
+        public new IEnumerator<TValue> GetEnumerator ()
+        {
+            return Dictionary.Values.GetEnumerator ();
         }
         
         IEnumerator IEnumerable.GetEnumerator ()
         {
             return GetEnumerator ();
+        }
+        
+        public void MakeReadOnly ()
+        {
+            is_read_only = true;
+        }
+        
+        void CheckReadOnly ()
+        {
+            if (is_read_only) throw new NotSupportedException ("The collection is read-only.");
         }
     }
 }

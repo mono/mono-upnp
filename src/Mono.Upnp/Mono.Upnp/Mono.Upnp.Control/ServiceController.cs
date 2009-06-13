@@ -37,8 +37,8 @@ namespace Mono.Upnp.Control
     [XmlType ("scpd", Protocol.ServiceSchema)]
     public class ServiceController : Description, IXmlDeserializable
     {
-        readonly Map<string, ServiceAction> actions;
-        readonly Map<string, StateVariable> state_variables;
+        readonly CollectionMap<string, ServiceAction> actions;
+        readonly CollectionMap<string, StateVariable> state_variables;
         DataServer scpd_server;
         ControlServer control_server;
         ControlClient control_client;
@@ -52,27 +52,17 @@ namespace Mono.Upnp.Control
             if (service.ControlUrl == null) throw new ArgumentException ("The service has no ControlUrl.", "service");
             if (service.EventUrl == null) throw new ArgumentException ("The service has no EventUrl.", "service");
             
-            actions = new Map<string, ServiceAction> (ServiceActionMapper);
-            state_variables = new Map<string, StateVariable> (StateVariableMapper);
+            actions = new CollectionMap<string, ServiceAction> ();
+            state_variables = new CollectionMap<string, StateVariable> ();
             control_client = new ControlClient (service.ControlUrl, deserializer.XmlDeserializer, service.Type.ToString ());
             event_client = new EventClient (service.EventUrl, deserializer.XmlDeserializer);
         }
         
         public ServiceController (IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
         {
-            this.actions = Helper.MakeReadOnlyCopy<string, ServiceAction> (actions, ServiceActionMapper);
-            this.state_variables = Helper.MakeReadOnlyCopy<string, StateVariable> (stateVariables, StateVariableMapper);
+            this.actions = Helper.MakeReadOnlyCopy<string, ServiceAction> (actions);
+            this.state_variables = Helper.MakeReadOnlyCopy<string, StateVariable> (stateVariables);
             SpecVersion = new SpecVersion (1, 1);
-        }
-        
-        static string ServiceActionMapper (ServiceAction serviceAction)
-        {
-            return serviceAction.Name;
-        }
-        
-        static string StateVariableMapper (StateVariable stateVariable)
-        {
-            return stateVariable.Name;
         }
         
         [XmlAttribute ("configId")]
@@ -109,7 +99,7 @@ namespace Mono.Upnp.Control
             
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
             control_server = new ControlServer (this, service.Type.ToString (), serializer, service.ControlUrl);
-            event_server = new EventServer (this, service.EventUrl);
+            event_server = new EventServer (this, serializer, service.EventUrl);
         }
         
         protected internal virtual void Start ()

@@ -41,7 +41,7 @@ namespace Mono.Upnp.Internal
             listener.Prefixes.Add (url.ToString ());
         }
 
-        public void Start ()
+        public virtual void Start ()
         {
             listener.Start ();
             listener.BeginGetContext (OnGetContext, listener);
@@ -68,12 +68,12 @@ namespace Mono.Upnp.Internal
             context.Response.AppendHeader ("DATE", DateTime.Now.ToUniversalTime ().ToString ("r"));
         }
 
-        public void Stop ()
+        public virtual void Stop ()
         {
             listener.Stop ();
         }
 
-        public void Dispose ()
+        public virtual void Dispose ()
         {
             listener.Close ();
         }

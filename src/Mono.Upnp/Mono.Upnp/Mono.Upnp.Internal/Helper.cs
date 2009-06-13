@@ -53,9 +53,10 @@ namespace Mono.Upnp.Internal
             }
         }
         
-        public static Map<TKey, TValue> MakeReadOnlyCopy<TKey, TValue> (IEnumerable<TValue> items, Map<TKey, TValue>.Mapper mapper)
+        public static CollectionMap<TKey, TValue> MakeReadOnlyCopy<TKey, TValue> (IEnumerable<TValue> items)
+            where TValue : IMappable<TKey>
         {
-            var map = new Map<TKey, TValue> (mapper);
+            var map = new CollectionMap<TKey, TValue> ();
             if (items != null) {
                 foreach (var item in items) {
                     map.Add (item);

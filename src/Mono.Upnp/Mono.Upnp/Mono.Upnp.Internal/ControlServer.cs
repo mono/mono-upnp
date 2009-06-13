@@ -35,14 +35,24 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
-    sealed class ControlServer : XmlServer
+    sealed class ControlServer : UpnpServer
     {
+        static readonly WeakReference static_deserializer = new WeakReference (null);
+        readonly XmlDeserializer deserializer;
+        readonly XmlSerializer serializer;
         readonly IMap<string, ServiceAction> actions;
         readonly string service_type;
 
         public ControlServer (ServiceController controller, string serviceType, XmlSerializer serializer, Uri url)
-            : base (serializer, url)
+            : base (url)
         {
+            if (static_deserializer.IsAlive) {
+                this.deserializer = (XmlDeserializer)static_deserializer.Target;
+            } else {
+                this.deserializer = new XmlDeserializer ();
+                static_deserializer.Target = this.deserializer;
+            }
+            this.serializer = serializer;
             this.actions = controller.Actions;
             this.service_type = serviceType;
         }
@@ -51,14 +61,15 @@ namespace Mono.Upnp.Internal
         {
             base.HandleContext (context);
             
+            context.Response.ContentType = @"text/xml; charset=""utf-8""";
             using (var reader = XmlReader.Create (context.Request.InputStream)) {
                 reader.ReadToFollowing ("Envelope", Protocol.SoapEnvelopeSchema);
-                var requestEnvelope = Deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
+                var requestEnvelope = deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
                 var arguments = requestEnvelope.Body;
                 ServiceAction action;
                 if (actions.TryGetValue (arguments.ActionName, out action)) {
                     try {
-                        Serializer.Serialize (
+                        serializer.Serialize (
                             new SoapEnvelope<Arguments> (new Arguments (service_type, action.Name, action.Execute (arguments.Values), true)),
                             context.Response.OutputStream
                         );
