@@ -324,11 +324,11 @@ namespace Mono.Upnp.Internal
         {
             lock (subscription_mutex) {
                 subscribers.Remove ((string)state);
-                
-                Log.Information (string.Format ("Subscription {0} expired and was removed.", state));
-                
-                return false;
             }
+                
+            Log.Information (string.Format ("Subscription {0} expired and was removed.", state));
+            
+            return false;
         }
     }
 }
