@@ -43,11 +43,17 @@ namespace Mono.Upnp.Internal
     {
         class Subscription
         {
-            public Uri Callback;
-            public string Sid;
+            readonly public Uri Callback;
+            readonly public string Sid;
             public uint TimeoutId;
             public uint Seq;
             public int ConnectFailures;
+            
+            public Subscription (Uri callback, string sid)
+            {
+                this.Callback = callback;
+                this.Sid = sid;
+            }
         }
         
         readonly ServiceController controller;
@@ -167,12 +173,9 @@ namespace Mono.Upnp.Internal
                 if (method == "SUBSCRIBE") {
                     var callback = context.Request.Headers["CALLBACK"];
                     if (callback != null) {
-                        var uuid = GenerateUuid ();
+                        var uuid = string.Format ("uuid:{0}", Guid.NewGuid ());
                         // TODO try/catch
-                        var subscriber = new Subscription {
-                            Callback = new Uri (callback.Substring (1, callback.Length - 2)),
-                            Sid = uuid
-                        };
+                        var subscriber = new Subscription (new Uri (callback.Substring (1, callback.Length - 2)), uuid);
                         subscribers.Add (uuid, subscriber);
                         HandleSubscription (context, subscriber);
                         context.Response.Close ();
@@ -219,22 +222,6 @@ namespace Mono.Upnp.Internal
             context.Response.AddHeader ("TIMEOUT", timeout);
             context.Response.StatusCode = 200;
             context.Response.StatusDescription = "OK";
-        }
-
-        static readonly Random random = new Random ();
-        static string GenerateUuid ()
-        {
-            var builder = new StringBuilder (37);
-            builder.Append ("uuid:");
-            for (int i = 0; i < 32; i++) {
-                int r = random.Next (65, 100);
-                if (r > 90) {
-                    builder.Append (r - 90);
-                } else {
-                    builder.Append ((char)r);
-                }
-            }
-            return builder.ToString ();
         }
     }
 }
