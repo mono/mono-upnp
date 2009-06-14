@@ -98,8 +98,8 @@ namespace Mono.Upnp.Control
             if (service.EventUrl == null) throw new ArgumentException ("The service has no EventUrl.", "service");
             
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
-            control_server = new ControlServer (this, service.Type.ToString (), serializer, service.ControlUrl);
-            event_server = new EventServer (this, serializer, service.EventUrl);
+            control_server = new ControlServer (Actions, service.Type.ToString (), serializer, service.ControlUrl);
+            event_server = new EventServer (StateVariables, serializer, service.EventUrl);
         }
         
         protected internal virtual void Start ()

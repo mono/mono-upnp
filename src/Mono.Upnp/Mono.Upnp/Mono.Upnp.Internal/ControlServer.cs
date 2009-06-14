@@ -38,23 +38,24 @@ namespace Mono.Upnp.Internal
     sealed class ControlServer : UpnpServer
     {
         static readonly WeakReference static_deserializer = new WeakReference (null);
-        readonly XmlDeserializer deserializer;
-        readonly XmlSerializer serializer;
+        
         readonly IMap<string, ServiceAction> actions;
         readonly string service_type;
+        readonly XmlSerializer serializer;
+        readonly XmlDeserializer deserializer;
 
-        public ControlServer (ServiceController controller, string serviceType, XmlSerializer serializer, Uri url)
+        public ControlServer (IMap<string, ServiceAction> actions, string serviceType, XmlSerializer serializer, Uri url)
             : base (url)
         {
+            this.actions = actions;
+            this.service_type = serviceType;
+            this.serializer = serializer;
             if (static_deserializer.IsAlive) {
                 this.deserializer = (XmlDeserializer)static_deserializer.Target;
             } else {
                 this.deserializer = new XmlDeserializer ();
                 static_deserializer.Target = this.deserializer;
             }
-            this.serializer = serializer;
-            this.actions = controller.Actions;
-            this.service_type = serviceType;
         }
         
         protected override void HandleContext (HttpListenerContext context)

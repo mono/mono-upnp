@@ -54,7 +54,7 @@ namespace Mono.Upnp.Internal
             }
         }
         
-        readonly ServiceController controller;
+        readonly IMap<string, StateVariable> state_variables;
         volatile bool started;
         
         readonly object subscription_mutex = new object ();
@@ -67,10 +67,10 @@ namespace Mono.Upnp.Internal
         readonly XmlSerializer serializer;
         Thread publish_thread;
 
-        public EventServer (ServiceController service, XmlSerializer serializer, Uri url)
+        public EventServer (IMap<string, StateVariable> stateVariables, XmlSerializer serializer, Uri url)
             : base (url)
         {
-            this.controller = service;
+            this.state_variables = stateVariables;
             this.serializer = serializer;
         }
         
@@ -178,7 +178,7 @@ namespace Mono.Upnp.Internal
                         HandleSubscription (context, subscriber);
                         context.Response.Close ();
                         
-                        WriteUpdatesToStream (controller.StateVariables);
+                        WriteUpdatesToStream (state_variables);
                         PublishUpdates (subscriber);
                     } else {
                         var sid = context.Request.Headers["SID"];
