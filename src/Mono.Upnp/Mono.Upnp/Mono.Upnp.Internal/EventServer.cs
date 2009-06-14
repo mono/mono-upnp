@@ -107,15 +107,9 @@ namespace Mono.Upnp.Internal
                 Monitor.Wait (publish_mutex);
                 
                 while (started) {
-                    var count = 0;
-                    do {
-                        // FIXME what if code updates a state variable constantly at more than 1Hz?
-                        // We would never broadcast. We need to handle that.
-                        count = updated_state_variables.Count;
-                        Monitor.Exit (publish_mutex);
-                        Thread.Sleep (TimeSpan.FromSeconds (1));
-                        Monitor.Enter (publish_mutex);
-                    } while (count != updated_state_variables.Count);
+                    Monitor.Exit (publish_mutex);
+                    Thread.Sleep (TimeSpan.FromSeconds (1));
+                    Monitor.Enter (publish_mutex);
                     
                     PublishUpdates (updated_state_variables);
                     updated_state_variables.Clear ();
@@ -194,6 +188,10 @@ namespace Mono.Upnp.Internal
                     }
                 } else if (method == "UNSUBSCRIBE") {
                     Unsubscribe (context);
+                } else {
+                    Log.Error (string.Format (
+                        "A request from {0} to {1} uses an unsupported HTTP method: {2}.",
+                        context.Request.RemoteEndPoint, context.Request.Url, method));
                 }
             }
         }
@@ -204,7 +202,7 @@ namespace Mono.Upnp.Internal
             
             if (url_string == null || !Uri.IsWellFormedUriString (url_string, UriKind.Absolute)) {
                 Log.Error (string.Format (
-                    "The subscription request from {0} to {1} provides an illegal callback: {2}",
+                    "The subscription request from {0} to {1} provided an illegal callback: {2}.",
                     context.Request.RemoteEndPoint, context.Request.Url, callback));
                 return; 
             }
@@ -213,7 +211,7 @@ namespace Mono.Upnp.Internal
             
             if (url.Scheme != Uri.UriSchemeHttp) {
                 Log.Error (string.Format (
-                    "The callback for the subscription request from {0} to {1} is not HTTP: {2}",
+                    "The callback for the subscription request from {0} to {1} is not HTTP: {2}.",
                     context.Request.RemoteEndPoint, context.Request.Url, url));
                 return;
             }
@@ -268,7 +266,7 @@ namespace Mono.Upnp.Internal
             var sid = context.Request.Headers["SID"];
             if (sid == null) {
                 Log.Error (string.Format (
-                    "An unsubscribe request from {0} to {1} did not provide a SID.",
+                    "An unsubscribe request from {0} to {1} did not provide an SID.",
                     context.Request.RemoteEndPoint, context.Request.Url));
                 return;
             } else if (!subscribers.ContainsKey (sid)) {
@@ -293,7 +291,9 @@ namespace Mono.Upnp.Internal
                 if (timeout.Length > 7 && int.TryParse (timeout.Substring (7), out time)) {
                     subscriber.TimeoutId = dispatcher.Add (TimeSpan.FromSeconds (time), OnTimeout, subscriber.Sid);
                 } else {
-                    Log.Error (string.Format ("Subscription request has an illegal TIMEOUT value: {0}", timeout));
+                    Log.Error (string.Format (
+                        "Subscription request {0} from {1} to {2} has an illegal TIMEOUT value: {3}",
+                        subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, timeout));
                     return false;
                 }
             }
