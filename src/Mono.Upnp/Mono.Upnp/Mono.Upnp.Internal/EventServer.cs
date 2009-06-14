@@ -180,22 +180,20 @@ namespace Mono.Upnp.Internal
 
         protected override void HandleContext (HttpListenerContext context)
         {
-            lock (subscription_mutex) {
-                var method = context.Request.HttpMethod.ToUpper ();
-                if (method == "SUBSCRIBE") {
-                    var callback = context.Request.Headers["CALLBACK"];
-                    if (callback != null) {
-                        Subscribe (context, callback);
-                    } else {
-                        Renew (context);
-                    }
-                } else if (method == "UNSUBSCRIBE") {
-                    Unsubscribe (context);
+            var method = context.Request.HttpMethod.ToUpper ();
+            if (method == "SUBSCRIBE") {
+                var callback = context.Request.Headers["CALLBACK"];
+                if (callback != null) {
+                    Subscribe (context, callback);
                 } else {
-                    Log.Error (string.Format (
-                        "A request from {0} to {1} uses an unsupported HTTP method: {2}.",
-                        context.Request.RemoteEndPoint, context.Request.Url, method));
+                    Renew (context);
                 }
+            } else if (method == "UNSUBSCRIBE") {
+                Unsubscribe (context);
+            } else {
+                Log.Error (string.Format (
+                    "A request from {0} to {1} uses an unsupported HTTP method: {2}.",
+                    context.Request.RemoteEndPoint, context.Request.Url, method));
             }
         }
         
@@ -229,7 +227,10 @@ namespace Mono.Upnp.Internal
                 return;
             }
             
-            subscribers.Add (uuid, subscriber);
+            lock (subscription_mutex) {
+                subscribers.Add (uuid, subscriber);
+            }
+            
             context.Response.Close ();
             
             Log.Information (string.Format (
@@ -248,14 +249,19 @@ namespace Mono.Upnp.Internal
                     "A subscription request from {0} to {1} provided neither a CALLBACK nor a SID.",
                     context.Request.RemoteEndPoint, context.Request.Url));
                 return;
-            } else if (!subscribers.ContainsKey (sid)) {
-                Log.Error (string.Format (
-                    "A renewal request from {0} to {1} was for subscription {2} which does not exist.",
-                    context.Request.RemoteEndPoint, context.Request.Url, sid));
-                return;
             }
             
-            if (!HandleSubscription (context, subscribers[sid])) {
+            Subscription subscription;
+            lock (subscription_mutex) {
+                if (!subscribers.TryGetValue (sid, out subscription)) {
+                    Log.Error (string.Format (
+                        "A renewal request from {0} to {1} was for subscription {2} which does not exist.",
+                        context.Request.RemoteEndPoint, context.Request.Url, sid));
+                    return;
+                }
+            }
+            
+            if (!HandleSubscription (context, subscription)) {
                 Log.Error (string.Format ("Failed to renew subscription {0}.", sid));
                 return;
             }
@@ -272,15 +278,20 @@ namespace Mono.Upnp.Internal
                     "An unsubscribe request from {0} to {1} did not provide an SID.",
                     context.Request.RemoteEndPoint, context.Request.Url));
                 return;
-            } else if (!subscribers.ContainsKey (sid)) {
-                Log.Error (string.Format (
-                    "An unsubscribe request from {0} to {1} was for subscription {2} which does not exist.",
-                    context.Request.RemoteEndPoint, context.Request.Url, sid));
-                return;
             }
             
-            dispatcher.Remove (subscribers[sid].TimeoutId);
-            subscribers.Remove (sid);
+            Subscription subscription;
+            lock (subscription_mutex) {
+                if (!subscribers.TryGetValue (sid, out subscription)) {
+                    Log.Error (string.Format (
+                        "An unsubscribe request from {0} to {1} was for subscription {2} which does not exist.",
+                        context.Request.RemoteEndPoint, context.Request.Url, sid));
+                    return;
+                }
+                subscribers.Remove (sid);
+            }
+            
+            dispatcher.Remove (subscription.TimeoutId);
             
             Log.Information (string.Format ("Subscription {0} was canceled.", sid));
         }
