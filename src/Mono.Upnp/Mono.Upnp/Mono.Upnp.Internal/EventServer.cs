@@ -62,6 +62,7 @@ namespace Mono.Upnp.Internal
         readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
         
         readonly object publish_mutex = new object ();
+        readonly Properties update_properties;
         readonly CollectionMap<string, StateVariable> updates = new CollectionMap<string, StateVariable> ();
         readonly MemoryStream update_stream = new MemoryStream ();
         readonly XmlSerializer serializer;
@@ -71,6 +72,7 @@ namespace Mono.Upnp.Internal
             : base (url)
         {
             this.all_properties = new Properties (stateVariables);
+            this.update_properties = new Properties (updates);
             this.serializer = serializer;
         }
         
@@ -116,7 +118,7 @@ namespace Mono.Upnp.Internal
                         Thread.Sleep (TimeSpan.FromSeconds (1));
                         Monitor.Enter (publish_mutex);
                     } while (count != updates.Count);
-                    PublishUpdates (new Properties (updates));
+                    PublishUpdates (update_properties);
                     updates.Clear ();
                     
                     Monitor.Wait (publish_mutex);
