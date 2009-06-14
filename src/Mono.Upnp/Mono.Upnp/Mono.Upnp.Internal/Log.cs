@@ -32,8 +32,8 @@ namespace Mono.Upnp.Internal
 {
     internal static class Log
     {
-        private static bool? enabled;
-        private static bool Enabled {
+        static bool? enabled;
+        static bool Enabled {
             get {
                 if (enabled == null) {
                     enabled = Environment.GetEnvironmentVariable ("MONO_UPNP_DEBUG") != null;
@@ -50,8 +50,20 @@ namespace Mono.Upnp.Internal
 
         public static void Exception (string message, Exception e)
         {
+            Error (string.Format ("{0}, {1}", message, e));
+        }
+        
+        public static void Error (string message)
+        {
             if (Enabled || true) {
-                Console.Error.WriteLine ("Mono.Upnp Error: {0}, {1}", message, e);
+                Console.Error.WriteLine ("Mono.Upnp Error: {0}", message);
+            }
+        }
+        
+        public static void Information (string message)
+        {
+            if (Enabled) {
+                Console.WriteLine ("Mono.Upnp Message: {0}", message);
             }
         }
     }

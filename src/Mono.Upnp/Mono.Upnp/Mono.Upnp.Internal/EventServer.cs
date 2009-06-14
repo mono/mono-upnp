@@ -157,6 +157,7 @@ namespace Mono.Upnp.Internal
                         lock (subscription_mutex) {
                             if (subscribers.ContainsKey (subscriber.Sid)) {
                                 subscribers.Remove (subscriber.Sid);
+                                Log.Information (string.Format ("Subscription {0} has failed multiple times and has been removed.", subscriber.Sid));
                             }
                         }
                     }
@@ -178,15 +179,30 @@ namespace Mono.Upnp.Internal
                         HandleSubscription (context, subscriber);
                         context.Response.Close ();
                         
+                        Log.Information (string.Format (
+                            "{0} from {1} is now subscribed to {2} as {3}.",
+                            subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, subscriber.Sid));
+                        
                         WriteUpdatesToStream (state_variables);
                         PublishUpdates (subscriber);
                     } else {
                         var sid = context.Request.Headers["SID"];
-                        if (sid == null || !subscribers.ContainsKey (sid)) {
-                            // TODO stuff here
+                        if (sid == null) {
+                            Log.Error (string.Format (
+                                "A subscription request from {0} to {1} provided neither a CALLBACK nor a SID.",
+                                context.Request.RemoteEndPoint, context.Request.Url));
+                            return;
+                        } else if (!subscribers.ContainsKey (sid)) {
+                            Log.Error (string.Format (
+                                "A renewal request from {0} to {1} was for subscription {2} which does not exist.",
+                                context.Request.RemoteEndPoint, context.Request.Url, sid));
+                            return;
                         }
+                        
                         HandleSubscription (context, subscribers[sid]);
                         context.Response.Close ();
+                        
+                        Log.Information (string.Format ("Subscription {0} has been renewed.", sid));
                     }
                 } else if (method == "UNSUBSCRIBE") {
                     var sid = context.Request.Headers["SID"];
@@ -196,6 +212,8 @@ namespace Mono.Upnp.Internal
                     dispatcher.Remove (subscribers[sid].TimeoutId);
                     subscribers.Remove (sid);
                     context.Response.Close ();
+                    
+                    Log.Information (string.Format ("Subscription {0} has been canceled.", sid));
                 }
             }
         }
@@ -204,6 +222,7 @@ namespace Mono.Upnp.Internal
         {
             lock (subscription_mutex) {
                 subscribers.Remove ((string)state);
+                Log.Information (string.Format ("Subscription {0} has expired.", state));
                 return false;
             }
         }
