@@ -77,7 +77,7 @@ namespace Mono.Upnp.Internal
                         
                         Log.Information (string.Format ("{0} invoked {1} on {2}.",
                             context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
-                    } catch (Exception e) {
+                    } catch {
                         // TODO handle faults
                     }
                 } else {

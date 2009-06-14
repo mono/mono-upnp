@@ -131,12 +131,13 @@ namespace Mono.Upnp.Internal
         void PublishUpdates (Subscription subscriber, IEnumerable<StateVariable> stateVariables)
         {
             var request = (HttpWebRequest)WebRequest.Create (subscriber.Callback);
+            var seq = subscriber.Seq;
             request.Method = "NOTIFY";
             request.ContentType = "text/xml";
             request.Headers.Add ("NT", "upnp:event");
             request.Headers.Add ("NTS", "upnp:propchange");
             request.Headers.Add ("SID", subscriber.Sid);
-            request.Headers.Add ("SEQ", subscriber.Seq.ToString ());
+            request.Headers.Add ("SEQ", seq.ToString ());
             request.KeepAlive = false;
             subscriber.Seq++;
             
@@ -154,6 +155,7 @@ namespace Mono.Upnp.Internal
             }
             
             request.BeginGetResponse (async => {
+                #pragma warning disable 0420
                 try {
                     request.EndGetResponse (async).Close ();
                     Interlocked.Exchange (ref subscriber.ConnectFailures, 0);
@@ -172,6 +174,7 @@ namespace Mono.Upnp.Internal
                         }
                     }
                 }
+                #pragma warning restore 0420
             }, null);
         }
 
