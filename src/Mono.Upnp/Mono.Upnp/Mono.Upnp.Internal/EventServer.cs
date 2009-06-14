@@ -31,7 +31,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Threading;
-using System.Xml;
 
 using Mono.Upnp.Control;
 using Mono.Upnp.Xml;
