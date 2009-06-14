@@ -41,8 +41,8 @@ namespace Mono.Upnp.Internal
     {
         class Subscription
         {
-            readonly public Uri Callback;
-            readonly public string Sid;
+            public readonly Uri Callback;
+            public readonly string Sid;
             public uint TimeoutId;
             public uint Seq;
             public int ConnectFailures;
