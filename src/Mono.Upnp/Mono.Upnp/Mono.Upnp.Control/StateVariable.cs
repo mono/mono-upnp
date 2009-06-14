@@ -37,7 +37,6 @@ namespace Mono.Upnp.Control
     [XmlType ("stateVariable")]
     public class StateVariable : XmlAutomatable, IMappable<string>
     {
-        readonly StateVariableEventer eventer;
         ServiceController controller;
         IList<string> allowed_values;
         
@@ -62,7 +61,7 @@ namespace Mono.Upnp.Control
         {
             if (eventer == null) throw new ArgumentNullException ("eventer");
             
-            this.eventer = eventer;
+            // TODO do we need to store this to unlink this event?
             eventer.StateVariableUpdated += OnStateVariableUpdated;
         }
         

@@ -38,13 +38,11 @@ namespace Mono.Upnp.Internal
 {
     sealed class ControlClient : UpnpClient
     {
-        readonly Uri url;
         readonly string service_type;
         
         public ControlClient (Uri url, XmlDeserializer deserializer, string serviceType)
             : base (url, deserializer)
         {
-            this.url = url;
             service_type = serviceType;
         }
         
