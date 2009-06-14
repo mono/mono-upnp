@@ -212,8 +212,9 @@ namespace Mono.Upnp.Internal
         {
             dispatcher.Remove (subscriber.TimeoutId);
             var timeout = context.Request.Headers["TIMEOUT"] ?? "Second-1800";
-            var time = timeout == "infinate" ? TimeSpan.MaxValue : TimeSpan.FromSeconds (int.Parse (timeout.Substring (7)));
-            subscriber.TimeoutId = dispatcher.Add (time, OnTimeout, subscriber.Sid);
+            if (timeout != "infinate") {
+                subscriber.TimeoutId = dispatcher.Add (TimeSpan.FromSeconds (int.Parse (timeout.Substring (7))), OnTimeout, subscriber.Sid);
+            }
             context.Response.AddHeader ("DATE", DateTime.Now.ToString ("r"));
             context.Response.AddHeader ("SERVER", Protocol.UserAgent);
             context.Response.AddHeader ("SID", subscriber.Sid);
