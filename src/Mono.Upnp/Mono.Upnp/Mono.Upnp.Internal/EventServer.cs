@@ -43,9 +43,9 @@ namespace Mono.Upnp.Internal
         {
             public readonly Uri Callback;
             public readonly string Sid;
+            public volatile uint Seq;
+            public volatile int ConnectFailures;
             public uint TimeoutId;
-            public uint Seq;
-            public int ConnectFailures;
             
             public Subscription (Uri callback, string sid)
             {
@@ -145,13 +145,18 @@ namespace Mono.Upnp.Internal
             request.Headers.Add ("SEQ", subscriber.Seq.ToString ());
             request.KeepAlive = false;
             subscriber.Seq++;
+            
             using (var stream = request.GetRequestStream ()) {
                 update_stream.WriteTo (stream);
             }
+            
             request.BeginGetResponse (async => {
                 try {
                     request.EndGetResponse (async).Close ();
-                } catch (WebException) {
+                    Interlocked.Exchange (ref subscriber.ConnectFailures, 0);
+                } catch (Exception e) {
+                    Log.Exception (string.Format ("There was a problem publishing updates to subscription {0}", subscriber.Sid), e);
+                    
                     Interlocked.Increment (ref subscriber.ConnectFailures);
                     if (subscriber.ConnectFailures == 2) {
                         lock (subscription_mutex) {
@@ -233,7 +238,9 @@ namespace Mono.Upnp.Internal
         {
             lock (subscription_mutex) {
                 subscribers.Remove ((string)state);
+                
                 Log.Information (string.Format ("Subscription {0} expired and was removed.", state));
+                
                 return false;
             }
         }
