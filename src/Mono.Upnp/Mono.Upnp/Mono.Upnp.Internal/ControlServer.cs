@@ -74,11 +74,17 @@ namespace Mono.Upnp.Internal
                             new SoapEnvelope<Arguments> (new Arguments (service_type, action.Name, action.Execute (arguments.Values), true)),
                             context.Response.OutputStream
                         );
+                        
+                        Log.Information (string.Format ("{0} invoked {1} on {2}.",
+                            context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
                     } catch (Exception e) {
                         // TODO handle faults
                     }
                 } else {
-                    // TODO report fault
+                    Log.Error (string.Format (
+                        "{0} attempted to invoke the non-existant action {1} on {2}.",
+                        context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
+                    // TODO generate fault
                 }
             }
         }
