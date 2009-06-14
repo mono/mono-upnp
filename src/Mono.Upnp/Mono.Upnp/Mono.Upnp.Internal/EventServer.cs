@@ -220,7 +220,14 @@ namespace Mono.Upnp.Internal
             
             var uuid = string.Format ("uuid:{0}", Guid.NewGuid ());
             var subscriber = new Subscription (url, uuid);
-            HandleSubscription (context, subscriber);
+            
+            if (!HandleSubscription (context, subscriber)) {
+                Log.Error (string.Format (
+                    "{0} from {1} failed to subscribe to {0}.",
+                    subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url));
+                return;
+            }
+            
             subscribers.Add (uuid, subscriber);
             context.Response.Close ();
             
@@ -247,9 +254,13 @@ namespace Mono.Upnp.Internal
                 return;
             }
             
-            HandleSubscription (context, subscribers[sid]);
+            if (!HandleSubscription (context, subscribers[sid])) {
+                Log.Error (string.Format ("Failed to renew subscription {0}.", sid));
+                return;
+            }
             
             Log.Information (string.Format ("Subscription {0} was renewed.", sid));
+                
         }
         
         void Unsubscribe (HttpListenerContext context)
@@ -273,7 +284,7 @@ namespace Mono.Upnp.Internal
             Log.Information (string.Format ("Subscription {0} was canceled.", sid));
         }
 
-        void HandleSubscription (HttpListenerContext context, Subscription subscriber)
+        bool HandleSubscription (HttpListenerContext context, Subscription subscriber)
         {
             dispatcher.Remove (subscriber.TimeoutId);
             var timeout = context.Request.Headers["TIMEOUT"] ?? "Second-1800";
@@ -282,10 +293,8 @@ namespace Mono.Upnp.Internal
                 if (timeout.Length > 7 && int.TryParse (timeout.Substring (7), out time)) {
                     subscriber.TimeoutId = dispatcher.Add (TimeSpan.FromSeconds (time), OnTimeout, subscriber.Sid);
                 } else {
-                    Log.Error (string.Format (
-                        "Subscription {0} ({1}) from {2} to {3} has an illegal TIMEOUT value: {4}",
-                        subscriber.Sid, subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, timeout));
-                    // TODO throw
+                    Log.Error (string.Format ("Subscription request has an illegal TIMEOUT value: {0}", timeout));
+                    return false;
                 }
             }
             context.Response.AddHeader ("DATE", DateTime.Now.ToString ("r"));
@@ -294,6 +303,7 @@ namespace Mono.Upnp.Internal
             context.Response.AddHeader ("TIMEOUT", timeout);
             context.Response.StatusCode = 200;
             context.Response.StatusDescription = "OK";
+            return true;
         }
         
         bool OnTimeout (object state, ref TimeSpan interval)
