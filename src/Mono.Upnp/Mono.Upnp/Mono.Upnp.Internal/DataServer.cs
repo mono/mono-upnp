@@ -47,6 +47,8 @@ namespace Mono.Upnp.Internal
         {
             context.Response.OutputStream.Write (data, 0, data.Length);
             context.Response.Close ();
+            
+            Log.Information (string.Format ("{0} requested {1}.", context.Request.RemoteEndPoint, context.Request.Url));
         }
     }
 }

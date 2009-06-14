@@ -157,7 +157,9 @@ namespace Mono.Upnp.Internal
                         lock (subscription_mutex) {
                             if (subscribers.ContainsKey (subscriber.Sid)) {
                                 subscribers.Remove (subscriber.Sid);
-                                Log.Information (string.Format ("Subscription {0} has failed multiple times and has been removed.", subscriber.Sid));
+                                
+                                Log.Information (string.Format (
+                                    "Subscription {0} failed multiple times and was removed.", subscriber.Sid));
                             }
                         }
                     }
@@ -175,12 +177,12 @@ namespace Mono.Upnp.Internal
                         var uuid = string.Format ("uuid:{0}", Guid.NewGuid ());
                         // TODO try/catch
                         var subscriber = new Subscription (new Uri (callback.Substring (1, callback.Length - 2)), uuid);
-                        subscribers.Add (uuid, subscriber);
                         HandleSubscription (context, subscriber);
+                        subscribers.Add (uuid, subscriber);
                         context.Response.Close ();
                         
                         Log.Information (string.Format (
-                            "{0} from {1} is now subscribed to {2} as {3}.",
+                            "{0} from {1} subscribed to {2} as {3}.",
                             subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, subscriber.Sid));
                         
                         WriteUpdatesToStream (state_variables);
@@ -202,18 +204,27 @@ namespace Mono.Upnp.Internal
                         HandleSubscription (context, subscribers[sid]);
                         context.Response.Close ();
                         
-                        Log.Information (string.Format ("Subscription {0} has been renewed.", sid));
+                        Log.Information (string.Format ("Subscription {0} was renewed.", sid));
                     }
                 } else if (method == "UNSUBSCRIBE") {
                     var sid = context.Request.Headers["SID"];
-                    if (sid == null || !subscribers.ContainsKey (sid)) {
-                        // TODO stuff here
+                    if (sid == null) {
+                        Log.Error (string.Format (
+                            "An unsubscribe request from {0} to {1} provided neither a CALLBACK nor a SID.",
+                            context.Request.RemoteEndPoint, context.Request.Url));
+                        return;
+                    } else if (!subscribers.ContainsKey (sid)) {
+                        Log.Error (string.Format (
+                            "An unsubscribe request from {0} to {1} was for subscription {2} which does not exist.",
+                            context.Request.RemoteEndPoint, context.Request.Url, sid));
+                        return;
                     }
+                    
                     dispatcher.Remove (subscribers[sid].TimeoutId);
                     subscribers.Remove (sid);
                     context.Response.Close ();
                     
-                    Log.Information (string.Format ("Subscription {0} has been canceled.", sid));
+                    Log.Information (string.Format ("Subscription {0} was canceled.", sid));
                 }
             }
         }
@@ -222,7 +233,7 @@ namespace Mono.Upnp.Internal
         {
             lock (subscription_mutex) {
                 subscribers.Remove ((string)state);
-                Log.Information (string.Format ("Subscription {0} has expired.", state));
+                Log.Information (string.Format ("Subscription {0} expired and was removed.", state));
                 return false;
             }
         }
@@ -232,7 +243,14 @@ namespace Mono.Upnp.Internal
             dispatcher.Remove (subscriber.TimeoutId);
             var timeout = context.Request.Headers["TIMEOUT"] ?? "Second-1800";
             if (timeout != "infinite") {
-                subscriber.TimeoutId = dispatcher.Add (TimeSpan.FromSeconds (int.Parse (timeout.Substring (7))), OnTimeout, subscriber.Sid);
+                int time;
+                if (!int.TryParse (timeout.Substring (7), out time)) {
+                    Log.Error (string.Format (
+                        "Subscription {0} ({1}) from {2} to {3} has an illegal TIMEOUT value: {4}",
+                        subscriber.Sid, subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, timeout));
+                    // TODO throw
+                }
+                subscriber.TimeoutId = dispatcher.Add (TimeSpan.FromSeconds (time), OnTimeout, subscriber.Sid);
             }
             context.Response.AddHeader ("DATE", DateTime.Now.ToString ("r"));
             context.Response.AddHeader ("SERVER", Protocol.UserAgent);
