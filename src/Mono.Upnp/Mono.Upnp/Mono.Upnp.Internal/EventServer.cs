@@ -54,7 +54,7 @@ namespace Mono.Upnp.Internal
             }
         }
         
-        readonly IMap<string, StateVariable> state_variables;
+        readonly Properties all_properties;
         volatile bool started;
         
         readonly object subscription_mutex = new object ();
@@ -70,7 +70,7 @@ namespace Mono.Upnp.Internal
         public EventServer (IMap<string, StateVariable> stateVariables, XmlSerializer serializer, Uri url)
             : base (url)
         {
-            this.state_variables = stateVariables;
+            this.all_properties = new Properties (stateVariables);
             this.serializer = serializer;
         }
         
@@ -116,7 +116,7 @@ namespace Mono.Upnp.Internal
                         Thread.Sleep (TimeSpan.FromSeconds (1));
                         Monitor.Enter (publish_mutex);
                     } while (count != updates.Count);
-                    PublishUpdates (updates);
+                    PublishUpdates (new Properties (updates));
                     updates.Clear ();
                     
                     Monitor.Wait (publish_mutex);
@@ -124,20 +124,20 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        public void PublishUpdates (IMap<string, StateVariable> map)
+        public void PublishUpdates (Properties properties)
         {
             lock (subscription_mutex) {
-                WriteUpdatesToStream (map);
+                WriteUpdatesToStream (properties);
                 foreach (var subscriber in subscribers.Values) {
                     PublishUpdates (subscriber);
                 }
             }
         }
         
-        void WriteUpdatesToStream (IMap<string, StateVariable> map)
+        void WriteUpdatesToStream (Properties properties)
         {
             update_stream.SetLength (0);
-            serializer.Serialize (new Properties (map), update_stream);
+            serializer.Serialize (properties, update_stream);
         }
 
         void PublishUpdates (Subscription subscriber)
@@ -161,7 +161,7 @@ namespace Mono.Upnp.Internal
                     request.EndGetResponse (async).Close ();
                     Interlocked.Exchange (ref subscriber.ConnectFailures, 0);
                 } catch (Exception e) {
-                    Log.Exception (string.Format ("There was a problem publishing updates to subscription {0}", subscriber.Sid), e);
+                    Log.Exception (string.Format ("There was a problem publishing updates to subscription {0}.", subscriber.Sid), e);
                     
                     Interlocked.Increment (ref subscriber.ConnectFailures);
                     if (subscriber.ConnectFailures == 2) {
@@ -196,7 +196,7 @@ namespace Mono.Upnp.Internal
                             "{0} from {1} subscribed to {2} as {3}.",
                             subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, subscriber.Sid));
                         
-                        WriteUpdatesToStream (state_variables);
+                        WriteUpdatesToStream (all_properties);
                         PublishUpdates (subscriber);
                     } else {
                         var sid = context.Request.Headers["SID"];
