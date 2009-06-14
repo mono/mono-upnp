@@ -95,14 +95,18 @@ namespace Mono.Upnp.Internal
         public override void Stop ()
         {
             started = false;
+            lock (publish_mutex) {
+                Monitor.Pulse (publish_mutex);
+            }
             base.Stop ();
         }
         
         void Publish ()
         {
-            while (started) {
-                lock (publish_mutex) {
-                    Monitor.Wait (publish_mutex);
+            lock (publish_mutex) {
+                Monitor.Wait (publish_mutex);
+                
+                while (started) {
                     var count = 0;
                     do {
                         // FIXME what if code updates a state variable constantly at more than 1Hz?
@@ -114,6 +118,8 @@ namespace Mono.Upnp.Internal
                     } while (count != updates.Count);
                     PublishUpdates (updates);
                     updates.Clear ();
+                    
+                    Monitor.Wait (publish_mutex);
                 }
             }
         }
