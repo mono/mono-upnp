@@ -188,60 +188,114 @@ namespace Mono.Upnp.Internal
                 if (method == "SUBSCRIBE") {
                     var callback = context.Request.Headers["CALLBACK"];
                     if (callback != null) {
-                        var uuid = string.Format ("uuid:{0}", Guid.NewGuid ());
-                        // TODO try/catch
-                        var subscriber = new Subscription (new Uri (callback.Substring (1, callback.Length - 2)), uuid);
-                        HandleSubscription (context, subscriber);
-                        subscribers.Add (uuid, subscriber);
-                        context.Response.Close ();
-                        
-                        Log.Information (string.Format (
-                            "{0} from {1} subscribed to {2} as {3}.",
-                            subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, subscriber.Sid));
-                        
-                        PublishUpdates (subscriber, state_variables);
+                        Subscribe (context, callback);
                     } else {
-                        var sid = context.Request.Headers["SID"];
-                        if (sid == null) {
-                            Log.Error (string.Format (
-                                "A subscription request from {0} to {1} provided neither a CALLBACK nor a SID.",
-                                context.Request.RemoteEndPoint, context.Request.Url));
-                            return;
-                        } else if (!subscribers.ContainsKey (sid)) {
-                            Log.Error (string.Format (
-                                "A renewal request from {0} to {1} was for subscription {2} which does not exist.",
-                                context.Request.RemoteEndPoint, context.Request.Url, sid));
-                            return;
-                        }
-                        
-                        HandleSubscription (context, subscribers[sid]);
-                        context.Response.Close ();
-                        
-                        Log.Information (string.Format ("Subscription {0} was renewed.", sid));
+                        Renew (context);
                     }
                 } else if (method == "UNSUBSCRIBE") {
-                    var sid = context.Request.Headers["SID"];
-                    if (sid == null) {
-                        Log.Error (string.Format (
-                            "An unsubscribe request from {0} to {1} provided neither a CALLBACK nor a SID.",
-                            context.Request.RemoteEndPoint, context.Request.Url));
-                        return;
-                    } else if (!subscribers.ContainsKey (sid)) {
-                        Log.Error (string.Format (
-                            "An unsubscribe request from {0} to {1} was for subscription {2} which does not exist.",
-                            context.Request.RemoteEndPoint, context.Request.Url, sid));
-                        return;
-                    }
-                    
-                    dispatcher.Remove (subscribers[sid].TimeoutId);
-                    subscribers.Remove (sid);
-                    context.Response.Close ();
-                    
-                    Log.Information (string.Format ("Subscription {0} was canceled.", sid));
+                    Unsubscribe (context);
                 }
             }
         }
+        
+        void Subscribe (HttpListenerContext context, string callback)
+        {
+            var url_string = callback.Length < 3 ? null : callback.Substring (1, callback.Length - 2);
+            
+            if (url_string == null || !Uri.IsWellFormedUriString (url_string, UriKind.Absolute)) {
+                Log.Error (string.Format (
+                    "The subscription request from {0} to {1} provides an illegal callback: {2}",
+                    context.Request.RemoteEndPoint, context.Request.Url, callback));
+                return; 
+            }
+            
+            var url = new Uri (url_string);
+            
+            if (url.Scheme != Uri.UriSchemeHttp) {
+                Log.Error (string.Format (
+                    "The callback for the subscription request from {0} to {1} is not HTTP: {2}",
+                    context.Request.RemoteEndPoint, context.Request.Url, url));
+                return;
+            }
+            
+            var uuid = string.Format ("uuid:{0}", Guid.NewGuid ());
+            var subscriber = new Subscription (url, uuid);
+            HandleSubscription (context, subscriber);
+            subscribers.Add (uuid, subscriber);
+            context.Response.Close ();
+            
+            Log.Information (string.Format (
+                "{0} from {1} subscribed to {2} as {3}.",
+                subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, subscriber.Sid));
+            
+            PublishUpdates (subscriber, state_variables);
+        }
+        
+        void Renew (HttpListenerContext context)
+        {
+            var sid = context.Request.Headers["SID"];
+            
+            if (sid == null) {
+                Log.Error (string.Format (
+                    "A subscription request from {0} to {1} provided neither a CALLBACK nor a SID.",
+                    context.Request.RemoteEndPoint, context.Request.Url));
+                return;
+            } else if (!subscribers.ContainsKey (sid)) {
+                Log.Error (string.Format (
+                    "A renewal request from {0} to {1} was for subscription {2} which does not exist.",
+                    context.Request.RemoteEndPoint, context.Request.Url, sid));
+                return;
+            }
+            
+            HandleSubscription (context, subscribers[sid]);
+            
+            Log.Information (string.Format ("Subscription {0} was renewed.", sid));
+        }
+        
+        void Unsubscribe (HttpListenerContext context)
+        {
+            var sid = context.Request.Headers["SID"];
+            if (sid == null) {
+                Log.Error (string.Format (
+                    "An unsubscribe request from {0} to {1} did not provide a SID.",
+                    context.Request.RemoteEndPoint, context.Request.Url));
+                return;
+            } else if (!subscribers.ContainsKey (sid)) {
+                Log.Error (string.Format (
+                    "An unsubscribe request from {0} to {1} was for subscription {2} which does not exist.",
+                    context.Request.RemoteEndPoint, context.Request.Url, sid));
+                return;
+            }
+            
+            dispatcher.Remove (subscribers[sid].TimeoutId);
+            subscribers.Remove (sid);
+            
+            Log.Information (string.Format ("Subscription {0} was canceled.", sid));
+        }
 
+        void HandleSubscription (HttpListenerContext context, Subscription subscriber)
+        {
+            dispatcher.Remove (subscriber.TimeoutId);
+            var timeout = context.Request.Headers["TIMEOUT"] ?? "Second-1800";
+            if (timeout != "infinite") {
+                int time;
+                if (timeout.Length > 7 && int.TryParse (timeout.Substring (7), out time)) {
+                    subscriber.TimeoutId = dispatcher.Add (TimeSpan.FromSeconds (time), OnTimeout, subscriber.Sid);
+                } else {
+                    Log.Error (string.Format (
+                        "Subscription {0} ({1}) from {2} to {3} has an illegal TIMEOUT value: {4}",
+                        subscriber.Sid, subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, timeout));
+                    // TODO throw
+                }
+            }
+            context.Response.AddHeader ("DATE", DateTime.Now.ToString ("r"));
+            context.Response.AddHeader ("SERVER", Protocol.UserAgent);
+            context.Response.AddHeader ("SID", subscriber.Sid);
+            context.Response.AddHeader ("TIMEOUT", timeout);
+            context.Response.StatusCode = 200;
+            context.Response.StatusDescription = "OK";
+        }
+        
         bool OnTimeout (object state, ref TimeSpan interval)
         {
             lock (subscription_mutex) {
@@ -251,28 +305,6 @@ namespace Mono.Upnp.Internal
                 
                 return false;
             }
-        }
-
-        void HandleSubscription (HttpListenerContext context, Subscription subscriber)
-        {
-            dispatcher.Remove (subscriber.TimeoutId);
-            var timeout = context.Request.Headers["TIMEOUT"] ?? "Second-1800";
-            if (timeout != "infinite") {
-                int time;
-                if (!int.TryParse (timeout.Substring (7), out time)) {
-                    Log.Error (string.Format (
-                        "Subscription {0} ({1}) from {2} to {3} has an illegal TIMEOUT value: {4}",
-                        subscriber.Sid, subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, timeout));
-                    // TODO throw
-                }
-                subscriber.TimeoutId = dispatcher.Add (TimeSpan.FromSeconds (time), OnTimeout, subscriber.Sid);
-            }
-            context.Response.AddHeader ("DATE", DateTime.Now.ToString ("r"));
-            context.Response.AddHeader ("SERVER", Protocol.UserAgent);
-            context.Response.AddHeader ("SID", subscriber.Sid);
-            context.Response.AddHeader ("TIMEOUT", timeout);
-            context.Response.StatusCode = 200;
-            context.Response.StatusDescription = "OK";
         }
     }
 }
