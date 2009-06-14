@@ -37,19 +37,19 @@ namespace Mono.Upnp.Control
     [XmlType ("stateVariable")]
     public class StateVariable : XmlAutomatable, IMappable<string>
     {
-        readonly ServiceController controller;
         readonly StateVariableEventer eventer;
+        ServiceController controller;
         IList<string> allowed_values;
         
         protected StateVariable ()
         {
         }
 
-        protected internal StateVariable (ServiceController service)
+        protected internal StateVariable (ServiceController serviceController)
         {
-            if (service == null) throw new ArgumentNullException ("service");
+            if (serviceController == null) throw new ArgumentNullException ("serviceController");
 
-            this.controller = service;
+            this.controller = serviceController;
         }
         
         public StateVariable (string name, string dataType, StateVariableEventer eventer)
@@ -148,11 +148,21 @@ namespace Mono.Upnp.Control
         [XmlElement ("allowedValueRange", OmitIfNull = true)]
         public virtual AllowedValueRange AllowedValueRange { get; protected set; }
         
+        protected internal virtual void Initialize (ServiceController serviceController)
+        {
+            if (serviceController == null) throw new ArgumentNullException ("serviceController");
+            
+            this.controller = serviceController;
+        }
+        
         internal string Value { get; set; }
         
         protected virtual void OnStateVariableUpdated (object sender, StateVariableChangedArgs<string> args)
         {
-            controller.UpdateStateVariable (this, args.NewValue);
+            Value = args.NewValue;
+            if (controller != null) {
+                controller.UpdateStateVariable (this);
+            }
         }
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)

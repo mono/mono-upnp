@@ -120,11 +120,18 @@ namespace Mono.Upnp.Control
         {
             // TODO try dispose on timeout
             // TODO retry attempts
+            if (control_client == null) throw new InvalidOperationException ("The service controller was created to describe a local service and cannot be invoked across the network. Use the constructor which takes a Deserializer.");
+            
             return control_client.Invoke (action.Name, arguments);
         }
         
-        protected internal virtual void UpdateStateVariable (StateVariable stateVariable, string newValue)
+        protected internal virtual void UpdateStateVariable (StateVariable stateVariable)
         {
+            if (stateVariable == null) throw new ArgumentNullException ("stateVariable");
+            if (!state_variables.ContainsKey (stateVariable.Name)) throw new ArgumentException ("The state variable does not belong to this service controller.", "stateVariable");
+            if (event_server == null) throw new InvalidOperationException ("The service controller has not been properly initialized. Did you forget to call the base implementation of Initialize?");
+            
+            event_server.QueueUpdate (stateVariable);
         }
         
         [XmlTypeDeserializer]

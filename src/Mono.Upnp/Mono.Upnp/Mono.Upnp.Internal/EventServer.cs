@@ -105,7 +105,7 @@ namespace Mono.Upnp.Internal
                     Monitor.Wait (publish_mutex);
                     var count = 0;
                     do {
-                        // TODO what if code updates a state variable constantly at more than 1Hz?
+                        // FIXME what if code updates a state variable constantly at more than 1Hz?
                         // We would never broadcast. We need to handle that.
                         count = updates.Count;
                         Monitor.Exit (publish_mutex);
@@ -212,7 +212,7 @@ namespace Mono.Upnp.Internal
         {
             dispatcher.Remove (subscriber.TimeoutId);
             var timeout = context.Request.Headers["TIMEOUT"] ?? "Second-1800";
-            if (timeout != "infinate") {
+            if (timeout != "infinite") {
                 subscriber.TimeoutId = dispatcher.Add (TimeSpan.FromSeconds (int.Parse (timeout.Substring (7))), OnTimeout, subscriber.Sid);
             }
             context.Response.AddHeader ("DATE", DateTime.Now.ToString ("r"));
