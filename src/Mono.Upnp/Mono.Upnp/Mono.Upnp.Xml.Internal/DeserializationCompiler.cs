@@ -56,6 +56,7 @@ namespace Mono.Upnp.Xml.Internal
         Dictionary<Type, MethodInfo> TypeDeserializers {
             get {
                 if (!has_processed_type_deserializers) {
+                    has_processed_type_deserializers = true;
                     ProcessTypeDeserializers ();
                 }
                 return type_deserializers;
