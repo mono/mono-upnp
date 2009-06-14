@@ -117,7 +117,6 @@
     <Compile Include="Mono.Upnp.Xml.Internal\SerializationInfo.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\SerializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\Compiler.cs" />
-    <Compile Include="Mono.Upnp.Internal\Properties.cs" />
     <Compile Include="Mono.Upnp.Internal\IMappable.cs" />
     <Compile Include="Mono.Upnp.Internal\CollectionMap.cs" />
   </ItemGroup>

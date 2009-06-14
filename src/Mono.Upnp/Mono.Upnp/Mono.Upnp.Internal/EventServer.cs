@@ -30,10 +30,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading;
+using System.Xml;
 
 using Mono.Upnp.Control;
-using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
@@ -54,7 +55,9 @@ namespace Mono.Upnp.Internal
             }
         }
         
-        readonly Properties all_properties;
+        readonly static Encoding utf8 = new UTF8Encoding (false);
+        
+        readonly IEnumerable<StateVariable> state_variables;
         volatile bool started;
         
         readonly object subscription_mutex = new object ();
@@ -62,25 +65,20 @@ namespace Mono.Upnp.Internal
         readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
         
         readonly object publish_mutex = new object ();
-        readonly Properties update_properties;
-        readonly CollectionMap<string, StateVariable> updates = new CollectionMap<string, StateVariable> ();
-        readonly MemoryStream update_stream = new MemoryStream ();
-        readonly XmlSerializer serializer;
+        readonly List<StateVariable> updated_state_variables = new List<StateVariable> ();
         Thread publish_thread;
 
-        public EventServer (IMap<string, StateVariable> stateVariables, XmlSerializer serializer, Uri url)
+        public EventServer (IEnumerable<StateVariable> stateVariables, Uri url)
             : base (url)
         {
-            this.all_properties = new Properties (stateVariables);
-            this.update_properties = new Properties (updates);
-            this.serializer = serializer;
+            this.state_variables = stateVariables;
         }
         
         public void QueueUpdate (StateVariable stateVariable)
         {
             lock (publish_mutex) {
-                if (!updates.Contains (stateVariable)) {
-                    updates.Add (stateVariable);
+                if (!updated_state_variables.Contains (stateVariable)) {
+                    updated_state_variables.Add (stateVariable);
                     Monitor.Pulse (publish_mutex);
                 }
             }
@@ -113,36 +111,30 @@ namespace Mono.Upnp.Internal
                     do {
                         // FIXME what if code updates a state variable constantly at more than 1Hz?
                         // We would never broadcast. We need to handle that.
-                        count = updates.Count;
+                        count = updated_state_variables.Count;
                         Monitor.Exit (publish_mutex);
                         Thread.Sleep (TimeSpan.FromSeconds (1));
                         Monitor.Enter (publish_mutex);
-                    } while (count != updates.Count);
-                    PublishUpdates (update_properties);
-                    updates.Clear ();
+                    } while (count != updated_state_variables.Count);
+                    
+                    PublishUpdates (updated_state_variables);
+                    updated_state_variables.Clear ();
                     
                     Monitor.Wait (publish_mutex);
                 }
             }
         }
 
-        public void PublishUpdates (Properties properties)
+        public void PublishUpdates (IEnumerable<StateVariable> stateVariables)
         {
             lock (subscription_mutex) {
-                WriteUpdatesToStream (properties);
                 foreach (var subscriber in subscribers.Values) {
-                    PublishUpdates (subscriber);
+                    PublishUpdates (subscriber, stateVariables);
                 }
             }
         }
-        
-        void WriteUpdatesToStream (Properties properties)
-        {
-            update_stream.SetLength (0);
-            serializer.Serialize (properties, update_stream);
-        }
 
-        void PublishUpdates (Subscription subscriber)
+        void PublishUpdates (Subscription subscriber, IEnumerable<StateVariable> stateVariables)
         {
             var request = (HttpWebRequest)WebRequest.Create (subscriber.Callback);
             request.Method = "NOTIFY";
@@ -155,7 +147,16 @@ namespace Mono.Upnp.Internal
             subscriber.Seq++;
             
             using (var stream = request.GetRequestStream ()) {
-                update_stream.WriteTo (stream);
+                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
+                    writer.WriteStartDocument ();
+                    writer.WriteStartElement ("e", "propertyset", Protocol.EventSchema);
+                    foreach (var state_variable in stateVariables) {
+                        writer.WriteStartAttribute ("property", Protocol.EventSchema);
+                        writer.WriteElementString (state_variable.Name, state_variable.Value);
+                        writer.WriteEndElement ();
+                    }
+                    writer.WriteEndElement ();
+                }
             }
             
             request.BeginGetResponse (async => {
@@ -198,8 +199,7 @@ namespace Mono.Upnp.Internal
                             "{0} from {1} subscribed to {2} as {3}.",
                             subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, subscriber.Sid));
                         
-                        WriteUpdatesToStream (all_properties);
-                        PublishUpdates (subscriber);
+                        PublishUpdates (subscriber, state_variables);
                     } else {
                         var sid = context.Request.Headers["SID"];
                         if (sid == null) {

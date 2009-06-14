@@ -99,7 +99,7 @@ namespace Mono.Upnp.Control
             
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
             control_server = new ControlServer (Actions, service.Type.ToString (), serializer, service.ControlUrl);
-            event_server = new EventServer (StateVariables, serializer, service.EventUrl);
+            event_server = new EventServer (StateVariables.Values, service.EventUrl);
         }
         
         protected internal virtual void Start ()
