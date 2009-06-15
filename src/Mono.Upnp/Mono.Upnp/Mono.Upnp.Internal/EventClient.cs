@@ -106,43 +106,49 @@ namespace Mono.Upnp.Internal
                 listener = new HttpListener { IgnoreWriteExceptions = true };
                 listener.Prefixes.Add (prefix);
             }
-            listener.Start ();
-            listener.BeginGetContext (OnGotContext, null);
+            lock (listener) {
+                listener.Start ();
+                listener.BeginGetContext (OnGotContext, null);
+            }
         }
 
         void OnGotContext (IAsyncResult asyncResult)
         {
-            if (!listener.IsListening) {
-                return;
-            }
-            var context = listener.EndGetContext (asyncResult);
-            try {
-                using (var stream = context.Request.InputStream) {
-                    using (var reader = XmlReader.Create (stream)) {
-                        while (reader.ReadToFollowing ("property", Protocol.EventSchema)) {
-                            reader.Read ();
-                            StateVariable state_variable;
-                            if (state_variables.TryGetValue (reader.Name, out state_variable)) {
-                                state_variable.Value = reader.ReadElementContentAsString ();
-                            } else {
-                                Log.Warning (string.Format (
-                                    "{0} published an event update to {1} which includes unknown state variable {2}.",
-                                    context.Request.RemoteEndPoint, context.Request.Url, reader.Name));
+            lock (listener) {
+                if (!listener.IsListening) {
+                    return;
+                }
+                var context = listener.EndGetContext (asyncResult);
+                try {
+                    using (var stream = context.Request.InputStream) {
+                        using (var reader = XmlReader.Create (stream)) {
+                            while (reader.ReadToFollowing ("property", Protocol.EventSchema)) {
+                                reader.Read ();
+                                StateVariable state_variable;
+                                if (state_variables.TryGetValue (reader.Name, out state_variable)) {
+                                    state_variable.Value = reader.ReadElementContentAsString ();
+                                } else {
+                                    Log.Warning (string.Format (
+                                        "{0} published an event update to {1} which includes unknown state variable {2}.",
+                                        context.Request.RemoteEndPoint, context.Request.Url, reader.Name));
+                                }
                             }
                         }
                     }
+                } catch (Exception e) {
+                    Log.Exception (string.Format ("There was a problem processing an event update from {0} to {1}.",
+                        context.Request.RemoteEndPoint, context.Request.Url), e);
                 }
-            } catch (Exception e) {
-                Log.Exception (string.Format ("There was a problem processing an event update from {0} to {1}.",
-                    context.Request.RemoteEndPoint, context.Request.Url), e);
+                context.Response.Close ();
+                listener.BeginGetContext (OnGotContext, null);
             }
-            context.Response.Close ();
-            listener.BeginGetContext (OnGotContext, null);
         }
 
         void StopListening ()
         {
-            listener.Stop ();
+            lock (listener) {
+                listener.Stop ();
+            }
         }
 
         void Subscribe ()
@@ -289,7 +295,9 @@ namespace Mono.Upnp.Internal
         public void Dispose ()
         {
             Stop ();
-            listener.Close ();
+            lock (listener) {
+                listener.Close ();
+            }
         }
     }
 }
