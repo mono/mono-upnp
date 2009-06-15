@@ -29,31 +29,36 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Xml;
 
 using Mono.Upnp.Control;
-using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
-    class EventClient : UpnpClient, IDisposable
+    class EventClient : IDisposable
     {
         static readonly Random random = new Random ();
         static int id;
 
         readonly object mutex = new object ();
-        readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher();
+        readonly IMap<string, StateVariable> state_variables;
+        readonly Uri url;
+        readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
+        readonly string prefix = GeneratePrefix ();
+        
         volatile bool started;
         volatile bool confidently_subscribed;
+        
         HttpListener listener;
         uint expire_timeout_id;
         uint renew_timeout_id;
-        string prefix;
         string subscription_uuid;
+        int ref_count;
 
-        public EventClient (Uri url, XmlDeserializer deserializer)
-            : base (url, deserializer)
+        public EventClient (IMap<string, StateVariable> stateVariable, Uri url)
         {
-            this.prefix = GeneratePrefix ();
+            this.state_variables = stateVariable;
+            this.url = url;
         }
 
         static string GeneratePrefix ()
@@ -66,6 +71,22 @@ namespace Mono.Upnp.Internal
             }
             
             return null;
+        }
+        
+        public void Ref ()
+        {
+            if (ref_count == 0) {
+                Start ();
+            }
+            ref_count++;
+        }
+        
+        public void Unref ()
+        {
+            ref_count--;
+            if (ref_count == 0) {
+                Stop ();
+            }
         }
 
         public void Start ()
@@ -93,9 +114,24 @@ namespace Mono.Upnp.Internal
         {
             var context = listener.EndGetContext (asyncResult);
             try {
-                //controller.DeserializeEvents (context.Request);
-            } catch {
-                // TODO log
+                using (var stream = context.Request.InputStream) {
+                    using (var reader = XmlReader.Create (stream)) {
+                        while (reader.ReadToFollowing ("property", Protocol.EventSchema)) {
+                            reader.Read ();
+                            StateVariable state_variable;
+                            if (state_variables.TryGetValue (reader.Name, out state_variable)) {
+                                state_variable.Value = reader.ReadElementContentAsString ();
+                            } else {
+                                Log.Warning (string.Format (
+                                    "{0} published an event update to {1} which includes unknown state variable {2}.",
+                                    context.Request.RemoteEndPoint, context.Request.Url, reader.Name));
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.Exception (string.Format ("There was a problem processing an event update from {0} to {1}.",
+                    context.Request.RemoteEndPoint, context.Request.Url), e);
             }
             context.Response.Close ();
             listener.BeginGetContext (OnGotContext, null);
@@ -108,7 +144,7 @@ namespace Mono.Upnp.Internal
 
         void Subscribe ()
         {
-            var request = CreateRequest ();
+            var request = WebRequest.Create (url);
             request.Method = "SUBSCRIBE";
             request.Headers.Add ("USERAGENT", Protocol.UserAgent);
             request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
@@ -131,8 +167,7 @@ namespace Mono.Upnp.Internal
                     request.Abort ();
                     Stop ();
                     // TODO retry
-                    Log.Exception (new UpnpException (
-                        "Failed to subscribe or renew. The server did not respond in 30 seconds."));
+                    Log.Error ("Failed to subscribe or renew. The server did not respond in 30 seconds.");
                     //controller.Description.CheckDisposed ();
                 }
             }
@@ -192,7 +227,7 @@ namespace Mono.Upnp.Internal
         void Renew ()
         {
             lock (mutex) {
-                var request = CreateRequest ();
+                var request = WebRequest.Create (url);
                 request.Method = "SUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
                 request.Headers.Add ("TIMEOUT", "Second-1800");
@@ -205,7 +240,7 @@ namespace Mono.Upnp.Internal
         void Unsubscribe ()
         {
             lock (mutex) {
-                var request = CreateRequest ();
+                var request = WebRequest.Create (url);
                 request.Method = "UNSUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
                 request.BeginGetResponse (OnUnsubscribeResponse, request);

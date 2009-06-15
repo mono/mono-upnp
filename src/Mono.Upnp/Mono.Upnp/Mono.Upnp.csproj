@@ -101,7 +101,6 @@
     <Compile Include="Mono.Upnp.Control\ArgumentDirection.cs" />
     <Compile Include="Mono.Upnp.Internal\SoapEnvelope.cs" />
     <Compile Include="Mono.Upnp.Internal\SoapHeader.cs" />
-    <Compile Include="Mono.Upnp.Internal\UpnpClient.cs" />
     <Compile Include="Mono.Upnp.Internal\Arguments.cs" />
     <Compile Include="Mono.Upnp.Internal\ServiceControllerBuilder.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpActionAttribute.cs" />

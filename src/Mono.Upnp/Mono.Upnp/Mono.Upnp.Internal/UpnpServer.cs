@@ -44,7 +44,7 @@ namespace Mono.Upnp.Internal
         public virtual void Start ()
         {
             listener.Start ();
-            listener.BeginGetContext (OnGetContext, listener);
+            listener.BeginGetContext (OnGetContext, null);
         }
 
         void OnGetContext (IAsyncResult asyncResult)
@@ -53,13 +53,10 @@ namespace Mono.Upnp.Internal
             try {
                 HandleContext (context);
             } catch {
-            } finally {
-                try {
-                    context.Response.Close ();
-                } catch {
-                }
+                // TODO log
             }
-            listener.BeginGetContext (OnGetContext, listener);
+            context.Response.Close ();
+            listener.BeginGetContext (OnGetContext, null);
         }
 
         protected virtual void HandleContext (HttpListenerContext context)

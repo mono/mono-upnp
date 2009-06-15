@@ -163,6 +163,7 @@ namespace Mono.Upnp.Internal
                     Log.Exception (string.Format ("There was a problem publishing updates to subscription {0}.", subscriber.Sid), e);
                     
                     Interlocked.Increment (ref subscriber.ConnectFailures);
+                    
                     if (subscriber.ConnectFailures == 2) {
                         lock (subscription_mutex) {
                             if (subscribers.ContainsKey (subscriber.Sid)) {
@@ -191,7 +192,7 @@ namespace Mono.Upnp.Internal
             } else if (method == "UNSUBSCRIBE") {
                 Unsubscribe (context);
             } else {
-                Log.Error (string.Format (
+                Log.Warning (string.Format (
                     "A request from {0} to {1} uses an unsupported HTTP method: {2}.",
                     context.Request.RemoteEndPoint, context.Request.Url, method));
             }

@@ -60,6 +60,13 @@ namespace Mono.Upnp.Internal
             }
         }
         
+        public static void Warning (string message)
+        {
+            if (Enabled) {
+                Console.WriteLine ("Mono.Upnp Warning: {0}", message);
+            }
+        }
+        
         public static void Information (string message)
         {
             if (Enabled) {

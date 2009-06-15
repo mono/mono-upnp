@@ -54,8 +54,8 @@ namespace Mono.Upnp.Control
             
             actions = new CollectionMap<string, ServiceAction> ();
             state_variables = new CollectionMap<string, StateVariable> ();
-            control_client = new ControlClient (service.ControlUrl, deserializer.XmlDeserializer, service.Type.ToString ());
-            event_client = new EventClient (service.EventUrl, deserializer.XmlDeserializer);
+            control_client = new ControlClient (service.Type.ToString (), service.ControlUrl, deserializer.XmlDeserializer);
+            event_client = new EventClient (state_variables, service.EventUrl);
         }
         
         public ServiceController (IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
@@ -98,7 +98,7 @@ namespace Mono.Upnp.Control
             if (service.EventUrl == null) throw new ArgumentException ("The service has no EventUrl.", "service");
             
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
-            control_server = new ControlServer (Actions, service.Type.ToString (), serializer, service.ControlUrl);
+            control_server = new ControlServer (Actions, service.Type.ToString (), service.ControlUrl, serializer);
             event_server = new EventServer (StateVariables.Values, service.EventUrl);
         }
         
@@ -123,6 +123,16 @@ namespace Mono.Upnp.Control
             if (control_client == null) throw new InvalidOperationException ("The service controller was created to describe a local service and cannot be invoked across the network. Use the constructor which takes a Deserializer.");
             
             return control_client.Invoke (action.Name, arguments);
+        }
+        
+        internal void RefEvents ()
+        {
+            event_client.Ref ();
+        }
+        
+        internal void UnrefEvents ()
+        {
+            event_client.Unref ();
         }
         
         protected internal virtual void UpdateStateVariable (StateVariable stateVariable)

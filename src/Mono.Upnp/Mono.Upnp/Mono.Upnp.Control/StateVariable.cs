@@ -37,8 +37,10 @@ namespace Mono.Upnp.Control
     [XmlType ("stateVariable")]
     public class StateVariable : XmlAutomatable, IMappable<string>
     {
+        readonly LinkedList<EventHandler<StateVariableChangedArgs<string>>> value_changed = new LinkedList<EventHandler<StateVariableChangedArgs<string>>> ();
         ServiceController controller;
         IList<string> allowed_values;
+        string value;
         
         protected StateVariable ()
         {
@@ -147,6 +149,40 @@ namespace Mono.Upnp.Control
         [XmlElement ("allowedValueRange", OmitIfNull = true)]
         public virtual AllowedValueRange AllowedValueRange { get; protected set; }
         
+        public event EventHandler<StateVariableChangedArgs<string>> ValueChanged {
+            add {
+                if (value == null) {
+                    return;
+                }
+                value_changed.AddLast (value);
+                controller.RefEvents ();
+            }
+            remove {
+                if (value == null || value_changed.Count == 0) {
+                    return;
+                }
+                var node = value_changed.First;
+                do {
+                    if (node.Value == value) {
+                        value_changed.Remove (node);
+                        controller.UnrefEvents ();
+                        break;
+                    }
+                    node = node.Next;
+                } while (node != null);
+            }
+        }
+        
+        internal string Value {
+            get { return value; }
+            set {
+                this.value = value;
+                foreach (var handler in value_changed) {
+                    handler (this, new StateVariableChangedArgs<string> (value));
+                }
+            }
+        }
+        
         protected internal virtual void Initialize (ServiceController serviceController)
         {
             if (serviceController == null) throw new ArgumentNullException ("serviceController");
@@ -154,11 +190,9 @@ namespace Mono.Upnp.Control
             this.controller = serviceController;
         }
         
-        internal string Value { get; set; }
-        
         protected virtual void OnStateVariableUpdated (object sender, StateVariableChangedArgs<string> args)
         {
-            Value = args.NewValue;
+            value = args.NewValue;
             if (controller != null) {
                 controller.UpdateStateVariable (this);
             }

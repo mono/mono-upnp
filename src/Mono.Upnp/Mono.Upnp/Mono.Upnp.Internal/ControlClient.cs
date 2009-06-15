@@ -36,31 +36,44 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Internal
 {
-    sealed class ControlClient : UpnpClient
+    sealed class ControlClient
     {
-        readonly string service_type;
+        readonly static WeakReference static_serializer = new WeakReference (null);
         
-        public ControlClient (Uri url, XmlDeserializer deserializer, string serviceType)
-            : base (url, deserializer)
+        readonly string service_type;
+        readonly Uri url;
+        readonly XmlSerializer serializer;
+        readonly XmlDeserializer deserializer;
+        
+        public ControlClient (string serviceType, Uri url, XmlDeserializer deserializer)
         {
-            service_type = serviceType;
+            this.service_type = serviceType;
+            this.url = url;
+            this.deserializer = deserializer;
+            
+            if (static_serializer.IsAlive) {
+                this.serializer = (XmlSerializer)static_serializer.Target;
+            } else {
+                this.serializer = new XmlSerializer ();
+                static_serializer.Target = this.serializer;
+            }
         }
         
         public IMap<string, string> Invoke (string actionName, IDictionary<string, string> arguments)
         {
-            var request = CreateRequest ();
+            var request = (HttpWebRequest)WebRequest.Create (url);
             request.Method = "POST";
             request.ContentType = @"text/xml; charset=""utf-8""";
             request.UserAgent = Protocol.UserAgent;
             request.Headers.Add ("SOAPACTION", string.Format ("{0}#{1}", service_type, actionName));
             using (var stream = request.GetRequestStream ()) {
-                Serializer.Serialize (new SoapEnvelope<Arguments> (new Arguments (service_type, actionName, arguments)), stream);
+                serializer.Serialize (new SoapEnvelope<Arguments> (new Arguments (service_type, actionName, arguments)), stream);
             }
             using (var response = (HttpWebResponse)request.GetResponse ()) {
                 if (response.StatusCode == HttpStatusCode.OK) {
                     using (var reader = XmlReader.Create (response.GetResponseStream ())) {
                         reader.ReadToFollowing ("Envelope", Protocol.SoapEnvelopeSchema);
-                        var envelope = Deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
+                        var envelope = deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
                         return new Map<string, string> (envelope.Body.Values);
                     }
                 } else {
