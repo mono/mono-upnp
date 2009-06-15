@@ -28,5 +28,9 @@ namespace Mono.Upnp.Control.Tests
 {
     public class DummyStateVariableEventer : StateVariableEventer
     {
+        public void SetValue (string value)
+        {
+            OnStateVariableUpdated (value);
+        }
     }
 }

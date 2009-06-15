@@ -181,6 +181,7 @@ namespace Mono.Upnp.Internal
 
         protected override void HandleContext (HttpListenerContext context)
         {
+            base.HandleContext (context);
             var method = context.Request.HttpMethod.ToUpper ();
             if (method == "SUBSCRIBE") {
                 var callback = context.Request.Headers["CALLBACK"];

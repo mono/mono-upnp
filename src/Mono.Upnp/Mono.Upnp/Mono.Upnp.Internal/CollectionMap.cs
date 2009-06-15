@@ -43,6 +43,9 @@ namespace Mono.Upnp.Internal
         public void Add (TValue value)
         {
             CheckReadOnly ();
+            if (value == null) {
+                return;
+            }
             Dictionary.Add (value.Map (), value);
         }
         
@@ -55,11 +58,17 @@ namespace Mono.Upnp.Internal
         public bool Remove (TValue value)
         {
             CheckReadOnly ();
+            if (value == null) {
+                return false;
+            }
             return Dictionary.Remove (value.Map ());
         }
         
         public bool Contains (TValue value)
         {
+            if (value == null) {
+                return false;
+            }
             return Dictionary.ContainsKey (value.Map ());
         }
         

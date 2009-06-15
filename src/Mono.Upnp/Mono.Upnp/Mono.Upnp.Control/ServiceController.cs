@@ -104,6 +104,8 @@ namespace Mono.Upnp.Control
         
         protected internal virtual void Start ()
         {
+            if (scpd_server == null) throw new InvalidOperationException ("The service controller has not been initialized.");
+            
             scpd_server.Start ();
             control_server.Start ();
             event_server.Start ();
@@ -111,6 +113,8 @@ namespace Mono.Upnp.Control
         
         protected internal virtual void Stop ()
         {
+            if (scpd_server == null) throw new InvalidOperationException ("The service controller has not been initialized.");
+            
             scpd_server.Stop ();
             control_server.Stop ();
             event_server.Stop ();
@@ -139,9 +143,10 @@ namespace Mono.Upnp.Control
         {
             if (stateVariable == null) throw new ArgumentNullException ("stateVariable");
             if (!state_variables.ContainsKey (stateVariable.Name)) throw new ArgumentException ("The state variable does not belong to this service controller.", "stateVariable");
-            if (event_server == null) throw new InvalidOperationException ("The service controller has not been properly initialized. Did you forget to call the base implementation of Initialize?");
             
-            event_server.QueueUpdate (stateVariable);
+            if (event_server != null) {
+                event_server.QueueUpdate (stateVariable);
+            }
         }
         
         [XmlTypeDeserializer]

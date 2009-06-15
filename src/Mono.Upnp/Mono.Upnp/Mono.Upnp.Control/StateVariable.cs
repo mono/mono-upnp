@@ -192,7 +192,7 @@ namespace Mono.Upnp.Control
         
         protected virtual void OnStateVariableUpdated (object sender, StateVariableChangedArgs<string> args)
         {
-            value = args.NewValue;
+            Value = args.NewValue;
             if (controller != null) {
                 controller.UpdateStateVariable (this);
             }

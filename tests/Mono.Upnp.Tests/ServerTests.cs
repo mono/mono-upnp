@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Xml;
 
@@ -45,7 +46,54 @@ namespace Mono.Upnp.Tests
         readonly object mutex = new object ();
         readonly DummyDeserializer deserializer = new DummyDeserializer ();
         
+        [Test]
+        public void InitialUnicastEventTest ()
+        {
+            var eventer = new DummyStateVariableEventer ();
+            var root = CreateRoot (CreateServiceController (new StateVariable ("Foo", "string", eventer)));
+            eventer.SetValue ("bar");
+            
+            using (var server = new Server (root)) {
+                server.Start ();
+                var prefix = GeneratePrefix ();
+                using (var listener = new HttpListener ()) {
+                    listener.Prefixes.Add (prefix);
+                    listener.Start ();
+    //                listener.BeginGetContext (result => {
+    //                    lock (mutex) {
+    //                        var context = listener.EndGetContext (result);
+    //                        using (var reader = new StreamReader (context.Request.InputStream)) {
+    //                            var xml = reader.ReadToEnd ();
+    //                            Console.WriteLine (xml);
+    //                        }
+    //                        context.Response.Close ();
+    //                        Monitor.Pulse (mutex);
+    //                    }
+    //                }, null);
+                    var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/event/"));
+                    request.Method = "SUBSCRIBE";
+                    request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
+                    request.Headers.Add ("NT", "upnp:event");
+                    lock (mutex) {
+                        using (var response = (HttpWebResponse)request.GetResponse ()) {
+                            Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                            Assert.IsNotNull (response.Headers["SID"]);
+                            Assert.AreEqual ("Second-1800", response.Headers["TIMEOUT"]);
+                        }
+    //                    if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+    //                        Assert.Fail ("Event publishing timed out.");
+    //                    }
+                    }
+                }
+            }
+        }
+        
         static ServiceController CreateServiceController ()
+        {
+            return CreateServiceController (null);
+        }
+        
+        static ServiceController CreateServiceController (StateVariable stateVariable)
         {
             return new ServiceController (
                 new ServiceAction[] {
@@ -64,7 +112,8 @@ namespace Mono.Upnp.Tests
                 },
                 new StateVariable[] {
                     new StateVariable ("X_ARG_bar", "string"),
-                    new StateVariable ("X_ARG_result", "string")
+                    new StateVariable ("X_ARG_result", "string"),
+                    stateVariable
                 }
             );
         }
@@ -72,22 +121,7 @@ namespace Mono.Upnp.Tests
         [Test]
         public void ControlTest ()
         {
-            var root = new DummyRoot (
-                new DeviceSettings (
-                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
-                    "uuid:d1",
-                    "Mono.Upnp.Tests Device",
-                    "Mono Project",
-                    "Device") {
-                    Services = new Service[] {
-                        new Service (
-                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
-                            "urn:upnp-org:serviceId:testService1",
-                            CreateServiceController ()
-                        )
-                    }
-                }
-            );
+            var root = CreateRoot (CreateServiceController ());
             
             using (var server = new Server (root)) {
                 server.Start ();
@@ -111,12 +145,32 @@ namespace Mono.Upnp.Tests
             }
         }
         
-        Root CreateRoot ()
+        static Root CreateRoot (ServiceController controller)
+        {
+            return new DummyRoot (
+                new DeviceSettings (
+                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                    "uuid:d1",
+                    "Mono.Upnp.Tests Device",
+                    "Mono Project",
+                    "Device") {
+                    Services = new Service[] {
+                        new Service (
+                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            "urn:upnp-org:serviceId:testService1",
+                            controller
+                        )
+                    }
+                }
+            );
+        }
+        
+        static Root CreateRoot ()
         {
             return CreateRoot (null, null);
         }
         
-        Root CreateRoot (IEnumerable<Icon> icons1, IEnumerable<Icon> icons2)
+        static Root CreateRoot (IEnumerable<Icon> icons1, IEnumerable<Icon> icons2)
         {
             return new DummyRoot (
                 new DeviceSettings (
@@ -270,6 +324,20 @@ namespace Mono.Upnp.Tests
                     }
                 }
             }
+        }
+        
+        static readonly Random random = new Random ();
+                                
+        static string GeneratePrefix ()
+        {
+            foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
+                if (address.AddressFamily == AddressFamily.InterNetwork) {
+                    return string.Format (
+                        "http://{0}:{1}/mono-upnp-tests/event-subscriber/", address, random.Next (1024, 5000));
+                }
+            }
+            
+            return null;
         }
     }
 }

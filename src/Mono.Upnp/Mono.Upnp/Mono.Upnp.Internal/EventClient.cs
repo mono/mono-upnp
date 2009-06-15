@@ -103,7 +103,7 @@ namespace Mono.Upnp.Internal
         void StartListening ()
         {
             if (listener == null) {
-                listener = new HttpListener ();
+                listener = new HttpListener { IgnoreWriteExceptions = true };
                 listener.Prefixes.Add (prefix);
             }
             listener.Start ();
@@ -112,6 +112,9 @@ namespace Mono.Upnp.Internal
 
         void OnGotContext (IAsyncResult asyncResult)
         {
+            if (!listener.IsListening) {
+                return;
+            }
             var context = listener.EndGetContext (asyncResult);
             try {
                 using (var stream = context.Request.InputStream) {

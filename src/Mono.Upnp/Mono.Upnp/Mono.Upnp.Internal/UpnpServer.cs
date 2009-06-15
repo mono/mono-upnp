@@ -37,26 +37,29 @@ namespace Mono.Upnp.Internal
 
         protected UpnpServer (Uri url)
         {
-            listener = new HttpListener ();
+            listener = new HttpListener { IgnoreWriteExceptions = true };
             listener.Prefixes.Add (url.ToString ());
         }
 
         public virtual void Start ()
         {
-            listener.Start ();
-            listener.BeginGetContext (OnGetContext, null);
+            lock (listener) {
+                listener.Start ();
+                listener.BeginGetContext (OnGetContext, null);
+            }
         }
 
         void OnGetContext (IAsyncResult asyncResult)
         {
-            var context = listener.EndGetContext (asyncResult);
-            try {
+            lock (listener) {
+                if (!listener.IsListening) {
+                    return;
+                }
+                var context = listener.EndGetContext (asyncResult);
                 HandleContext (context);
-            } catch {
-                // TODO log
+                context.Response.Close ();
+                listener.BeginGetContext (OnGetContext, null);
             }
-            context.Response.Close ();
-            listener.BeginGetContext (OnGetContext, null);
         }
 
         protected virtual void HandleContext (HttpListenerContext context)
@@ -67,12 +70,16 @@ namespace Mono.Upnp.Internal
 
         public virtual void Stop ()
         {
-            listener.Stop ();
+            lock (listener) {
+                listener.Stop ();
+            }
         }
 
         public virtual void Dispose ()
         {
-            listener.Close ();
+            lock (listener) {
+                listener.Close ();
+            }
         }
     }
 }
