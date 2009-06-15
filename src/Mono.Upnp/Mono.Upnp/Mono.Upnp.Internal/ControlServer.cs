@@ -50,12 +50,7 @@ namespace Mono.Upnp.Internal
             this.actions = actions;
             this.service_type = serviceType;
             this.serializer = serializer;
-            if (static_deserializer.IsAlive) {
-                this.deserializer = (XmlDeserializer)static_deserializer.Target;
-            } else {
-                this.deserializer = new XmlDeserializer ();
-                static_deserializer.Target = this.deserializer;
-            }
+            this.deserializer = Helper.Get<XmlDeserializer> (static_deserializer);
         }
         
         protected override void HandleContext (HttpListenerContext context)
@@ -63,10 +58,33 @@ namespace Mono.Upnp.Internal
             base.HandleContext (context);
             
             context.Response.ContentType = @"text/xml; charset=""utf-8""";
+            
             using (var reader = XmlReader.Create (context.Request.InputStream)) {
-                reader.ReadToFollowing ("Envelope", Protocol.SoapEnvelopeSchema);
+                if (!reader.ReadToFollowing ("Envelope", Protocol.SoapEnvelopeSchema)) {
+                    Log.Error (string.Format (
+                        "A control request from {0} to {1} does not have a SOAP envelope.",
+                        context.Request.RemoteEndPoint, context.Request.Url));
+                    return;
+                }
+                
                 var requestEnvelope = deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
+                
+                if (requestEnvelope == null) {
+                    Log.Error (string.Format (
+                        "A control request from {0} to {1} does not have a valid SOAP envelope.",
+                        context.Request.RemoteEndPoint, context.Request.Url));
+                    return;
+                }
+                
                 var arguments = requestEnvelope.Body;
+                
+                if (arguments == null) {
+                    Log.Error (string.Format (
+                        "A control request from {0} to {1} does not have a valid argument list.",
+                        context.Request.RemoteEndPoint, context.Request.Url));
+                    return;
+                }
+                
                 ServiceAction action;
                 if (actions.TryGetValue (arguments.ActionName, out action)) {
                     try {

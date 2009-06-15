@@ -62,11 +62,7 @@ namespace Mono.Upnp
         
         void Initialize (Uri url)
         {
-            var serializer = (XmlSerializer)static_serializer.Target;
-            if (serializer == null) {
-                serializer = new XmlSerializer ();
-                static_serializer.Target = serializer;
-            }
+            var serializer = Helper.Get<XmlSerializer> (static_serializer);
             root.Initialize (serializer, url);
             description_server = new DataServer (serializer.GetBytes (root), url);
             Announce (url);

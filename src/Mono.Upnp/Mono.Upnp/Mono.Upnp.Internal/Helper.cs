@@ -36,6 +36,18 @@ namespace Mono.Upnp.Internal
 {
     static class Helper
     {
+        public static T Get<T> (WeakReference weakReference)
+            where T : new ()
+        {
+            if (weakReference.IsAlive) {
+                return (T)weakReference.Target;
+            } else {
+                var t = new T ();
+                weakReference.Target = t;
+                return t;
+            }
+        }
+        
         public static IList<T> MakeReadOnlyCopy<T> (IEnumerable<T> items)
         {
             var array = items as T[];
