@@ -254,5 +254,13 @@ namespace Mono.Upnp.Tests
                     "</u:Foo>" +
                 "</s:Body>" +
             "</s:Envelope>";
+        
+        public const string EventReport1 =
+           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<e:propertyset xmlns:e=""urn:schemas-upnp-org:event-1-0"">" +
+                "<e:property>" +
+                    "<Foo>bar</Foo>" +
+                "</e:property>" +
+            "</e:propertyset>";
     }
 }

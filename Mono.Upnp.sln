@@ -70,11 +70,18 @@ Global
 		$2.inheritsSet = MITX11License
 		$0.TextStylePolicy = $3
 		$3.FileWidth = 120
-		$3.TabWidth = 4
-		$3.TabsToSpaces = True
-		$3.NoTabsAfterNonTabs = False
-		$3.RemoveTrailingWhitespace = False
-		$3.EolMarker = Native
-		$0.CodeFormat = $4
+		$3.inheritsSet = VisualStudio
+		$3.inheritsScope = text/plain
+		$0.TextStylePolicy = $4
+		$4.inheritsSet = null
+		$4.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $5
+		$5.inheritsSet = Mono
+		$5.inheritsScope = text/x-csharp
+		$5.scope = text/x-csharp
+		$0.TextStylePolicy = $6
+		$6.inheritsSet = VisualStudio
+		$6.inheritsScope = text/plain
+		$6.scope = text/plain
 	EndGlobalSection
 EndGlobal

@@ -59,17 +59,16 @@ namespace Mono.Upnp.Tests
                 using (var listener = new HttpListener ()) {
                     listener.Prefixes.Add (prefix);
                     listener.Start ();
-    //                listener.BeginGetContext (result => {
-    //                    lock (mutex) {
-    //                        var context = listener.EndGetContext (result);
-    //                        using (var reader = new StreamReader (context.Request.InputStream)) {
-    //                            var xml = reader.ReadToEnd ();
-    //                            Console.WriteLine (xml);
-    //                        }
-    //                        context.Response.Close ();
-    //                        Monitor.Pulse (mutex);
-    //                    }
-    //                }, null);
+                    listener.BeginGetContext (result => {
+                        lock (mutex) {
+                            var context = listener.EndGetContext (result);
+                            using (var reader = new StreamReader (context.Request.InputStream)) {
+                                Assert.AreEqual (Xml.EventReport1, reader.ReadToEnd ());
+                            }
+                            context.Response.Close ();
+                            Monitor.Pulse (mutex);
+                        }
+                    }, null);
                     var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/event/"));
                     request.Method = "SUBSCRIBE";
                     request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
@@ -80,9 +79,9 @@ namespace Mono.Upnp.Tests
                             Assert.IsNotNull (response.Headers["SID"]);
                             Assert.AreEqual ("Second-1800", response.Headers["TIMEOUT"]);
                         }
-    //                    if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
-    //                        Assert.Fail ("Event publishing timed out.");
-    //                    }
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                            Assert.Fail ("Event publishing timed out.");
+                        }
                     }
                 }
             }

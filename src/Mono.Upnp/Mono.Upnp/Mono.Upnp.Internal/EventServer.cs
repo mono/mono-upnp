@@ -71,7 +71,7 @@ namespace Mono.Upnp.Internal
         public EventServer (IEnumerable<StateVariable> stateVariables, Uri url)
             : base (url)
         {
-            this.state_variables = stateVariables;
+            this.state_variables = GetEventedStateVariables (stateVariables);
         }
         
         public void QueueUpdate (StateVariable stateVariable)
@@ -146,7 +146,7 @@ namespace Mono.Upnp.Internal
                     writer.WriteStartDocument ();
                     writer.WriteStartElement ("e", "propertyset", Protocol.EventSchema);
                     foreach (var state_variable in stateVariables) {
-                        writer.WriteStartAttribute ("property", Protocol.EventSchema);
+                        writer.WriteStartElement ("property", Protocol.EventSchema);
                         writer.WriteElementString (state_variable.Name, state_variable.Value);
                         writer.WriteEndElement ();
                     }
@@ -155,15 +155,16 @@ namespace Mono.Upnp.Internal
             }
             
             request.BeginGetResponse (async => {
-                #pragma warning disable 0420
                 try {
                     request.EndGetResponse (async).Close ();
+                    #pragma warning disable 0420
                     Interlocked.Exchange (ref subscriber.ConnectFailures, 0);
+                    #pragma warning restore 0420
                 } catch (Exception e) {
                     Log.Exception (string.Format ("There was a problem publishing updates to subscription {0}.", subscriber.Sid), e);
-                    
+                    #pragma warning disable 0420
                     Interlocked.Increment (ref subscriber.ConnectFailures);
-                    
+                    #pragma warning restore 0420
                     if (subscriber.ConnectFailures == 2) {
                         lock (subscription_mutex) {
                             if (subscribers.ContainsKey (subscriber.Sid)) {
@@ -175,7 +176,6 @@ namespace Mono.Upnp.Internal
                         }
                     }
                 }
-                #pragma warning restore 0420
             }, null);
         }
 
@@ -331,6 +331,15 @@ namespace Mono.Upnp.Internal
             Log.Information (string.Format ("Subscription {0} expired and was removed.", state));
             
             return false;
+        }
+        
+        static IEnumerable<StateVariable> GetEventedStateVariables (IEnumerable<StateVariable> stateVariables)
+        {
+            foreach (var state_variable in stateVariables) {
+                if (state_variable.SendsEvents) {
+                    yield return state_variable;
+                }
+            }
         }
     }
 }
