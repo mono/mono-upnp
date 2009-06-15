@@ -1,0 +1,11 @@
+# ignore assemblies
+*.dll
+*.exe
+#ignore debug info
+*.pidb
+*.mdb
+#ignore project settings
+*.userprefs
+*.usertasks
+#ignore test results
+test-results/
