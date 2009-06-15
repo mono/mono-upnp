@@ -51,7 +51,7 @@ namespace Mono.Upnp.Tests
         {
             var eventer = new DummyStateVariableEventer ();
             var root = CreateRoot (CreateServiceController (new StateVariable ("Foo", "string", eventer)));
-            eventer.SetValue ("bar");
+            eventer.SetValue ("foo");
             
             using (var server = new Server (root)) {
                 server.Start ();
@@ -63,26 +63,124 @@ namespace Mono.Upnp.Tests
                         lock (mutex) {
                             var context = listener.EndGetContext (result);
                             using (var reader = new StreamReader (context.Request.InputStream)) {
-                                Assert.AreEqual (Xml.EventReport1, reader.ReadToEnd ());
+                                Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
                             }
                             context.Response.Close ();
                             Monitor.Pulse (mutex);
                         }
                     }, null);
-                    var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/event/"));
-                    request.Method = "SUBSCRIBE";
-                    request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
-                    request.Headers.Add ("NT", "upnp:event");
-                    lock (mutex) {
-                        using (var response = (HttpWebResponse)request.GetResponse ()) {
-                            Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
-                            Assert.IsNotNull (response.Headers["SID"]);
-                            Assert.AreEqual ("Second-1800", response.Headers["TIMEOUT"]);
+                    Subscribe (root, prefix);
+                }
+            }
+        }
+        
+        [Test]
+        public void SingleUpdateUnicastEventTest ()
+        {
+            var eventer1 = new DummyStateVariableEventer ();
+            var eventer2 = new DummyStateVariableEventer ();
+            var root = CreateRoot (CreateServiceController (
+                new StateVariable ("Foo", "string", eventer1),
+                new StateVariable ("Bar", "string", eventer2)
+            ));
+            eventer1.SetValue ("foo");
+            eventer2.SetValue ("bar");
+            
+            using (var server = new Server (root)) {
+                server.Start ();
+                var prefix = GeneratePrefix ();
+                using (var listener = new HttpListener ()) {
+                    listener.Prefixes.Add (prefix);
+                    listener.Start ();
+                    listener.BeginGetContext (result => {
+                        var context = listener.EndGetContext (result);
+                        using (var reader = new StreamReader (context.Request.InputStream)) {
+                            Assert.AreEqual (Xml.DoubleEventReport, reader.ReadToEnd ());
                         }
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
-                            Assert.Fail ("Event publishing timed out.");
+                        context.Response.Close ();
+                        listener.BeginGetContext (r => {
+                            lock (mutex) {
+                                var c = listener.EndGetContext (r);
+                                using (var reader = new StreamReader (c.Request.InputStream)) {
+                                    Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
+                                }
+                                c.Response.Close ();
+                                Monitor.Pulse (mutex);
+                            }
+                        }, null);
+                        eventer1.SetValue ("foo");
+                    }, null);
+                    Subscribe (root, prefix);
+                }
+            }
+        }
+        
+        [Test]
+        public void MultipleUpdateUnicastEventTest ()
+        {
+            var eventer1 = new DummyStateVariableEventer ();
+            var eventer2 = new DummyStateVariableEventer ();
+            var root = CreateRoot (CreateServiceController (
+                new StateVariable ("Foo", "string", eventer1),
+                new StateVariable ("Bar", "string", eventer2)
+            ));
+            eventer1.SetValue ("foo");
+            eventer2.SetValue ("bar");
+            
+            using (var server = new Server (root)) {
+                server.Start ();
+                var prefix = GeneratePrefix ();
+                using (var listener = new HttpListener ()) {
+                    listener.Prefixes.Add (prefix);
+                    listener.Start ();
+                    listener.BeginGetContext (result => {
+                        var context = listener.EndGetContext (result);
+                        using (var reader = new StreamReader (context.Request.InputStream)) {
+                            Assert.AreEqual (Xml.DoubleEventReport, reader.ReadToEnd ());
                         }
-                    }
+                        context.Response.Close ();
+                        listener.BeginGetContext (resp => {
+                            var con = listener.EndGetContext (resp);
+                            using (var reader = new StreamReader (con.Request.InputStream)) {
+                                Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
+                            }
+                            con.Response.Close ();
+                            listener.BeginGetContext (r => {
+                                lock (mutex) {
+                                    var c = listener.EndGetContext (r);
+                                    using (var reader = new StreamReader (c.Request.InputStream)) {
+                                        var xml = reader.ReadToEnd ();
+                                        Console.WriteLine (xml);
+                                        Assert.AreEqual (Xml.DoubleEventReport, xml);
+                                    }
+                                    c.Response.Close ();
+                                    Monitor.Pulse (mutex);
+                                }
+                            }, null);
+                            eventer1.SetValue ("foo");
+                            eventer2.SetValue ("bar");
+                        }, null);
+                        eventer1.SetValue ("foo");
+                    }, null);
+                    Subscribe (root, prefix);
+                }
+            }
+        }
+        
+        void Subscribe (Root root, string prefix)
+        {
+            var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/event/"));
+            request.Method = "SUBSCRIBE";
+            request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
+            request.Headers.Add ("NT", "upnp:event");
+            lock (mutex) {
+                using (var response = (HttpWebResponse)request.GetResponse ()) {
+                    Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                    Assert.IsNotNull (response.Headers["SID"]);
+                    Assert.AreEqual ("Second-1800", response.Headers["TIMEOUT"]);
+                }
+                if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                    Assert.Fail ("Event publishing timed out.");
                 }
             }
         }
@@ -93,6 +191,11 @@ namespace Mono.Upnp.Tests
         }
         
         static ServiceController CreateServiceController (StateVariable stateVariable)
+        {
+            return CreateServiceController (stateVariable, null);
+        }
+        
+        static ServiceController CreateServiceController (StateVariable stateVariable1, StateVariable stateVariable2)
         {
             return new ServiceController (
                 new ServiceAction[] {
@@ -112,7 +215,8 @@ namespace Mono.Upnp.Tests
                 new StateVariable[] {
                     new StateVariable ("X_ARG_bar", "string"),
                     new StateVariable ("X_ARG_result", "string"),
-                    stateVariable
+                    stateVariable1,
+                    stateVariable2
                 }
             );
         }

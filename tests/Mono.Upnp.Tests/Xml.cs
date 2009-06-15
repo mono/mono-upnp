@@ -255,11 +255,22 @@ namespace Mono.Upnp.Tests
                 "</s:Body>" +
             "</s:Envelope>";
         
-        public const string EventReport1 =
+        public const string SingleEventReport =
            @"<?xml version=""1.0"" encoding=""utf-8""?>" +
            @"<e:propertyset xmlns:e=""urn:schemas-upnp-org:event-1-0"">" +
                 "<e:property>" +
-                    "<Foo>bar</Foo>" +
+                    "<Foo>foo</Foo>" +
+                "</e:property>" +
+            "</e:propertyset>";
+        
+        public const string DoubleEventReport =
+           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<e:propertyset xmlns:e=""urn:schemas-upnp-org:event-1-0"">" +
+                "<e:property>" +
+                    "<Foo>foo</Foo>" +
+                "</e:property>" +
+                "<e:property>" +
+                    "<Bar>bar</Bar>" +
                 "</e:property>" +
             "</e:propertyset>";
     }

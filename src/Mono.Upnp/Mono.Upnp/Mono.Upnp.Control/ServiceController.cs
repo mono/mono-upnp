@@ -100,6 +100,10 @@ namespace Mono.Upnp.Control
             scpd_server = new DataServer (serializer.GetBytes (this), service.ScpdUrl);
             control_server = new ControlServer (Actions, service.Type.ToString (), service.ControlUrl, serializer);
             event_server = new EventServer (StateVariables.Values, service.EventUrl);
+            
+            foreach (var state_variable in state_variables.Values) {
+                state_variable.Initialize (this);
+            }
         }
         
         protected internal virtual void Start ()
@@ -139,14 +143,9 @@ namespace Mono.Upnp.Control
             event_client.Unref ();
         }
         
-        protected internal virtual void UpdateStateVariable (StateVariable stateVariable)
+        internal void UpdateStateVariable (StateVariable stateVariable)
         {
-            if (stateVariable == null) throw new ArgumentNullException ("stateVariable");
-            if (!state_variables.ContainsKey (stateVariable.Name)) throw new ArgumentException ("The state variable does not belong to this service controller.", "stateVariable");
-            
-            if (event_server != null) {
-                event_server.QueueUpdate (stateVariable);
-            }
+            event_server.QueueUpdate (stateVariable);
         }
         
         [XmlTypeDeserializer]

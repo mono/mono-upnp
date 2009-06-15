@@ -173,7 +173,7 @@ namespace Mono.Upnp.Control
             }
         }
         
-        internal string Value {
+        protected internal string Value {
             get { return value; }
             set {
                 this.value = value;

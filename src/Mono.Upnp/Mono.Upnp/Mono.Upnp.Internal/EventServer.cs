@@ -119,7 +119,7 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        public void PublishUpdates (IEnumerable<StateVariable> stateVariables)
+        void PublishUpdates (IEnumerable<StateVariable> stateVariables)
         {
             lock (subscription_mutex) {
                 foreach (var subscriber in subscribers.Values) {
