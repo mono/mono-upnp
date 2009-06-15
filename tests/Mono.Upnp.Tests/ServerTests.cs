@@ -185,6 +185,60 @@ namespace Mono.Upnp.Tests
             }
         }
         
+        [Test]
+        public void UnsubscribeUnicastEventTest ()
+        {
+            string sid = null;
+            var eventer = new DummyStateVariableEventer ();
+            var root = CreateRoot (CreateServiceController (new StateVariable ("Foo", "string", eventer)));
+            eventer.SetValue ("foo");
+            
+            using (var server = new Server (root)) {
+                server.Start ();
+                var prefix = GeneratePrefix ();
+                var url = new Uri (root.UrlBase, "service/0/event/");
+                using (var listener = new HttpListener ()) {
+                    listener.Prefixes.Add (prefix);
+                    listener.Start ();
+                    listener.BeginGetContext (result => {
+                        lock (mutex) {
+                            var context = listener.EndGetContext (result);
+                            using (var reader = new StreamReader (context.Request.InputStream)) {
+                                Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
+                            }
+                            context.Response.Close ();
+                            var unsub_request = WebRequest.Create (url);
+                            unsub_request.Method = "UNSUBSCRIBE";
+                            unsub_request.Headers.Add ("SID", sid);
+                            using (var response = (HttpWebResponse)unsub_request.GetResponse ()) {
+                                Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                            }
+                            listener.BeginGetContext (r => {
+                                lock (mutex) {
+                                    Monitor.Pulse (mutex);
+                                }
+                            }, null);
+                            eventer.SetValue ("foo");
+                        }
+                    }, null);
+                    var request = WebRequest.Create (url);
+                    request.Method = "SUBSCRIBE";
+                    request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
+                    request.Headers.Add ("NT", "upnp:event");
+                    lock (mutex) {
+                        using (var response = (HttpWebResponse)request.GetResponse ()) {
+                            Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                            Assert.IsNotNull (response.Headers["SID"]);
+                            sid = response.Headers["SID"];
+                        }
+                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                            Assert.Fail ("The event server sent updates to an unsubscribed client.");
+                        }
+                    }
+                }
+            }
+        }
+        
         static ServiceController CreateServiceController ()
         {
             return CreateServiceController (null);
