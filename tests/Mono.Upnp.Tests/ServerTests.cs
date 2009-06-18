@@ -433,7 +433,7 @@ namespace Mono.Upnp.Tests
             }
         }
                     
-        void AssertEquality (Uri url, int iconIndex, int iconValue)
+        static void AssertEquality (Uri url, int iconIndex, int iconValue)
         {
             var request = WebRequest.Create (new Uri (url, iconIndex.ToString ()));
             using (var response = (HttpWebResponse)request.GetResponse ()) {

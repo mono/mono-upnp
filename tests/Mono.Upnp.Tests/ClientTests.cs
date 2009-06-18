@@ -240,6 +240,93 @@ namespace Mono.Upnp.Tests
             }
         }
         
+        class EventTestClass
+        {
+            [UpnpStateVariable]
+            public event EventHandler<StateVariableChangedArgs<string>> FooChanged;
+            
+            string foo;
+            public string Foo {
+                get {
+                    return foo;
+                }
+                set {
+                    foo = value;
+                    if (FooChanged != null) {
+                        FooChanged (this, new StateVariableChangedArgs<string> (value));
+                    }
+                }
+            }
+        }
+        
+        [Test]
+        public void EventTest ()
+        {
+            var service = new EventTestClass ();
+            var root = new Root (
+                new DeviceSettings (
+                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                    "uuid:d1",
+                    "Mono.Upnp.Tests Device",
+                    "Mono Project",
+                    "Device") {
+                    Services = new Service [] {
+                        new Service<EventTestClass> (
+                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            "urn:upnp-org:serviceId:testService1",
+                            service
+                        )
+                    }
+                }
+            );
+            using (var server = new Server (root)) {
+                service.Foo = "Hello World!";
+                using (var client = new Client ()) {
+                    client.ServiceAdded += (sender, args) => {
+                        var controller = args.Service.GetService ().GetController ();
+                        var helper = new EventTestHelperClass (service, mutex);
+                        controller.StateVariables["FooChanged"].ValueChanged += helper.FirstEventHandler;
+                    };
+                    client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
+                    lock (mutex) {
+                        server.Start ();
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                            Assert.Fail ("The event timed out.");
+                        }
+                    }
+                }
+            }
+        }
+        
+        class EventTestHelperClass
+        {
+            readonly EventTestClass service;
+            readonly object mutex;
+            
+            public EventTestHelperClass (EventTestClass service, object mutex)
+            {
+                this.service = service;
+                this.mutex = mutex;
+            }
+        
+            public void FirstEventHandler (object sender, StateVariableChangedArgs<string> args)
+            {
+                Assert.AreEqual ("Hello World!", args.NewValue);
+                var state_variable = (StateVariable)sender;
+                state_variable.ValueChanged -= FirstEventHandler;
+                state_variable.ValueChanged += SecondEventHandler;
+                service.Foo = "Hello Universe!";
+            }
+            
+            public void SecondEventHandler (object sender, StateVariableChangedArgs<string> args)
+            {
+                Assert.AreEqual ("Hello Universe!", args.NewValue);
+                lock (mutex) {
+                    Monitor.Pulse (mutex);
+                }
+            }
+        }
+        
         static Root CreateRoot ()
         {
             return new DummyRoot (
