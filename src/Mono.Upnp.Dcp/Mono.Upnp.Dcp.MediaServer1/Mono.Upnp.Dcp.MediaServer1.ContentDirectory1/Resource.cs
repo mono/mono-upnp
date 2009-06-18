@@ -25,80 +25,96 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class Resource
+    [XmlType ("res", Schemas.DidlLiteSchema)]
+    public class Resource : XmlAutomatable
     {
-        readonly ulong? size;
-        readonly TimeSpan? duration;
-        readonly uint? bitrate;
-        readonly uint? sample_frequency;
-        readonly uint? bits_per_sample;
-        readonly uint? nr_audio_channels;
-        readonly Resolution? resolution;
-        readonly uint? color_depth;
-        readonly string protocol_info;
-        readonly string protection;
-        readonly Uri import_uri;
-        readonly Uri uri;
-        
-        internal Resource (XmlReader reader)
+        protected Resource ()
         {
-            ulong size;
-            TimeSpan duration;
-            Resolution resolution;
-            uint bitrate, sample_frequency, bits_per_sample, nr_audio_channels, color_depth;
-            
-            if (ulong.TryParse (reader["size"], out size))
-                this.size = size;
-            
-            if (TimeSpan.TryParse (reader["duration"], out duration)) // TODO our own parsing
-                this.duration = duration;
-            
-            if (uint.TryParse (reader["bitrate"], out bitrate))
-                this.bitrate = bitrate;
-            
-            if (uint.TryParse (reader["sampleFrequency"], out sample_frequency))
-                this.sample_frequency = sample_frequency;
-            
-            if (uint.TryParse (reader["bitsPerSecond"], out bits_per_sample))
-                this.bits_per_sample = bits_per_sample;
-            
-            if (uint.TryParse (reader["nrAudioChannels"], out nr_audio_channels))
-                this.nr_audio_channels = nr_audio_channels;
-            
-            // FIXME I shouldn't have to qualify this
-            if (Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Resolution.TryParse (reader["resolution"], out resolution))
-                this.resolution = resolution;
-            
-            if (uint.TryParse (reader["colorDepth"], out color_depth))
-                this.color_depth = color_depth;
-            
-            protocol_info = reader["protocolInfo"];
-            
-            protection = reader["protection"];
-            
-            var import_uri = reader["importUri"];
-            if (Uri.IsWellFormedUriString (import_uri, UriKind.Absolute)) {
-                this.import_uri = new Uri (import_uri);
-            }
-            
-            uri = new Uri (reader.ReadString ());
         }
         
-        public ulong? Size { get { return size; } }
-        public TimeSpan? Duration { get { return duration; } }
-        public uint? Bitrate { get { return bitrate; } }
-        public uint? SampleFrequency { get { return sample_frequency; } }
-        public uint? BitsPerSample { get { return bits_per_sample; } }
-        public uint? NrAudioChannels { get { return nr_audio_channels; } }
-        public Resolution? Resolution { get { return resolution; } }
-        public uint? ColorDepth { get { return color_depth; } }
-        public string ProtocolInfo { get { return protocol_info; } }
-        public string Protection { get { return protection; } }
-        public Uri ImportUri { get { return import_uri; } }
-        public Uri Uri { get { return uri; } }
+        public Resource (ResourceSettings settings)
+        {
+            if (settings == null) throw new ArgumentNullException ("settings");
+            
+            this.Uri = settings.Uri;
+            this.Size = settings.Size;
+            this.Duration = settings.Duration;
+            this.Bitrate = settings.Bitrate;
+            this.SampleFrequency = settings.SampleFrequency;
+            this.BitsPerSample = settings.BitsPerSample;
+            this.NrAudioChannels = settings.NrAudioChannels;
+            this.Resolution = settings.Resolution;
+            this.ColorDepth = settings.ColorDepth;
+            this.ProtocolInfo = settings.ProtocolInfo;
+            this.Protection = settings.Protection;
+            this.ImportUri = settings.ImportUri;
+        }
+        
+        
+        [XmlValue]
+        public virtual Uri Uri { get; protected set; }
+        
+        [XmlAttribute ("size", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual ulong? Size { get; protected set; }
+        
+        [XmlAttribute ("duration", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual TimeSpan? Duration { get; protected set; }
+
+        [XmlAttribute ("bitrate", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual uint? Bitrate { get; protected set; }
+
+        [XmlAttribute ("samplyFrequency", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual uint? SampleFrequency { get; protected set; }
+
+        [XmlAttribute ("bitsPerSample", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual uint? BitsPerSample { get; protected set; }
+
+        [XmlAttribute ("nrAudioChannels", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual uint? NrAudioChannels { get; protected set; }
+
+        [XmlAttribute ("resolution", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual Resolution? Resolution { get; protected set; }
+
+        [XmlAttribute ("colorDepth", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual uint? ColorDepth { get; protected set; }
+
+        [XmlAttribute ("protocolInfo", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual string ProtocolInfo { get; protected set; }
+
+        [XmlAttribute ("protection", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual string Protection { get; protected set; }
+
+        [XmlAttribute ("importUri", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public virtual Uri ImportUri { get; protected set; }
+        
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            context.AutoDeserialize (this);
+        }
+        
+        protected override void DeserializeAttribute (XmlDeserializationContext context)
+        {
+            context.AutoDeserializeAttribute (this);
+        }
+
+        protected override void DeserializeElement (XmlDeserializationContext context)
+        {
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
+        }
     }
 }

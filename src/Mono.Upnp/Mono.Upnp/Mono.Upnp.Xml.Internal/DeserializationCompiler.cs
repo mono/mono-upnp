@@ -114,6 +114,11 @@ namespace Mono.Upnp.Xml.Internal
             } else if (Type.IsEnum) {
                 var map = GetEnumMap (Type);
                 return context => map[context.Reader.ReadElementContentAsString ()];
+            } else if (Type.IsGenericType && Type.GetGenericTypeDefinition () == typeof (Nullable<>)) {
+                var type = Type.GetGenericArguments ()[0];
+                var deserializer = xml_deserializer.GetDeserializer (type);
+                var constructor = Type.GetConstructor (new Type [] { type });
+                return context => constructor.Invoke (new object[] { deserializer (context) });
             } else {
                 // TODO check for default ctor
                 if (typeof (IXmlDeserializable).IsAssignableFrom (Type)) {
@@ -380,7 +385,7 @@ namespace Mono.Upnp.Xml.Internal
             return (obj, context) => property.SetValue (obj, deserializer (context), null);
         }
         
-        Deserializer CreateAttributeDeserializer (Type type)
+        static Deserializer CreateAttributeDeserializer (Type type)
         {
             if (type == typeof (string)) {
                 return context => context.Reader.ReadContentAsString ();
@@ -403,6 +408,11 @@ namespace Mono.Upnp.Xml.Internal
             } else if (type.IsEnum) {
                 var map = GetEnumMap (type);
                 return context => map[context.Reader.ReadContentAsString ()];
+            }  else if (type.IsGenericType && type.GetGenericTypeDefinition () == typeof (Nullable<>)) {
+                var nullable_type = type.GetGenericArguments ()[0];
+                var deserializer = CreateAttributeDeserializer (nullable_type);
+                var constructor = type.GetConstructor (new Type [] { nullable_type });
+                return context => constructor.Invoke (new object[] { deserializer (context) });
             } else {
                 return context => context.Reader.ReadContentAs (type, null);
             }

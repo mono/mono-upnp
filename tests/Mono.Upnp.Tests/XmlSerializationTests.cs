@@ -682,5 +682,39 @@ namespace Mono.Upnp.Xml.Tests
                 @"<?xml version=""1.0"" encoding=""utf-8""?><FreeArrayItemTestClass><Foo>foo</Foo><Foo>bar</Foo><Foo>bat</Foo></FreeArrayItemTestClass>",
                 serializer.GetString (new FreeArrayItemTestClass { Foos = new string[] { "foo", "bar", "bat" } }));
         }
+        
+        class NullableOmitIfNullClass
+        {
+            [XmlElement (OmitIfNull = true)] public int? Foo { get; set; }
+        }
+        
+        [Test]
+        public void NullableNotNullTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><NullableOmitIfNullClass><Foo>42</Foo></NullableOmitIfNullClass>",
+                serializer.GetString (new NullableOmitIfNullClass { Foo = 42 }));
+        }
+        
+        [Test]
+        public void NullableOmitIfNullTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><NullableOmitIfNullClass />",
+                serializer.GetString (new NullableOmitIfNullClass ()));
+        }
+        
+        class NullableIncludeIfNullTestClass
+        {
+            [XmlElement] public int? Foo { get; set; }
+        }
+        
+        [Test]
+        public void NullableIncludeIfNullTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><NullableIncludeIfNullTestClass><Foo /></NullableIncludeIfNullTestClass>",
+                serializer.GetString (new NullableIncludeIfNullTestClass ()));
+        }
     }
 }

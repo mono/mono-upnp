@@ -26,22 +26,17 @@
 
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class Object
+    public class Object : XmlAutomatable
     {
-        readonly List<Resource> resource_list = new List<Resource> ();
-        readonly ReadOnlyCollection<Resource> resources;
-        bool has_class;
-        bool has_restricted;
-        bool verified;
+        readonly IList<Resource> resources;
         
         protected Object ()
         {
-            resources = resource_list.AsReadOnly ();
         }
         
         public Container GetParent ()
@@ -62,14 +57,36 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             get { return ContentDirectory.CheckIfObjectIsOutOfDate (this); }
         }
 
-        public string Id { get; private set; }
-        public string ParentId { get; private set; }
+        [XmlAttribute ("id", Schemas.DidlLiteSchema)]
+        public virtual string Id { get; protected set; }
+        
+        [XmlAttribute ("parentId", Schemas.DidlLiteSchema)]
+        public virtual string ParentId { get; protected set; }
+        
+        [XmlAttribute ("restricted", Schemas.DidlLiteSchema)]
+        public virtual bool IsRestricted { get; protected set; }
+        
+        public IEnumerable<Resource> Resources {
+            get { return resources; }
+        }
+        
+        [XmlArrayItem]
+        protected ICollection<Resource> ResourceCollection {
+            get { return resources; }
+        }
+        
+        [XmlElement ("title", Schemas.DublinCoreSchema)]
         public string Title { get; private set; }
+        
+        [XmlElement ("creator", Schemas.DublinCoreSchema)]
         public string Creator { get; private set; }
-        public ReadOnlyCollection<Resource> Resources { get { return resources; } }
+        
+        [XmlElement ("class", Schemas.UpnpSchema)]
         public Class Class { get; private set; }
-        public bool IsRestricted { get; private set; }
+        
+        [XmlElement ("writeStatus", Schemas.UpnpSchema, OmitIfNull = true)]
         public WriteStatus? WriteStatus { get; private set; }
+        
         internal ContentDirectory ContentDirectory { get; private set; }
         internal uint ParentUpdateId { get; set; }
         
@@ -77,135 +94,25 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             return string.Format("{0} ({1})", Id, Class.FullClassName);
         }
-
-        internal void Deserialize (ContentDirectory contentDirectory, XmlReader reader)
+        
+        protected override void DeserializeAttribute (XmlDeserializationContext context)
         {
-            ContentDirectory = contentDirectory;
-            DeserializeRootElement (reader);
-            Verify ();
+            context.AutoDeserializeAttribute (this);
         }
 
-        protected virtual void DeserializeRootElement (XmlReader reader)
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            Id = reader["id"];
-            ParentId = reader["parentID"];
-            bool restricted;
-            if (TryParseBool (reader["restricted"], out restricted)) {
-                IsRestricted = restricted;
-                has_restricted = true;
-            }
-            
-            while (ReadToNextElement (reader)) {
-                var property_reader = reader.ReadSubtree ();
-                property_reader.Read ();
-                try {
-                    DeserializePropertyElement (property_reader);
-                } catch (Exception) {
-                    // TODO log?
-                } finally {
-                    property_reader.Close ();
-                }
-            }
-        }
-        
-        protected virtual void DeserializePropertyElement (XmlReader reader)
-        {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.DidlLiteSchema) {
-                if (reader.LocalName == "res") {
-                    resource_list.Add (new Resource (reader));
-                } else {
-                    reader.Skip (); // This is a workaround for Mono bug 334752
-                }
-            } else if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "class":
-                    Class = new Class (reader);
-                    has_class = true;
-                    break;
-                case "writeStatus":
-                    // TODO parse here
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
-            } else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-                switch (reader.LocalName) {
-                case "title":
-                    Title = reader.ReadString ();
-                    break;
-                case "creator":
-                    Creator = reader.ReadString ();
-                    break;
-                default: // This is a workaround for Mono bug 334752
-                    reader.Skip ();
-                    break;
-                }
-            } else { // This is a workaround for Mono bug 334752
-                reader.Skip ();
-            }
+            context.AutoDeserializeElement (this);
         }
 
-        void Verify ()
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            VerifyDeserialization ();
-            if (!verified) {
-                throw new DeserializationException (
-                    "The deserialization has not been fully verified. Be sure to call base.VerifyDeserialization ().");
-            }
+            context.AutoSerializeObjectAndMembers (this);
         }
-        
-        protected virtual void VerifyDeserialization ()
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
-            if (Id == null)
-                throw new DeserializationException ("The object does not have an ID.");
-            if (ParentId == null)
-                throw new DeserializationException (string.Format ("The object {0} does not have a parent ID.", Id));
-            if (Title == null)
-                throw new DeserializationException (string.Format ("The object {0} does not have a title.", Id));
-            if (!has_class)
-                throw new DeserializationException (string.Format ("The object {0} does not have a class.", Id));
-            if (!has_restricted)
-                throw new DeserializationException (string.Format ("The object {0} does not have a restricted value.", Id));
-            verified = true;
-        }
-        
-        static bool ReadToNextElement (XmlReader reader)
-        {
-            while (reader.Read ()) {
-                if (reader.NodeType == XmlNodeType.Element) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        
-        protected static bool ParseBool (string value)
-        {
-            if (value == "0") {
-                return false;
-            } else if (value == "1") {
-                return true;
-            } else {
-                return bool.Parse (value);
-            }
-        }
-        
-        protected static bool TryParseBool (string value, out bool result)
-        {
-            if (value == "0") {
-                result = false;
-                return true;
-            } else if (value == "1") {
-                result = true;
-                return true;
-            } else {
-                return bool.TryParse (value, out result);
-            }
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

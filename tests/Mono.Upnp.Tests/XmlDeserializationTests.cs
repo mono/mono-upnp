@@ -794,5 +794,29 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual ("bar", deserialized_object.Foos[1]);
             Assert.AreEqual ("bat", deserialized_object.Foos[2]);
         }
+        
+        class NullableElementTestClass
+        {
+            [XmlElement] public int? Foo { get; set; }
+        }
+        
+        [Test]
+        public void NullableElementTest ()
+        {
+            var deserialized_object = Deserialize<NullableElementTestClass> (@"<Test><Foo>42</Foo></Test>");
+            Assert.AreEqual (42, deserialized_object.Foo);
+        }
+        
+        class NullableAttributeTestClass
+        {
+            [XmlAttribute] public int? Foo { get; set; }
+        }
+        
+        [Test]
+        public void NullableAttributeTest ()
+        {
+            var deserialized_object = Deserialize<NullableAttributeTestClass> (@"<Test Foo=""42"" />");
+            Assert.AreEqual (42, deserialized_object.Foo);
+        }
     }
 }

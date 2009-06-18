@@ -91,7 +91,7 @@ namespace Mono.Upnp
         }
         
         [XmlArray ("iconList")]
-        protected virtual ICollection<Icon> IconList {
+        protected virtual ICollection<Icon> IconCollection {
             get { return icons; }
         }
         
@@ -100,7 +100,7 @@ namespace Mono.Upnp
         }
         
         [XmlArray ("serviceList")]
-        protected virtual ICollection<Service> ServiceList {
+        protected virtual ICollection<Service> ServiceCollection {
             get { return services; }
         }
         
@@ -109,7 +109,7 @@ namespace Mono.Upnp
         }
         
         [XmlArray ("deviceList", OmitIfEmpty = true)]
-        protected virtual ICollection<Device> DeviceList {
+        protected virtual ICollection<Device> DeviceCollection {
             get { return devices; }
         }
         

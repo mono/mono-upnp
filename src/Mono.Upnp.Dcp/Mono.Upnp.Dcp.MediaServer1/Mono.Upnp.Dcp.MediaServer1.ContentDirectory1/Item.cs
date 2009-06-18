@@ -25,13 +25,17 @@
 // THE SOFTWARE.
 
 using System;
-﻿using System.Xml;
+
+﻿using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
+    [XmlType ("item", Schemas.DidlLiteSchema)]
     public class Item : Object
     {
-        public string RefId { get; private set; }
+        [XmlAttribute ("refID", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        public string RefId { get; set; }
+        
         public bool IsReference { get { return RefId != null; } }
         
         public Item GetReferedObject ()
@@ -42,13 +46,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return ContentDirectory.GetObject<Item> (RefId);
         }
         
-        protected override void DeserializeRootElement (XmlReader reader)
+        protected override void DeserializeAttribute (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            RefId = reader["refID"];
-            
-            base.DeserializeRootElement (reader);
+            context.AutoDeserializeAttribute (this);
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

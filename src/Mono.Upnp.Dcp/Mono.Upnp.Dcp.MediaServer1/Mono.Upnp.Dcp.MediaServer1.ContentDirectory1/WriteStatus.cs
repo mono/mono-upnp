@@ -24,14 +24,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 ﻿
+using Mono.Upnp.Xml;
+
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public enum WriteStatus
     {
-        Writeable,
-        Protected,
-        NotWritable,
-        Unknown,
-        Mixed
+        [XmlEnum ("WRITABLE")] Writeable,
+        [XmlEnum ("PROTECTED")] Protected,
+        [XmlEnum ("NOT_WRITABLE")] NotWritable,
+        [XmlEnum ("UNKNOWN")] Unknown,
+        [XmlEnum ("MIXED")] Mixed
     }
 }

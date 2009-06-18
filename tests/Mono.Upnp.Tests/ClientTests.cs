@@ -259,6 +259,35 @@ namespace Mono.Upnp.Tests
             }
         }
         
+        class EventTestHelperClass
+        {
+            readonly EventTestClass service;
+            readonly object mutex;
+            
+            public EventTestHelperClass (EventTestClass service, object mutex)
+            {
+                this.service = service;
+                this.mutex = mutex;
+            }
+        
+            public void FirstEventHandler (object sender, StateVariableChangedArgs<string> args)
+            {
+                Assert.AreEqual ("Hello World!", args.NewValue);
+                var state_variable = (StateVariable)sender;
+                state_variable.ValueChanged -= FirstEventHandler;
+                state_variable.ValueChanged += SecondEventHandler;
+                service.Foo = "Hello Universe!";
+            }
+            
+            public void SecondEventHandler (object sender, StateVariableChangedArgs<string> args)
+            {
+                Assert.AreEqual ("Hello Universe!", args.NewValue);
+                lock (mutex) {
+                    Monitor.Pulse (mutex);
+                }
+            }
+        }
+        
         [Test]
         public void EventTest ()
         {
@@ -294,35 +323,6 @@ namespace Mono.Upnp.Tests
                             Assert.Fail ("The event timed out.");
                         }
                     }
-                }
-            }
-        }
-        
-        class EventTestHelperClass
-        {
-            readonly EventTestClass service;
-            readonly object mutex;
-            
-            public EventTestHelperClass (EventTestClass service, object mutex)
-            {
-                this.service = service;
-                this.mutex = mutex;
-            }
-        
-            public void FirstEventHandler (object sender, StateVariableChangedArgs<string> args)
-            {
-                Assert.AreEqual ("Hello World!", args.NewValue);
-                var state_variable = (StateVariable)sender;
-                state_variable.ValueChanged -= FirstEventHandler;
-                state_variable.ValueChanged += SecondEventHandler;
-                service.Foo = "Hello Universe!";
-            }
-            
-            public void SecondEventHandler (object sender, StateVariableChangedArgs<string> args)
-            {
-                Assert.AreEqual ("Hello Universe!", args.NewValue);
-                lock (mutex) {
-                    Monitor.Pulse (mutex);
                 }
             }
         }

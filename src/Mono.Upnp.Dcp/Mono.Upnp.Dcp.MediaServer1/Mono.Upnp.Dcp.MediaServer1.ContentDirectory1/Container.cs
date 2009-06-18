@@ -26,14 +26,14 @@
 
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
+    [XmlType ("container", Schemas.DidlLiteSchema)]
     public class Container : Object
     {
         readonly List<ClassReference> search_class_list = new List<ClassReference> ();
