@@ -42,7 +42,7 @@ namespace Mono.Upnp
     public class Server : IDisposable
     {
         static WeakReference static_serializer = new WeakReference (null);
-        readonly object mutex = new object ();
+        
         DataServer description_server;
         SsdpServer ssdp_server;
         Root root;
@@ -72,31 +72,27 @@ namespace Mono.Upnp
 
         public void Start ()
         {
-            lock (mutex) {
-                CheckDisposed ();
-                if (Started) throw new InvalidOperationException ("The server is already started.");
+            CheckDisposed ();
+            if (Started) throw new InvalidOperationException ("The server is already started.");
 
-                root.Start ();
-                description_server.Start ();
-                ssdp_server.Start ();
-                Started = true;
-            }
+            root.Start ();
+            description_server.Start ();
+            ssdp_server.Start ();
+            Started = true;
         }
 
         public void Stop ()
         {
-            lock (mutex) {
-                CheckDisposed ();
-                
-                if (!Started) {
-                    return;
-                }
-                
-                ssdp_server.Stop ();
-                root.Stop ();
-                description_server.Stop ();
-                Started = false;
+            CheckDisposed ();
+            
+            if (!Started) {
+                return;
             }
+            
+            ssdp_server.Stop ();
+            root.Stop ();
+            description_server.Stop ();
+            Started = false;
         }
 
         void Announce (Uri url)
@@ -161,11 +157,9 @@ namespace Mono.Upnp
 
         public void Dispose ()
         {
-            lock (mutex) {
-                if (root != null) {
-                    Dispose (true);
-                    GC.SuppressFinalize (this);
-                }
+            if (root != null) {
+                Dispose (true);
+                GC.SuppressFinalize (this);
             }
         }
 
