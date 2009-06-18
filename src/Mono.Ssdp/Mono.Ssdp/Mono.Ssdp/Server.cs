@@ -46,6 +46,10 @@ namespace Mono.Ssdp
         readonly Dictionary<string, Announcer> announcers;
 
         public bool Started { get; private set; }
+        
+        public bool IsDisposed {
+            get { return disposed; }
+        }
 
         readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
         internal TimeoutDispatcher Dispatcher {

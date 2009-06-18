@@ -39,7 +39,6 @@ namespace Mono.Ssdp
     {
         static readonly Random random = new Random ();
 
-        bool disposed;
         readonly object mutex = new object ();
 
         public string Location { get; set; }
@@ -73,6 +72,10 @@ namespace Mono.Ssdp
         }
 
         public bool Started { get; private set; }
+        
+        public bool IsDisposed {
+            get { return server.IsDisposed; }
+        }
 
         internal Announcer (Server server, string name, string type, string location)
         {
@@ -181,7 +184,7 @@ namespace Mono.Ssdp
 
         void CheckDisposed ()
         {
-            if (disposed) {
+            if (IsDisposed) {
                 throw new ObjectDisposedException ("Announcer has been Disposed");
             }
         }
