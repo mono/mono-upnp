@@ -36,9 +36,10 @@ namespace Mono.Upnp.Internal
         readonly T header;
         readonly bool must_understand;
         
-        public SoapHeader (T header)
+        public SoapHeader (T header, bool mustUnderstand)
         {
             this.header = header;
+            this.must_understand = mustUnderstand;
         }
         
         [XmlAttribute ("mustUnderstand")]
@@ -48,5 +49,10 @@ namespace Mono.Upnp.Internal
         
         [XmlAttribute ("actor")]
         public Uri Actor { get; private set; }
+        
+        [XmlValue]
+        public T Header {
+            get { return header; }
+        }
     }
 }

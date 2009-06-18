@@ -36,27 +36,27 @@ namespace Mono.Ssdp.Tests
     [TestFixture]
     public class ServerTests
     {
-        const string address = "239.255.255.250";
-        static readonly IPAddress ipaddress = IPAddress.Parse (address);
-        static readonly IPEndPoint endpoint = new IPEndPoint (ipaddress, 1900);
-        
-        readonly object mutex = new object ();
-        
-        static Socket CreateMulticastSocket ()
-        {
-            var socket = CreateSocket ();
-            socket.SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
-            socket.SetSocketOption (SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 4);
-            socket.SetSocketOption (SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption (ipaddress, 0));
-            return socket;
-        }
-        
-        static Socket CreateSocket ()
-        {
-            var socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            socket.SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            return socket;
-        }
+//        const string address = "239.255.255.250";
+//        static readonly IPAddress ipaddress = IPAddress.Parse (address);
+//        static readonly IPEndPoint endpoint = new IPEndPoint (ipaddress, 1900);
+//        
+//        readonly object mutex = new object ();
+//        
+//        static Socket CreateMulticastSocket ()
+//        {
+//            var socket = CreateSocket ();
+//            socket.SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
+//            socket.SetSocketOption (SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 4);
+//            socket.SetSocketOption (SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption (ipaddress, 0));
+//            return socket;
+//        }
+//        
+//        static Socket CreateSocket ()
+//        {
+//            var socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+//            socket.SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+//            return socket;
+//        }
         
         [Test]
         public void AnnouncementTest ()

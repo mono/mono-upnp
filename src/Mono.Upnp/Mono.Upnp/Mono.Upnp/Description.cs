@@ -62,6 +62,11 @@ namespace Mono.Upnp
             get { return deserializer != null ? deserializer.IsDisposed : is_disposed; }
         }
         
+        internal virtual void Dispose ()
+        {
+            is_disposed = true;
+        }
+        
         event EventHandler<DisposedEventArgs> disposed;
         
         public event EventHandler<DisposedEventArgs> Disposed {

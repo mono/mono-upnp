@@ -17,8 +17,9 @@
     <OutputPath>.</OutputPath>
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>3</WarningLevel>
+    <WarningLevel>4</WarningLevel>
     <AssemblyKeyFile>mono-upnp.snk</AssemblyKeyFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -27,6 +28,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AssemblyKeyFile>mono-upnp.snk</AssemblyKeyFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
