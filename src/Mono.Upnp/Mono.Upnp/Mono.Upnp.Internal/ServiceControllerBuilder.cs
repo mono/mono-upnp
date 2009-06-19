@@ -121,14 +121,28 @@ namespace Mono.Upnp.Internal
             if (parameterInfo.ParameterType == typeof (void)) {
                 return null;
             }
-            var attributes = parameterInfo.GetCustomAttributes (typeof (UpnpArgumentAttribute), false);
-            var attribute = attributes.Length != 0 ? (UpnpArgumentAttribute)attributes[0] : null;
-            var name = attribute != null && !string.IsNullOrEmpty (attribute.Name) ? attribute.Name : (string.IsNullOrEmpty (parameterInfo.Name) ? "result" : parameterInfo.Name);
+            
+            UpnpArgumentAttribute argument_attribute = null;
+            UpnpReturnValueAttribute return_value_attribute = null;
+            foreach (var custom_attribute in parameterInfo.GetCustomAttributes (false)) {
+                var argument = custom_attribute as UpnpArgumentAttribute;
+                if (argument != null) {
+                    argument_attribute = argument;
+                    continue;
+                }
+                
+                var return_value = custom_attribute as UpnpReturnValueAttribute;
+                if (return_value != null) {
+                    return_value_attribute = return_value;
+                }
+            }
+            var name = argument_attribute != null && !string.IsNullOrEmpty (argument_attribute.Name) ? argument_attribute.Name : (string.IsNullOrEmpty (parameterInfo.Name) ? "result" : parameterInfo.Name);
             var related_state_variable = BuildRelatedStateVariable (parameterInfo, actionName, name, stateVariables);
             var direction = parameterInfo.IsRetval || parameterInfo.ParameterType.IsByRef ? ArgumentDirection.Out : ArgumentDirection.In;
+            var is_return_value = parameterInfo.IsRetval ? return_value_attribute == null || return_value_attribute.IsReturnValue : false;
             return new ArgumentInfo {
                 ParameterInfo = parameterInfo,
-                Argument = new Argument (name, related_state_variable.StateVariable.Name, direction, parameterInfo.IsRetval)
+                Argument = new Argument (name, related_state_variable.StateVariable.Name, direction, is_return_value)
             };
         }
         

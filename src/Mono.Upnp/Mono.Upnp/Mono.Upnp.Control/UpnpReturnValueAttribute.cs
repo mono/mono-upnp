@@ -1,5 +1,5 @@
 // 
-// XmlSerializable.cs
+// UpnpReturnValueAttribute.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,39 +24,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.Xml
+using System;
+
+namespace Mono.Upnp.Control
 {
-    public abstract class XmlSerializable : IXmlSerializable
+    [AttributeUsage (AttributeTargets.ReturnValue)]
+    public sealed class UpnpReturnValueAttribute : Attribute
     {
-        void IXmlSerializable.SerializeSelfAndMembers (XmlSerializationContext context)
+        readonly bool is_return_value;
+        
+        public UpnpReturnValueAttribute (bool isReturnValue)
         {
-            SerializeSelfAndMembers (context);
+            this.is_return_value = isReturnValue;
         }
         
-        void IXmlSerializable.SerializeMembersOnly (XmlSerializationContext context)
-        {
-            SerializeMembersOnly (context);
+        public bool IsReturnValue {
+            get { return is_return_value; }
         }
-        
-        protected abstract void SerializeSelfAndMembers (XmlSerializationContext context);
-        
-        protected abstract void SerializeMembersOnly (XmlSerializationContext context);
-    }
-    
-    public abstract class XmlSerializable<TContext> : IXmlSerializable<TContext>
-    {
-        void IXmlSerializable<TContext>.SerializeSelfAndMembers (XmlSerializationContext<TContext> context)
-        {
-            SerializeSelfAndMembers (context);
-        }
-        
-        void IXmlSerializable<TContext>.SerializeMembersOnly (XmlSerializationContext<TContext> context)
-        {
-            SerializeMembersOnly (context);
-        }
-        
-        protected abstract void SerializeSelfAndMembers (XmlSerializationContext<TContext> context);
-        
-        protected abstract void SerializeMembersOnly (XmlSerializationContext<TContext> context);
     }
 }

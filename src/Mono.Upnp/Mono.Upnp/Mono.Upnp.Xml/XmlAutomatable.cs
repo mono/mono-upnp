@@ -42,4 +42,21 @@ namespace Mono.Upnp.Xml
         
         protected abstract void SerializeMembersOnly (XmlSerializationContext context);
     }
+    
+    public abstract class XmlAutomatable<TContext> : XmlDeserializable, IXmlSerializable<TContext>
+    {
+        void IXmlSerializable<TContext>.SerializeSelfAndMembers (XmlSerializationContext<TContext> context)
+        {
+            SerializeSelfAndMembers (context);
+        }
+        
+        void IXmlSerializable<TContext>.SerializeMembersOnly (XmlSerializationContext<TContext> context)
+        {
+            SerializeMembersOnly (context);
+        }
+        
+        protected abstract void SerializeSelfAndMembers (XmlSerializationContext<TContext> context);
+        
+        protected abstract void SerializeMembersOnly (XmlSerializationContext<TContext> context);
+    }
 }

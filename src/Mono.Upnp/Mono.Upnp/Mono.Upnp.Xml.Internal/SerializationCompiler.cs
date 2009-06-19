@@ -32,28 +32,30 @@ using System.Text;
 
 namespace Mono.Upnp.Xml.Internal
 {
-    class SerializationCompiler : Compiler
+    class SerializationCompiler<TContext> : Compiler
     {
-        readonly XmlSerializer xml_serializer;
-        readonly SerializationInfo info;
+        readonly XmlSerializer<TContext> xml_serializer;
+        readonly SerializationInfo<TContext> info;
         
-        public SerializationCompiler (XmlSerializer xmlSerializer, SerializationInfo info, Type type)
+        public SerializationCompiler (XmlSerializer<TContext> xmlSerializer, SerializationInfo<TContext> info, Type type)
             : base (type)
         {
             this.xml_serializer = xmlSerializer;
             this.info = info;
         }
         
-        public Serializer CreateTypeSerializer ()
+        public Serializer<TContext> CreateTypeSerializer ()
         {
-            if (typeof (IXmlSerializable).IsAssignableFrom (Type)) {
+            if (typeof (IXmlSerializable<TContext>).IsAssignableFrom (Type)) {
+                return (obj, context) => ((IXmlSerializable<TContext>)obj).SerializeSelfAndMembers (context);
+            } else if (typeof (IXmlSerializable).IsAssignableFrom (Type)) {
                 return (obj, context) => ((IXmlSerializable)obj).SerializeSelfAndMembers (context);
             } else {
                 return info.TypeAutoSerializer;
             }
         }
         
-        public Serializer CreateTypeAutoSerializer ()
+        public Serializer<TContext> CreateTypeAutoSerializer ()
         {
             var name = Type.Name;
             string @namespace = null;
@@ -99,9 +101,11 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        public Serializer CreateMemberSerializer ()
+        public Serializer<TContext> CreateMemberSerializer ()
         {
-            if (typeof (IXmlSerializable).IsAssignableFrom (Type)) {
+            if (typeof (IXmlSerializable<TContext>).IsAssignableFrom (Type)) {
+                return (obj, context) => ((IXmlSerializable<TContext>)obj).SerializeMembersOnly (context);
+            } else if (typeof (IXmlSerializable).IsAssignableFrom (Type)) {
                 return (obj, context) => ((IXmlSerializable)obj).SerializeMembersOnly (context);
             } else if (Type.IsEnum) {
                 var map = GetEnumMap (Type);
@@ -111,10 +115,10 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        public Serializer CreateMemberAutoSerializer ()
+        public Serializer<TContext> CreateMemberAutoSerializer ()
         {
-            var attribute_serializers = new List<Serializer>();
-            var element_serializers = new List<Serializer> ();
+            var attribute_serializers = new List<Serializer<TContext>>();
+            var element_serializers = new List<Serializer<TContext>> ();
             
             foreach (var property in Properties) {
                 XmlAttributeAttribute attribute_attribute = null;
@@ -215,12 +219,12 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        static Serializer CreateSerializer (PropertyInfo property, Serializer serializer)
+        static Serializer<TContext> CreateSerializer (PropertyInfo property, Serializer<TContext> serializer)
         {
             return (obj, context) => serializer (property.GetValue (obj, null), context);
         }
         
-        static Serializer CreateSerializer (Serializer serializer, bool omitIfNull)
+        static Serializer<TContext> CreateSerializer (Serializer<TContext> serializer, bool omitIfNull)
         {
             if (omitIfNull) {
                 return (obj, writer) => {
@@ -233,12 +237,12 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        static Serializer CreateSerializer (PropertyInfo property, XmlAttributeAttribute attributeAttribute)
+        static Serializer<TContext> CreateSerializer (PropertyInfo property, XmlAttributeAttribute attributeAttribute)
         {
             return CreateSerializer (CreateSerializerCore (property, attributeAttribute), attributeAttribute.OmitIfNull);
         }
         
-        static Serializer CreateSerializerCore (PropertyInfo property, XmlAttributeAttribute attributeAttribute)
+        static Serializer<TContext> CreateSerializerCore (PropertyInfo property, XmlAttributeAttribute attributeAttribute)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -258,12 +262,12 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        Serializer CreateSerializer (PropertyInfo property, XmlElementAttribute elementAttribute)
+        Serializer<TContext> CreateSerializer (PropertyInfo property, XmlElementAttribute elementAttribute)
         {
             return CreateSerializer (CreateSerializerCore (property, elementAttribute), elementAttribute.OmitIfNull);
         }
         
-        Serializer CreateSerializerCore (PropertyInfo property, XmlElementAttribute elementAttribute)
+        Serializer<TContext> CreateSerializerCore (PropertyInfo property, XmlElementAttribute elementAttribute)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -279,12 +283,12 @@ namespace Mono.Upnp.Xml.Internal
             };
         }
         
-        Serializer CreateSerializer (PropertyInfo property, XmlArrayAttribute arrayAttribute, XmlArrayItemAttribute arrayItemAttribute)
+        Serializer<TContext> CreateSerializer (PropertyInfo property, XmlArrayAttribute arrayAttribute, XmlArrayItemAttribute arrayItemAttribute)
         {
             return CreateSerializer (CreateSerializerCore (property, arrayAttribute, arrayItemAttribute), arrayAttribute.OmitIfNull);
         }
         
-        Serializer CreateSerializerCore (PropertyInfo property, XmlArrayAttribute arrayAttribute, XmlArrayItemAttribute arrayItemAttribute)
+        Serializer<TContext> CreateSerializerCore (PropertyInfo property, XmlArrayAttribute arrayAttribute, XmlArrayItemAttribute arrayItemAttribute)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -324,7 +328,7 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        Serializer CreateSerializer (Type type, XmlArrayItemAttribute arrayItemAttribute)
+        Serializer<TContext> CreateSerializer (Type type, XmlArrayItemAttribute arrayItemAttribute)
         {
             if (arrayItemAttribute == null || string.IsNullOrEmpty (arrayItemAttribute.Name)) {
                 return xml_serializer.GetInfo (type).TypeSerializer;
@@ -341,7 +345,7 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        Serializer CreateSerializer (PropertyInfo property, XmlArrayItemAttribute arrayItemAttribute)
+        Serializer<TContext> CreateSerializer (PropertyInfo property, XmlArrayItemAttribute arrayItemAttribute)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -389,7 +393,7 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        static Serializer CreateSerializer (PropertyInfo property, XmlFlagAttribute flagAttribute)
+        static Serializer<TContext> CreateSerializer (PropertyInfo property, XmlFlagAttribute flagAttribute)
         {
             if (property.PropertyType != typeof (bool)) {
                 // TODO throw
@@ -405,7 +409,7 @@ namespace Mono.Upnp.Xml.Internal
             };
         }
         
-        static Serializer CreateSerializer (PropertyInfo property)
+        static Serializer<TContext> CreateSerializer (PropertyInfo property)
         {
             return (obj, context) => {
                 if (obj != null) {

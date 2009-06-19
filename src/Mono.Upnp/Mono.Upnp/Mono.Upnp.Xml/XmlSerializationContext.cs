@@ -29,14 +29,12 @@ using System.Xml;
 
 namespace Mono.Upnp.Xml
 {
-    public class XmlSerializationContext
+    public abstract class XmlSerializationContext
     {
-        readonly XmlSerializer serializer;
         readonly XmlWriter writer;
         
-        internal XmlSerializationContext(XmlSerializer serializer, XmlWriter writer)
+        internal XmlSerializationContext (XmlWriter writer)
         {
-            this.serializer = serializer;
             this.writer = writer;
         }
         
@@ -44,18 +42,53 @@ namespace Mono.Upnp.Xml
             get { return writer; }
         }
         
-        public void AutoSerializeObjectAndMembers<T> (T obj)
+        public abstract void AutoSerializeObjectAndMembers<TObject> (TObject obj);
+        
+        public abstract void AutoSerializeMembersOnly<TObject> (TObject obj);
+    }
+    
+    public class XmlSerializationContext<TContext> : XmlSerializationContext
+    {
+        readonly XmlSerializer<TContext> serializer;
+        readonly TContext context;
+        
+        internal XmlSerializationContext(XmlSerializer<TContext> serializer, XmlWriter writer, TContext context)
+            : base (writer)
+        {
+            this.serializer = serializer;
+            this.context = context;
+        }
+        
+        public TContext Context {
+            get { return context; }
+        }
+        
+        public override void AutoSerializeObjectAndMembers<TObject> (TObject obj)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
             serializer.AutoSerializeObjectAndMembers (obj, this);
         }
         
-        public void AutoSerializeMembersOnly<T> (T obj)
+        public void AutoSerializeObjectAndMembers<TObject> (TObject obj, TContext context)
+        {
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            serializer.AutoSerializeObjectAndMembers (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
+        }
+        
+        public override void AutoSerializeMembersOnly<TObject> (TObject obj)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
             serializer.AutoSerializeMembersOnly (obj, this);
+        }
+        
+        public void AutoSerializeMembersOnly<TObject> (TObject obj, TContext context)
+        {
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            serializer.AutoSerializeMembersOnly (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
         }
     }
 }

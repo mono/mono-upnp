@@ -1,5 +1,5 @@
 // 
-// IXmlSerializable.cs
+// Nothing.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,17 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.Xml
+namespace Mono.Upnp.Xml.Internal
 {
-    public interface IXmlSerializable
+    struct Nothing
     {
-        void SerializeSelfAndMembers (XmlSerializationContext context);
-        void SerializeMembersOnly (XmlSerializationContext context);
-    }
-    
-    public interface IXmlSerializable<T>
-    {
-        void SerializeSelfAndMembers (XmlSerializationContext<T> context);
-        void SerializeMembersOnly (XmlSerializationContext<T> context);
     }
 }

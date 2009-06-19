@@ -36,67 +36,92 @@ namespace Mono.Upnp.Xml
 {
     public sealed class XmlSerializer
     {
-        static UTF8Encoding utf8 = new UTF8Encoding (false);
+        readonly XmlSerializer<Nothing> serializer = new XmlSerializer<Nothing> ();
         
-        readonly Dictionary<Type, SerializationInfo> infos = new Dictionary<Type, SerializationInfo> ();
-        
-        public void Serialize<T> (T obj, XmlWriter writer)
+        public void Serialize<TObject> (TObject obj, XmlWriter writer)
         {
-            if (writer == null) throw new ArgumentNullException ("writer");
-
-            SerializeCore (obj, writer);
+            serializer.Serialize (obj, writer, new Nothing ());
         }
         
-        public void Serialize<T> (T obj, Stream stream)
+        public void Serialize<TObject> (TObject obj, Stream stream)
+        {
+            serializer.Serialize (obj, stream, new Nothing ());
+        }
+        
+        public byte[] GetBytes<TObject> (TObject obj)
+        {
+            return serializer.GetBytes (obj, new Nothing ());
+        }
+        
+        public string GetString<TObject> (TObject obj)
+        {
+            return serializer.GetString (obj, new Nothing ());
+        }
+    }
+    
+    public sealed class XmlSerializer<TContext>
+    {
+        static UTF8Encoding utf8 = new UTF8Encoding (false);
+        
+        readonly Dictionary<Type, SerializationInfo<TContext>> infos = new Dictionary<Type, SerializationInfo<TContext>> ();
+        
+        public void Serialize<TObject> (TObject obj, XmlWriter writer, TContext context)
+        {
+            if (writer == null) throw new ArgumentNullException ("writer");
+            
+            SerializeCore (obj, writer, context);
+        }
+        
+        public void Serialize<TObject> (TObject obj, Stream stream, TContext context)
         {
             if (stream == null) throw new ArgumentNullException ("stream");
             
             using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
-                SerializeCore (obj, writer);
+                SerializeCore (obj, writer, context);
             }
         }
                 
-        public byte[] GetBytes<T> (T obj)
+        public byte[] GetBytes<TObject> (TObject obj, TContext context)
         {
             using (var stream = new MemoryStream ()) {
                 using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
                     writer.WriteStartDocument ();
-                    SerializeCore (obj, writer);
+                    SerializeCore (obj, writer, context);
                 }
                 return stream.ToArray ();
             }
         }
         
-        public string GetString<T> (T obj)
+        public string GetString<TObject> (TObject obj, TContext context)
         {
-            return utf8.GetString (GetBytes (obj));
+            return utf8.GetString (GetBytes (obj, context));
         }
         
-        void SerializeCore<T> (T obj, XmlWriter writer)
+        void SerializeCore<TObject> (TObject obj, XmlWriter writer, TContext context)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            var serializer = GetInfo (typeof (T)).TypeSerializer;
-            serializer (obj, new XmlSerializationContext (this, writer));
+            var serializer = GetInfo (typeof (TObject)).TypeSerializer;
+            serializer (obj, new XmlSerializationContext<TContext> (this, writer, context));
         }
 
-        internal void AutoSerializeObjectAndMembers<T> (T obj, XmlSerializationContext context)
+        internal void AutoSerializeObjectAndMembers<TObject> (TObject obj, XmlSerializationContext<TContext> context)
         {
-            var serializer = GetInfo (typeof (T)).TypeAutoSerializer;
+            var serializer = GetInfo (typeof (TObject)).TypeAutoSerializer;
             serializer (obj, context);
         }
         
-        internal void AutoSerializeMembersOnly<T> (T obj, XmlSerializationContext context)
+        internal void AutoSerializeMembersOnly<TObject> (TObject obj, XmlSerializationContext<TContext> context)
         {
-            var serialzer = GetInfo (typeof (T)).MemberAutoSerializer;
+            var serialzer = GetInfo (typeof (TObject)).MemberAutoSerializer;
             serialzer (obj, context);
         }
         
-        internal SerializationInfo GetInfo (Type type)
+        internal SerializationInfo<TContext> GetInfo (Type type)
         {
-            SerializationInfo info;
+            SerializationInfo<TContext> info;
             if (!infos.TryGetValue (type, out info)) {
-                info = new SerializationInfo (this, type);
+                info = new SerializationInfo<TContext> (this, type);
                 infos[type] = info;
             }
             return info;

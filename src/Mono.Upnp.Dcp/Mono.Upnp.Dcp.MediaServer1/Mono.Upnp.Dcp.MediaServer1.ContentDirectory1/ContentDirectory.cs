@@ -25,146 +25,56 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml.XPath;
+
+using Mono.Upnp.Control;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public class ContentDirectory
     {
-        public static readonly ServiceType ServiceType = new ServiceType (
-            "urn:schemas-upnp-org:service:ContentDirectory:1");
+        readonly XmlSerializer serializer = new XmlSerializer ();
         
-        readonly Dictionary<string, Dictionary<string, WeakReference>> object_cache =
-            new Dictionary<string, Dictionary<string, WeakReference>> ();
-        readonly Dictionary<string, uint> container_update_ids = new Dictionary<string, uint> ();
-        
-        readonly ContentDirectoryController controller;
-        readonly string search_capabilities;
-        readonly string sort_capabilities;
-        Container root_container;
-        
-        public ContentDirectory (ContentDirectoryController controller)
+        [UpnpAction]
+        [return: UpnpReturnValue (false)]
+        [return: UpnpArgument ("SearchCaps")]
+        [return: UpnpRelatedStateVariable ("SearchCapabilities")]
+        public virtual string GetSearchCapabilities ()
         {
-            if (controller == null) throw new ArgumentNullException ("controller");
-            
-            this.controller = controller;
-            search_capabilities = controller.GetSearchCapabilities ();
-            sort_capabilities = controller.GetSortCapabilities ();
+            return GetSearchCapabilitiesCore ();
         }
         
-        public ContentDirectoryController Controller { get { return controller; } }
-        
-        public Container GetRootContainer ()
+        [UpnpAction]
+        [return: UpnpReturnValue (false)]
+        [return: UpnpArgument ("SortCaps")]
+        [return: UpnpRelatedStateVariable ("SortCapabilities")]
+        public virtual string GetSortCapabilities ()
         {
-            if (root_container == null) {
-                root_container = GetObject<Container> ("0");
-            }
-            return root_container;
+            return GetSortCapabilitiesCore ();
         }
         
-        internal IEnumerable<T> Deserialize<T> (string filter, string xml) where T : Object
+        [UpnpAction]
+        [return: UpnpReturnValue (false)]
+        [return: UpnpArgument ("Id")]
+        [return: UpnpRelatedStateVariable ("SystemUpdateID")]
+        public virtual string GetSystemUpdateID ()
         {
-            if (!object_cache.ContainsKey (filter)) {
-                object_cache[filter] = new Dictionary<string, WeakReference> ();
-            }
-            
-            using (var reader = new StringReader (xml)) {
-                var navigator = new XPathDocument (reader).CreateNavigator ();
-                if (navigator.MoveToChild ("DIDL-Lite", Schemas.DidlLiteSchema) && navigator.MoveToFirstChild ()) {
-                    do {
-                        yield return DerserializeObject<T> (filter, navigator);
-                    } while (navigator.MoveToNext ());
-                }
-            }
+            return GetSystemUpdateIDCore ();
         }
         
-        T DerserializeObject<T> (string filter, XPathNavigator navigator) where T : Object
+        [UpnpAction]
+        [return: UpnpReturnValue (false)]
+        [return: UpnpArgument ("Result")]
+        public virtual string Browse ([UpnpArgument ("ObjectID")] string objectId,
+                                      [UpnpArgument ("BrowseFlag")] BrowseFlag browseFlag,
+                                      [UpnpArgument ("StartingIndex")] int startingIndex,
+                                      [UpnpArgument ("RequestCount")] int requestCount,
+                                      [UpnpArgument ("SortCriteria")] string sortCriteria,
+                                      [UpnpArgument ("NumberReturned")] out int numberReturned,
+                                      [UpnpArgument ("TotalMatches")] out int totalMatches,
+                                      [UpnpArgument ("UpdateID")] out string updateId)
         {
-            return GetObjectFromCache<T> (filter, navigator) ?? CreateObject<T> (filter, navigator);
-        }
-        
-        T GetObjectFromCache<T> (string filter, XPathNavigator navigator) where T : Object
-        {
-            if (navigator.MoveToAttribute ("id", Schemas.DidlLiteSchema)) {
-                var id = navigator.Value;
-                WeakReference weak_reference;
-                if (object_cache.ContainsKey (filter) && object_cache[filter].ContainsKey (id)) {
-                    weak_reference = object_cache[filter][id];
-                } else if (filter != "*" && object_cache.ContainsKey ("*") && object_cache["*"].ContainsKey (id)) {
-                    weak_reference = object_cache["*"][id];
-                } else {
-                    return null;
-                }
-                if (weak_reference.IsAlive) {
-                    var @object = (T)weak_reference.Target;
-                    if (!CheckIfObjectIsOutOfDate (@object)) {
-                        return @object;
-                    }
-                }
-            }
-            return null;
-        }
-        
-        T CreateObject<T> (string filter, XPathNavigator navigator) where T : Object
-        {
-            navigator.MoveToChild ("class", Schemas.UpnpSchema);
-            var type = ClassManager.GetTypeFromClass (navigator.Value);
-            navigator.MoveToParent ();
-            
-            if (type == null || (type != typeof (T) && !type.IsSubclassOf (typeof (T)))) {
-                return null;
-            }
-            
-            var @object = (T)Activator.CreateInstance (type, true);
-            using (var reader = navigator.ReadSubtree ()) {
-                reader.Read ();
-                @object.Deserialize (this, reader);
-            }
-            if (container_update_ids.ContainsKey (@object.ParentId)) {
-                @object.ParentUpdateId = container_update_ids[@object.ParentId];
-            }
-            
-            object_cache[filter][@object.Id] = new WeakReference (@object);
-            return @object;
-        }
-        
-        internal bool CheckIfContainerIsOutOfDate (string id, uint updateId)
-        {
-            var result = false;
-            if (container_update_ids.ContainsKey (id) && container_update_ids [id] != updateId) {
-                result = true;
-            }
-            container_update_ids [id] = updateId;
-            return result;
-        }
-        
-        internal bool CheckIfObjectIsOutOfDate (Object @object)
-        {
-            return container_update_ids.ContainsKey (@object.ParentId) &&
-                container_update_ids[@object.ParentId] != @object.ParentUpdateId;
-        }
-        
-        internal T GetObject<T> (string id) where T : Object
-        {
-            uint returned, total, update_id;
-            var xml = controller.Browse (id, BrowseFlag.BrowseMetadata, "*", 0, 1, "",
-                out returned, out total, out update_id);
-            
-            CheckIfContainerIsOutOfDate (id, update_id);
-            foreach (var result in Deserialize<T> ("*", xml)) {
-                return result;
-            }
-            
-            return null;
-        }
-        
-        public static T GetUpdatedObject<T> (T @object) where T : Object
-        {
-            if (@object == null) throw new ArgumentNullException ("object");
-            
-            return @object.ContentDirectory.GetObject<T> (@object.Id);
+            return BrowseCore (objectId, browseFlag, startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches);
         }
     }
 }

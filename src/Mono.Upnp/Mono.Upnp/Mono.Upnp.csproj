@@ -120,6 +120,8 @@
     <Compile Include="Mono.Upnp.Xml.Internal\Compiler.cs" />
     <Compile Include="Mono.Upnp.Internal\IMappable.cs" />
     <Compile Include="Mono.Upnp.Internal\CollectionMap.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpReturnValueAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml.Internal\Nothing.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -28,26 +28,26 @@ using System;
 
 namespace Mono.Upnp.Xml.Internal
 {
-    delegate void Serializer (object obj, XmlSerializationContext context);
+    delegate void Serializer<TContext> (object obj, XmlSerializationContext<TContext> context);
     
-    class SerializationInfo
+    class SerializationInfo<TContext>
     {
-        readonly SerializationCompiler compiler;
+        readonly SerializationCompiler<TContext> compiler;
         
-        Serializer type_serializer;
-        Serializer type_auto_serializer;
-        Serializer member_serializer;
-        Serializer member_auto_serializer;
+        Serializer<TContext> type_serializer;
+        Serializer<TContext> type_auto_serializer;
+        Serializer<TContext> member_serializer;
+        Serializer<TContext> member_auto_serializer;
         
-        public SerializationInfo (XmlSerializer xmlSerializer, Type type)
+        public SerializationInfo (XmlSerializer<TContext> xmlSerializer, Type type)
         {
-            compiler = new SerializationCompiler (xmlSerializer, this, type);
+            compiler = new SerializationCompiler<TContext> (xmlSerializer, this, type);
         }
         
-        public Serializer TypeSerializer {
+        public Serializer<TContext> TypeSerializer {
             get {
                 if (this.type_serializer == null) {
-                    Serializer type_serializer = null;
+                    Serializer<TContext> type_serializer = null;
                     this.type_serializer = (obj, context) => type_serializer (obj, context);
                     type_serializer = compiler.CreateTypeSerializer ();
                     this.type_serializer = type_serializer;
@@ -56,7 +56,7 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        public Serializer TypeAutoSerializer {
+        public Serializer<TContext> TypeAutoSerializer {
             get {
                 if (type_auto_serializer == null) {
                     type_auto_serializer = compiler.CreateTypeAutoSerializer ();
@@ -65,10 +65,10 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        public Serializer MemberSerializer {
+        public Serializer<TContext> MemberSerializer {
             get {
                 if (this.member_serializer == null) {
-                    Serializer member_serializer = null;
+                    Serializer<TContext> member_serializer = null;
                     this.member_serializer = (obj, context) => member_serializer (obj, context);
                     member_serializer = compiler.CreateMemberSerializer ();
                     this.member_serializer = member_serializer;
@@ -77,7 +77,7 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        public Serializer MemberAutoSerializer {
+        public Serializer<TContext> MemberAutoSerializer {
             get {
                 if (member_auto_serializer == null) {
                     member_auto_serializer = compiler.CreateMemberAutoSerializer ();
