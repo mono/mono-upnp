@@ -716,5 +716,30 @@ namespace Mono.Upnp.Xml.Tests
                 @"<?xml version=""1.0"" encoding=""utf-8""?><NullableIncludeIfNullTestClass><Foo /></NullableIncludeIfNullTestClass>",
                 serializer.GetString (new NullableIncludeIfNullTestClass ()));
         }
+        
+        class SerializationContextTestClass : IXmlSerializable<int>
+        {
+            [XmlElement (OmitIfNull = true)] public SerializationContextTestClass Child { get; set; }
+            
+            public void SerializeSelfAndMembers (XmlSerializationContext<int> context)
+            {
+                context.AutoSerializeObjectAndMembers (this);
+            }
+            
+            public void SerializeMembersOnly (XmlSerializationContext<int> context)
+            {
+                context.Writer.WriteAttributeString ("depth", context.Context.ToString ());
+                context.AutoSerializeMembersOnly (this, context.Context + 1);
+            }
+        }
+        
+        [Test]
+        public void SerializationContextTest ()
+        {
+            var serializer = new XmlSerializer<int> ();
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><SerializationContextTestClass depth=""0""><Child depth=""1""><Child depth=""2"" /></Child></SerializationContextTestClass>",
+                serializer.GetString (new SerializationContextTestClass { Child = new SerializationContextTestClass { Child = new SerializationContextTestClass () } }, 0));
+        }
     }
 }
