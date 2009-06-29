@@ -60,7 +60,6 @@ namespace Mono.Upnp.Internal
         readonly IEnumerable<StateVariable> state_variables;
         volatile bool started;
         
-        readonly object subscription_mutex = new object ();
         readonly Dictionary<string, Subscription> subscribers = new Dictionary<string, Subscription> ();
         readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
         
@@ -121,7 +120,7 @@ namespace Mono.Upnp.Internal
 
         void PublishUpdates (IEnumerable<StateVariable> stateVariables)
         {
-            lock (subscription_mutex) {
+            lock (subscribers) {
                 foreach (var subscriber in subscribers.Values) {
                     PublishUpdates (subscriber, stateVariables);
                 }
@@ -166,7 +165,7 @@ namespace Mono.Upnp.Internal
                     Interlocked.Increment (ref subscriber.ConnectFailures);
                     #pragma warning restore 0420
                     if (subscriber.ConnectFailures == 2) {
-                        lock (subscription_mutex) {
+                        lock (subscribers) {
                             if (subscribers.ContainsKey (subscriber.Sid)) {
                                 subscribers.Remove (subscriber.Sid);
                                 
@@ -229,7 +228,7 @@ namespace Mono.Upnp.Internal
                 return;
             }
             
-            lock (subscription_mutex) {
+            lock (subscribers) {
                 subscribers.Add (uuid, subscriber);
             }
             
@@ -254,7 +253,7 @@ namespace Mono.Upnp.Internal
             }
             
             Subscription subscription;
-            lock (subscription_mutex) {
+            lock (subscribers) {
                 if (!subscribers.TryGetValue (sid, out subscription)) {
                     Log.Error (string.Format (
                         "A renewal request from {0} to {1} was for subscription {2} which does not exist.",
@@ -283,7 +282,7 @@ namespace Mono.Upnp.Internal
             }
             
             Subscription subscription;
-            lock (subscription_mutex) {
+            lock (subscribers) {
                 if (!subscribers.TryGetValue (sid, out subscription)) {
                     Log.Error (string.Format (
                         "An unsubscribe request from {0} to {1} was for subscription {2} which does not exist.",
@@ -324,7 +323,7 @@ namespace Mono.Upnp.Internal
         
         bool OnTimeout (object state, ref TimeSpan interval)
         {
-            lock (subscription_mutex) {
+            lock (subscribers) {
                 subscribers.Remove ((string)state);
             }
                 
