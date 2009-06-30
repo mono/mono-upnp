@@ -37,7 +37,7 @@ namespace Mono.Upnp.Internal
         // TODO this file could use some clean-up (mainly readability)
         class Eventer : StateVariableEventer
         {
-            public static readonly MethodInfo handler = typeof (Eventer).GetMethod ("Handler");
+            public static readonly MethodInfo HandlerMethod = typeof (Eventer).GetMethod ("Handler");
             
             public void Handler<T> (object sender, StateVariableChangedArgs<T> args)
             {
@@ -265,7 +265,7 @@ namespace Mono.Upnp.Internal
                 }
                 type = type.GetGenericArguments ()[0];
                 var eventer = new Eventer ();
-                var method = Eventer.handler.MakeGenericMethod (new Type[] { type });
+                var method = Eventer.HandlerMethod.MakeGenericMethod (new Type[] { type });
                 var handler = Delegate.CreateDelegate (eventInfo.EventHandlerType, eventer, method);
                 eventInfo.AddEventHandler (service, handler);
                 var attribute = (UpnpStateVariableAttribute)attributes[0];
