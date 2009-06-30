@@ -63,7 +63,6 @@ namespace Mono.Upnp.Internal
         readonly Dictionary<string, Subscription> subscribers = new Dictionary<string, Subscription> ();
         readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
         
-        readonly object publish_mutex = new object ();
         readonly List<StateVariable> updated_state_variables = new List<StateVariable> ();
         Thread publish_thread;
 
@@ -75,10 +74,10 @@ namespace Mono.Upnp.Internal
         
         public void QueueUpdate (StateVariable stateVariable)
         {
-            lock (publish_mutex) {
+            lock (this) {
                 if (!updated_state_variables.Contains (stateVariable)) {
                     updated_state_variables.Add (stateVariable);
-                    Monitor.Pulse (publish_mutex);
+                    Monitor.Pulse (this);
                 }
             }
         }
@@ -94,26 +93,26 @@ namespace Mono.Upnp.Internal
         public override void Stop ()
         {
             started = false;
-            lock (publish_mutex) {
-                Monitor.Pulse (publish_mutex);
+            lock (this) {
+                Monitor.Pulse (this);
             }
             base.Stop ();
         }
         
         void Publish ()
         {
-            lock (publish_mutex) {
-                Monitor.Wait (publish_mutex);
+            lock (this) {
+                Monitor.Wait (this);
                 
                 while (started) {
-                    Monitor.Exit (publish_mutex);
+                    Monitor.Exit (this);
                     Thread.Sleep (TimeSpan.FromSeconds (1));
-                    Monitor.Enter (publish_mutex);
+                    Monitor.Enter (this);
                     
                     PublishUpdates (updated_state_variables);
                     updated_state_variables.Clear ();
                     
-                    Monitor.Wait (publish_mutex);
+                    Monitor.Wait (this);
                 }
             }
         }
