@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.Diagnostics;
 
 namespace Mono.Upnp.Internal
 {
@@ -60,6 +61,7 @@ namespace Mono.Upnp.Internal
             }
         }
         
+        [Conditional ("DEBUG")]
         public static void Warning (string message)
         {
             if (Enabled) {
@@ -67,6 +69,7 @@ namespace Mono.Upnp.Internal
             }
         }
         
+        [Conditional ("DEBUG")]
         public static void Information (string message)
         {
             if (Enabled) {
