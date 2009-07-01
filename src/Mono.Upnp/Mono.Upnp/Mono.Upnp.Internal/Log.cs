@@ -46,7 +46,7 @@ namespace Mono.Upnp.Internal
 
         public static void Exception (Exception e)
         {
-            Exception (null, e);
+            Error (e.ToString ());
         }
 
         public static void Exception (string message, Exception e)
@@ -56,7 +56,7 @@ namespace Mono.Upnp.Internal
         
         public static void Error (string message)
         {
-            if (Enabled || true) {
+            if (Enabled) {
                 Console.Error.WriteLine ("Mono.Upnp Error: {0}", message);
             }
         }
