@@ -40,7 +40,6 @@ namespace Mono.Upnp.Internal
         static readonly Random random = new Random ();
         static int id;
 
-        readonly object mutex = new object ();
         readonly IMap<string, StateVariable> state_variables;
         readonly Uri url;
         readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
@@ -160,7 +159,7 @@ namespace Mono.Upnp.Internal
             request.Headers.Add ("NT", "upnp:event");
             request.Headers.Add ("TIMEOUT", "Second-1800");
             
-            lock (mutex) {
+            lock (this) {
                 request.BeginGetResponse (OnSubscribeResponse, request);
                 expire_timeout_id = dispatcher.Add (TimeSpan.FromSeconds (30), OnSubscribeTimeout, request);
                 confidently_subscribed = false;
@@ -169,7 +168,7 @@ namespace Mono.Upnp.Internal
 
         bool OnSubscribeTimeout (object state, ref TimeSpan interval)
         {
-            lock (mutex) {
+            lock (this) {
                 expire_timeout_id = 0;
                 if (!confidently_subscribed) {
                     var request = (WebRequest)state;
@@ -185,7 +184,7 @@ namespace Mono.Upnp.Internal
 
         void OnSubscribeResponse (IAsyncResult asyncResult)
         {
-            lock (mutex) {
+            lock (this) {
                 if (expire_timeout_id != 0) {
                     dispatcher.Remove (expire_timeout_id);
                 }
@@ -224,7 +223,7 @@ namespace Mono.Upnp.Internal
 
         bool OnRenewTimeout (object state, ref TimeSpan interval)
         {
-            lock (mutex) {
+            lock (this) {
                 renew_timeout_id = 0;
                 if (started) {
                     Renew ();
@@ -235,7 +234,7 @@ namespace Mono.Upnp.Internal
 
         void Renew ()
         {
-            lock (mutex) {
+            lock (this) {
                 var request = WebRequest.Create (url);
                 request.Method = "SUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
@@ -248,7 +247,7 @@ namespace Mono.Upnp.Internal
 
         void Unsubscribe ()
         {
-            lock (mutex) {
+            lock (this) {
                 var request = WebRequest.Create (url);
                 request.Method = "UNSUBSCRIBE";
                 request.Headers.Add ("SID", subscription_uuid);
@@ -281,7 +280,7 @@ namespace Mono.Upnp.Internal
                 expire_timeout_id = 0;
             }
 
-            lock (mutex) {
+            lock (this) {
                 if (confidently_subscribed) {
                     Unsubscribe ();
                 }
