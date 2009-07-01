@@ -122,6 +122,9 @@
     <Compile Include="Mono.Upnp.Internal\CollectionMap.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpReturnValueAttribute.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\Nothing.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlMemberSerializationContext.cs" />
+    <Compile Include="Mono.Upnp.Xml.Internal\Serializer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Internal\PropertySerializer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -28,8 +28,6 @@ using System;
 
 namespace Mono.Upnp.Xml.Internal
 {
-    delegate void Serializer<TContext> (object obj, XmlSerializationContext<TContext> context);
-    
     class SerializationInfo<TContext>
     {
         readonly SerializationCompiler<TContext> compiler;

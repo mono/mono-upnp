@@ -47,7 +47,7 @@ namespace Mono.Upnp.Xml
         public abstract void AutoSerializeMembersOnly<TObject> (TObject obj);
     }
     
-    public class XmlSerializationContext<TContext> : XmlSerializationContext
+    public sealed class XmlSerializationContext<TContext> : XmlSerializationContext
     {
         readonly XmlSerializer<TContext> serializer;
         readonly TContext context;

@@ -47,13 +47,11 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ClassNameAttribute.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ClassReference.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Container.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContainerBuilder.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Deserializer.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContentDirectoryClient.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContentDirectoryController.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\DeserializationException.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Item.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ItemBuilder.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Object.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Resolution.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Resource.cs" />

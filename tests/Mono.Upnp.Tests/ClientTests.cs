@@ -319,7 +319,7 @@ namespace Mono.Upnp.Tests
                     client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
                     lock (mutex) {
                         server.Start ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (10))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
                             Assert.Fail ("The event timed out.");
                         }
                     }
