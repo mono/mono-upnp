@@ -483,6 +483,11 @@ namespace Mono.Upnp.Xml.Tests
             {
                 context.Writer.WriteAttributeString ("foo", Foo);
             }
+            
+            public void SerializeMember (XmlMemberSerializationContext context)
+            {
+                context.AutoSerializeMember ();
+            }
         }
         
         [Test]
@@ -730,6 +735,11 @@ namespace Mono.Upnp.Xml.Tests
             {
                 context.Writer.WriteAttributeString ("depth", context.Context.ToString ());
                 context.AutoSerializeMembersOnly (this, context.Context + 1);
+            }
+            
+            public void SerializeMember (XmlMemberSerializationContext<int> context)
+            {
+                context.AutoSerializeMember ();
             }
         }
         

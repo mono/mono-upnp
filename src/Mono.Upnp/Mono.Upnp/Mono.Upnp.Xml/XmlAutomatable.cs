@@ -38,9 +38,19 @@ namespace Mono.Upnp.Xml
             SerializeMembersOnly (context);
         }
         
+        void IXmlSerializable.SerializeMember (XmlMemberSerializationContext context)
+        {
+            SerializeMember (context);
+        }
+        
         protected abstract void SerializeSelfAndMembers (XmlSerializationContext context);
         
         protected abstract void SerializeMembersOnly (XmlSerializationContext context);
+        
+        protected virtual void SerializeMember (XmlMemberSerializationContext context)
+        {
+            context.AutoSerializeMember ();
+        }
     }
     
     public abstract class XmlAutomatable<TContext> : XmlDeserializable, IXmlSerializable<TContext>
@@ -55,8 +65,18 @@ namespace Mono.Upnp.Xml
             SerializeMembersOnly (context);
         }
         
+        void IXmlSerializable<TContext>.SerializeMember (XmlMemberSerializationContext<TContext> context)
+        {
+            SerializeMember (context);
+        }
+        
         protected abstract void SerializeSelfAndMembers (XmlSerializationContext<TContext> context);
         
         protected abstract void SerializeMembersOnly (XmlSerializationContext<TContext> context);
+        
+        protected virtual void SerializeMember (XmlMemberSerializationContext<TContext> context)
+        {
+            context.AutoSerializeMember ();
+        }
     }
 }
