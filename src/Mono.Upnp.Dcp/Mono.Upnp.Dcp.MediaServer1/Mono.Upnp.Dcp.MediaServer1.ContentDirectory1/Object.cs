@@ -31,7 +31,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class Object : XmlAutomatable
+    public class Object : XmlAutomatable<string>
     {
         readonly IList<Resource> resources;
         
@@ -105,14 +105,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             context.AutoDeserializeElement (this);
         }
 
-        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        protected override void SerializeSelfAndMembers (XmlSerializationContext<string> context)
         {
             context.AutoSerializeObjectAndMembers (this);
         }
 
-        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        protected override void SerializeMembersOnly (XmlSerializationContext<string> context)
         {
             context.AutoSerializeMembersOnly (this);
+        }
+        
+        protected override void SerializeMember (XmlMemberSerializationContext<string> context)
+        {
+            base.SerializeMember (context);
         }
     }
 }

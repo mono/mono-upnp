@@ -54,7 +54,7 @@ namespace Mono.Upnp
             get { return root; }
         }
         
-        protected internal virtual Root DeserializeRoot (Uri url)
+        public virtual Root DeserializeRoot (Uri url)
         {
             // TODO retry fallback
             var request = WebRequest.Create (url);
@@ -80,7 +80,7 @@ namespace Mono.Upnp
             return new Root (this, url);
         }
         
-        protected internal virtual Device DeserializeDevice (XmlDeserializationContext context)
+        public virtual Device DeserializeDevice (XmlDeserializationContext context)
         {
             var device = CreateDevice ();
             Deserialize (device, context);
@@ -92,7 +92,7 @@ namespace Mono.Upnp
             return new Device (this);
         }
         
-        protected internal virtual Service DeserializeService (XmlDeserializationContext context)
+        public virtual Service DeserializeService (XmlDeserializationContext context)
         {
             var service = CreateService ();
             Deserialize (service, context);
@@ -104,7 +104,7 @@ namespace Mono.Upnp
             return new Service (this);
         }
         
-        protected internal virtual Icon DeserializeIcon (XmlDeserializationContext context)
+        public virtual Icon DeserializeIcon (XmlDeserializationContext context)
         {
             var icon = CreateIcon ();
             Deserialize (icon, context);
@@ -116,7 +116,7 @@ namespace Mono.Upnp
             return new Icon (this);
         }
         
-        protected internal virtual ServiceAction DeserializeAction (ServiceController controller, XmlDeserializationContext context)
+        public virtual ServiceAction DeserializeAction (ServiceController controller, XmlDeserializationContext context)
         {
             var action = CreateAction (controller);
             Deserialize (action, context);
@@ -128,7 +128,7 @@ namespace Mono.Upnp
             return new ServiceAction (this, controller);
         }
         
-        protected internal virtual Argument DeserializeArgument (XmlDeserializationContext context)
+        public virtual Argument DeserializeArgument (XmlDeserializationContext context)
         {
             var argument = CreateArgument ();
             Deserialize (argument, context);
@@ -140,7 +140,7 @@ namespace Mono.Upnp
             return new Argument ();
         }
         
-        protected internal virtual StateVariable DeserializeStateVariable (ServiceController controller, XmlDeserializationContext context)
+        public virtual StateVariable DeserializeStateVariable (ServiceController controller, XmlDeserializationContext context)
         {
             var state_variable = CreateStateVariable (controller);
             Deserialize (state_variable, context);
@@ -152,7 +152,7 @@ namespace Mono.Upnp
             return new StateVariable (controller);
         }
         
-        protected internal virtual ServiceController GetServiceController (Service service)
+        public virtual ServiceController GetServiceController (Service service)
         {
             if (service == null) throw new ArgumentNullException ("service");
             if (service.ScpdUrl == null) throw new ArgumentException ("The service has no ScpdUrl", "service");

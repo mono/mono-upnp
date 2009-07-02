@@ -30,13 +30,11 @@ namespace Mono.Upnp.Xml
     {
         void SerializeSelfAndMembers (XmlSerializationContext context);
         void SerializeMembersOnly (XmlSerializationContext context);
-        void SerializeMember (XmlMemberSerializationContext context);
     }
     
     public interface IXmlSerializable<TContext>
     {
         void SerializeSelfAndMembers (XmlSerializationContext<TContext> context);
         void SerializeMembersOnly (XmlSerializationContext<TContext> context);
-        void SerializeMember (XmlMemberSerializationContext<TContext> context);
     }
 }
