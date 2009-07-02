@@ -125,6 +125,7 @@
     <Compile Include="Mono.Upnp.Xml\XmlMemberSerializationContext.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\Serializer.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\PropertySerializer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Internal\MemberSerializer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

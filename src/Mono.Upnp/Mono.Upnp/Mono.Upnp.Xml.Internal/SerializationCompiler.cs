@@ -34,8 +34,6 @@ namespace Mono.Upnp.Xml.Internal
 {
     class SerializationCompiler<TContext> : Compiler
     {
-        delegate void MemberSerializer<TContext> (object obj, XmlSerializationContext<TContext> context, string name, string @namespace, string prefix);
-        
         readonly XmlSerializer<TContext> xml_serializer;
         readonly SerializationInfo<TContext> info;
         
@@ -297,15 +295,15 @@ namespace Mono.Upnp.Xml.Internal
             return CreateSerializer (property, name, @namespace, prefix,
                 CreatePropertySerializer (
                     CreateMemberSerializer (
-                        CreateArraySerializer (property.PropertyType, arrayItemAttribute),
+                        CreateArraySerializer (property.PropertyType, arrayItemAttribute, arrayAttribute.OmitIfEmpty),
                         arrayAttribute.OmitIfNull)));
         }
         
-        MemberSerializer<TContext> CreateArraySerializer (Type type, XmlArrayItemAttribute arrayItemAttribute)
+        MemberSerializer<TContext> CreateArraySerializer (Type type, XmlArrayItemAttribute arrayItemAttribute, bool omitIfEmpty)
         {
             var item_type = GetIEnumerable (type).GetGenericArguments ()[0];
             var next = CreateArrayItemSerializer (item_type, arrayItemAttribute);
-            if (arrayAttribute.OmitIfEmpty) {
+            if (omitIfEmpty) {
                 return (obj, context, name, @namespace, prefix) => {
                     if (obj != null) {
                         var first = true;
@@ -405,9 +403,9 @@ namespace Mono.Upnp.Xml.Internal
             }
             
             if (typeof (IXmlSerializable<TContext>).IsAssignableFrom (Type)) {
-                return (obj, context) => ((IXmlSerializable<TContext>)obj).SerializeMember (new XmlMemberSerializationContext<TContext> (obj, context, serializer, property, name, @namespace, prefix));
+                return (obj, context) => ((IXmlSerializable<TContext>)obj).SerializeMember (new XmlMemberSerializationContext<TContext> (obj, context, serializer, name, @namespace, prefix, property));
             } else if (typeof (IXmlSerializable).IsAssignableFrom (Type)) {
-                return (obj, context) => ((IXmlSerializable)obj).SerializeMember (new XmlMemberSerializationContext<TContext> (obj, context, serializer, property, name, @namespace, prefix));
+                return (obj, context) => ((IXmlSerializable)obj).SerializeMember (new XmlMemberSerializationContext<TContext> (obj, context, serializer, name, @namespace, prefix, property));
             } else {
                 return (obj, context) => serializer (obj, context, property, name, @namespace, prefix);
             }

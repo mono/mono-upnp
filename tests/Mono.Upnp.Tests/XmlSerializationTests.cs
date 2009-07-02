@@ -751,5 +751,102 @@ namespace Mono.Upnp.Xml.Tests
                 @"<?xml version=""1.0"" encoding=""utf-8""?><SerializationContextTestClass depth=""0""><Child depth=""1""><Child depth=""2"" /></Child></SerializationContextTestClass>",
                 serializer.GetString (new SerializationContextTestClass { Child = new SerializationContextTestClass { Child = new SerializationContextTestClass () } }, 0));
         }
+        
+        class MemberSerializationTest1Class : IXmlSerializable
+        {
+            public void SerializeSelfAndMembers (XmlSerializationContext context)
+            {
+                context.AutoSerializeObjectAndMembers (this);
+            }
+            
+            public void SerializeMembersOnly (XmlSerializationContext context)
+            {
+                context.AutoSerializeMembersOnly (this);
+            }
+            
+            public void SerializeMember (XmlMemberSerializationContext context)
+            {
+                if (context.Name != "Foo") {
+                    context.AutoSerializeMember ();
+                }
+            }
+            
+            [XmlAttribute] public string Foo { get; set; }
+            
+            [XmlAttribute] public string Bar { get; set; }
+        }
+        
+        [Test]
+        public void MemberSerializationTest1 ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><MemberSerializationTest1Class Bar=""bar"" />",
+                serializer.GetString (new MemberSerializationTest1Class { Foo = "foo", Bar = "bar" }));
+        }
+        
+        class MemberSerializationTest2Class : IXmlSerializable
+        {
+            static System.Reflection.PropertyInfo foo = typeof (MemberSerializationTest2Class).GetProperty ("Foo");
+            
+            public void SerializeSelfAndMembers (XmlSerializationContext context)
+            {
+                context.AutoSerializeObjectAndMembers (this);
+            }
+            
+            public void SerializeMembersOnly (XmlSerializationContext context)
+            {
+                context.AutoSerializeMembersOnly (this);
+            }
+            
+            public void SerializeMember (XmlMemberSerializationContext context)
+            {
+                if (context.Name == "Foo" && context.Namespace == "urn:mono-upnp:tests" && context.Prefix == "test" && context.Property == foo) {
+                    context.AutoSerializeMember ();
+                }
+            }
+            
+            [XmlAttribute (Namespace = "urn:mono-upnp:tests", Prefix = "test")] public string Foo { get; set; }
+        }
+        
+        [Test]
+        public void MemberSerializationTest2 ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><MemberSerializationTest2Class test:Foo=""foo"" xmlns:test=""urn:mono-upnp:tests"" />",
+                serializer.GetString (new MemberSerializationTest2Class { Foo = "foo" }));
+        }
+        
+        class MemberSerializationContextTestClass : IXmlSerializable<string>
+        {
+            public void SerializeSelfAndMembers (XmlSerializationContext<string> context)
+            {
+                context.AutoSerializeObjectAndMembers (this);
+            }
+            
+            public void SerializeMembersOnly (XmlSerializationContext<string> context)
+            {
+                context.AutoSerializeMembersOnly (this);
+            }
+            
+            public void SerializeMember (XmlMemberSerializationContext<string> context)
+            {
+                if (context.Name == context.Context) {
+                    context.AutoSerializeMember ();
+                }
+            }
+            
+            [XmlAttribute] public string Foo { get; set; }
+            
+            [XmlAttribute] public string Bar { get; set; }
+        }
+        
+        [Test]
+        public void MemberSerializationContextTest ()
+        {
+            var serializer = new XmlSerializer<string> ();
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><MemberSerializationContextTestClass Foo=""foo"" />",
+                serializer.GetString (new MemberSerializationContextTestClass { Foo = "foo", Bar = "bar" }, "Foo"));
+        }
     }
 }

@@ -1,10 +1,10 @@
 // 
-// PropertySerializer.cs
+// MemberSerializer.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       scott <${AuthorEmail}>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 scott
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Reflection;
-
 namespace Mono.Upnp.Xml.Internal
 {
-    delegate void PropertySerializer<TContext> (object obj, XmlSerializationContext<TContext> context, PropertyInfo property, string name, string @namespace, string prefix);
+    delegate void MemberSerializer<TContext> (object obj, XmlSerializationContext<TContext> context, string name, string @namespace, string prefix);  
 }
