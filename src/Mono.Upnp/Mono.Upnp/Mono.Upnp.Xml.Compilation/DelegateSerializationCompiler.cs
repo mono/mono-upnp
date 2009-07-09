@@ -45,7 +45,7 @@ namespace Mono.Upnp.Xml.Compilation
             string prefix = null;
             
             XmlTypeAttribute type_attribute = null;
-            var namespace_attributes = new List<XmlNamespaceAttribute> ();
+            var namespaces = new List<XmlNamespaceAttribute> ();
             
             foreach (var custom_attribute in Type.GetCustomAttributes (false)) {
                 var xml_type = custom_attribute as XmlTypeAttribute;
@@ -53,7 +53,7 @@ namespace Mono.Upnp.Xml.Compilation
                     type_attribute = xml_type;
                     continue;
                 }
-                namespace_attributes.Add (custom_attribute as XmlNamespaceAttribute);
+                namespaces.Add (custom_attribute as XmlNamespaceAttribute);
             }
             
             if (type_attribute != null) {
@@ -64,10 +64,14 @@ namespace Mono.Upnp.Xml.Compilation
                 prefix = type_attribute.Prefix;
             }
             
+            return CreateTypeAutoSerializer (name, @namespace, prefix, namespaces.Count == 0 ? null : namespaces.ToArray ());
+        }
+        
+        protected virtual Serializer<TContext> CreateTypeAutoSerializer (string name, string @namespace, string prefix, IEnumerable<XmlNamespaceAttribute> namespaces)
+        {
             var next = MemberSerializer;
             
-            if (namespace_attributes.Count != 0) {
-                var namespaces = namespace_attributes.ToArray ();
+            if (namespaces != null) {
                 return (obj, context) => {
                     context.Writer.WriteStartElement (prefix, name, @namespace);
                     foreach (var ns in namespaces) {
