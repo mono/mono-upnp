@@ -115,14 +115,16 @@
     <Compile Include="Mono.Upnp.Xml\XmlValueAttribute.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\DeserializationInfo.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\DeserializationCompiler.cs" />
-    <Compile Include="Mono.Upnp.Xml.Internal\SerializationInfo.cs" />
-    <Compile Include="Mono.Upnp.Xml.Internal\SerializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Internal\Compiler.cs" />
     <Compile Include="Mono.Upnp.Internal\IMappable.cs" />
     <Compile Include="Mono.Upnp.Internal\CollectionMap.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpReturnValueAttribute.cs" />
-    <Compile Include="Mono.Upnp.Xml.Internal\Nothing.cs" />
-    <Compile Include="Mono.Upnp.Xml.Internal\Serializer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\Compiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\Serializer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompilerFactory.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompilerFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -133,5 +135,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mono.Upnp.Xml.Internal\" />
+    <Folder Include="Mono.Upnp.Xml.Compilation\" />
   </ItemGroup>
 </Project>

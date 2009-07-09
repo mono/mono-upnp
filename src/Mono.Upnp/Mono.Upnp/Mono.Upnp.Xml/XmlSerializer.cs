@@ -30,12 +30,16 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-using Mono.Upnp.Xml.Internal;
+using Mono.Upnp.Xml.Compilation;
 
 namespace Mono.Upnp.Xml
 {
     public sealed class XmlSerializer
     {
+        struct Nothing
+        {
+        }
+        
         readonly XmlSerializer<Nothing> serializer = new XmlSerializer<Nothing> ();
         
         public void Serialize<TObject> (TObject obj, XmlWriter writer)
@@ -63,7 +67,18 @@ namespace Mono.Upnp.Xml
     {
         static UTF8Encoding utf8 = new UTF8Encoding (false);
         
-        readonly Dictionary<Type, SerializationInfo<TContext>> infos = new Dictionary<Type, SerializationInfo<TContext>> ();
+        readonly SerializationCompilerFactory<TContext> compiler_factory;
+        readonly Dictionary<Type, SerializationCompiler<TContext>> compilers = new Dictionary<Type, SerializationCompiler<TContext>> ();
+        
+        public XmlSerializer ()
+            : this (null)
+        {
+        }
+        
+        public XmlSerializer (SerializationCompilerFactory<TContext> compilerFactory)
+        {
+            this.compiler_factory = compilerFactory ?? new DelegateSerializationCompilerFactory<TContext> ();
+        }
         
         public void Serialize<TObject> (TObject obj, XmlWriter writer, TContext context)
         {
@@ -101,30 +116,30 @@ namespace Mono.Upnp.Xml
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            var serializer = GetInfo (typeof (TObject)).TypeSerializer;
+            var serializer = GetCompilerForType (typeof (TObject)).TypeSerializer;
             serializer (obj, new XmlSerializationContext<TContext> (this, writer, context));
         }
 
         internal void AutoSerializeObjectAndMembers<TObject> (TObject obj, XmlSerializationContext<TContext> context)
         {
-            var serializer = GetInfo (typeof (TObject)).TypeAutoSerializer;
+            var serializer = GetCompilerForType (typeof (TObject)).TypeAutoSerializer;
             serializer (obj, context);
         }
         
         internal void AutoSerializeMembersOnly<TObject> (TObject obj, XmlSerializationContext<TContext> context)
         {
-            var serialzer = GetInfo (typeof (TObject)).MemberAutoSerializer;
+            var serialzer = GetCompilerForType (typeof (TObject)).MemberAutoSerializer;
             serialzer (obj, context);
         }
         
-        internal SerializationInfo<TContext> GetInfo (Type type)
+        internal SerializationCompiler<TContext> GetCompilerForType (Type type)
         {
-            SerializationInfo<TContext> info;
-            if (!infos.TryGetValue (type, out info)) {
-                info = new SerializationInfo<TContext> (this, type);
-                infos[type] = info;
+            SerializationCompiler<TContext> compiler;
+            if (!compilers.TryGetValue (type, out compiler)) {
+                compiler = compiler_factory.CreateSerializationCompiler (this, type);
+                compilers[type] = compiler;
             }
-            return info;
+            return compiler;
         }
     }
 }

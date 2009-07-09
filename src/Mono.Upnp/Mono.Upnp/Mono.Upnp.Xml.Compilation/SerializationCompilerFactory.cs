@@ -1,10 +1,10 @@
 // 
-// Serializer.cs
+// SerializationCompilerFactory.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.Xml.Internal
+using System;
+
+namespace Mono.Upnp.Xml.Compilation
 {
-    delegate void Serializer<TContext> (object obj, XmlSerializationContext<TContext> context);
+    public abstract class SerializationCompilerFactory<TContext>
+    {
+        public abstract SerializationCompiler<TContext> CreateSerializationCompiler (XmlSerializer<TContext> xmlSerializer, Type type);
+    }
 }
