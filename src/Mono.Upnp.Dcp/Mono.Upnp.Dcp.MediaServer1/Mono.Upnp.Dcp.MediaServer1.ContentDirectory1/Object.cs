@@ -74,7 +74,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [XmlElement ("writeStatus", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual WriteStatus? WriteStatus { get; private set; }
         
-        internal ContentDirectory ContentDirectory { get; private set; }
+        internal Deserializer Deserializer { get; private set; }
+        
         internal uint ParentUpdateId { get; set; }
         
 //        public Container GetParent ()

@@ -28,7 +28,7 @@ using System;
 
 namespace Mono.Upnp.Control
 {
-    [AttributeUsage (AttributeTargets.Parameter)]
+    [AttributeUsage (AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
     public sealed class UpnpRelatedStateVariableAttribute : Attribute
     {
         readonly string minimum_value;

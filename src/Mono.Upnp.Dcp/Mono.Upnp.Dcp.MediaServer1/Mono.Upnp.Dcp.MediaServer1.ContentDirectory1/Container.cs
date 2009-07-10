@@ -81,7 +81,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         public Results<Object> Browse (ResultsSettings settings)
         {
-            var results = new BrowseResults (ContentDirectory, Id, settings);
+            var results = new BrowseResults (Deserializer, Id, settings);
             results.FetchResults ();
             return results;
         }
@@ -111,7 +111,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (searchCriteria == null) throw new ArgumentNullException ("searchCriteria");
             
-            var results = new SearchResults<T> (ContentDirectory, Id, searchCriteria, settings);
+            var results = new SearchResults<T> (Deserializer, Id, searchCriteria, settings);
             results.FetchResults ();
             return results;
         }
@@ -143,7 +143,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         public bool CanCreateType<T> () where T : Object
         {
-            return ContentDirectory.Controller.CanCreateObject && IsValidType<T> (create_classes, false);
+            return Deserializer.Controller.CanCreateObject && IsValidType<T> (create_classes, false);
         }
         
         public Object CreateReference (Object target)
@@ -154,8 +154,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             if (IsRestricted) throw new InvalidOperationException (
                 "A reference cannot be created because the parent object is restricted.");
             
-            var id = ContentDirectory.Controller.CreateReference (Id, target.Id);
-            return ContentDirectory.GetObject <Object> (id);
+            var id = Deserializer.Controller.CreateReference (Id, target.Id);
+            return Deserializer.GetObject <Object> (id);
         }
         
         static bool IsValidType<T> (IList<ClassReference> classes, bool allowSuperClasses) where T : Object
@@ -165,7 +165,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
             var type = ClassManager.GetClassFromType<T> ();
             foreach (var @class in classes) {
-                var class_name = @class.Class.FullClassName;
+                var class_name = @class.FullClassName;
                 var compare = type.CompareTo (class_name);
                 if (compare == 0) {
                     return true;

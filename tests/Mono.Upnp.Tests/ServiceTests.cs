@@ -209,6 +209,31 @@ namespace Mono.Upnp.Tests
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
         }
         
+        class ReturnArgumentNameTestClass
+        {
+            [UpnpAction]
+            [return: UpnpArgument ("foo")]
+            public string Foo ()
+            {
+                return null;
+            }
+        }
+        
+        [Test]
+        public void ReturnArgumentNameTest ()
+        {
+            var service = new DummyService<ReturnArgumentNameTestClass> ();
+            var controller = new ServiceController (
+                new ServiceAction[] {
+                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("foo", "A_ARG_foo", ArgumentDirection.Out, true) })
+                },
+                new StateVariable[] {
+                    new StateVariable ("A_ARG_foo", "string")
+                }
+            );
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
+        
         class RelatedStateVariableNameTestClass
         {
             [UpnpAction]
@@ -227,6 +252,31 @@ namespace Mono.Upnp.Tests
                 },
                 new StateVariable[] {
                     new StateVariable ("X_ARG_bar", "string")
+                }
+            );
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
+        
+        class ReturnArgumentRelatedStateVariableNameTestClass
+        {
+            [UpnpAction]
+            [return: UpnpRelatedStateVariable ("X_ARG_foo")]
+            public string Foo ()
+            {
+                return null;
+            }
+        }
+        
+        [Test]
+        public void ReturnArgumentRelatedStateVariableNameTest ()
+        {
+            var service = new DummyService<ReturnArgumentRelatedStateVariableNameTestClass> ();
+            var controller = new ServiceController (
+                new ServiceAction[] {
+                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("result", "X_ARG_foo", ArgumentDirection.Out, true) })
+                },
+                new StateVariable[] {
+                    new StateVariable ("X_ARG_foo", "string")
                 }
             );
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());

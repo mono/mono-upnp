@@ -120,7 +120,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             var @object = (T)Activator.CreateInstance (type, true);
             using (var reader = navigator.ReadSubtree ()) {
                 reader.Read ();
-                @object.Deserialize (this, reader);
+                //@object.Deserialize (this, reader);
             }
             if (container_update_ids.ContainsKey (@object.ParentId)) {
                 @object.ParentUpdateId = container_update_ids[@object.ParentId];
@@ -164,7 +164,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (@object == null) throw new ArgumentNullException ("object");
             
-            return @object.ContentDirectory.GetObject<T> (@object.Id);
+            return @object.Deserializer.GetObject<T> (@object.Id);
         }
     }
 }

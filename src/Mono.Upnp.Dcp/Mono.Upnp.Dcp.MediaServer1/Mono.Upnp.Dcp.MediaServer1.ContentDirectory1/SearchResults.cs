@@ -30,30 +30,30 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     {
         readonly string search_criteria;
         
-        public SearchResults (ContentDirectory contentDirectory, string objectId, string searchCriteria,
+        public SearchResults (Deserializer deserializer, string objectId, string searchCriteria,
                               ResultsSettings settings)
-            : this (contentDirectory, objectId, searchCriteria,
+            : this (deserializer, objectId, searchCriteria,
                     settings.SortCriteria, settings.Filter, settings.RequestCount, settings.Offset)
         {
         }
         
-        SearchResults (ContentDirectory contentDirectory, string objectId, string searchCriteria,
+        SearchResults (Deserializer deserializer, string objectId, string searchCriteria,
                        string sortCriteria, string filter, uint requestCount, uint offset)
-            : base (contentDirectory, objectId, sortCriteria, filter, requestCount, offset)
+            : base (deserializer, objectId, sortCriteria, filter, requestCount, offset)
         {
             search_criteria = searchCriteria;
         }
         
         protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
         {
-            return ContentDirectory.Controller.Search (
+            return Deserializer.Controller.Search (
                 ObjectId, search_criteria, Filter, Offset, RequestCount, SortCriteria,
                 out returnedCount, out totalCount, out updateId);
         }
         
         protected override Results<T> CreateMoreResults ()
         {
-            return new SearchResults<T> (ContentDirectory, ObjectId, search_criteria, SortCriteria,
+            return new SearchResults<T> (Deserializer, ObjectId, search_criteria, SortCriteria,
                 Filter, RequestCount, Offset + ReturnedCount);
         }
     }

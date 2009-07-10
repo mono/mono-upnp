@@ -31,7 +31,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class Results<T> : IEnumerable<T> where T : Object
     {
-        readonly ContentDirectory content_directory;
+        readonly Deserializer deserializer;
         readonly string object_id;
         readonly string sort_criteria;
         readonly string filter;
@@ -39,10 +39,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         readonly uint offset;
         readonly List<T> results = new List<T> ();
         
-        internal Results (ContentDirectory contentDirectory, string objectId, string sortCriteria,
+        internal Results (Deserializer deserializer, string objectId, string sortCriteria,
                           string filter, uint requestCount, uint offset)
         {
-            this.content_directory = contentDirectory;
+            this.deserializer = deserializer;
             this.object_id = objectId;
             this.sort_criteria = sortCriteria;
             this.filter = filter;
@@ -50,15 +50,38 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             this.offset = offset;
         }
         
-        protected ContentDirectory ContentDirectory { get { return content_directory; } }
-        protected string ObjectId { get { return object_id; } }
-        protected string SortCriteria { get { return sort_criteria; } }
-        protected string Filter { get { return filter; } }
-        protected uint RequestCount { get { return request_count; } }
-        public uint Offset { get { return offset; } }
-        public uint ReturnedCount { get; private set; }
+        protected Deserializer Deserializer {
+            get { return deserializer; }
+        }
+        
+        protected string ObjectId {
+            get { return object_id; }
+        }
+        
+        protected string SortCriteria {
+            get { return sort_criteria; }
+        }
+        
+        protected string Filter {
+            get { return filter; }
+        }
+        
+        protected uint RequestCount {
+            get { return request_count; }
+        }
+        
+        public uint Offset {
+            get { return offset; }
+        }
+        
+        public uint ReturnedCount {
+            get; private set;
+        }
+        
         public uint TotalCount { get; private set; }
+        
         public bool IsOutOfDate { get; private set; }
+        
         public bool HasMoreResults {
             get { return Offset + ReturnedCount < TotalCount; }
         }

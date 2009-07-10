@@ -30,28 +30,28 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     sealed class BrowseResults : Results<Object>
     {
-        public BrowseResults (ContentDirectory contentDirectory, string objectId, ResultsSettings settings)
-            : this (contentDirectory, objectId, settings.SortCriteria,
+        public BrowseResults (Deserializer deserializer, string objectId, ResultsSettings settings)
+            : this (deserializer, objectId, settings.SortCriteria,
                     settings.Filter, settings.RequestCount, settings.Offset)
         {
         }
         
-        BrowseResults (ContentDirectory contentDirectory, string objectId,
+        BrowseResults (Deserializer deserializer, string objectId,
                        string sortCriteria, string filter, uint requestCount, uint offset)
-            : base (contentDirectory, objectId, sortCriteria, filter, requestCount, offset)
+            : base (deserializer, objectId, sortCriteria, filter, requestCount, offset)
         {
         }
         
         protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
         {
-            return ContentDirectory.Controller.Browse (
+            return Deserializer.Controller.Browse (
                 ObjectId, BrowseFlag.BrowseDirectChildren, Filter, Offset, RequestCount, SortCriteria,
                 out returnedCount, out totalCount, out updateId);
         }
         
         protected override Results<Object> CreateMoreResults ()
         {
-            return new BrowseResults (ContentDirectory, ObjectId, SortCriteria,
+            return new BrowseResults (Deserializer, ObjectId, SortCriteria,
                  Filter, RequestCount, Offset + ReturnedCount);
         }
     }

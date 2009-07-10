@@ -43,7 +43,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             if (RefId == null) throw new InvalidOperationException (
                 "Cannot get refered object because the item is not a reference.");
             
-            return ContentDirectory.GetObject<Item> (RefId);
+            return Deserializer.GetObject<Item> (RefId);
         }
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)

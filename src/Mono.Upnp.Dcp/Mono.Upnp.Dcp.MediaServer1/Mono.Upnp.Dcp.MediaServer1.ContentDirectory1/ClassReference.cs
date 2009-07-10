@@ -38,7 +38,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         int IComparable<ClassReference>.CompareTo (ClassReference classReference)
         {
-            return @class.FullClassName.CompareTo (classReference.@class.FullClassName);
+            return FullClassName.CompareTo (classReference.FullClassName);
         }
     }
 }
