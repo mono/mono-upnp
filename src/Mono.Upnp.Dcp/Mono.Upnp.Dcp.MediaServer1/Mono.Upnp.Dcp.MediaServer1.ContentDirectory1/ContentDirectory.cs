@@ -27,7 +27,6 @@
 using System;
 
 using Mono.Upnp.Control;
-using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
@@ -35,8 +34,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     {
         public static readonly ServiceType ServiceType = new ServiceType (
             "urn:schemas-upnp-org:service:ContentDirectory:1");
-        
-        readonly XmlSerializer serializer = new XmlSerializer ();
         
         [UpnpAction]
         public virtual void GetSearchCapabilities ([UpnpArgument ("SearchCaps")]
@@ -71,18 +68,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [UpnpAction]
         public virtual void Browse ([UpnpArgument ("ObjectID")] string objectId,
                                     [UpnpArgument ("BrowseFlag")] BrowseFlag browseFlag,
+                                    [UpnpArgument ("Filter")] string filter,
                                     [UpnpArgument ("StartingIndex")] int startingIndex,
                                     [UpnpArgument ("RequestCount")] int requestCount,
                                     [UpnpArgument ("SortCriteria")] string sortCriteria,
+                                    [UpnpArgument ("Result")] out string result,
                                     [UpnpArgument ("NumberReturned")] out int numberReturned,
                                     [UpnpArgument ("TotalMatches")] out int totalMatches,
-                                    [UpnpArgument ("UpdateID")] out string updateId,
-                                    [UpnpArgument ("Result")] out string result)
+                                    [UpnpArgument ("UpdateID")] out string updateId)
         {
-            result = Browse (objectId, browseFlag, startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches, out updateId);
+            result = Browse (objectId, browseFlag, filter, startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches, out updateId);
         }
         
-        protected abstract string Browse (string objectId, BrowseFlag browseFlag, int startIndex,
+        protected abstract string Browse (string objectId, BrowseFlag browseFlag, string filter, int startIndex,
                                           int requestCount, string sortCriteria, out int numberReturned,
                                           out int totalMatches, out string updateId);
     }

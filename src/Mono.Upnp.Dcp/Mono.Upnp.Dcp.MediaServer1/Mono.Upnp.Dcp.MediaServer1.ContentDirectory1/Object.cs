@@ -33,17 +33,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class Object : XmlAutomatable
     {
-        readonly IList<Resource> resources;
-        
-        protected Object ()
-        {
-        }
+        readonly IList<Resource> resources = new List<Resource> ();
+        bool is_restricted;
+        string title;
+        string creator;
+        Class @class;
+        WriteStatus? write_status;
 
         [XmlAttribute ("id", Schemas.DidlLiteSchema)]
-        public virtual string Id { get; protected set; }
+        public virtual string Id { get; protected internal set; }
         
         [XmlAttribute ("parentId", Schemas.DidlLiteSchema)]
-        public virtual string ParentId { get; protected set; }
+        public virtual string ParentId { get; protected internal set; }
         
         [XmlAttribute ("restricted", Schemas.DidlLiteSchema)]
         protected virtual string IsRestrictedValue {
@@ -51,7 +52,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             set { IsRestricted = value == "true"; }
         }
         
-        public bool IsRestricted { get; protected set; }
+        public bool IsRestricted {
+            get { return is_restricted; }
+            set { is_restricted = value; }
+        }
         
         [XmlArrayItem]
         protected virtual ICollection<Resource> ResourceCollection {
@@ -63,20 +67,42 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         }
         
         [XmlElement ("title", Schemas.DublinCoreSchema)]
-        public virtual string Title { get; private set; }
+        public virtual string Title {
+            get { return title; }
+            set { title = value; }
+        }
         
         [XmlElement ("creator", Schemas.DublinCoreSchema, OmitIfNull = true)]
-        public virtual string Creator { get; private set; }
+        public virtual string Creator {
+            get { return creator; }
+            set { creator = value; }
+        }
         
         [XmlElement ("class", Schemas.UpnpSchema)]
-        public virtual Class Class { get; private set; }
+        public virtual Class Class {
+            get { return @class; }
+            set { @class = value; }
+        }
         
         [XmlElement ("writeStatus", Schemas.UpnpSchema, OmitIfNull = true)]
-        public virtual WriteStatus? WriteStatus { get; private set; }
+        public virtual WriteStatus? WriteStatus {
+            get { return write_status; }
+            set { write_status = value; }
+        }
         
         internal Deserializer Deserializer { get; private set; }
         
         internal uint ParentUpdateId { get; set; }
+        
+        public void AddResource (Resource resource)
+        {
+            resources.Add (resource);
+        }
+        
+        public bool RemoveResource (Resource resource)
+        {
+            return resources.Remove (resource);
+        }
         
 //        public Container GetParent ()
 //        {

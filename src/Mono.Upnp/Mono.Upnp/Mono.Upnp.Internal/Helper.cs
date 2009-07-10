@@ -78,6 +78,7 @@ namespace Mono.Upnp.Internal
             return map;
         }
 
+        // TODO this is almost obsolete
         public static bool ReadToNextElement (XmlReader reader)
         {
             while (reader.Read ()) {

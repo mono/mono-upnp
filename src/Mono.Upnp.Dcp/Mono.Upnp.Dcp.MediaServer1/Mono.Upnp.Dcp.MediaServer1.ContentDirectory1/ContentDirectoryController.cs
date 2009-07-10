@@ -46,6 +46,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (browseFlag < BrowseFlag.BrowseMetadata || browseFlag > BrowseFlag.BrowseDirectChildren)
                 throw new ArgumentOutOfRangeException ("browseFlag");
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (6);
             in_arguments.Add ("ObjectID", objectId);
             in_arguments.Add ("BrowseFlag", browseFlag.ToString ());
@@ -60,10 +61,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return action_result["Result"];
         }
 
-        public bool CanSearch { get { return controller.Actions.ContainsKey ("Search"); } }
+        public bool CanSearch {
+            get { return controller.Actions.ContainsKey ("Search"); }
+        }
+        
         public string Search (string containerId, string searchCriteria, string filter, uint startingIndex, uint requestedCount, string sortCriteria, out uint numberReturned, out uint totalMatches, out uint updateId)
         {
             if (!CanSearch) throw new NotImplementedException ();
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (6);
             in_arguments.Add ("ContainerID", containerId);
             in_arguments.Add ("SearchCriteria", searchCriteria);
@@ -78,10 +83,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return action_result["Result"];
         }
 
-        public bool CanCreateObject { get { return controller.Actions.ContainsKey ("CreateObject"); } }
+        public bool CanCreateObject {
+            get { return controller.Actions.ContainsKey ("CreateObject"); }
+        }
+        
         public string CreateObject (string containerId, string elements)
         {
             if (!CanCreateObject) throw new NotImplementedException ();
+            
             var in_arguments = new Dictionary<string, string> (2);
             in_arguments.Add ("ContainerID", containerId);
             in_arguments.Add ("Elements", elements);
@@ -89,19 +98,27 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return action_result["Result"];
         }
 
-        public bool CanDestroyObject { get { return controller.Actions.ContainsKey ("DestroyObject"); } }
+        public bool CanDestroyObject {
+            get { return controller.Actions.ContainsKey ("DestroyObject"); }
+        }
+        
         public void DestroyObject (string objectId)
         {
             if (!CanDestroyObject) throw new NotImplementedException ();
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
             in_arguments.Add ("ObjectID", objectId);
             controller.Actions["DestroyObject"].Invoke (in_arguments);
         }
 
-        public bool CanUpdateObject { get { return controller.Actions.ContainsKey ("UpdateObject"); } }
+        public bool CanUpdateObject {
+            get { return controller.Actions.ContainsKey ("UpdateObject"); }
+        }
+        
         public void UpdateObject (string objectId, string currentTagValue, string newTagValue)
         {
             if (!CanUpdateObject) throw new NotImplementedException ();
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (3);
             in_arguments.Add ("ObjectID", objectId);
             in_arguments.Add ("CurrentTagValue", currentTagValue);
@@ -109,10 +126,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             controller.Actions["UpdateObject"].Invoke (in_arguments);
         }
 
-        public bool CanImportResource { get { return controller.Actions.ContainsKey ("ImportResource"); } }
+        public bool CanImportResource {
+            get { return controller.Actions.ContainsKey ("ImportResource"); }
+        }
+        
         public string ImportResource (Uri sourceUri, Uri destinationUri)
         {
             if (!CanImportResource) throw new NotImplementedException ();
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
             in_arguments.Add ("SourceURI", sourceUri.ToString ());
             in_arguments.Add ("DestinationURI", destinationUri.ToString ());
@@ -120,10 +141,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return action_result["TransferID"];
         }
 
-        public bool CanExportResource { get { return controller.Actions.ContainsKey ("ExportResource"); } }
+        public bool CanExportResource {
+            get { return controller.Actions.ContainsKey ("ExportResource"); }
+        }
+        
         public string ExportResource (Uri sourceUri, Uri destinationUri)
         {
             if (!CanExportResource) throw new NotImplementedException ();
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
             in_arguments.Add ("SourceURI", sourceUri.ToString ());
             in_arguments.Add ("DestinationURI", destinationUri.ToString ());
@@ -131,19 +156,27 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return action_result["TransferID"];
         }
 
-        public bool CanStopTransferResource { get { return controller.Actions.ContainsKey ("StopTransferResource"); } }
+        public bool CanStopTransferResource {
+            get { return controller.Actions.ContainsKey ("StopTransferResource"); }
+        }
+        
         public void StopTransferResource (uint transferId)
         {
             if (!CanStopTransferResource) throw new NotImplementedException ();
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
             in_arguments.Add ("TransferID", transferId.ToString ());
             controller.Actions["StopTransferResource"].Invoke (in_arguments);
         }
 
-        public bool CanGetTransferProgress { get { return controller.Actions.ContainsKey ("GetTransferProgress"); } }
+        public bool CanGetTransferProgress {
+            get { return controller.Actions.ContainsKey ("GetTransferProgress"); }
+        }
+        
         public void GetTransferProgress (uint transferId, out string transferStatus, out string transferLength, out string transferTotal)
         {
             if (!CanGetTransferProgress) throw new NotImplementedException ();
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
             in_arguments.Add ("TransferID", transferId.ToString ());
             var action_result = controller.Actions["GetTransferProgress"].Invoke (in_arguments);
@@ -152,19 +185,27 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             transferTotal = action_result["TransferTotal"];
         }
 
-        public bool CanDeleteResource { get { return controller.Actions.ContainsKey ("DeleteResource"); } }
+        public bool CanDeleteResource {
+            get { return controller.Actions.ContainsKey ("DeleteResource"); }
+        }
+        
         public void DeleteResource (Uri resourceUri)
         {
             if (!CanDeleteResource) throw new NotImplementedException ();
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
             in_arguments.Add ("ResourceURI", resourceUri.ToString ());
             controller.Actions["DeleteResource"].Invoke (in_arguments);
         }
 
-        public bool CanCreateReference { get { return controller.Actions.ContainsKey ("CreateReference"); } }
+        public bool CanCreateReference {
+            get { return controller.Actions.ContainsKey ("CreateReference"); }
+        }
+        
         public string CreateReference (string containerId, string objectId)
         {
             if (!CanCreateReference) throw new NotImplementedException ();
+            
             Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
             in_arguments.Add ("ContainerID", containerId);
             in_arguments.Add ("ObjectID", objectId);
