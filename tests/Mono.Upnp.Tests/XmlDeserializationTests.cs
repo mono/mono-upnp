@@ -778,21 +778,96 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual ("bar", deserialized_object.Foo);
         }
         
-        class FreeArrayItemTestClass
+        class FreeNamedArrayItemTestClass
         {
-            readonly List<string> foos = new List<string> ();
+            readonly List<string> values = new List<string> ();
             
-            [XmlArrayItem ("Foo")] public IList<string> Foos { get { return foos; } }
+            [XmlArrayItem ("Foo")] public IList<string> Values { get { return values; } }
         }
         
         [Test]
-        public void FreeArrayItemTest ()
+        public void FreeNamedArrayItemTest ()
         {
-            var deserialized_object = Deserialize<FreeArrayItemTestClass> (@"<Test><Foo>foo</Foo><Foo>bar</Foo><Foo>bat</Foo></Test>");
-            Assert.AreEqual (3, deserialized_object.Foos.Count);
-            Assert.AreEqual ("foo", deserialized_object.Foos[0]);
-            Assert.AreEqual ("bar", deserialized_object.Foos[1]);
-            Assert.AreEqual ("bat", deserialized_object.Foos[2]);
+            var deserialized_object = Deserialize<FreeNamedArrayItemTestClass> (@"<Test><Foo>foo</Foo><Foo>bar</Foo><foo>bat</foo></Test>");
+            Assert.AreEqual (2, deserialized_object.Values.Count);
+            Assert.AreEqual ("foo", deserialized_object.Values[0]);
+            Assert.AreEqual ("bar", deserialized_object.Values[1]);
+        }
+        
+        class FreeEmptyNameArrayItemTestClass
+        {
+            readonly IList<string> values = new List<string> ();
+            
+            [XmlArrayItem ("")] public IList<string> Values { get { return values; } }
+        }
+        
+        [Test]
+        public void FreeEmptyNameArrayItemTest ()
+        {
+            var deserialized_object = Deserialize<FreeEmptyNameArrayItemTestClass> (@"<Test><String>foo</String><String>bar</String><string>bat</string></Test>");
+            Assert.AreEqual (2, deserialized_object.Values.Count);
+            Assert.AreEqual ("foo", deserialized_object.Values[0]);
+            Assert.AreEqual ("bar", deserialized_object.Values[1]);
+        }
+        
+        class FreeUnnamedArrayItemTestClass
+        {
+            readonly IList<string> values = new List<string> ();
+            
+            [XmlArrayItem] public IList<string> Values { get { return values; } }
+        }
+        
+        [Test]
+        public void FreeUnnamedArrayItemTest ()
+        {
+            var deserialized_object = Deserialize<FreeUnnamedArrayItemTestClass> (@"<Test><String>foo</String><String>bar</String><string>bat</string></Test>");
+            Assert.AreEqual (2, deserialized_object.Values.Count);
+            Assert.AreEqual ("foo", deserialized_object.Values[0]);
+            Assert.AreEqual ("bar", deserialized_object.Values[1]);
+        }
+        
+        [XmlType ("test")]
+        class NamedItem
+        {
+            [XmlValue] public string Value { get; private set; }
+        }
+        
+        class FreeNamedTypeArrayItemTestClass
+        {
+            readonly IList<NamedItem> values = new List<NamedItem> ();
+            
+            [XmlArrayItem] public IList<NamedItem> Values { get { return values; } }
+        }
+        
+        [Test]
+        public void FreeNamedTypeArrayItemTest ()
+        {
+            var deserialized_object = Deserialize<FreeNamedTypeArrayItemTestClass> (@"<Test><test>foo</test><test>bar</test><NamedItem>bat</NamedItem></Test>");
+            Assert.AreEqual (2, deserialized_object.Values.Count);
+            Assert.AreEqual ("foo", deserialized_object.Values[0].Value);
+            Assert.AreEqual ("bar", deserialized_object.Values[1].Value);
+        }
+        
+        [XmlType ("")]
+        class EmptyNameItem
+        {
+            [XmlValue] public string Value { get; private set; }
+        }
+        
+        class FreeEmptyNameTypeArrayItemTestClass
+        {
+            readonly IList<EmptyNameItem> values = new List<EmptyNameItem> ();
+            
+            [XmlArrayItem] public IList<EmptyNameItem> Values { get { return values; } }
+        }
+        
+        [Test]
+        public void FreeEmptyNameTypeArrayItemTest ()
+        {
+            var deserialized_object = Deserialize<FreeEmptyNameTypeArrayItemTestClass> (@"<Test><EmptyNameItem>foo</EmptyNameItem><EmptyNameItem>bar</EmptyNameItem><item>bat</item></Test>");
+            Assert.AreEqual (2, deserialized_object.Values.Count);
+            Assert.AreEqual ("foo", deserialized_object.Values[0].Value);
+            Assert.AreEqual ("bar", deserialized_object.Values[1].Value);
         }
         
         class NullableElementTestClass

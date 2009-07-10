@@ -31,30 +31,12 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class Object : XmlAutomatable<string>
+    public abstract class Object : XmlAutomatable
     {
         readonly IList<Resource> resources;
         
         protected Object ()
         {
-        }
-        
-        public Container GetParent ()
-        {
-            return ParentId == "-1" ? null : ContentDirectory.GetObject<Container> (ParentId);
-        }
-        
-        public bool CanDestroy {
-            get { return !IsRestricted && ContentDirectory.Controller.CanDestroyObject; }
-        }
-        
-        public void Destroy ()
-        {
-            ContentDirectory.Controller.DestroyObject (Id);
-        }
-        
-        public bool IsOutOfDate {
-            get { return ContentDirectory.CheckIfObjectIsOutOfDate (this); }
         }
 
         [XmlAttribute ("id", Schemas.DidlLiteSchema)]
@@ -64,31 +46,54 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public virtual string ParentId { get; protected set; }
         
         [XmlAttribute ("restricted", Schemas.DidlLiteSchema)]
-        public virtual bool IsRestricted { get; protected set; }
+        protected virtual string IsRestrictedValue {
+            get { return IsRestricted ? "true" : "false"; }
+            set { IsRestricted = value == "true"; }
+        }
+        
+        public bool IsRestricted { get; protected set; }
+        
+        [XmlArrayItem]
+        protected virtual ICollection<Resource> ResourceCollection {
+            get { return resources; }
+        }
         
         public IEnumerable<Resource> Resources {
             get { return resources; }
         }
         
-        [XmlArrayItem]
-        protected ICollection<Resource> ResourceCollection {
-            get { return resources; }
-        }
-        
         [XmlElement ("title", Schemas.DublinCoreSchema)]
-        public string Title { get; private set; }
+        public virtual string Title { get; private set; }
         
-        [XmlElement ("creator", Schemas.DublinCoreSchema)]
-        public string Creator { get; private set; }
+        [XmlElement ("creator", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Creator { get; private set; }
         
         [XmlElement ("class", Schemas.UpnpSchema)]
-        public Class Class { get; private set; }
+        public virtual Class Class { get; private set; }
         
         [XmlElement ("writeStatus", Schemas.UpnpSchema, OmitIfNull = true)]
-        public WriteStatus? WriteStatus { get; private set; }
+        public virtual WriteStatus? WriteStatus { get; private set; }
         
         internal ContentDirectory ContentDirectory { get; private set; }
         internal uint ParentUpdateId { get; set; }
+        
+//        public Container GetParent ()
+//        {
+//            return ParentId == "-1" ? null : ContentDirectory.GetObject<Container> (ParentId);
+//        }
+//        
+//        public bool CanDestroy {
+//            get { return !IsRestricted && ContentDirectory.Controller.CanDestroyObject; }
+//        }
+//        
+//        public void Destroy ()
+//        {
+//            ContentDirectory.Controller.DestroyObject (Id);
+//        }
+//        
+//        public bool IsOutOfDate {
+//            get { return ContentDirectory.CheckIfObjectIsOutOfDate (this); }
+//        }
         
         public override string ToString ()
         {
@@ -103,21 +108,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
             context.AutoDeserializeElement (this);
-        }
-
-        protected override void SerializeSelfAndMembers (XmlSerializationContext<string> context)
-        {
-            context.AutoSerializeObjectAndMembers (this);
-        }
-
-        protected override void SerializeMembersOnly (XmlSerializationContext<string> context)
-        {
-            context.AutoSerializeMembersOnly (this);
-        }
-        
-        protected override void SerializeMember (XmlMemberSerializationContext<string> context)
-        {
-            base.SerializeMember (context);
         }
     }
 }

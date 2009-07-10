@@ -69,13 +69,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             var xml = FetchXml (out returned_count, out total_count, out update_id);
             ReturnedCount = returned_count;
             TotalCount = total_count;
-            if (content_directory.CheckIfContainerIsOutOfDate (object_id, update_id) && offset != 0) {
-                IsOutOfDate = true;
-            } else {
-                foreach (var result in content_directory.Deserialize<T> (filter, xml)) {
-                    results.Add (result);
-                }
-            }
+//            if (content_directory.CheckIfContainerIsOutOfDate (object_id, update_id) && offset != 0) {
+//                IsOutOfDate = true;
+//            } else {
+//                foreach (var result in content_directory.Deserialize<T> (filter, xml)) {
+//                    results.Add (result);
+//                }
+//            }
         }
         
         protected abstract string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId);

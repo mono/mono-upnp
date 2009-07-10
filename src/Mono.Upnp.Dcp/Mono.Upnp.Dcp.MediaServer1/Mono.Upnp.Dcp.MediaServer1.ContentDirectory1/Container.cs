@@ -34,23 +34,45 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     [XmlType ("container", Schemas.DidlLiteSchema)]
-    public class Container : Object
+    public abstract class Container : Object
     {
-        readonly List<ClassReference> search_class_list = new List<ClassReference> ();
-        readonly List<ClassReference> create_class_list = new List<ClassReference> ();
-        readonly ReadOnlyCollection<ClassReference> search_classes;
-        readonly ReadOnlyCollection<ClassReference> create_classes;
+        readonly List<ClassReference> search_classes = new List<ClassReference> ();
+        readonly List<ClassReference> create_classes = new List<ClassReference> ();
         
         internal Container ()
         {
-            search_classes = search_class_list.AsReadOnly ();
-            create_classes = create_class_list.AsReadOnly ();
+            //search_classes = search_class_list.AsReadOnly ();
+            //create_classes = create_class_list.AsReadOnly ();
         }
         
-        public int? ChildCount { get; private set; }
-        public ReadOnlyCollection<ClassReference> CreateClasses { get { return create_classes; } }
-        public ReadOnlyCollection<ClassReference> SearchClasses { get { return search_classes; } }
-        public bool Searchable { get; private set; }
+        [XmlAttribute ("childCount", OmitIfNull = true)]
+        public virtual int? ChildCount { get; protected set; }
+        
+        [XmlArrayItem ("createClass", Schemas.UpnpSchema)]
+        protected virtual ICollection<ClassReference> CreateClassCollection {
+            get { return create_classes; }
+        }
+        
+        public IEnumerable<ClassReference> CreateClasses {
+            get { return create_classes; }
+        }
+        
+        [XmlArrayItem ("searchClass", Schemas.UpnpSchema)]
+        protected virtual ICollection<ClassReference> SearchClassCollection {
+            get { return search_classes; }
+        }
+        
+        public IEnumerable<ClassReference> SearchClasses {
+            get { return search_classes; }
+        }
+        
+        [XmlAttribute ("searchable", OmitIfNull = true)]
+        protected virtual string SearchableValue {
+            get { return Searchable ? "true" : null; }
+            set { Searchable = value == "true"; }
+        }
+        
+        public bool Searchable { get; protected set; }
         
         public Results<Object> Browse ()
         {
@@ -94,25 +116,25 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return results;
         }
         
-        public T CreateObject<T> (ObjectBuilder builder) where T : Object
-        {
-            // TODO update resources
-            var xml = new StringBuilder ();
-            using (var stream = new StringWriter (xml)) {
-                using (var writer = XmlWriter.Create (stream)) {
-                    writer.WriteStartElement ("DIDL-Lite", Schemas.DidlLiteSchema);
-                    writer.WriteAttributeString ("xmlns", "dc", null, Schemas.DublinCoreSchema);
-                    writer.WriteAttributeString ("xmlns", "upnp", null, Schemas.UpnpSchema);
-                    var serializer = new XmlSerializer (builder.GetType ());
-                    serializer.Serialize (writer, builder);
-                }
-            }
-            var @object = ContentDirectory.Controller.CreateObject (Id, xml.ToString ());
-            foreach (var result in ContentDirectory.Deserialize<T> ("*", @object)) {
-                return result;
-            }
-            return null;
-        }
+//        public T CreateObject<T> (ObjectBuilder builder) where T : Object
+//        {
+//            // TODO update resources
+//            var xml = new StringBuilder ();
+//            using (var stream = new StringWriter (xml)) {
+//                using (var writer = XmlWriter.Create (stream)) {
+//                    writer.WriteStartElement ("DIDL-Lite", Schemas.DidlLiteSchema);
+//                    writer.WriteAttributeString ("xmlns", "dc", null, Schemas.DublinCoreSchema);
+//                    writer.WriteAttributeString ("xmlns", "upnp", null, Schemas.UpnpSchema);
+//                    var serializer = new XmlSerializer (builder.GetType ());
+//                    serializer.Serialize (writer, builder);
+//                }
+//            }
+//            var @object = ContentDirectory.Controller.CreateObject (Id, xml.ToString ());
+//            foreach (var result in ContentDirectory.Deserialize<T> ("*", @object)) {
+//                return result;
+//            }
+//            return null;
+//        }
         
         public bool CanSearchForType<T> () where T : Object
         {
@@ -158,45 +180,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return false;
         }
         
-        protected override void DeserializeRootElement (XmlReader reader)
+        protected override void DeserializeAttribute (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            Searchable = ParseBool (reader["searchable"]);
-            int child_count;
-            if (int.TryParse (reader["childCount"], out child_count)) {
-                ChildCount = child_count;
-            }
-            
-            base.DeserializeRootElement (reader);
+            context.AutoDeserializeAttribute (this);
         }
-        
-        protected override void DeserializePropertyElement (XmlReader reader)
+
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "searchClass":
-                    search_class_list.Add (new ClassReference (reader));
-                    break;
-                case "createClass":
-                    create_class_list.Add (new ClassReference (reader));
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
-        }
-        
-        protected override void VerifyDeserialization ()
-        {
-            base.VerifyDeserialization ();
-            search_class_list.Sort ();
-            create_class_list.Sort ();
+            context.AutoDeserializeElement (this);
         }
     }
 }

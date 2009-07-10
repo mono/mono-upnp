@@ -28,7 +28,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public sealed class Class
+    public class Class
     {
         [XmlAttribute ("name")]
         public string FriendlyClassName { get; private set; }

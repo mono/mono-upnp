@@ -1,5 +1,5 @@
 // 
-// ContentDirectory.cs
+// Deserializer.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -31,7 +31,7 @@ using System.Xml.XPath;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class ContentDirectory
+    public class Deserializer
     {
         public static readonly ServiceType ServiceType = new ServiceType (
             "urn:schemas-upnp-org:service:ContentDirectory:1");
@@ -45,7 +45,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         readonly string sort_capabilities;
         Container root_container;
         
-        public ContentDirectory (ContentDirectoryController controller)
+        public Deserializer (ContentDirectoryController controller)
         {
             if (controller == null) throw new ArgumentNullException ("controller");
             

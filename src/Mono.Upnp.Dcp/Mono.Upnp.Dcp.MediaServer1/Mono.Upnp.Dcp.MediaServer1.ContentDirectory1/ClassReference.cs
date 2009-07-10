@@ -26,23 +26,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public struct ClassReference : IComparable<ClassReference>
+    public class ClassReference : Class, IComparable<ClassReference>
     {
-        readonly Class @class;
-        readonly bool include_derived;
-        
-        internal ClassReference (XmlReader reader)
-        {
-            include_derived = bool.Parse (reader["includeDerived"]);
-            @class = new Class (reader);
-        }
-        
-        public Class Class { get { return @class; } }
-        public bool IncludeDerived { get { return include_derived; } }
+        [XmlAttribute ("includeDerived")]
+        public bool IncludeDerived { get; private set; }
         
         int IComparable<ClassReference>.CompareTo (ClassReference classReference)
         {

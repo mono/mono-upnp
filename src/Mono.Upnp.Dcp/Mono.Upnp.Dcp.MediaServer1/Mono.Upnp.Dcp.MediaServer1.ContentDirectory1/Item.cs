@@ -31,10 +31,10 @@ using System;
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     [XmlType ("item", Schemas.DidlLiteSchema)]
-    public class Item : Object
+    public abstract class Item : Object
     {
         [XmlAttribute ("refID", Schemas.DidlLiteSchema, OmitIfNull = true)]
-        public string RefId { get; set; }
+        public virtual string RefId { get; protected set; }
         
         public bool IsReference { get { return RefId != null; } }
         
@@ -49,16 +49,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         protected override void DeserializeAttribute (XmlDeserializationContext context)
         {
             context.AutoDeserializeAttribute (this);
-        }
-        
-        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
-        {
-            context.AutoSerializeObjectAndMembers (this);
-        }
-        
-        protected override void SerializeMembersOnly (XmlSerializationContext context)
-        {
-            context.AutoSerializeMembersOnly (this);
         }
     }
 }

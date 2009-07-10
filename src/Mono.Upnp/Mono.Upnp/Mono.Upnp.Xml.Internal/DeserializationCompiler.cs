@@ -341,12 +341,25 @@ namespace Mono.Upnp.Xml.Internal
                 if (array_attribute != null) {
                     AddDeserializer (element_deserializers,
                         CreateName (property.Name, array_attribute.Name, array_attribute.Namespace),
-                        CreateArrayElementDeserializer (property, array_item_attribute));
+                        CreateArrayElementDeserializer (property));
                     continue;
                 } else if (array_item_attribute != null) {
+                    var name = array_item_attribute.Name;
+                    var @namespace = array_item_attribute.Namespace;
+                    if (string.IsNullOrEmpty (name)) {
+                        var item_type = GetICollection (property.PropertyType).GetGenericArguments ()[0];
+                        var type_attribute = item_type.GetCustomAttributes (typeof (XmlTypeAttribute), false);
+                        if (type_attribute.Length == 0) {
+                            name = item_type.Name;
+                        } else {
+                            var xml_type = (XmlTypeAttribute)type_attribute[0];
+                            name = string.IsNullOrEmpty (xml_type.Name) ? item_type.Name : xml_type.Name;
+                            @namespace = xml_type.Namespace;
+                        }
+                    }
                     AddDeserializer (element_deserializers,
-                        CreateName (property.Name, array_item_attribute.Name, array_item_attribute.Namespace),
-                        CreateArrayItemElementDeserializer (property, array_item_attribute));
+                        CreateName (name, @namespace),
+                        CreateArrayItemElementDeserializer (property));
                 }
                 
                 if (attribute_attribute != null) {
@@ -464,7 +477,7 @@ namespace Mono.Upnp.Xml.Internal
             }
         }
         
-        ObjectDeserializer CreateArrayElementDeserializer (PropertyInfo property, XmlArrayItemAttribute arrayItemAttribute)
+        ObjectDeserializer CreateArrayElementDeserializer (PropertyInfo property)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -490,7 +503,7 @@ namespace Mono.Upnp.Xml.Internal
             };
         }
         
-        ObjectDeserializer CreateArrayItemElementDeserializer (PropertyInfo property, XmlArrayItemAttribute arrayItemAttribute)
+        ObjectDeserializer CreateArrayItemElementDeserializer (PropertyInfo property)
         {
             if (!property.CanRead) {
                 // TODO throw

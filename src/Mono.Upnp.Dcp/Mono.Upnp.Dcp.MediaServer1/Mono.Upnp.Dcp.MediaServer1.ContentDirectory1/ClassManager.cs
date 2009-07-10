@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
+//using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
@@ -45,7 +45,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             RegisterType<Object> ();
             RegisterType<Item> ();
             RegisterType<Container> ();
-            RegisterType<Album> ();
+            /*RegisterType<Album> ();
             RegisterType<AudioBook> ();
             RegisterType<AudioBroadcast> ();
             RegisterType<AudioItem> ();
@@ -68,7 +68,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             RegisterType<StorageVolume> ();
             RegisterType<TextItem> ();
             RegisterType<VideoBroadcast> ();
-            RegisterType<VideoItem> ();
+            RegisterType<VideoItem> ();*/
         }
         
         public static void RegisterType<T> () where T : Object
