@@ -29,7 +29,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         void ClientServiceAdded (object sender, ServiceEventArgs args)
         {
-            if (args.Service.Type != Deserializer.ServiceType) return;
+            if (args.Service.Type != ContentDirectory.ServiceType) return;
 
             try {
                 var description = args.Service.GetService ();
@@ -46,7 +46,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         public void Browse ()
         {
-            client.Browse (Deserializer.ServiceType);
+            client.Browse (ContentDirectory.ServiceType);
         }
 
         void OnContentDirectoryAdded (DiscoveryEventArgs<ContentDirectory> e)

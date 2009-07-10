@@ -33,6 +33,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class ContentDirectory
     {
+        public static readonly ServiceType ServiceType = new ServiceType (
+            "urn:schemas-upnp-org:service:ContentDirectory:1");
+        
         readonly XmlSerializer serializer = new XmlSerializer ();
         
         [UpnpAction]

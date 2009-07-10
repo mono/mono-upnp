@@ -33,9 +33,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public class Deserializer
     {
-        public static readonly ServiceType ServiceType = new ServiceType (
-            "urn:schemas-upnp-org:service:ContentDirectory:1");
-        
         readonly Dictionary<string, Dictionary<string, WeakReference>> object_cache =
             new Dictionary<string, Dictionary<string, WeakReference>> ();
         readonly Dictionary<string, uint> container_update_ids = new Dictionary<string, uint> ();
