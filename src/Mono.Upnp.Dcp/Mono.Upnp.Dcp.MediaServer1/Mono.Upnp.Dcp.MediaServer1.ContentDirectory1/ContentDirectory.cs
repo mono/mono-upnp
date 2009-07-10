@@ -31,7 +31,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class ContentDirectory
+    public abstract class ContentDirectory
     {
         readonly XmlSerializer serializer = new XmlSerializer ();
         
@@ -44,6 +44,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return GetSearchCapabilitiesCore ();
         }
         
+        protected abstract string GetSearchCapabilitiesCore ();
+        
         [UpnpAction]
         [return: UpnpReturnValue (false)]
         [return: UpnpArgument ("SortCaps")]
@@ -53,6 +55,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return GetSortCapabilitiesCore ();
         }
         
+        protected abstract string GetSortCapabilitiesCore ();
+        
         [UpnpAction]
         [return: UpnpReturnValue (false)]
         [return: UpnpArgument ("Id")]
@@ -61,6 +65,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             return GetSystemUpdateIDCore ();
         }
+        
+        protected abstract string GetSystemUpdateIDCore ();
         
         [UpnpAction]
         [return: UpnpReturnValue (false)]
@@ -74,7 +80,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                       [UpnpArgument ("TotalMatches")] out int totalMatches,
                                       [UpnpArgument ("UpdateID")] out string updateId)
         {
-            return BrowseCore (objectId, browseFlag, startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches);
+            return BrowseCore (objectId, browseFlag, startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches, out updateId);
         }
+        
+        protected abstract string BrowseCore (string objectId, BrowseFlag browseFlag, int startIndex,
+                                              int requestCount, string sortCriteria, out int numberReturned,
+                                              out int totalMatches, out string updateId);
     }
 }
