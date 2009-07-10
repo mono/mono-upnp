@@ -36,55 +36,51 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         readonly XmlSerializer serializer = new XmlSerializer ();
         
         [UpnpAction]
-        [return: UpnpReturnValue (false)]
-        [return: UpnpArgument ("SearchCaps")]
-        [return: UpnpRelatedStateVariable ("SearchCapabilities")]
-        public virtual string GetSearchCapabilities ()
+        public virtual void GetSearchCapabilities ([UpnpArgument ("SearchCaps")]
+                                                     [UpnpRelatedStateVariable ("SearchCapabilities")]
+                                                     out string searchCapabilities)
         {
-            return GetSearchCapabilitiesCore ();
+            searchCapabilities = SearchCapabilities;
         }
         
-        protected abstract string GetSearchCapabilitiesCore ();
+        protected abstract string SearchCapabilities { get; }
         
         [UpnpAction]
-        [return: UpnpReturnValue (false)]
-        [return: UpnpArgument ("SortCaps")]
-        [return: UpnpRelatedStateVariable ("SortCapabilities")]
-        public virtual string GetSortCapabilities ()
+        public virtual void GetSortCapabilities ([UpnpArgument ("SortCaps")]
+                                                   [UpnpRelatedStateVariable ("SortCapabilities")]
+                                                   out string sortCapabilities)
         {
-            return GetSortCapabilitiesCore ();
+            sortCapabilities = SortCapabilities;
         }
         
-        protected abstract string GetSortCapabilitiesCore ();
+        protected abstract string SortCapabilities { get; }
         
         [UpnpAction]
-        [return: UpnpReturnValue (false)]
-        [return: UpnpArgument ("Id")]
-        [return: UpnpRelatedStateVariable ("SystemUpdateID")]
-        public virtual string GetSystemUpdateID ()
+        public virtual void GetSystemUpdateID ([UpnpArgument ("Id")]
+                                                 [UpnpRelatedStateVariable ("SystemUpdateID")]
+                                                 out string systemUpdateId)
         {
-            return GetSystemUpdateIDCore ();
+            systemUpdateId = SystemUpdateID;
         }
         
-        protected abstract string GetSystemUpdateIDCore ();
+        protected abstract string SystemUpdateID { get; }
         
         [UpnpAction]
-        [return: UpnpReturnValue (false)]
-        [return: UpnpArgument ("Result")]
-        public virtual string Browse ([UpnpArgument ("ObjectID")] string objectId,
+        public virtual void Browse ([UpnpArgument ("ObjectID")] string objectId,
                                       [UpnpArgument ("BrowseFlag")] BrowseFlag browseFlag,
                                       [UpnpArgument ("StartingIndex")] int startingIndex,
                                       [UpnpArgument ("RequestCount")] int requestCount,
                                       [UpnpArgument ("SortCriteria")] string sortCriteria,
                                       [UpnpArgument ("NumberReturned")] out int numberReturned,
                                       [UpnpArgument ("TotalMatches")] out int totalMatches,
-                                      [UpnpArgument ("UpdateID")] out string updateId)
+                                      [UpnpArgument ("UpdateID")] out string updateId,
+                                      [UpnpArgument ("Result")] out string result)
         {
-            return BrowseCore (objectId, browseFlag, startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches, out updateId);
+            result = Browse (objectId, browseFlag, startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches, out updateId);
         }
         
-        protected abstract string BrowseCore (string objectId, BrowseFlag browseFlag, int startIndex,
-                                              int requestCount, string sortCriteria, out int numberReturned,
-                                              out int totalMatches, out string updateId);
+        protected abstract string Browse (string objectId, BrowseFlag browseFlag, int startIndex,
+                                          int requestCount, string sortCriteria, out int numberReturned,
+                                          out int totalMatches, out string updateId);
     }
 }

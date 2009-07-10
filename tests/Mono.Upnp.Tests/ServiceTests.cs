@@ -35,31 +35,6 @@ namespace Mono.Upnp.Tests
     [TestFixture]
     public class ServiceTests
     {
-        class ReturnValueTestClass
-        {
-            [UpnpAction]
-            [return: UpnpReturnValue (false)]
-            public string Foo ()
-            {
-                return null;
-            }
-        }
-        
-        [Test]
-        public void ReturnValueTest ()
-        {
-            var service = new DummyService<ReturnValueTestClass> ();
-            var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("result", "A_ARG_result", ArgumentDirection.Out) })
-                },
-                new StateVariable[] {
-                    new StateVariable ("A_ARG_result", "string")
-                }
-            );
-            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
-        }
-        
         class ActionTestClass
         {
             [UpnpAction]
