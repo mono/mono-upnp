@@ -36,12 +36,14 @@ namespace Mono.Ssdp.Tests
     [TestFixture]
     public class ServerTests
     {
-//        const string address = "239.255.255.250";
-//        static readonly IPAddress ipaddress = IPAddress.Parse (address);
-//        static readonly IPEndPoint endpoint = new IPEndPoint (ipaddress, 1900);
-//        
-//        readonly object mutex = new object ();
-//        
+        const string address = "239.255.255.250";
+        const int port = 1900;
+        static readonly IPAddress ipaddress = IPAddress.Parse (address);
+        static readonly IPEndPoint ip_endpoint = new IPEndPoint (ipaddress, port);
+        static EndPoint endpoint = new IPEndPoint (IPAddress.Any, port);
+        
+        readonly object mutex = new object ();
+        
 //        static Socket CreateMulticastSocket ()
 //        {
 //            var socket = CreateSocket ();
@@ -50,33 +52,39 @@ namespace Mono.Ssdp.Tests
 //            socket.SetSocketOption (SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption (ipaddress, 0));
 //            return socket;
 //        }
-//        
-//        static Socket CreateSocket ()
-//        {
-//            var socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-//            socket.SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-//            return socket;
-//        }
+        
+        static Socket CreateSocket ()
+        {
+            var socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            return socket;
+        }
         
         [Test]
         public void AnnouncementTest ()
         {
-//            using (var socket = CreateSocket ()) {
-//                using (var server = new Server ()) {
-//                    socket.Bind (endpoint);
-//                    var buffer = new byte[1024];
-//                    socket.BeginReceiveFrom (buffer, 0, buffer.Length, SocketFlags.None, ref endpoint,
-//                        result => {
-//                            lock (mutex) {
-//                                socket.EndReceiveFrom (result, ref endpoint);
-//                                var datagram = Encoding.ASCII.GetString (buffer, 0, buffer.Length);
-//                                Assert.IsTrue (datagram.StartsWith ("NOTIFY * HTTP/1.1\r\n"));
-//                                Monitor.Pulse (mutex);
-//                            }
-//                        }, null
-//                    );
-//                }
-//            }
+            using (var socket = CreateSocket ()) {
+                using (var server = new Server ()) {
+                    socket.Bind (ip_endpoint);
+                    var buffer = new byte[1024];
+                    socket.BeginReceiveFrom (buffer, 0, buffer.Length, SocketFlags.None, ref endpoint,
+                        result => {
+                            lock (mutex) {
+                                socket.EndReceiveFrom (result, ref endpoint);
+                                var datagram = Encoding.ASCII.GetString (buffer, 0, buffer.Length);
+                                Assert.IsTrue (datagram.StartsWith ("NOTIFY * HTTP/1.1\r\n"));
+                                Monitor.Pulse (mutex);
+                            }
+                        }, null
+                    );
+                    lock (mutex) {
+                        server.Announce ("test-service", "test1", "http://localhost/");
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                            Assert.Fail ("The server notification timed out.");
+                        }
+                    }
+                }
+            }
         }
     }
 }
