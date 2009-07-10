@@ -37,8 +37,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         [UpnpAction]
         public virtual void GetSearchCapabilities ([UpnpArgument ("SearchCaps")]
-                                                     [UpnpRelatedStateVariable ("SearchCapabilities")]
-                                                     out string searchCapabilities)
+                                                   [UpnpRelatedStateVariable ("SearchCapabilities")]
+                                                   out string searchCapabilities)
         {
             searchCapabilities = SearchCapabilities;
         }
@@ -47,8 +47,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         [UpnpAction]
         public virtual void GetSortCapabilities ([UpnpArgument ("SortCaps")]
-                                                   [UpnpRelatedStateVariable ("SortCapabilities")]
-                                                   out string sortCapabilities)
+                                                 [UpnpRelatedStateVariable ("SortCapabilities")]
+                                                 out string sortCapabilities)
         {
             sortCapabilities = SortCapabilities;
         }
@@ -57,8 +57,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         [UpnpAction]
         public virtual void GetSystemUpdateID ([UpnpArgument ("Id")]
-                                                 [UpnpRelatedStateVariable ("SystemUpdateID")]
-                                                 out string systemUpdateId)
+                                               [UpnpRelatedStateVariable ("SystemUpdateID")]
+                                               out string systemUpdateId)
         {
             systemUpdateId = SystemUpdateID;
         }
@@ -67,14 +67,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         [UpnpAction]
         public virtual void Browse ([UpnpArgument ("ObjectID")] string objectId,
-                                      [UpnpArgument ("BrowseFlag")] BrowseFlag browseFlag,
-                                      [UpnpArgument ("StartingIndex")] int startingIndex,
-                                      [UpnpArgument ("RequestCount")] int requestCount,
-                                      [UpnpArgument ("SortCriteria")] string sortCriteria,
-                                      [UpnpArgument ("NumberReturned")] out int numberReturned,
-                                      [UpnpArgument ("TotalMatches")] out int totalMatches,
-                                      [UpnpArgument ("UpdateID")] out string updateId,
-                                      [UpnpArgument ("Result")] out string result)
+                                    [UpnpArgument ("BrowseFlag")] BrowseFlag browseFlag,
+                                    [UpnpArgument ("StartingIndex")] int startingIndex,
+                                    [UpnpArgument ("RequestCount")] int requestCount,
+                                    [UpnpArgument ("SortCriteria")] string sortCriteria,
+                                    [UpnpArgument ("NumberReturned")] out int numberReturned,
+                                    [UpnpArgument ("TotalMatches")] out int totalMatches,
+                                    [UpnpArgument ("UpdateID")] out string updateId,
+                                    [UpnpArgument ("Result")] out string result)
         {
             result = Browse (objectId, browseFlag, startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches, out updateId);
         }
