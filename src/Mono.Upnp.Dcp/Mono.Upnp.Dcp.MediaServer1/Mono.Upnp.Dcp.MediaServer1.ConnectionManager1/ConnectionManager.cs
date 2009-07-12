@@ -6,15 +6,15 @@ using System.Collections.Generic;
 using Mono.Upnp;
 using Mono.Upnp.Control;
 
-namespace Mono.Upnp.Dcp.MediaServer1
+namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
 {
-    public class ConnectionManager1
+    public class ConnectionManager
     {
         public static readonly ServiceType ServiceType = new ServiceType ("urn:schemas-upnp-org:service:ConnectionManager:1");
         
         readonly ServiceController controller;
         
-        public ConnectionManager1 (ServiceAnnouncement announcement)
+        public ConnectionManager (ServiceAnnouncement announcement)
         {
             if (announcement == null) throw new ArgumentNullException ("announcement");
             controller = announcement.GetService ().GetController ();

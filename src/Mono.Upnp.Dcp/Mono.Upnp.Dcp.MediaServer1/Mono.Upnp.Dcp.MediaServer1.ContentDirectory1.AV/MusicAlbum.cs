@@ -26,64 +26,70 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class MusicAlbum : Album
     {
-        readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
-        readonly ReadOnlyCollection<PersonWithRole> artists;
-        readonly List<string> producer_list = new List<string> ();
-        readonly ReadOnlyCollection<string> producers;
-        readonly List<string> genre_list = new List<string> ();
-        readonly ReadOnlyCollection<string> genres;
-        readonly List<Uri> album_art_uri_list = new List<Uri> ();
-        readonly ReadOnlyCollection<Uri> album_art_uris;
+        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
+        readonly List<string> producers = new List<string> ();
+        readonly List<string> genres = new List<string> ();
+        readonly List<Uri> album_art_uris = new List<Uri> ();
         
-        protected MusicAlbum ()
+        protected MusicAlbum (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
-            artists = artist_list.AsReadOnly ();
-            producers = producer_list.AsReadOnly ();
-            genres = genre_list.AsReadOnly ();
-            album_art_uris = album_art_uri_list.AsReadOnly ();
         }
         
-        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-        public ReadOnlyCollection<string> Genres { get { return genres; } }
-        public ReadOnlyCollection<string> Producers { get { return producers; } }
-        public ReadOnlyCollection<Uri> AlbumArtUris { get { return album_art_uris; } }
-        public string Toc { get; private set; }
+        [XmlArrayItem ("artist", Schemas.UpnpSchema)]
+        protected virtual ICollection<PersonWithRole> ArtistCollection {
+            get { return artists; }
+        }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        public IEnumerable<PersonWithRole> Artists {
+            get { return artists; }
+        }
+        
+        [XmlArrayItem ("genre", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> GenreCollection {
+            get { return genres; }
+        }
+        
+        public IEnumerable<string> Genres {
+            get { return genres; }
+        }
+        
+        [XmlArrayItem ("producer", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> ProducerCollection {
+            get { return producers; }
+        }
+        
+        public IEnumerable<string> Producers {
+            get { return producers; }
+        }
+        
+        [XmlArrayItem ("albumArtURI", Schemas.UpnpSchema)]
+        protected virtual ICollection<Uri> AlbumArtUriCollection {
+            get { return album_art_uris; }
+        }
+        
+        public IEnumerable<Uri> AlbumArtUris {
+            get { return album_art_uris; }
+        }
+        
+        [XmlElement ("toc", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string Toc { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "artist":
-                    artist_list.Add (PersonWithRole.Deserialize (reader));
-                    break;
-                case "producer":
-                    producer_list.Add (reader.ReadString ());
-                    break;
-                case "genre":
-                    genre_list.Add (reader.ReadString ());
-                    break;
-                case "albumArtURI":
-                    album_art_uri_list.Add (new Uri (reader.ReadString ()));
-                    break;
-                case "toc":
-                    Toc = reader.ReadString ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

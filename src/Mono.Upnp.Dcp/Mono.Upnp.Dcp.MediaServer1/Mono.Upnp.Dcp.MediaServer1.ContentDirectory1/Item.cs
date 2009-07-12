@@ -26,13 +26,18 @@
 
 using System;
 
-﻿using Mono.Upnp.Xml;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     [XmlType ("item", Schemas.DidlLiteSchema)]
-    public abstract class Item : Object
+    public class Item : Object
     {
+        protected Item (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
+        {
+        }
+        
         [XmlAttribute ("refID", Schemas.DidlLiteSchema, OmitIfNull = true)]
         public virtual string RefId { get; protected set; }
         
@@ -49,6 +54,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         protected override void DeserializeAttribute (XmlDeserializationContext context)
         {
             context.AutoDeserializeAttribute (this);
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

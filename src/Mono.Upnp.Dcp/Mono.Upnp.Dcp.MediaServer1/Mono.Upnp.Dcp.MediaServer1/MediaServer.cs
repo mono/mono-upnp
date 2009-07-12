@@ -26,23 +26,26 @@
 
 using System;
 
+using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
 namespace Mono.Upnp.Dcp.MediaServer1
 {
-    public class MediaServer
+    public class MediaServer : IDisposable
     {
-        public static readonly DeviceType DeviceType = null;
+        public static readonly DeviceType DeviceType = new DeviceType ("urn:schemas-upnp-org:device:MediaServer:1");
         
         readonly Server server;
         
-        public MediaServer (MediaServerSettings settings, ContentDirectory contentDirectory)
+        public MediaServer (MediaServerSettings settings, ConnectionManager connectionManager, ContentDirectory contentDirectory)
         {
             if (settings == null) throw new ArgumentNullException ("settings");
+            if (connectionManager == null) throw new ArgumentNullException ("connnectionManager");
             if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
             
+            var connectionManagerService = new Service<ConnectionManager> (ConnectionManager.ServiceType, "ConnectionManager", connectionManager);
             var contentDirectoryService = new Service<ContentDirectory> (ContentDirectory.ServiceType, "ContentDirectory", contentDirectory);
-            settings.Services = new Service[] { contentDirectoryService };
+            settings.Services = new Service[] { contentDirectoryService, connectionManagerService };
             server = new Server (new Root (settings));
         }
         
@@ -54,6 +57,11 @@ namespace Mono.Upnp.Dcp.MediaServer1
         public void Stop ()
         {
             server.Stop ();
+        }
+        
+        public void Dispose ()
+        {
+            server.Dispose ();
         }
     }
 }

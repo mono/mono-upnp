@@ -28,7 +28,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class PhotoAlbum : Album
     {
-        protected PhotoAlbum ()
+        protected PhotoAlbum (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
         }
     }

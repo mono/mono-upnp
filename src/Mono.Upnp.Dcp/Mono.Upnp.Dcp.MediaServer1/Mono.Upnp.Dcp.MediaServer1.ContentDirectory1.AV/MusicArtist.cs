@@ -26,41 +26,40 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
 
-using Mono.Upnp.Dcp.MediaServer1;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class MusicArtist : Person
     {
-        readonly List<string> genre_list = new List<string> ();
-        readonly ReadOnlyCollection<string> genres;
+        readonly List<string> genres = new List<string> ();
         
-        protected MusicArtist ()
+        protected MusicArtist (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
-            genres = genre_list.AsReadOnly ();
         }
         
-        public ReadOnlyCollection<string> Genres { get { return genres; } }
-        public Uri ArtistDiscographyUri { get; private set; }
+        [XmlArrayItem ("genre", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> GenreCollection {
+            get { return genres; }
+        }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        public IEnumerable<string> Genres {
+            get { return genres; }
+        }
+        
+        [XmlElement ("artistDiscographyURI", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual Uri ArtistDiscographyUri { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                if (reader.Name == "genre") {
-                    genre_list.Add (reader.ReadString ());
-                } else if (reader.Name == "artistDiscographyURI") {
-                    ArtistDiscographyUri = new Uri (reader.ReadString ());
-                } else {
-                    base.DeserializePropertyElement (reader);
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

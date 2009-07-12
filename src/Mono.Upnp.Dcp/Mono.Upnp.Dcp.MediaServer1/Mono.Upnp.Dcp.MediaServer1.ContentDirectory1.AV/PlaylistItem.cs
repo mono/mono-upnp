@@ -26,77 +26,62 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class PlaylistItem : Item
     {
-        readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
-        readonly ReadOnlyCollection<PersonWithRole> artists;
-        readonly List<string> genre_list = new List<string> ();
-        readonly ReadOnlyCollection<string> genres;
+        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
+        readonly List<string> genres = new List<string> ();
         
-        protected PlaylistItem ()
+        protected PlaylistItem (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
-            artists = artist_list.AsReadOnly ();
-            genres = genre_list.AsReadOnly ();
         }
         
-        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-        public ReadOnlyCollection<string> Genres { get { return genres; } }
-        public string LongDescription { get; private set; }
-        public string StorageMedium { get; private set; }
-        public string Description { get; private set; }
-        public string Date { get; private set; }
-        public string Language { get; private set; }
-        
-        protected override void DeserializePropertyElement (XmlReader reader)
-        {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "artist":
-                    artist_list.Add (PersonWithRole.Deserialize (reader));
-                    break;
-                case "genre":
-                    genre_list.Add (reader.ReadString ());
-                    break;
-                case "longDescription":
-                    LongDescription = reader.ReadString ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-                switch (reader.LocalName) {
-                case "description":
-                    Description = reader.ReadString ();
-                    break;
-                case "date":
-                    Date = reader.ReadString ();
-                    break;
-                case "language":
-                    Language = reader.ReadString ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+        [XmlArrayItem ("artist", Schemas.UpnpSchema)]
+        protected virtual ICollection<PersonWithRole> ArtistCollection {
+            get { return artists; }
         }
         
-        protected override void VerifyDeserialization ()
+        public IEnumerable<PersonWithRole> Artists {
+            get { return artists; }
+        }
+        
+        [XmlArrayItem ("genre", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> GenreCollection {
+            get { return genres; }
+        }
+        
+        public IEnumerable<string> Genres {
+            get { return genres; }
+        }
+        
+        [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string LongDescription { get; protected set; }
+        
+        [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string StorageMedium { get; protected set; }
+        
+        [XmlElement ("description", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Description { get; protected set; }
+        
+        [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Date { get; protected set; }
+        
+        [XmlElement ("language", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Language { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (Resources.Count == 0) {
-                throw new DeserializationException ("A playlist item must have a res.");
-            }
-            base.VerifyDeserialization ();
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

@@ -25,50 +25,41 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class AudioBroadcast  : AudioItem
     {
-        protected AudioBroadcast ()
+        protected AudioBroadcast (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
         }
         
-        public string Region { get; private set; }
-        public string RadioCallSign { get; private set; }
-        public string RadioStationId { get; private set; }
-        public string RadioBand { get; private set; }
-        public int? ChannelNr { get; private set; } // FIXME is this right?
+        [XmlElement ("region", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string Region { get; protected set; }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        [XmlElement ("radioCallSign", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string RadioCallSign { get; protected set; }
+        
+        [XmlElement ("radioStationID", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string RadioStationId { get; protected set; }
+        
+        [XmlElement ("radioBand", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string RadioBand { get; protected set; }
+        
+        [XmlElement ("channelNr", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual int? ChannelNr { get; protected set; } // FIXME is this right?
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "region":
-                    Region = reader.ReadString ();
-                     break;
-                case "radioCallSign":
-                    RadioCallSign = reader.ReadString ();
-                    break;
-                case "radioStationID":
-                    RadioStationId = reader.ReadString ();
-                    break;
-                case "radioBand":
-                    RadioBand = reader.ReadString ();
-                    break;
-                case "channelNr":
-                    ChannelNr = reader.ReadContentAsInt ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

@@ -26,78 +26,83 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class MusicVideoClip : VideoItem
     {
-        readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
-        readonly ReadOnlyCollection<PersonWithRole> artists;
-        readonly List<string> contributor_list = new List<string> ();
-        readonly ReadOnlyCollection<string> contributors;
-        readonly List<string> album_list = new List<string>();
-        readonly ReadOnlyCollection<string> albums;
-        readonly List<DateTime> scheduled_start_time_list = new List<DateTime>();
-        readonly ReadOnlyCollection<DateTime> scheduled_start_times;
-        readonly List<DateTime> scheduled_end_time_list = new List<DateTime>();
-        readonly ReadOnlyCollection<DateTime> scheduled_end_times;
+        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
+        readonly List<string> contributors = new List<string> ();
+        readonly List<string> albums = new List<string> ();
+        readonly List<DateTime> scheduled_start_times = new List<DateTime> ();
+        readonly List<DateTime> scheduled_end_times = new List<DateTime> ();
         
-        protected MusicVideoClip ()
+        protected MusicVideoClip (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
-            artists = artist_list.AsReadOnly ();
-            contributors = contributor_list.AsReadOnly ();
-            albums = album_list.AsReadOnly ();
-            scheduled_start_times = scheduled_start_time_list.AsReadOnly ();
-            scheduled_end_times = scheduled_end_time_list.AsReadOnly ();
         }
         
-        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-        public string StorageMedium { get; private set; }
-        public ReadOnlyCollection<string> Albums { get { return albums; } }
-        public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
-        public ReadOnlyCollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
-        public ReadOnlyCollection<string> Contributors { get { return contributors; } }
-        public string Date { get; private set; }
+        [XmlArrayItem ("artist", Schemas.UpnpSchema)]
+        protected virtual ICollection<PersonWithRole> ArtistCollection {
+            get { return artists; }
+        }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        public IEnumerable<PersonWithRole> Artists {
+            get { return artists; }
+        }
+        
+        [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string StorageMedium { get; protected set; }
+        
+        [XmlArrayItem ("album", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> AlbumCollection {
+            get { return albums; }
+        }
+        
+        public IEnumerable<string> Albums {
+            get { return albums; }
+        }
+        
+        [XmlArrayItem ("scheduledStartTime", Schemas.UpnpSchema)]
+        protected virtual ICollection<DateTime> ScheduledStartTimeCollection {
+            get { return scheduled_start_times; }
+        }
+        
+        public IEnumerable<DateTime> ScheduledStartTimes {
+            get { return scheduled_end_times; }
+        }
+        
+        [XmlArrayItem ("scheduledEndTime", Schemas.UpnpSchema)]
+        protected virtual ICollection<DateTime> ScheduledEndTimeCollection {
+            get { return scheduled_end_times; }
+        }
+        
+        public IEnumerable<DateTime> ScheduledEndTimes {
+            get { return scheduled_end_times; }
+        }
+        
+        [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
+        protected virtual ICollection<string> ContributorCollection {
+            get { return contributors; }
+        }
+        
+        public IEnumerable<string> Contributors {
+            get { return contributors; }
+        }
+        
+        [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Date { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "artist":
-                    artist_list.Add (PersonWithRole.Deserialize (reader));
-                    break;
-                case "album":
-                    album_list.Add (reader.ReadString ());
-                    break;
-                case "scheduledStartTime":
-                    scheduled_start_time_list.Add (reader.ReadElementContentAsDateTime ()); // TODO is this going to work?
-                    break;
-                case "scheduledEndTime":
-                    scheduled_end_time_list.Add (reader.ReadElementContentAsDateTime ());
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-                switch (reader.LocalName) {
-                case "contributor":
-                    contributor_list.Add (reader.ReadString ());
-                    break;
-                case "date":
-                    Date = reader.ReadString ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

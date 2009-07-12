@@ -25,27 +25,29 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class Person : Container
     {
-        protected Person ()
+        protected Person (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
         }
         
-        public string Language { get; private set; }
-        
-        protected override void DeserializePropertyElement (XmlReader reader)
+        [XmlElement ("language", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Language { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.DublinCoreSchema && reader.Name == "language") {
-                Language = reader.ReadString ();
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

@@ -28,7 +28,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class MovieGenre : Genre
     {
-        protected MovieGenre ()
+        protected MovieGenre (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
         }
     }

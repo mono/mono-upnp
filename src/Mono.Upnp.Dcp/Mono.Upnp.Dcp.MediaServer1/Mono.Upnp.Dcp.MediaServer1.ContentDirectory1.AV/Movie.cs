@@ -26,55 +26,56 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class Movie : VideoItem
     {
-        readonly List<DateTime> scheduled_start_time_list = new List<DateTime>();
-        readonly ReadOnlyCollection<DateTime> scheduled_start_times;
-        readonly List<DateTime> scheduled_end_time_list = new List<DateTime>();
-        readonly ReadOnlyCollection<DateTime> scheduled_end_times;
+        readonly List<DateTime> scheduled_start_times = new List<DateTime>();
+        readonly List<DateTime> scheduled_end_times = new List<DateTime>();
         
-        protected Movie ()
+        protected Movie (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
-            scheduled_start_times = scheduled_start_time_list.AsReadOnly ();
-            scheduled_end_times = scheduled_end_time_list.AsReadOnly ();
         }
         
-        public string StorageMedium { get; private set; }
-        public int? DvdRegionCode { get; private set; }
-        public string ChannelName { get; private set; }
-        public ReadOnlyCollection<DateTime> ScheduledStartTimes { get { return scheduled_start_times; } }
-        public ReadOnlyCollection<DateTime> ScheduledEndTimes { get { return scheduled_end_times; } }
+        [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string StorageMedium { get; protected set; }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        [XmlElement ("DVDRegionCode", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual int? DvdRegionCode { get; protected set; }
+        
+        [XmlElement ("channelName", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string ChannelName { get; protected set; }
+        
+        [XmlArrayItem ("scheduledStartTime", Schemas.UpnpSchema)]
+        protected virtual ICollection<DateTime> ScheduledStartTimeCollection {
+            get { return scheduled_start_times; }
+        }
+        
+        public IEnumerable<DateTime> ScheduledStartTimes {
+            get { return scheduled_start_times; }
+        }
+        
+        [XmlArrayItem ("scheduledEndTime", Schemas.UpnpSchema)]
+        protected virtual ICollection<DateTime> ScheduledEndTimeCollection {
+            get { return scheduled_end_times; }
+        }
+        
+        public IEnumerable<DateTime> ScheduledEndTimes {
+            get { return scheduled_end_times; }
+        }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "channelName":
-                    ChannelName = reader.ReadString ();
-                    break;
-                case "scheduledStartTime":
-                    scheduled_start_time_list.Add (reader.ReadElementContentAsDateTime ()); // TODO this is ISO 8601
-                    break;
-                case "scheduledEndTime":
-                    scheduled_end_time_list.Add (reader.ReadElementContentAsDateTime ());
-                    break;
-                case "DVDRegionCode":
-                    DvdRegionCode = reader.ReadElementContentAsInt ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

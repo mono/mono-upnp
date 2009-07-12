@@ -32,6 +32,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class ContentDirectory
     {
+        ulong ids;
+        
+        internal string GetNewObjectId ()
+        {
+            var id = ids.ToString ();
+            ids++;
+            return id;
+        }
+        
         public static readonly ServiceType ServiceType = new ServiceType (
             "urn:schemas-upnp-org:service:ContentDirectory:1");
         

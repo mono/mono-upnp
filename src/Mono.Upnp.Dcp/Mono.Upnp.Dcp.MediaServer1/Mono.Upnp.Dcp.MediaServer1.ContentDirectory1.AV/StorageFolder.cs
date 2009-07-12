@@ -25,27 +25,29 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class StorageFolder : Container
     {
-        protected StorageFolder ()
+        protected StorageFolder (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
         }
         
-        protected long StorageUsed { get; private set; }
-        
-        protected override void DeserializePropertyElement (XmlReader reader)
+        [XmlElement ("storageUsed", Schemas.UpnpSchema)]
+        public virtual long StorageUsed { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema && reader.Name == "storageUsed") {
-                    StorageUsed = reader.ReadElementContentAsLong ();
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

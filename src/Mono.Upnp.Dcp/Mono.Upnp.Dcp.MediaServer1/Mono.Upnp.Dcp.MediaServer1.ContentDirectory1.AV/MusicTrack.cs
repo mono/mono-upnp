@@ -26,76 +26,79 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class MusicTrack : AudioItem
     {
-        readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
-        readonly ReadOnlyCollection<PersonWithRole> artists;
-        readonly List<string> contributor_list = new List<string> ();
-        readonly ReadOnlyCollection<string> contributors;
-         readonly List<string> album_list = new List<string>();
-        readonly ReadOnlyCollection<string> albums;
-        readonly List<string> playlist_list = new List<string> ();
-        readonly ReadOnlyCollection<string> playlists;
+        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
+        readonly List<string> contributors = new List<string> ();
+        readonly List<string> albums = new List<string>();
+        readonly List<string> playlists = new List<string> ();
         
-        protected MusicTrack ()
+        protected MusicTrack (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
-            artists = artist_list.AsReadOnly ();
-            contributors = contributor_list.AsReadOnly ();
-            albums = album_list.AsReadOnly ();
-            playlists = playlist_list.AsReadOnly ();
         }
         
-        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-        public ReadOnlyCollection<string> Albums { get { return albums; } }
-        public int? OriginalTrackNumber { get; private set; }
-        public ReadOnlyCollection<string> Playlists { get { return playlists; } }
-        public string StorageMedium { get; private set; }
-        public ReadOnlyCollection<string> Contributors { get { return contributors; } }
-        public string Date { get; private set; }
-        public Uri LyricsUri { get; private set; }
+        [XmlArrayItem ("artist", Schemas.UpnpSchema)]
+        protected virtual ICollection<PersonWithRole> ArtistCollection {
+            get { return artists; }
+        }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        public IEnumerable<PersonWithRole> Artists {
+            get { return artists; }
+        }
+        
+        [XmlArrayItem ("album", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> AlbumCollection {
+            get { return albums; }
+        }
+        
+        public IEnumerable<string> Albums {
+            get { return albums; }
+        }
+        
+        [XmlElement ("orginalTrackElement", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual int? OriginalTrackNumber { get; protected set; }
+        
+        [XmlArrayItem ("playlist", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> PlaylistCollections {
+            get { return playlists; }
+        }
+        
+        public IEnumerable<string> Playlists {
+            get { return playlists; }
+        }
+        
+        [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string StorageMedium { get; protected set; }
+        
+        [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
+        protected virtual ICollection<string> ContributorCollection {
+            get { return contributors; }
+        }
+        
+        public IEnumerable<string> Contributors {
+            get { return contributors; }
+        }
+        
+        [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Date { get; protected set; }
+        
+        // TODO what is the deal with this?!?!?!
+        //public Uri LyricsUri { get; private set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "artist":
-                    artist_list.Add (PersonWithRole.Deserialize (reader));
-                    break;
-                case "album":
-                    album_list.Add (reader.ReadString ());
-                    break;
-                case "playlist":
-                    playlist_list.Add (reader.ReadString ());
-                    break;
-                case "originalTrackNumber":
-                    OriginalTrackNumber = reader.ReadElementContentAsInt ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-             } else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-                switch (reader.LocalName) {
-                case "contributor":
-                    contributor_list.Add (reader.ReadString ());
-                    break;
-                case "date":
-                    Date = reader.ReadString ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

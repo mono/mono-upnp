@@ -26,32 +26,37 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class Photo : ImageItem
     {
-        readonly List<string> album_list = new List<string> ();
-        readonly ReadOnlyCollection<string> albums;
+        readonly List<string> albums = new List<string> ();
         
-        protected Photo ()
+        protected Photo (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
-            albums = album_list.AsReadOnly ();
         }
         
-        public ReadOnlyCollection<string> Albums { get { return albums; } }
+        [XmlArrayItem ("album", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> AlbumCollection {
+            get { return albums; }
+        }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        public IEnumerable<string> Albums {
+            get { return albums; }
+        }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema && reader.Name == "album") {
-                album_list.Add (reader.ReadString ());
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

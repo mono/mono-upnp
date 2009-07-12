@@ -26,90 +26,92 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class PlaylistContainer : Container
     {
-        readonly List<PersonWithRole> artist_list = new List<PersonWithRole> ();
-        readonly ReadOnlyCollection<PersonWithRole> artists;
-        readonly List<string> producer_list = new List<string> ();
-        readonly ReadOnlyCollection<string> producers;
-        readonly List<string> contributor_list = new List<string> ();
-        readonly ReadOnlyCollection<string> contributors;
-        readonly List<string> genre_list = new List<string> ();
-        readonly ReadOnlyCollection<string> genres;
-        readonly List<string> right_list = new List<string> ();
-        readonly ReadOnlyCollection<string> rights;
+        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
+        readonly List<string> producers = new List<string> ();
+        readonly List<string> contributors = new List<string> ();
+        readonly List<string> genres = new List<string> ();
+        readonly List<string> rights = new List<string> ();
         
-        protected PlaylistContainer ()
+        protected PlaylistContainer (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
-            artists = artist_list.AsReadOnly ();
-            producers = producer_list.AsReadOnly ();
-            contributors = contributor_list.AsReadOnly ();
-            genres = genre_list.AsReadOnly ();
-            rights = right_list.AsReadOnly ();
         }
         
-        public ReadOnlyCollection<PersonWithRole> Artists { get { return artists; } }
-        public ReadOnlyCollection<string> Genres { get { return genres; } }
-        public string LongDescription { get; private set; }
-        public ReadOnlyCollection<string> Producers { get { return producers; } }
-        public string StorageMedium { get; private set; }
-        public string Description { get; private set; }
-        public ReadOnlyCollection<string> Contributors { get { return contributors; } }
-        public string Date { get; private set; }
-        public string Language { get; private set; }
-        public ReadOnlyCollection<string> Rights { get { return rights; } }
+        [XmlArrayItem ("artist", Schemas.UpnpSchema)]
+        protected virtual ICollection<PersonWithRole> ArtistCollection {
+            get { return artists; }
+        }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        public IEnumerable<PersonWithRole> Artists {
+            get { return artists; }
+        }
+        
+        [XmlArrayItem ("genre", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> GenreCollection {
+            get { return genres; }
+        }
+        
+        public IEnumerable<string> Genres {
+            get { return genres; }
+        }
+        
+        [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string LongDescription { get; protected set; }
+        
+        [XmlArrayItem ("producer", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> ProducerCollection {
+            get { return producers; }
+        }
+        
+        public IEnumerable<string> Producers {
+            get { return producers; }
+        }
+        
+        [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string StorageMedium { get; protected set; }
+        
+        [XmlElement ("description", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Description { get; protected set; }
+        
+        [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
+        protected virtual ICollection<string> ContributorCollection {
+            get { return contributors; }
+        }
+        
+        public IEnumerable<string> Contributors {
+            get { return contributors; }
+        }
+        
+        [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Date { get; protected set; }
+        
+        [XmlElement ("language", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Language { get; protected set; }
+        
+        [XmlArrayItem ("rights", Schemas.DublinCoreSchema)]
+        protected virtual ICollection<string> RightsCollection {
+            get { return rights; }
+        }
+        
+        public IEnumerable<string> Rights {
+            get { return rights; }
+        }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "artist":
-                    artist_list.Add (PersonWithRole.Deserialize (reader));
-                    break;
-                case "producer":
-                    producer_list.Add (reader.ReadString ());
-                    break;
-                case "genre":
-                    genre_list.Add (reader.ReadString ());
-                    break;
-                case "longDescription":
-                    LongDescription = reader.ReadString ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-                switch (reader.LocalName) {
-                case "contributor":
-                    contributor_list.Add (reader.ReadString ());
-                    break;
-                case "description":
-                    Description = reader.ReadString ();
-                    break;
-                case "rights":
-                    right_list.Add (reader.ReadString ());
-                    break;
-                case "date":
-                    Date = reader.ReadString ();
-                    break;
-                case "language":
-                    Language = reader.ReadString ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

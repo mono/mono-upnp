@@ -24,33 +24,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System.Xml;
-using System.Xml.Serialization;
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public struct PersonWithRole
     {
-        readonly string name;
-        readonly string role;
-        
-        public PersonWithRole (string name, string role)
-        {
-            this.name = name;
-            this.role = role;
-        }
-        
-        internal static PersonWithRole Deserialize (XmlReader reader)
-        {
-            var role = reader["role"];
-            var name = reader.ReadString ();
-            return new PersonWithRole (name, role);
-        }
-        
-        [XmlText]
-        public string Name { get { return name; } }
+        [XmlValue]
+        public string Name { get; set; }
         
         [XmlAttribute ("role", Namespace = Schemas.UpnpSchema)]
-        public string Role { get { return role; } }
+        public string Role { get; set;  }
     }
 }

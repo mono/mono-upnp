@@ -33,18 +33,26 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class Object : XmlAutomatable
     {
-        readonly IList<Resource> resources = new List<Resource> ();
+        readonly List<Resource> resources = new List<Resource> ();
         bool is_restricted;
         string title;
         string creator;
         Class @class;
         WriteStatus? write_status;
+        
+        protected Object (ContentDirectory contentDirectory, Container parent)
+        {
+            if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
+            
+            Id = contentDirectory.GetNewObjectId ();
+            ParentId = parent == null ? "-1" : parent.Id;
+        }
 
         [XmlAttribute ("id", Schemas.DidlLiteSchema)]
-        public virtual string Id { get; protected internal set; }
+        public virtual string Id { get; protected set; }
         
         [XmlAttribute ("parentId", Schemas.DidlLiteSchema)]
-        public virtual string ParentId { get; protected internal set; }
+        public virtual string ParentId { get; protected set; }
         
         [XmlAttribute ("restricted", Schemas.DidlLiteSchema)]
         protected virtual string IsRestrictedValue {

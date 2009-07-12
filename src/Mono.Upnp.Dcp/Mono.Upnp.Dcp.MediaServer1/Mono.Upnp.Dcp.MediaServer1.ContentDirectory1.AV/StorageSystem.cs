@@ -25,50 +25,41 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class StorageSystem : Container
     {
-        protected StorageSystem ()
+        protected StorageSystem (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
         }
         
-        public long StorageTotal { get; private set; }
-        public long StorageUsed { get; private set; }
-        public long StorageFree { get; private set; }
-        public long StorageMaxPartition { get; private set; }
-        public string StorageMedium { get; private set; }
+        [XmlElement ("storageTotal", Schemas.UpnpSchema)]
+        public virtual long StorageTotal { get; protected set; }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        [XmlElement ("storageUsed", Schemas.UpnpSchema)]
+        public virtual long StorageUsed { get; protected set; }
+        
+        [XmlElement ("storageFree", Schemas.UpnpSchema)]
+        public virtual long StorageFree { get; protected set; }
+        
+        [XmlElement ("storageMaxPartition", Schemas.UpnpSchema)]
+        public virtual long StorageMaxPartition { get; protected set; }
+        
+        [XmlElement ("storageMedium", Schemas.UpnpSchema)]
+        public virtual string StorageMedium { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "storageTotal":
-                    StorageTotal = reader.ReadElementContentAsLong ();
-                    break;
-                case "storageUsed":
-                    StorageUsed = reader.ReadElementContentAsLong ();
-                    break;
-                case "storageFree":
-                    StorageFree = reader.ReadElementContentAsLong ();
-                    break;
-                case "storageMaxPartition":
-                    StorageMaxPartition = reader.ReadElementContentAsLong ();
-                    break;
-                case "storageMedium":
-                    StorageMedium = reader.ReadString ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

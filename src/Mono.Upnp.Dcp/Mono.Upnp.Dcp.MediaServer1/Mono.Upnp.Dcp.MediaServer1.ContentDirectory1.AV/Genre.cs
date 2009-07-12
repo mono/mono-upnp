@@ -25,30 +25,32 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class Genre : Container
     {
-        protected Genre ()
+        protected Genre (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
         }
         
-        public string LongDescription { get; private set; }
-        public string Description { get; private set; }
+        [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string LongDescription { get; protected set; }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        [XmlElement ("description", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Description { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.DublinCoreSchema && reader.Name == "description") {
-                Description = reader.ReadString ();
-            } if (reader.NamespaceURI == Schemas.UpnpSchema && reader.Name == "longDescription") {
-                LongDescription = reader.ReadString ();
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

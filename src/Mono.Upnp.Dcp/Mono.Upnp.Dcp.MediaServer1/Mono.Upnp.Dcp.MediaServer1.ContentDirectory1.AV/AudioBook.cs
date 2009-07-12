@@ -26,57 +26,53 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class AudioBook : AudioItem
     {
-        readonly List<string> producer_list = new List<string> ();
-        readonly ReadOnlyCollection<string> producers;
-        readonly List<string> contributor_list = new List<string> ();
-        readonly ReadOnlyCollection<string> contributors;
+        readonly List<string> producers = new List<string> ();
+        readonly List<string> contributors = new List<string> ();
         
-        protected AudioBook ()
+        protected AudioBook (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
-            producers = producer_list.AsReadOnly ();
-            contributors = contributor_list.AsReadOnly ();
         }
         
-        public string StorageMedium { get; private set; }
-        public ReadOnlyCollection<string> Producers { get { return producers; } }
-        public ReadOnlyCollection<string> Contributors { get { return contributors; } }
-        public string Date { get; private set; }
+        [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string StorageMedium { get; protected set; }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        [XmlArrayItem ("producer", Schemas.UpnpSchema)]
+        protected virtual ICollection<string> ProducerCollection {
+            get { return producers; }
+        }
+        
+        public IEnumerable<string> Producers {
+            get { return producers; }
+        }
+        
+        [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
+        protected virtual ICollection<string> ContributorCollection {
+            get { return contributors; }
+        }
+        
+        public IEnumerable<string> Contributors {
+            get { return contributors; }
+        }
+        
+        [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Date { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "producer":
-                    producer_list.Add (reader.ReadString ());
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else if (reader.NamespaceURI == Schemas.DublinCoreSchema) {
-                switch (reader.LocalName) {
-                case "contributor":
-                    contributor_list.Add (reader.ReadString ());
-                    break;
-                case "date":
-                    Date = reader.ReadString ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

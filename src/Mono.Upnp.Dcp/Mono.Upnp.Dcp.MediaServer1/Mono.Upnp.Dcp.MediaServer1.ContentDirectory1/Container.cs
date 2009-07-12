@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -34,16 +34,15 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     [XmlType ("container", Schemas.DidlLiteSchema)]
-    public abstract class Container : Object
+    public class Container : Object
     {
+        protected Container (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
+        {
+        }
+        
         readonly List<ClassReference> search_classes = new List<ClassReference> ();
         readonly List<ClassReference> create_classes = new List<ClassReference> ();
-        
-        internal Container ()
-        {
-            //search_classes = search_class_list.AsReadOnly ();
-            //create_classes = create_class_list.AsReadOnly ();
-        }
         
         [XmlAttribute ("childCount", OmitIfNull = true)]
         public virtual int? ChildCount { get; protected set; }
@@ -188,6 +187,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
             context.AutoDeserializeElement (this);
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

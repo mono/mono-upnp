@@ -25,42 +25,35 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml;
+
+using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class VideoBroadcast : VideoItem
     {
-        protected VideoBroadcast ()
+        protected VideoBroadcast (ContentDirectory contentDirectory, Container parent)
+            : base (contentDirectory, parent)
         {
         }
         
-        public Uri Icon { get; private set; }
-        public string Region { get; private set; }
-        public int? ChannelNr { get; private set; }
+        [XmlElement ("icon", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual Uri Icon { get; protected set; }
         
-        protected override void DeserializePropertyElement (XmlReader reader)
+        [XmlElement ("region", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual string Region { get; protected set; }
+        
+        [XmlElement ("channelNr", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual int? ChannelNr { get; protected set; }
+    
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (reader == null) throw new ArgumentNullException ("reader");
-            
-            if (reader.NamespaceURI == Schemas.UpnpSchema) {
-                switch (reader.LocalName) {
-                case "icon":
-                    Icon = new Uri (reader.ReadString ());
-                    break;
-                case "region":
-                    Region = reader.ReadString ();
-                     break;
-                case "channelNr":
-                    ChannelNr = reader.ReadElementContentAsInt ();
-                    break;
-                default:
-                    base.DeserializePropertyElement (reader);
-                    break;
-                }
-            } else {
-                base.DeserializePropertyElement (reader);
-            }
+            context.AutoDeserializeElement (this);
+        }
+
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }
