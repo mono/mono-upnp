@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=Mono.Upnp.Gtk
+Exec=mono-upnp-gtk
+Terminal=false
+Categories=Debugger;Development;
+OnlyShowIn=GNOME;

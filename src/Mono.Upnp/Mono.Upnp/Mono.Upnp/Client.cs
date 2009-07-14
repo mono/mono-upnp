@@ -76,6 +76,11 @@ namespace Mono.Upnp
         public event EventHandler<ServiceEventArgs> ServiceAdded;
         public event EventHandler<ServiceEventArgs> ServiceRemoved;
 
+        public void BrowseRoots ()
+        {
+            client.Browse ("upnp:rootdevice");
+        }
+        
         public void BrowseAll ()
         {
             client.BrowseAll ();

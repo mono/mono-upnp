@@ -8,7 +8,7 @@
     <ProjectGuid>{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AssemblyName>Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

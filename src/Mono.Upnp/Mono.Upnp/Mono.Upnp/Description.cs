@@ -88,11 +88,11 @@ namespace Mono.Upnp
         
         internal Uri ExpandUrl (string urlFragment)
         {
-            if (Uri.IsWellFormedUriString (urlFragment, UriKind.Absolute)) {
-                return new Uri (urlFragment);
-            } else if (Uri.IsWellFormedUriString (urlFragment, UriKind.Relative)) {
+            if (Uri.IsWellFormedUriString (urlFragment, UriKind.Relative)) {
                 // TODO handle NREs
                 return new Uri (Root.UrlBase, urlFragment);
+            } else if (Uri.IsWellFormedUriString (urlFragment, UriKind.Absolute)) {
+                return new Uri (urlFragment);
             } else {
                 throw new UpnpDeserializationException ("The URL fragment is not valid.");
             }

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{582939F7-13F0-49EB-A970-15955BCE8E8E}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>Mono.Upnp.GtkClient</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>.</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Mono.Posix" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="Mono.Addins, Version=0.4.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="gtk-gui\gui.stetic">
+      <LogicalName>gui.stetic</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="gtk-gui\generated.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\MainWindow.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\Main.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\DeviceDescriptionInfo.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\DeviceAnnouncementInfo.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.DeviceAnnouncementInfo.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.DeviceDescriptionInfo.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.MainWindow.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\IDeviceInfoProvider.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\IServiceInfoProvider.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\DeviceAnnouncementInfoProvider.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\DeviceDescriptionInfoProvider.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\LazyDeviceInfo.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.LazyDeviceInfo.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\LazyServiceInfo.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.LazyServiceInfo.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\ServiceAnnouncementInfo.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.ServiceAnnouncementInfo.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\ServiceAnnouncementInfoProvider.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\ServiceDescriptionInfo.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.ServiceDescriptionInfo.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\ServiceDescriptionInfoProvider.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\LazyIcon.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.LazyIcon.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="app.desktop" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Deployment.LinuxDeployData scriptName="mono-upnp-gtk" />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+  <ItemGroup>
+    <Folder Include="Mono.Upnp.GtkClient\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Upnp\Mono.Upnp.csproj">
+      <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
+      <Name>Mono.Upnp</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
