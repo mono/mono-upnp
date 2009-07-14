@@ -1,10 +1,10 @@
 // 
-// StorageFolder.cs
+// Test.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,44 +25,47 @@
 // THE SOFTWARE.
 
 using System;
+using System.IO;
 
-using Mono.Upnp.Xml;
+using NUnit.Framework;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
 {
-    public class StorageFolder : Container
+    [TestFixture]
+    public class Test
     {
-        public StorageFolder (ContentDirectory contentDirectory)
-            : base (contentDirectory, null)
+        MediaServer media_server;
+        
+        [SetUp]
+        public void SetUp ()
         {
+            var path = Path.Combine (Directory.GetCurrentDirectory (), "ContentDirectory");
+            var connection_manager = new DummyConnectionManager ();
+            var content_directory = new FileSystemContentDirectory (path);
+            
+            media_server = new MediaServer (
+                new MediaServerSettings (
+                    "uuid:mono-upnp-dcp-mediaserver1-filesystem-test",
+                    "Mono.Upnp Test FileSystem MediaServer",
+                    "Mono Project",
+                    "FileSystem MediaServer"
+                ),
+                connection_manager,
+                content_directory
+            );
+            
+            media_server.Start ();
         }
         
-        public StorageFolder (ContentDirectory contentDirectory, StorageSystem parent)
-            : base (contentDirectory, parent)
+        [TearDown]
+        public void TearDown ()
         {
+            media_server.Dispose ();
         }
         
-        public StorageFolder (ContentDirectory contentDirectory, StorageVolume parent)
-            : base (contentDirectory, parent)
+        [Test]
+        public void TestCase ()
         {
-        }
-        
-        public StorageFolder (ContentDirectory contentDirectory, StorageFolder parent)
-            : base (contentDirectory, parent)
-        {
-        }
-        
-        [XmlElement ("storageUsed", Schemas.UpnpSchema)]
-        public virtual long StorageUsed { get; protected set; }
-    
-        protected override void DeserializeElement (XmlDeserializationContext context)
-        {
-            context.AutoDeserializeElement (this);
-        }
-
-        protected override void SerializeMembersOnly (XmlSerializationContext context)
-        {
-            context.AutoSerializeMembersOnly (this);
         }
     }
 }

@@ -180,6 +180,7 @@ namespace Mono.Upnp.Internal
         protected override void HandleContext (HttpListenerContext context)
         {
             base.HandleContext (context);
+            
             var method = context.Request.HttpMethod.ToUpper ();
             if (method == "SUBSCRIBE") {
                 var callback = context.Request.Headers["CALLBACK"];
@@ -300,6 +301,7 @@ namespace Mono.Upnp.Internal
         {
             dispatcher.Remove (subscriber.TimeoutId);
             var timeout = context.Request.Headers["TIMEOUT"] ?? "Second-1800";
+            
             if (timeout != "infinite") {
                 int time;
                 if (timeout.Length > 7 && int.TryParse (timeout.Substring (7), out time)) {
@@ -311,12 +313,14 @@ namespace Mono.Upnp.Internal
                     return false;
                 }
             }
+            
             context.Response.AddHeader ("DATE", DateTime.Now.ToString ("r"));
             context.Response.AddHeader ("SERVER", Protocol.UserAgent);
             context.Response.AddHeader ("SID", subscriber.Sid);
             context.Response.AddHeader ("TIMEOUT", timeout);
             context.Response.StatusCode = 200;
             context.Response.StatusDescription = "OK";
+            
             return true;
         }
         

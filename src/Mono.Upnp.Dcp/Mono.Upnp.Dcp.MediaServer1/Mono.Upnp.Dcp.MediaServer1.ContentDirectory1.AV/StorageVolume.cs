@@ -32,7 +32,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class StorageVolume : Container
     {
-        protected StorageVolume (ContentDirectory contentDirectory, Container parent)
+        public StorageVolume (ContentDirectory contentDirectory)
+            : base (contentDirectory, null)
+        {
+        }
+        
+        public StorageVolume (ContentDirectory contentDirectory, StorageSystem parent)
+            : base (contentDirectory, parent)
+        {
+        }
+        
+        public StorageVolume (ContentDirectory contentDirectory, StorageVolume parent)
             : base (contentDirectory, parent)
         {
         }

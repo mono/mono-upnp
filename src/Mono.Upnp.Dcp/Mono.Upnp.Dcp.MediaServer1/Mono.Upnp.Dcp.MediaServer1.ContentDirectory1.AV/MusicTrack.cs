@@ -38,7 +38,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         readonly List<string> albums = new List<string>();
         readonly List<string> playlists = new List<string> ();
         
-        protected MusicTrack (ContentDirectory contentDirectory, Container parent)
+        public MusicTrack (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
         }

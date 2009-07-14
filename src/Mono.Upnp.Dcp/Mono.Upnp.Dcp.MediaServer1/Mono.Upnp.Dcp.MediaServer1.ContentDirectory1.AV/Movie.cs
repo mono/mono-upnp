@@ -36,7 +36,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         readonly List<DateTime> scheduled_start_times = new List<DateTime>();
         readonly List<DateTime> scheduled_end_times = new List<DateTime>();
         
-        protected Movie (ContentDirectory contentDirectory, Container parent)
+        public Movie (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
         }

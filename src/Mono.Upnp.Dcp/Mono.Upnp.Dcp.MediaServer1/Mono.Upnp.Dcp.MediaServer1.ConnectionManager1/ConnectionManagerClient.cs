@@ -30,8 +30,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
             if (args.Service.Type != ConnectionManager.ServiceType) return;
 
             try {
-                ConnectionManager service = new ConnectionManager (args.Service);
-                OnConnectionManagerAdded (service);
+                //ConnectionManager service = new ConnectionManager (args.Service);
+                //OnConnectionManagerAdded (service);
             }
             catch
             {

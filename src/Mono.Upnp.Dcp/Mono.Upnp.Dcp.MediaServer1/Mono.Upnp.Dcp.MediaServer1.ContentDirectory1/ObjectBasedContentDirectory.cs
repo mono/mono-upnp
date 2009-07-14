@@ -36,7 +36,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [XmlType ("DIDL-Lite", Schemas.DidlLiteSchema)]
         [XmlNamespace (Schemas.DublinCoreSchema, "dc")]
         [XmlNamespace (Schemas.UpnpSchema, "upnp")]
-        class ResultsWrapper
+        class ResultsWrapper : IXmlSerializable
         {
             readonly IEnumerable<Object> results;
             
@@ -50,14 +50,28 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 this.results = results;
             }
             
-            [XmlArrayItem]
             public IEnumerable<Object> Results {
                 get { return results; }
             }
             
+            public int ResultsCount { get; private set; }
+            
             static IEnumerable<Object> Single (Object item)
             {
                 yield return item;
+            }
+            
+            public void SerializeSelfAndMembers (XmlSerializationContext context)
+            {
+                context.AutoSerializeObjectAndMembers (this);
+            }
+            
+            public void SerializeMembersOnly (XmlSerializationContext context)
+            {
+                foreach (var result in Results) {
+                    context.AutoSerializeObjectAndMembers (result);
+                    ResultsCount++;
+                }
             }
         }
         
@@ -69,8 +83,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             updateId = null;
             if (browseFlag == BrowseFlag.BrowseDirectChildren) {
-                var children = GetChildren (objectId, startIndex, requestCount, sortCriteria, out numberReturned, out totalMatches);
-                return serializer.GetString (new ResultsWrapper (children));
+                var children = GetChildren (objectId, startIndex, requestCount, sortCriteria, out totalMatches);
+                var results = new ResultsWrapper (children);
+                var xml = serializer.GetString (results);
+                numberReturned = results.ResultsCount;
+                return xml;
             } else {
                 var @object = GetObject (objectId);
                 if (@object == null) {
@@ -78,15 +95,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     totalMatches = 0;
                 } else {
                     numberReturned = 1;
-                    totalMatches = 0;
+                    totalMatches = 1;
                 }
-                
                 return serializer.GetString (new ResultsWrapper (@object));
             }
         }
         
-        protected abstract IEnumerable<Object> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria,
-                                                            out int numberReturned, out int totalMatches);
+        protected abstract IEnumerable<Object> GetChildren (string objectId, int startIndex, int requestCount,
+                                                            string sortCriteria, out int totalMatches);
         
         protected abstract Object GetObject (string objectId);
     }

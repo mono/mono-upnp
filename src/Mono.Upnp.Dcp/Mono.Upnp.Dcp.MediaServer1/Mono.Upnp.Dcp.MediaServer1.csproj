@@ -29,13 +29,15 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="System.Xml">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1\ConnectionStatus.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1\Direction.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\DiscoveryEventArgs.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\TransferStatus.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\BrowseFlag.cs" />
@@ -63,7 +65,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectBasedContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\MediaServer.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\MediaServerSettings.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionManager.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionManagerController.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionManagerClient.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Album.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\AudioBook.cs" />
@@ -90,6 +92,9 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\TextItem.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\VideoBroadcast.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\VideoItem.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionManager.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionStatus.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\Direction.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">

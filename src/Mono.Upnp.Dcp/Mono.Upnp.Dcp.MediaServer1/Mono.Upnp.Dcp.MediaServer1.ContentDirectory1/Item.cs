@@ -36,6 +36,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         protected Item (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+            if (parent == null) throw new ArgumentNullException ("parent");
         }
         
         [XmlAttribute ("refID", Schemas.DidlLiteSchema, OmitIfNull = true)]

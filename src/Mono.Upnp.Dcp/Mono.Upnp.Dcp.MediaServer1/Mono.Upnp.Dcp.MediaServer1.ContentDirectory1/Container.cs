@@ -45,7 +45,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         readonly List<ClassReference> create_classes = new List<ClassReference> ();
         
         [XmlAttribute ("childCount", OmitIfNull = true)]
-        public virtual int? ChildCount { get; protected set; }
+        public virtual int? ChildCount { get; set; }
         
         [XmlArrayItem ("createClass", Schemas.UpnpSchema)]
         protected virtual ICollection<ClassReference> CreateClassCollection {

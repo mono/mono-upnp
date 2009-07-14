@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Tests", "tests\Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.Tests", "tests\Mono.Ssdp.Tests\Mono.Ssdp.Tests.csproj", "{D6ADBD6C-8A83-4429-8975-624822AF7D3D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests", "tests\Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests\Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests.csproj", "{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Ssdp", "Mono.Ssdp", "{10FB35F1-FBF6-42C7-85E2-9A52345FD0F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp", "src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj", "{AD422A19-BA07-4039-B843-84E386804DD1}"
@@ -18,6 +20,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.Dcp", "Mono.Upnp.Dcp", "{251579B4-B8E2-4ACD-B5BD-0DC208BB8114}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj", "{D095ADE0-D74E-449C-BAF2-174A952B2056}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.FileSystem", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1.FileSystem\Mono.Upnp.Dcp.MediaServer1.FileSystem.csproj", "{5AD8D852-8ADA-477E-AA76-0958CAB1D881}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		Release Linq|Any CPU = Release Linq|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Debug Linq|Any CPU.ActiveCfg = Debug Linq|Any CPU
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Debug Linq|Any CPU.Build.0 = Debug Linq|Any CPU
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Release Linq|Any CPU.ActiveCfg = Release Linq|Any CPU
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Release Linq|Any CPU.Build.0 = Release Linq|Any CPU
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,13 +63,23 @@ Global
 		{D6ADBD6C-8A83-4429-8975-624822AF7D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6ADBD6C-8A83-4429-8975-624822AF7D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6ADBD6C-8A83-4429-8975-624822AF7D3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Debug Linq|Any CPU.ActiveCfg = Debug Linq|Any CPU
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Debug Linq|Any CPU.Build.0 = Debug Linq|Any CPU
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Release Linq|Any CPU.ActiveCfg = Release Linq|Any CPU
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Release Linq|Any CPU.Build.0 = Release Linq|Any CPU
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5E5A8C5E-334D-4ED2-B40F-34712C7E085C} = {42D6ED99-B55B-49DF-9D77-55C5FC2D2266}
 		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
 		{D6ADBD6C-8A83-4429-8975-624822AF7D3D} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
 		{AD422A19-BA07-4039-B843-84E386804DD1} = {10FB35F1-FBF6-42C7-85E2-9A52345FD0F3}
 		{D095ADE0-D74E-449C-BAF2-174A952B2056} = {251579B4-B8E2-4ACD-B5BD-0DC208BB8114}
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881} = {251579B4-B8E2-4ACD-B5BD-0DC208BB8114}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		version = 0.1

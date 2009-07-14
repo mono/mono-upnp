@@ -5,9 +5,9 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D6ADBD6C-8A83-4429-8975-624822AF7D3D}</ProjectGuid>
+    <ProjectGuid>{5AD8D852-8ADA-477E-AA76-0958CAB1D881}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Mono.Ssdp.Tests</AssemblyName>
+    <AssemblyName>Mono.Upnp.Dcp.MediaServer1.FileSystem</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -18,6 +18,7 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -26,35 +27,26 @@
     <OutputPath>.</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="nunit.core, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj">
-      <Project>{AD422A19-BA07-4039-B843-84E386804DD1}</Project>
-      <Name>Mono.Ssdp</Name>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\FileSystemContentDirectory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">
+      <Project>{D095ADE0-D74E-449C-BAF2-174A952B2056}</Project>
+      <Name>Mono.Upnp.Dcp.MediaServer1</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientTests.cs" />
-    <Compile Include="ServerTests.cs" />
+    <Folder Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <Deployment.LinuxDeployData generatePcFile="false" />
-      </Properties>
-    </MonoDevelop>
-  </ProjectExtensions>
 </Project>

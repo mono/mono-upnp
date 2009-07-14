@@ -30,15 +30,39 @@ using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public abstract class ContentDirectory
+    public abstract class ContentDirectory : IDisposable
     {
+        bool started;
+        ulong system_id;
         ulong ids;
+        
+        ~ContentDirectory()
+        {
+            Dispose (false);
+        }
         
         internal string GetNewObjectId ()
         {
             var id = ids.ToString ();
             ids++;
             return id;
+        }
+        
+        protected internal void OnSystemUpdate ()
+        {
+            if (started) {
+                system_id++;
+            }
+        }
+        
+        public virtual void Start ()
+        {
+            started = true;
+        }
+        
+        public virtual void Stop ()
+        {
+            started = false;
         }
         
         public static readonly ServiceType ServiceType = new ServiceType (
@@ -69,10 +93,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                                [UpnpRelatedStateVariable ("SystemUpdateID")]
                                                out string systemUpdateId)
         {
-            systemUpdateId = SystemUpdateID;
+            systemUpdateId = system_id.ToString ();
         }
-        
-        protected abstract string SystemUpdateID { get; }
         
         [UpnpAction]
         public virtual void Browse ([UpnpArgument ("ObjectID")] string objectId,
@@ -92,5 +114,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         protected abstract string Browse (string objectId, BrowseFlag browseFlag, string filter, int startIndex,
                                           int requestCount, string sortCriteria, out int numberReturned,
                                           out int totalMatches, out string updateId);
+        
+        public void Dispose ()
+        {
+            Dispose (true);
+            GC.SuppressFinalize (this);
+        }
+        
+        protected virtual void Dispose (bool disposing)
+        {
+        }
     }
 }

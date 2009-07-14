@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 using Mono.Upnp.Xml;
@@ -33,6 +33,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class Object : XmlAutomatable
     {
+        readonly ContentDirectory content_directory;
         readonly List<Resource> resources = new List<Resource> ();
         bool is_restricted;
         string title;
@@ -44,8 +45,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
             
-            Id = contentDirectory.GetNewObjectId ();
-            ParentId = parent == null ? "-1" : parent.Id;
+            this.content_directory = contentDirectory;
+            this.Id = contentDirectory.GetNewObjectId ();
+            this.ParentId = parent == null ? "-1" : parent.Id;
+        }
+        
+        protected void OnUpdate ()
+        {
+            content_directory.OnSystemUpdate ();
         }
 
         [XmlAttribute ("id", Schemas.DidlLiteSchema)]
