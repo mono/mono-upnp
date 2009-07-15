@@ -50,7 +50,7 @@ namespace Mono.Upnp.GtkClient
             
             try {
                 using (var string_reader = new StringReader (raw.Buffer.Text)) {
-                    using (var xml_reader = XmlReader.Create (string_reader)) {
+                    using (var xml_reader = XmlReader.Create (string_reader, new XmlReaderSettings { IgnoreWhitespace = true })) {
                         var builder = new StringBuilder ();
                         using (var writer = XmlWriter.Create (builder, new XmlWriterSettings { Indent = true })) {
                             writer.WriteNode (xml_reader, true);
