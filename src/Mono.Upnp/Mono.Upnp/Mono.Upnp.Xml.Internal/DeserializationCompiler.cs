@@ -194,7 +194,7 @@ namespace Mono.Upnp.Xml.Internal
             
             var element_deserializer = CreateSubElementDeserializer ();
             return (obj, context, depth) => {
-                while (context.Reader.Read () && context.Reader.NodeType == XmlNodeType.Element && context.Reader.Depth > depth) {
+                while (MoveToNextElement (context.Reader) && context.Reader.Depth > depth) {
                     var element_reader = context.Reader.ReadSubtree ();
                     element_reader.Read ();
                     try {
@@ -489,7 +489,7 @@ namespace Mono.Upnp.Xml.Internal
             return (obj, context) => {
                 var collection = property.GetValue (obj, null);
                 var depth = context.Reader.Depth;
-                while (context.Reader.Read () && context.Reader.NodeType == XmlNodeType.Element && context.Reader.Depth > depth) {
+                while (MoveToNextElement (context.Reader) && context.Reader.Depth > depth) {
                     var item_reader = context.Reader.ReadSubtree ();
                     item_reader.Read ();
                     try {
@@ -552,6 +552,20 @@ namespace Mono.Upnp.Xml.Internal
                     // TODO throw
                     return null;
                 }
+            }
+        }
+        
+        static bool MoveToNextElement (XmlReader reader)
+        {
+            if (reader.Read ()) {
+                while (reader.NodeType != XmlNodeType.Element) {
+                    if (!reader.Read ()) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return false;
             }
         }
     }

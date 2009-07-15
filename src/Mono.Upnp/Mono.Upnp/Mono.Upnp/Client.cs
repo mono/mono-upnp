@@ -211,6 +211,11 @@ namespace Mono.Upnp
                     }
                     
                     descriptions[url] = root;
+                    if (root.RootDevice == null) {
+                        Log.Error (string.Format ("The description root does not have a root device: {0}.", url));
+                        continue;
+                    }
+                    
                     var result = getter (announcement, root.RootDevice);
                     if (result == null) {
                         continue;

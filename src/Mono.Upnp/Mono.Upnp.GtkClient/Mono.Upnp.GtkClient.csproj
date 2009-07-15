@@ -79,6 +79,8 @@
     <Compile Include="Mono.Upnp.GtkClient\RawServiceDescriptionInfoProvider.cs" />
     <Compile Include="gtk-gui\Mono.Upnp.GtkClient.RawXmlInfo.cs" />
     <Compile Include="Mono.Upnp.GtkClient\RawServiceScdpInfoProvider.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\ActionInvocationWindow.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.ActionInvocationWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.desktop" />

@@ -61,6 +61,7 @@ namespace Mono.Upnp.GtkClient {
                 this.Child.ShowAll();
             }
             this.Hide();
+            this.actions.RowActivated += new Gtk.RowActivatedHandler(this.OnActionsRowActivated);
         }
     }
 }

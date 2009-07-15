@@ -35,12 +35,15 @@ namespace Mono.Upnp.GtkClient
     [System.ComponentModel.ToolboxItem(true)]
     public partial class ServiceScpdInfo : Gtk.Bin
     {
+        ServiceController service;
         TreeStore actionModel;
         TreeStore stateVariableModel;
         
         public ServiceScpdInfo (ServiceController service)
         {
             this.Build ();
+            
+            this.service = service;
             
             actionModel = new TreeStore (typeof (string));
             stateVariableModel = new TreeStore (typeof (string));
@@ -123,6 +126,20 @@ namespace Mono.Upnp.GtkClient
             
             while (related_state_variable != (string)stateVariableModel.GetValue (iter, 0) && stateVariableModel.IterNext (ref iter)) { }
             stateVariables.Selection.SelectIter (iter);
+        }
+
+        protected virtual void OnActionsRowActivated (object o, Gtk.RowActivatedArgs args)
+        {
+            TreeIter iter;
+            if (!actionModel.GetIter (out iter, args.Path)) {
+                return;
+            }
+            
+            if (actionModel.IterDepth (iter) == 0) {
+                var value = (string)actionModel.GetValue (iter, 0);
+                var window = new ActionInvocationWindow (service.Actions[value]);
+                window.ShowAll ();
+            }
         }
     }
 }
