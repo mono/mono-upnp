@@ -23,6 +23,12 @@ namespace Stetic {
                 w1.Add("Device", w2);
                 Gtk.IconSet w3 = new Gtk.IconSet(Stetic.IconLoader.LoadIcon(iconRenderer, "gtk-execute", Gtk.IconSize.Menu, 16));
                 w1.Add("Service", w3);
+                Gtk.IconSet w4 = new Gtk.IconSet(Stetic.IconLoader.LoadIcon(iconRenderer, "gtk-go-forward", Gtk.IconSize.Menu, 16));
+                w1.Add("Input", w4);
+                Gtk.IconSet w5 = new Gtk.IconSet(Stetic.IconLoader.LoadIcon(iconRenderer, "gtk-go-back", Gtk.IconSize.Menu, 16));
+                w1.Add("Output", w5);
+                Gtk.IconSet w6 = new Gtk.IconSet(Stetic.IconLoader.LoadIcon(iconRenderer, "gtk-go-up", Gtk.IconSize.Menu, 16));
+                w1.Add("Return", w6);
                 w1.AddDefault();
             }
         }

@@ -19,6 +19,21 @@
         <property name="Image">stock:gtk-execute Menu</property>
       </source>
     </icon-set>
+    <icon-set id="Input">
+      <source>
+        <property name="Image">stock:gtk-go-forward Menu</property>
+      </source>
+    </icon-set>
+    <icon-set id="Output">
+      <source>
+        <property name="Image">stock:gtk-go-back Menu</property>
+      </source>
+    </icon-set>
+    <icon-set id="Return">
+      <source>
+        <property name="Image">stock:gtk-go-up Menu</property>
+      </source>
+    </icon-set>
   </icon-factory>
   <widget class="Gtk.Bin" id="Mono.Upnp.GtkClient.DeviceDescriptionInfo" design-size="300 312">
     <property name="MemberName" />
@@ -701,7 +716,6 @@
                     <property name="MemberName" />
                     <property name="CanFocus">True</property>
                     <property name="ShowScrollbars">True</property>
-                    <signal name="RowActivated" handler="OnListRowActivated" />
                   </widget>
                 </child>
               </widget>
@@ -1135,6 +1149,51 @@
             <property name="MemberName" />
             <property name="LabelProp" translatable="yes">Loading Icon</property>
           </widget>
+        </child>
+      </widget>
+    </child>
+  </widget>
+  <widget class="Gtk.Bin" id="Mono.Upnp.GtkClient.ServiceScpdInfo" design-size="414 466">
+    <property name="MemberName" />
+    <property name="Visible">False</property>
+    <child>
+      <widget class="Gtk.HBox" id="hbox1">
+        <property name="MemberName" />
+        <property name="Spacing">6</property>
+        <child>
+          <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
+            <property name="MemberName" />
+            <property name="ShadowType">In</property>
+            <child>
+              <widget class="Gtk.TreeView" id="actions">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="ShowScrollbars">True</property>
+                <signal name="RowActivated" handler="OnActionsRowActivated" />
+              </widget>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">0</property>
+            <property name="AutoSize">True</property>
+          </packing>
+        </child>
+        <child>
+          <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow1">
+            <property name="MemberName" />
+            <property name="ShadowType">In</property>
+            <child>
+              <widget class="Gtk.TreeView" id="stateVariables">
+                <property name="MemberName" />
+                <property name="CanFocus">True</property>
+                <property name="ShowScrollbars">True</property>
+              </widget>
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">1</property>
+            <property name="AutoSize">True</property>
+          </packing>
         </child>
       </widget>
     </child>

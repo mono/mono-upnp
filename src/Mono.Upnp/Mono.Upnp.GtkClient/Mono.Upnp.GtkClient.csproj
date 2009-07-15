@@ -70,6 +70,9 @@
     <Compile Include="Mono.Upnp.GtkClient\ServiceDescriptionInfoProvider.cs" />
     <Compile Include="Mono.Upnp.GtkClient\LazyIcon.cs" />
     <Compile Include="gtk-gui\Mono.Upnp.GtkClient.LazyIcon.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\ServiceScpdInfo.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.GtkClient.ServiceScpdInfo.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\ServiceScpdInfoProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.desktop" />

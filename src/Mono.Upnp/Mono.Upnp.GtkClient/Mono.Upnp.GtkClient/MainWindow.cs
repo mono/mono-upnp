@@ -48,11 +48,32 @@ namespace Mono.Upnp.GtkClient
             
             model = new ListStore (typeof (Gdk.Pixbuf), typeof (DeviceAnnouncement));
             list.Model = model;
+            list.Selection.Changed += ListSelectionChanged;
             
             client = new Client ();
             client.DeviceAdded += ClientDeviceAdded;
             client.ServiceAdded += ClientServiceAdded;
             client.BrowseAll ();
+        }
+
+        void ListSelectionChanged (object sender, EventArgs e)
+        {
+            infoBox.Remove (infoBox.Children[0]);
+            
+            TreeIter iter;
+            if (!list.Selection.GetSelected (out iter)) {
+                infoBox.Add (infoFiller);
+                return;
+            }
+            
+            var value = model.GetValue (iter, 1);
+            var service = value as ServiceAnnouncement;
+            if (service != null) {
+                infoBox.Add (CreateNotebook (service));
+            } else {
+                infoBox.Add (CreateNotebook ((DeviceAnnouncement)value));
+            }
+            infoBox.ShowAll ();
         }
 
         void ClientDeviceAdded (object sender, DeviceEventArgs e)
@@ -83,25 +104,6 @@ namespace Mono.Upnp.GtkClient
         {
             Gtk.Application.Quit ();
             a.RetVal = true;
-        }
-
-        protected virtual void OnListRowActivated (object o, Gtk.RowActivatedArgs args)
-        {
-            TreeIter iter;
-            if (!model.GetIter (out iter, args.Path)) {
-                return;
-            }
-            
-            infoBox.Remove (infoBox.Children[0]);
-            
-            var value = model.GetValue (iter, 1);
-            var service = value as ServiceAnnouncement;
-            if (service != null) {
-                infoBox.Add (CreateNotebook (service));
-            } else {
-                infoBox.Add (CreateNotebook ((DeviceAnnouncement)value));
-            }
-            infoBox.ShowAll ();
         }
         
         Widget CreateNotebook (DeviceAnnouncement device)
@@ -138,6 +140,7 @@ namespace Mono.Upnp.GtkClient
             get {
                 yield return new ServiceAnnouncementInfoProvider ();
                 yield return new ServiceDescriptionInfoProvider ();
+                yield return new ServiceScpdInfoProvider ();
             }
         }
     }

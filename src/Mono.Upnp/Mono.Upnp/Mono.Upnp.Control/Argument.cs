@@ -46,7 +46,7 @@ namespace Mono.Upnp.Control
                 throw new ArgumentOutOfRangeException ("direction");
             
             Name = name;
-            RelatedStateVariableName = relatedStateVariable;
+            RelatedStateVariable = relatedStateVariable;
             Direction = direction;
         }
         
@@ -69,7 +69,7 @@ namespace Mono.Upnp.Control
         public virtual bool IsReturnValue { get; protected set; }
         
         [XmlElement ("relatedStateVariable")]
-        public virtual string RelatedStateVariableName { get; protected set; }
+        public virtual string RelatedStateVariable { get; protected set; }
         
         protected override void DeserializeElement (XmlDeserializationContext context)
         {

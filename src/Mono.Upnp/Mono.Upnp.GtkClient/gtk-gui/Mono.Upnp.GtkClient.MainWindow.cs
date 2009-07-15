@@ -85,7 +85,6 @@ namespace Mono.Upnp.GtkClient {
             this.DefaultHeight = 487;
             this.Show();
             this.DeleteEvent += new Gtk.DeleteEventHandler(this.OnDeleteEvent);
-            this.list.RowActivated += new Gtk.RowActivatedHandler(this.OnListRowActivated);
         }
     }
 }
