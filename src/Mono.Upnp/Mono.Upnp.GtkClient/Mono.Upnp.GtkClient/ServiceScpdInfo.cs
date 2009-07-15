@@ -91,27 +91,38 @@ namespace Mono.Upnp.GtkClient
             
             actions.AppendColumn ("Actions", new CellRendererText (), "text", 0);
             actions.Model = actionModel;
+            actions.Selection.Changed += ActionsSelectionChanged;
             
             stateVariables.AppendColumn ("State Variables", new CellRendererText (), "text", 0);
             stateVariables.Model = stateVariableModel;
         }
-        
-        protected virtual void OnActionsRowActivated (object o, Gtk.RowActivatedArgs args)
+
+        void ActionsSelectionChanged (object sender, EventArgs e)
         {
             TreeIter iter;
-            if (!actionModel.GetIter (out iter, args.Path)) {
+            if (!actions.Selection.GetSelected (out iter)) {
                 return;
             }
-            var value = (string)actionModel.GetValue (iter, 0);
             
-            if (value.StartsWith ("Related State Variable: ")) {
-                var related_state_variable = value.Substring (24);
-                if (!stateVariableModel.GetIterFirst (out iter)) {
-                    return;
-                }
-                while (related_state_variable != (string)stateVariableModel.GetValue (iter, 0) && stateVariableModel.IterNext (ref iter)) { }
-                stateVariables.Selection.SelectIter (iter);
+            switch (actionModel.IterDepth (iter)) {
+            case 1:
+                actionModel.IterNthChild (out iter, iter, 2);
+                break;
+            case 2:
+                actionModel.IterParent (out iter, iter);
+                goto case 1;
+            default:
+                return;
             }
+            
+            var value = (string)actionModel.GetValue (iter, 0);
+            var related_state_variable = value.Substring (24);
+            if (!stateVariableModel.GetIterFirst (out iter)) {
+                return;
+            }
+            
+            while (related_state_variable != (string)stateVariableModel.GetValue (iter, 0) && stateVariableModel.IterNext (ref iter)) { }
+            stateVariables.Selection.SelectIter (iter);
         }
     }
 }
