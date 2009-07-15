@@ -15,11 +15,7 @@ namespace Mono.Upnp.GtkClient {
         
         private Gtk.UIManager UIManager;
         
-        private Gtk.ToggleAction connectAction;
-        
         private Gtk.VBox vbox1;
-        
-        private Gtk.Toolbar toolbar2;
         
         private Gtk.HPaned hpaned;
         
@@ -36,8 +32,6 @@ namespace Mono.Upnp.GtkClient {
             // Widget Mono.Upnp.GtkClient.MainWindow
             this.UIManager = new Gtk.UIManager();
             Gtk.ActionGroup w1 = new Gtk.ActionGroup("Default");
-            this.connectAction = new Gtk.ToggleAction("connectAction", null, null, "gtk-connect");
-            w1.Add(this.connectAction, null);
             this.UIManager.InsertActionGroup(w1, 0);
             this.AddAccelGroup(this.UIManager.AccelGroup);
             this.WidthRequest = 0;
@@ -49,18 +43,6 @@ namespace Mono.Upnp.GtkClient {
             this.vbox1 = new Gtk.VBox();
             this.vbox1.Name = "vbox1";
             this.vbox1.Spacing = 6;
-            // Container child vbox1.Gtk.Box+BoxChild
-            this.UIManager.AddUiFromString("<ui><toolbar name='toolbar2'><toolitem name='connectAction' action='connectAction'/></toolbar></ui>");
-            this.toolbar2 = ((Gtk.Toolbar)(this.UIManager.GetWidget("/toolbar2")));
-            this.toolbar2.Name = "toolbar2";
-            this.toolbar2.ShowArrow = false;
-            this.toolbar2.ToolbarStyle = ((Gtk.ToolbarStyle)(0));
-            this.toolbar2.IconSize = ((Gtk.IconSize)(3));
-            this.vbox1.Add(this.toolbar2);
-            Gtk.Box.BoxChild w2 = ((Gtk.Box.BoxChild)(this.vbox1[this.toolbar2]));
-            w2.Position = 0;
-            w2.Expand = false;
-            w2.Fill = false;
             // Container child vbox1.Gtk.Box+BoxChild
             this.hpaned = new Gtk.HPaned();
             this.hpaned.CanFocus = true;
@@ -77,8 +59,8 @@ namespace Mono.Upnp.GtkClient {
             this.list.Name = "list";
             this.GtkScrolledWindow.Add(this.list);
             this.hpaned.Add(this.GtkScrolledWindow);
-            Gtk.Paned.PanedChild w4 = ((Gtk.Paned.PanedChild)(this.hpaned[this.GtkScrolledWindow]));
-            w4.Resize = false;
+            Gtk.Paned.PanedChild w3 = ((Gtk.Paned.PanedChild)(this.hpaned[this.GtkScrolledWindow]));
+            w3.Resize = false;
             // Container child hpaned.Gtk.Paned+PanedChild
             this.infoBox = new Gtk.VBox();
             this.infoBox.Name = "infoBox";
@@ -88,13 +70,13 @@ namespace Mono.Upnp.GtkClient {
             this.infoFiller.Name = "infoFiller";
             this.infoFiller.LabelProp = Mono.Unix.Catalog.GetString("Select a device or service");
             this.infoBox.Add(this.infoFiller);
-            Gtk.Box.BoxChild w5 = ((Gtk.Box.BoxChild)(this.infoBox[this.infoFiller]));
-            w5.Position = 0;
-            w5.Fill = false;
+            Gtk.Box.BoxChild w4 = ((Gtk.Box.BoxChild)(this.infoBox[this.infoFiller]));
+            w4.Position = 0;
+            w4.Fill = false;
             this.hpaned.Add(this.infoBox);
             this.vbox1.Add(this.hpaned);
-            Gtk.Box.BoxChild w7 = ((Gtk.Box.BoxChild)(this.vbox1[this.hpaned]));
-            w7.Position = 1;
+            Gtk.Box.BoxChild w6 = ((Gtk.Box.BoxChild)(this.vbox1[this.hpaned]));
+            w6.Position = 0;
             this.Add(this.vbox1);
             if ((this.Child != null)) {
                 this.Child.ShowAll();
@@ -103,7 +85,6 @@ namespace Mono.Upnp.GtkClient {
             this.DefaultHeight = 487;
             this.Show();
             this.DeleteEvent += new Gtk.DeleteEventHandler(this.OnDeleteEvent);
-            this.connectAction.Toggled += new System.EventHandler(this.OnConnectActionToggled);
             this.list.RowActivated += new Gtk.RowActivatedHandler(this.OnListRowActivated);
         }
     }

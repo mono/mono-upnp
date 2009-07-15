@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.IO;
 using System.Threading;
 
 namespace Mono.Upnp.GtkClient
@@ -47,12 +48,13 @@ namespace Mono.Upnp.GtkClient
             if (!mapped) {
                 mapped = true;
                 ThreadPool.QueueUserWorkItem(state => {
-                    var data = icon.GetData ();
-                    var pixbuf = new Gdk.Pixbuf (data, true);
+                    var stream = new MemoryStream (icon.GetData ());
+                    var pixbuf = new Gdk.Pixbuf (stream);
                     var image = new Gtk.Image (pixbuf);
                     Gtk.Application.Invoke ((o, a) => {
                         alignment.Remove (alignment.Child);
                         alignment.Add (image);
+                        ShowAll ();
                     });
                 });
             }

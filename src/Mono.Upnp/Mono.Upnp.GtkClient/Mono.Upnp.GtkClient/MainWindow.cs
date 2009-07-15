@@ -38,75 +38,51 @@ namespace Mono.Upnp.GtkClient
     {
         readonly Client client;
         readonly ListStore model;
-        bool connected;
         
         public MainWindow () : base (Gtk.WindowType.Toplevel)
         {
             Build ();
             
-            list.AppendColumn (Catalog.GetString ("UPnP Devices"), new CellRendererText (), RenderCell);
+            list.AppendColumn (Catalog.GetString ("Icon"), new CellRendererPixbuf (), "pixbuf", 0);
+            list.AppendColumn (Catalog.GetString ("UPnP Devices and Services"), new CellRendererText (), RenderCell);
             
-            model = new ListStore (typeof (DeviceAnnouncement));
+            model = new ListStore (typeof (Gdk.Pixbuf), typeof (DeviceAnnouncement));
             list.Model = model;
             
             client = new Client ();
             client.DeviceAdded += ClientDeviceAdded;
             client.ServiceAdded += ClientServiceAdded;
+            client.BrowseAll ();
+        }
+
+        void ClientDeviceAdded (object sender, DeviceEventArgs e)
+        {
+            model.AppendValues (Style.LookupIconSet ("Device").RenderIcon (Style, TextDirection.Ltr, StateType.Normal, IconSize.Menu, this, null), e.Device);
         }
 
         void ClientServiceAdded (object sender, ServiceEventArgs e)
         {
-            model.AppendValues (e.Service);
+            model.AppendValues (Style.LookupIconSet ("Service").RenderIcon (Style, TextDirection.Ltr, StateType.Normal, IconSize.Menu, this, null), e.Service);
         }
         
         void RenderCell (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)
         {
-            var value = model.GetValue (iter, 0);
+            var value = model.GetValue (iter, 1);
             
             if (value == null) return;
             
             var service = value as ServiceAnnouncement;
             if (service != null) {
-                ((CellRendererText)cell).Text = string.Format ("{0} - {1}", service.Type, service.DeviceUdn);
+                ((CellRendererText)cell).Text = service.Type.ToString ();
             } else {
-                ((CellRendererText)cell).Text = ((DeviceAnnouncement)value).Udn;
+                ((CellRendererText)cell).Text = ((DeviceAnnouncement)value).Type.ToString ();
             }
-        }
-
-        void ClientDeviceAdded (object sender, DeviceEventArgs e)
-        {
-            model.AppendValues (e.Device);
         }
     
         protected void OnDeleteEvent (object sender, Gtk.DeleteEventArgs a)
         {
             Gtk.Application.Quit ();
             a.RetVal = true;
-        }
-
-        protected virtual void OnConnectActionToggled (object sender, System.EventArgs e)
-        {
-            if (connected) {
-                Disconnect ();
-            } else {
-                Connect ();
-            }
-        }
-        
-        void Connect ()
-        {
-            connected = true;
-            connectAction.IconName = "gtk-disconnect";
-            connectAction.Label = Catalog.GetString ("Disconnect");
-            client.BrowseAll ();
-        }
-        
-        void Disconnect ()
-        {
-            connected = false;
-            connectAction.IconName = "gtk-connect";
-            connectAction.Label = Catalog.GetString ("Connect");
-            //client.Stop ();
         }
 
         protected virtual void OnListRowActivated (object o, Gtk.RowActivatedArgs args)
@@ -118,7 +94,7 @@ namespace Mono.Upnp.GtkClient
             
             infoBox.Remove (infoBox.Children[0]);
             
-            var value = model.GetValue (iter, 0);
+            var value = model.GetValue (iter, 1);
             var service = value as ServiceAnnouncement;
             if (service != null) {
                 infoBox.Add (CreateNotebook (service));
