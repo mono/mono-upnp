@@ -133,6 +133,7 @@ namespace Mono.Upnp.GtkClient
             get {
                 yield return new DeviceAnnouncementInfoProvider ();
                 yield return new DeviceDescriptionInfoProvider ();
+                yield return new RawDeviceDescriptionInfoProvider ();
             }
         }
         
@@ -141,6 +142,8 @@ namespace Mono.Upnp.GtkClient
                 yield return new ServiceAnnouncementInfoProvider ();
                 yield return new ServiceDescriptionInfoProvider ();
                 yield return new ServiceScpdInfoProvider ();
+                yield return new RawServiceDescriptionInfoProvider ();
+                yield return new RawServiceScdpInfoProvider ();
             }
         }
     }
