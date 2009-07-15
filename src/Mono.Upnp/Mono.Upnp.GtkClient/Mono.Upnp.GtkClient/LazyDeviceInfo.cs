@@ -45,7 +45,7 @@ namespace Mono.Upnp.GtkClient
             
             this.Build ();
             
-            loading.Text = Catalog.GetString (string.Format ("Loading {0}", provider.Name));
+            loading.Text = Catalog.GetString ("Loading " + provider.Name);
         }
 
         protected virtual void OnMapped (object sender, System.EventArgs e)
@@ -53,7 +53,12 @@ namespace Mono.Upnp.GtkClient
             if (!mapped) {
                 mapped = true;
                 ThreadPool.QueueUserWorkItem (state => {
-                    var widget = provider.ProvideInfo (device);
+                    Gtk.Widget widget;
+                    try {
+                        widget = provider.ProvideInfo (device);
+                    } catch {
+                        widget = new Gtk.Label ("Failed to Load " + provider.Name);
+                    }
                     Gtk.Application.Invoke ((o, a) => {
                         alignment.Remove (alignment.Child);
                         alignment.Add (widget);

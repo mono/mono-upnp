@@ -37,6 +37,7 @@ namespace Mono.Upnp.GtkClient {
             this.table1.Name = "table1";
             this.table1.RowSpacing = ((uint)(10));
             this.table1.ColumnSpacing = ((uint)(10));
+            this.table1.BorderWidth = ((uint)(10));
             // Container child table1.Gtk.Table+TableChild
             this.deviceUdn = new Gtk.Label();
             this.deviceUdn.Name = "deviceUdn";

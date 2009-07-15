@@ -45,6 +45,7 @@
         <property name="NColumns">2</property>
         <property name="RowSpacing">10</property>
         <property name="ColumnSpacing">10</property>
+        <property name="BorderWidth">10</property>
         <child>
           <widget class="Gtk.Label" id="deviceType">
             <property name="MemberName" />
@@ -540,6 +541,7 @@
         <property name="NColumns">2</property>
         <property name="RowSpacing">10</property>
         <property name="ColumnSpacing">10</property>
+        <property name="BorderWidth">10</property>
         <child>
           <widget class="Gtk.Label" id="deviceType">
             <property name="MemberName" />
@@ -689,7 +691,7 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Window" id="Mono.Upnp.GtkClient.MainWindow" design-size="786 487">
+  <widget class="Gtk.Window" id="Mono.Upnp.GtkClient.MainWindow" design-size="1077 527">
     <action-group name="Default" />
     <property name="MemberName" />
     <property name="WidthRequest">0</property>
@@ -705,7 +707,7 @@
           <widget class="Gtk.HPaned" id="hpaned">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
-            <property name="Position">283</property>
+            <property name="Position">354</property>
             <property name="BorderWidth">5</property>
             <child>
               <widget class="Gtk.ScrolledWindow" id="GtkScrolledWindow">
@@ -775,6 +777,7 @@
         <property name="NColumns">2</property>
         <property name="RowSpacing">10</property>
         <property name="ColumnSpacing">10</property>
+        <property name="BorderWidth">10</property>
         <child>
           <widget class="Gtk.Label" id="deviceUdn">
             <property name="MemberName" />
@@ -918,6 +921,7 @@
         <property name="NColumns">2</property>
         <property name="RowSpacing">10</property>
         <property name="ColumnSpacing">10</property>
+        <property name="BorderWidth">10</property>
         <child>
           <widget class="Gtk.Label" id="controlUrl">
             <property name="MemberName" />

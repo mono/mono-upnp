@@ -47,7 +47,7 @@ namespace Mono.Upnp.GtkClient {
             this.hpaned = new Gtk.HPaned();
             this.hpaned.CanFocus = true;
             this.hpaned.Name = "hpaned";
-            this.hpaned.Position = 283;
+            this.hpaned.Position = 354;
             this.hpaned.BorderWidth = ((uint)(5));
             // Container child hpaned.Gtk.Paned+PanedChild
             this.GtkScrolledWindow = new Gtk.ScrolledWindow();
@@ -81,8 +81,8 @@ namespace Mono.Upnp.GtkClient {
             if ((this.Child != null)) {
                 this.Child.ShowAll();
             }
-            this.DefaultWidth = 786;
-            this.DefaultHeight = 487;
+            this.DefaultWidth = 1077;
+            this.DefaultHeight = 527;
             this.Show();
             this.DeleteEvent += new Gtk.DeleteEventHandler(this.OnDeleteEvent);
         }
