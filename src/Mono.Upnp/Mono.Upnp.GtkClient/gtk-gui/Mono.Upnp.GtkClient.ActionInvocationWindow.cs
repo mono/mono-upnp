@@ -17,8 +17,6 @@ namespace Mono.Upnp.GtkClient {
         
         private Gtk.Label action;
         
-        private Gtk.Label label2;
-        
         private Gtk.VBox inputsBox;
         
         private Gtk.Button button1;
@@ -50,22 +48,12 @@ namespace Mono.Upnp.GtkClient {
             w1.Expand = false;
             w1.Fill = false;
             // Container child vbox.Gtk.Box+BoxChild
-            this.label2 = new Gtk.Label();
-            this.label2.Name = "label2";
-            this.label2.Xalign = 0F;
-            this.label2.LabelProp = Mono.Unix.Catalog.GetString("Input Arguments");
-            this.vbox.Add(this.label2);
-            Gtk.Box.BoxChild w2 = ((Gtk.Box.BoxChild)(this.vbox[this.label2]));
-            w2.Position = 1;
-            w2.Expand = false;
-            w2.Fill = false;
-            // Container child vbox.Gtk.Box+BoxChild
             this.inputsBox = new Gtk.VBox();
             this.inputsBox.Name = "inputsBox";
             this.inputsBox.Spacing = 6;
             this.vbox.Add(this.inputsBox);
-            Gtk.Box.BoxChild w3 = ((Gtk.Box.BoxChild)(this.vbox[this.inputsBox]));
-            w3.Position = 2;
+            Gtk.Box.BoxChild w2 = ((Gtk.Box.BoxChild)(this.vbox[this.inputsBox]));
+            w2.Position = 1;
             // Container child vbox.Gtk.Box+BoxChild
             this.button1 = new Gtk.Button();
             this.button1.CanFocus = true;
@@ -73,26 +61,26 @@ namespace Mono.Upnp.GtkClient {
             this.button1.UseUnderline = true;
             this.button1.Relief = ((Gtk.ReliefStyle)(2));
             // Container child button1.Gtk.Container+ContainerChild
-            Gtk.Alignment w4 = new Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
+            Gtk.Alignment w3 = new Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
             // Container child GtkAlignment.Gtk.Container+ContainerChild
-            Gtk.HBox w5 = new Gtk.HBox();
-            w5.Spacing = 2;
+            Gtk.HBox w4 = new Gtk.HBox();
+            w4.Spacing = 2;
             // Container child GtkHBox.Gtk.Container+ContainerChild
-            Gtk.Image w6 = new Gtk.Image();
-            w6.Pixbuf = Stetic.IconLoader.LoadIcon(this, "gtk-execute", Gtk.IconSize.Menu, 16);
-            w5.Add(w6);
-            // Container child GtkHBox.Gtk.Container+ContainerChild
-            Gtk.Label w8 = new Gtk.Label();
-            w8.LabelProp = Mono.Unix.Catalog.GetString("_Invoke");
-            w8.UseUnderline = true;
-            w5.Add(w8);
+            Gtk.Image w5 = new Gtk.Image();
+            w5.Pixbuf = Stetic.IconLoader.LoadIcon(this, "gtk-execute", Gtk.IconSize.Menu, 16);
             w4.Add(w5);
-            this.button1.Add(w4);
+            // Container child GtkHBox.Gtk.Container+ContainerChild
+            Gtk.Label w7 = new Gtk.Label();
+            w7.LabelProp = Mono.Unix.Catalog.GetString("_Invoke");
+            w7.UseUnderline = true;
+            w4.Add(w7);
+            w3.Add(w4);
+            this.button1.Add(w3);
             this.vbox.Add(this.button1);
-            Gtk.Box.BoxChild w12 = ((Gtk.Box.BoxChild)(this.vbox[this.button1]));
-            w12.Position = 3;
-            w12.Expand = false;
-            w12.Fill = false;
+            Gtk.Box.BoxChild w11 = ((Gtk.Box.BoxChild)(this.vbox[this.button1]));
+            w11.Position = 2;
+            w11.Expand = false;
+            w11.Fill = false;
             this.Add(this.vbox);
             if ((this.Child != null)) {
                 this.Child.ShowAll();

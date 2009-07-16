@@ -39,29 +39,30 @@ namespace Mono.Upnp.GtkClient
         {
             this.Build ();
             
-            this.action.Text = action.Name;
+            this.action.Markup = string.Format ("<big><b>{0}</b></big>", action.Name);
             
-//            var in_arguments = new List<Argument> ();
-//            var out_arguments = new List<Argument> ();
-//            
-//            foreach (var argument in action.Arguments) {
-//                if (argument.Value.Direction == ArgumentDirection.In) {
-//                    in_arguments.Add (argument.Value);
-//                } else {
-//                    out_arguments.Add (argument.Value);
-//                }
-//            }
-//            
-//            var table = new Table ((uint)2, (uint)in_arguments.Count, false);
-//            var row = (uint)0;
-//            foreach (var argument in in_arguments) {
-//                table.Attach (new Label (argument.Name), (uint)0, (uint)1, row, row + 1);
-//                table.Attach (new Entry (), (uint)1, (uint)2, row, row + 1);
-//                row++;
-//            }
-//            
-//            inputsBox.PackStart (table);
-//            inputsBox.ShowAll ();
+            var in_arguments = new List<Argument> ();
+            var out_arguments = new List<Argument> ();
+            
+            foreach (var argument in action.Arguments) {
+                if (argument.Value.Direction == ArgumentDirection.In) {
+                    in_arguments.Add (argument.Value);
+                } else {
+                    out_arguments.Add (argument.Value);
+                }
+            }
+            
+            var table = new Table ((uint)2, (uint)in_arguments.Count, false);
+            var row = (uint)0;
+            
+            foreach (var argument in in_arguments) {
+                table.Attach (new Label (argument.Name), (uint)0, (uint)1, row, row + 1);
+                table.Attach (new Entry (), (uint)1, (uint)2, row, row + 1);
+                row++;
+            }
+            
+            inputsBox.PackStart (table);
+            inputsBox.ShowAll ();
         }
     }
 }

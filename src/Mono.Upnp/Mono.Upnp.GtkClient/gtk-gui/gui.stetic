@@ -1265,19 +1265,6 @@
           </packing>
         </child>
         <child>
-          <widget class="Gtk.Label" id="label2">
-            <property name="MemberName" />
-            <property name="Xalign">0</property>
-            <property name="LabelProp" translatable="yes">Input Arguments</property>
-          </widget>
-          <packing>
-            <property name="Position">1</property>
-            <property name="AutoSize">True</property>
-            <property name="Expand">False</property>
-            <property name="Fill">False</property>
-          </packing>
-        </child>
-        <child>
           <widget class="Gtk.VBox" id="inputsBox">
             <property name="MemberName" />
             <property name="Spacing">6</property>
@@ -1286,7 +1273,7 @@
             </child>
           </widget>
           <packing>
-            <property name="Position">2</property>
+            <property name="Position">1</property>
             <property name="AutoSize">True</property>
           </packing>
         </child>
@@ -1301,7 +1288,7 @@
             <property name="Relief">None</property>
           </widget>
           <packing>
-            <property name="Position">3</property>
+            <property name="Position">2</property>
             <property name="AutoSize">True</property>
             <property name="Expand">False</property>
             <property name="Fill">False</property>

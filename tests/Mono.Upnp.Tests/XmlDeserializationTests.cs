@@ -893,5 +893,12 @@ namespace Mono.Upnp.Xml.Tests
             var deserialized_object = Deserialize<NullableAttributeTestClass> (@"<Test Foo=""42"" />");
             Assert.AreEqual (42, deserialized_object.Foo);
         }
+        
+        [Test]
+        public void WhiteSpaceAndCommentsTest ()
+        {
+            var deserialized_object = Deserialize<ElementTestClass> ("<Test>\n\t   <!-- this is a comment --><Foo>bar</Foo></Test>");
+            Assert.AreEqual ("bar", deserialized_object.Foo);
+        }
     }
 }
