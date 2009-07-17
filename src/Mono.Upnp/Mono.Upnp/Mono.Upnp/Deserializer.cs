@@ -61,7 +61,8 @@ namespace Mono.Upnp
             using (var response = request.GetResponse ()) {
                 using (var stream = response.GetResponseStream ()) {
                     using (var reader = XmlReader.Create (stream)) {
-                        reader.ReadToFollowing ("root", Protocol.DeviceSchema);
+                        // FIXME this is a workaround for Mono bug 523151
+                        reader.MoveToContent ();
                         return deserializer.Deserialize (reader, context => DeserializeRoot (url, context));
                     }
                 }
@@ -162,7 +163,8 @@ namespace Mono.Upnp
             using (var response = request.GetResponse ()) {
                 using (var stream = response.GetResponseStream ()) {
                     using (var reader = XmlReader.Create (stream)) {
-                        reader.ReadToFollowing ("scpd", Protocol.ServiceSchema);
+                        // FIXME this is a workaround for Mono bug 523151
+                        reader.MoveToContent ();
                         return deserializer.Deserialize (reader, context => DeserializeServiceController (service, context));
                     }
                 }

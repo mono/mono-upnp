@@ -72,6 +72,7 @@ namespace Mono.Upnp.Internal
             using (var response = (HttpWebResponse)request.GetResponse ()) {
                 if (response.StatusCode == HttpStatusCode.OK) {
                     using (var reader = XmlReader.Create (response.GetResponseStream ())) {
+                        // FIXME this is a workaround for Mono bug 523151
                         reader.MoveToContent ();
                         var envelope = deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
                         if (envelope == null) {

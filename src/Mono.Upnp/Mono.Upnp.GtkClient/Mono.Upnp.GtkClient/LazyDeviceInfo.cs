@@ -27,6 +27,8 @@
 using System;
 using System.Threading;
 
+using Gtk;
+
 using Mono.Unix;
 
 namespace Mono.Upnp.GtkClient
@@ -56,8 +58,13 @@ namespace Mono.Upnp.GtkClient
                     Gtk.Widget widget;
                     try {
                         widget = provider.ProvideInfo (device);
-                    } catch {
-                        widget = new Gtk.Label ("Failed to Load " + provider.Name);
+                    } catch (Exception exception) {
+                        var box = new VBox ();
+                        box.PackStart (new Gtk.Label ("Failed to Load " + provider.Name));
+                        var expander = new Expander ("Error");
+                        expander.Add (new Label (exception.ToString ()));
+                        box.PackStart (expander);
+                        widget = box;
                     }
                     Gtk.Application.Invoke ((o, a) => {
                         alignment.Remove (alignment.Child);

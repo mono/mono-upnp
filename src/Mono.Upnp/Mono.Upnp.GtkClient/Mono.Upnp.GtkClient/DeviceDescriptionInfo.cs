@@ -43,10 +43,10 @@ namespace Mono.Upnp.GtkClient
             udn.Text = device.Udn;
             friendlyName.Text = device.FriendlyName;
             manufacturer.Text = device.Manufacturer;
-            manufacturerUrl.Text = device.ManufacturerUrl.ToString ();
+            manufacturerUrl.Text = device.ManufacturerUrl != null ? device.ManufacturerUrl.ToString () : null;
             modelName.Text = device.ModelName;
             modelNumber.Text = device.ModelNumber;
-            modelUrl.Text = device.ModelUrl.ToString ();
+            modelUrl.Text = device.ModelUrl != null ? device.ModelUrl.ToString () : null;
             serialNumber.Text = device.SerialNumber;
             upc.Text = device.Upc;
             foreach (var icon in device.Icons) {

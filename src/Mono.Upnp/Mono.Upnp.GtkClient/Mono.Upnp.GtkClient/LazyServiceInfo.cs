@@ -27,6 +27,8 @@
 using System;
 using System.Threading;
 
+using Gtk;
+
 using Mono.Unix;
 
 namespace Mono.Upnp.GtkClient
@@ -53,7 +55,16 @@ namespace Mono.Upnp.GtkClient
             if (!mapped) {
                 mapped = true;
                 ThreadPool.QueueUserWorkItem (state => {
-                    var widget = provider.ProvideInfo (service);
+                    Widget widget;
+                    try {
+                        widget = provider.ProvideInfo (service);
+                    } catch (Exception exception) {
+                        var vbox = new VBox ();
+                        vbox.PackStart (new Gtk.Label ("Failed to Load " + provider.Name));
+                        var expander = new Expander ("Error");
+                        expander.Add (new Label (exception.ToString ()));
+                        widget = vbox;
+                    }
                     Gtk.Application.Invoke ((o, a) => {
                         alignment.Remove (alignment.Child);
                         alignment.Add (widget);
