@@ -134,6 +134,9 @@ namespace Mono.Upnp.GtkClient
                 yield return new DeviceAnnouncementInfoProvider ();
                 yield return new DeviceDescriptionInfoProvider ();
                 yield return new RawDeviceDescriptionInfoProvider ();
+                //foreach (IDeviceInfoProvider extension in AddinManager.GetExtensionObjects (typeof (IDeviceInfoProvider))) {
+                 //   yield return extension;
+                //}
             }
         }
         
@@ -144,6 +147,9 @@ namespace Mono.Upnp.GtkClient
                 yield return new ServiceScpdInfoProvider ();
                 yield return new RawServiceDescriptionInfoProvider ();
                 yield return new RawServiceScdpInfoProvider ();
+                //foreach (IServiceInfoProvider extension in AddinManager.GetExtensionObjects (typeof (IServiceInfoProvider))) {
+                //    yield return extension;
+                //}
             }
         }
     }

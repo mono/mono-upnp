@@ -81,15 +81,14 @@ namespace Mono.Upnp.Internal
         
         protected override void Deserialize (XmlDeserializationContext context)
         {
+            // TODO clean this for safety
             var reader = context.Reader;
-            reader.Read ();
+            Helper.ReadToNextElement (reader);
             ActionName = reader.LocalName;
             ServiceType = reader.NamespaceURI;
             var depth = reader.Depth;
-            while (reader.Read () && reader.Depth > depth) {
-                if (reader.NodeType == XmlNodeType.Element) {
-                    arguments.Add (reader.LocalName, reader.ReadElementContentAsString ());
-                }
+            while (Helper.ReadToNextElement (reader) && reader.Depth > depth) {
+                arguments.Add (reader.LocalName, reader.ReadElementContentAsString ());
             }
         }
     }

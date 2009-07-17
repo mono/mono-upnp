@@ -1242,7 +1242,7 @@
     <property name="WidthRequest">0</property>
     <property name="HeightRequest">0</property>
     <property name="Title">Invoke Action</property>
-    <property name="WindowPosition">CenterOnParent</property>
+    <property name="WindowPosition">Center</property>
     <property name="DefaultWidth">0</property>
     <property name="DefaultHeight">0</property>
     <child>
@@ -1251,7 +1251,7 @@
         <property name="Spacing">6</property>
         <property name="BorderWidth">6</property>
         <child>
-          <widget class="Gtk.Label" id="action">
+          <widget class="Gtk.Label" id="name">
             <property name="MemberName" />
             <property name="Xalign">0</property>
             <property name="LabelProp">&lt;big&gt;&lt;b&gt;action&lt;/b&gt;&lt;/big&gt;</property>
@@ -1278,7 +1278,7 @@
           </packing>
         </child>
         <child>
-          <widget class="Gtk.Button" id="button1">
+          <widget class="Gtk.Button" id="invoke">
             <property name="MemberName" />
             <property name="CanFocus">True</property>
             <property name="Type">TextAndIcon</property>
@@ -1286,6 +1286,7 @@
             <property name="Label" translatable="yes">_Invoke</property>
             <property name="UseUnderline">True</property>
             <property name="Relief">None</property>
+            <signal name="Clicked" handler="OnInvokeClicked" />
           </widget>
           <packing>
             <property name="Position">2</property>
@@ -1295,7 +1296,17 @@
           </packing>
         </child>
         <child>
-          <placeholder />
+          <widget class="Gtk.VBox" id="outputsBox">
+            <property name="MemberName" />
+            <property name="Spacing">6</property>
+            <child>
+              <placeholder />
+            </child>
+          </widget>
+          <packing>
+            <property name="Position">3</property>
+            <property name="AutoSize">True</property>
+          </packing>
         </child>
       </widget>
     </child>

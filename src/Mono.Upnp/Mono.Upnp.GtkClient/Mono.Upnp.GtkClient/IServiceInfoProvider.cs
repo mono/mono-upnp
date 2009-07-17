@@ -30,7 +30,7 @@ using Mono.Addins;
 
 namespace Mono.Upnp.GtkClient
 {
-    [TypeExtensionPoint ("Mono.Upnp.GtkClient/ServiceInfoProviders")]
+    [TypeExtensionPoint]
     public interface IServiceInfoProvider
     {
         string Name { get; }

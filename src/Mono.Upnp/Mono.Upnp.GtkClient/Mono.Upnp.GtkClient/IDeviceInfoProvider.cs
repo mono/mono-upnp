@@ -30,7 +30,7 @@ using Mono.Addins;
 
 namespace Mono.Upnp.GtkClient
 {
-    [TypeExtensionPoint ("Mono.Upnp.GtkClient/DeviceInfoProviders")]
+    [TypeExtensionPoint]
     public interface IDeviceInfoProvider
     {
         string Name { get; }

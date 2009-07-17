@@ -900,5 +900,42 @@ namespace Mono.Upnp.Xml.Tests
             var deserialized_object = Deserialize<ElementTestClass> ("<Test>\n\t   <!-- this is a comment --><Foo>bar</Foo></Test>");
             Assert.AreEqual ("bar", deserialized_object.Foo);
         }
+        
+        class PrivateConstructorClass
+        {
+            PrivateConstructorClass ()
+            {
+            }
+            
+            [XmlAttribute] public string Bar { get; set; }
+        }
+        
+        [Test]
+        public void PrivateConstructorTest ()
+        {
+            var deserialized_object = Deserialize<ElementTestClass<PrivateConstructorClass>> (@"<Test><Foo Bar=""bar"" /></Test>");
+            Assert.AreEqual ("bar", deserialized_object.Foo.Bar);
+        }
+        
+        class DeserializablePrivateConstructorClass : XmlDeserializable
+        {
+            DeserializablePrivateConstructorClass ()
+            {
+            }
+            
+            public string Bar { get; set; }
+            
+            protected override void DeserializeAttribute (XmlDeserializationContext context)
+            {
+                Bar = context.Reader["Bar"];
+            }
+        }
+        
+        [Test]
+        public void DeserializablePrivateConstructorTest ()
+        {
+            var deserialized_object = Deserialize<ElementTestClass<DeserializablePrivateConstructorClass>> (@"<Test><Foo Bar=""bar"" /></Test>");
+            Assert.AreEqual ("bar", deserialized_object.Foo.Bar);
+        }
     }
 }

@@ -26,6 +26,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using Gtk;
 
@@ -35,27 +36,29 @@ namespace Mono.Upnp.GtkClient
 {
     public partial class ActionInvocationWindow : Window
     {
+        readonly ServiceAction action;
+        readonly Table table;
+        
         public ActionInvocationWindow (ServiceAction action) : base (WindowType.Toplevel)
         {
+            this.action = action;
+            
             this.Build ();
             
-            this.action.Markup = string.Format ("<big><b>{0}</b></big>", action.Name);
+            name.Markup = string.Format ("<big><b>{0}</b></big>", action.Name);
             
-            var in_arguments = new List<Argument> ();
-            var out_arguments = new List<Argument> ();
+            var arguments = new List<Argument> ();
             
             foreach (var argument in action.Arguments) {
                 if (argument.Value.Direction == ArgumentDirection.In) {
-                    in_arguments.Add (argument.Value);
-                } else {
-                    out_arguments.Add (argument.Value);
+                    arguments.Add (argument.Value);
                 }
             }
             
-            var table = new Table ((uint)2, (uint)in_arguments.Count, false);
+            table = new Table ((uint)2, (uint)arguments.Count, false);
             var row = (uint)0;
             
-            foreach (var argument in in_arguments) {
+            foreach (var argument in arguments) {
                 table.Attach (new Label (argument.Name), (uint)0, (uint)1, row, row + 1);
                 table.Attach (new Entry (), (uint)1, (uint)2, row, row + 1);
                 row++;
@@ -63,6 +66,32 @@ namespace Mono.Upnp.GtkClient
             
             inputsBox.PackStart (table);
             inputsBox.ShowAll ();
+        }
+
+        protected virtual void OnInvokeClicked (object sender, System.EventArgs e)
+        {
+            var arguments = new Dictionary<string, string> ();
+            var children = table.Children;
+            for (var i = children.Length - 1; i > 0; i -= 2) {
+                arguments[((Label)children[i]).Text] = ((Entry)children[i - 1]).Text;
+            }
+            
+            inputsBox.Sensitive = false;
+            invoke.Sensitive = false;
+            
+            ThreadPool.QueueUserWorkItem (state => {
+                var results = action.Invoke (arguments);
+                Application.Invoke ((o, a) => {
+                    foreach (var result in results) {
+                        var expander = new Expander (result.Key);
+                        expander.Add (new Label (result.Value) { LineWrap = true });
+                        outputsBox.PackStart (expander, false, false, 0);
+                    }
+                    outputsBox.ShowAll ();
+                    inputsBox.Sensitive = true;
+                    invoke.Sensitive = true;
+                });
+            });
         }
     }
 }

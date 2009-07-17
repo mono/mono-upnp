@@ -15,11 +15,13 @@ namespace Mono.Upnp.GtkClient {
         
         private Gtk.VBox vbox;
         
-        private Gtk.Label action;
+        private Gtk.Label name;
         
         private Gtk.VBox inputsBox;
         
-        private Gtk.Button button1;
+        private Gtk.Button invoke;
+        
+        private Gtk.VBox outputsBox;
         
         protected virtual void Build() {
             Stetic.Gui.Initialize(this);
@@ -28,7 +30,7 @@ namespace Mono.Upnp.GtkClient {
             this.HeightRequest = 0;
             this.Name = "Mono.Upnp.GtkClient.ActionInvocationWindow";
             this.Title = "Invoke Action";
-            this.WindowPosition = ((Gtk.WindowPosition)(4));
+            this.WindowPosition = ((Gtk.WindowPosition)(1));
             this.DefaultWidth = 0;
             this.DefaultHeight = 0;
             // Container child Mono.Upnp.GtkClient.ActionInvocationWindow.Gtk.Container+ContainerChild
@@ -37,13 +39,13 @@ namespace Mono.Upnp.GtkClient {
             this.vbox.Spacing = 6;
             this.vbox.BorderWidth = ((uint)(6));
             // Container child vbox.Gtk.Box+BoxChild
-            this.action = new Gtk.Label();
-            this.action.Name = "action";
-            this.action.Xalign = 0F;
-            this.action.LabelProp = "<big><b>action</b></big>";
-            this.action.UseMarkup = true;
-            this.vbox.Add(this.action);
-            Gtk.Box.BoxChild w1 = ((Gtk.Box.BoxChild)(this.vbox[this.action]));
+            this.name = new Gtk.Label();
+            this.name.Name = "name";
+            this.name.Xalign = 0F;
+            this.name.LabelProp = "<big><b>action</b></big>";
+            this.name.UseMarkup = true;
+            this.vbox.Add(this.name);
+            Gtk.Box.BoxChild w1 = ((Gtk.Box.BoxChild)(this.vbox[this.name]));
             w1.Position = 0;
             w1.Expand = false;
             w1.Fill = false;
@@ -55,12 +57,12 @@ namespace Mono.Upnp.GtkClient {
             Gtk.Box.BoxChild w2 = ((Gtk.Box.BoxChild)(this.vbox[this.inputsBox]));
             w2.Position = 1;
             // Container child vbox.Gtk.Box+BoxChild
-            this.button1 = new Gtk.Button();
-            this.button1.CanFocus = true;
-            this.button1.Name = "button1";
-            this.button1.UseUnderline = true;
-            this.button1.Relief = ((Gtk.ReliefStyle)(2));
-            // Container child button1.Gtk.Container+ContainerChild
+            this.invoke = new Gtk.Button();
+            this.invoke.CanFocus = true;
+            this.invoke.Name = "invoke";
+            this.invoke.UseUnderline = true;
+            this.invoke.Relief = ((Gtk.ReliefStyle)(2));
+            // Container child invoke.Gtk.Container+ContainerChild
             Gtk.Alignment w3 = new Gtk.Alignment(0.5F, 0.5F, 0F, 0F);
             // Container child GtkAlignment.Gtk.Container+ContainerChild
             Gtk.HBox w4 = new Gtk.HBox();
@@ -75,17 +77,25 @@ namespace Mono.Upnp.GtkClient {
             w7.UseUnderline = true;
             w4.Add(w7);
             w3.Add(w4);
-            this.button1.Add(w3);
-            this.vbox.Add(this.button1);
-            Gtk.Box.BoxChild w11 = ((Gtk.Box.BoxChild)(this.vbox[this.button1]));
+            this.invoke.Add(w3);
+            this.vbox.Add(this.invoke);
+            Gtk.Box.BoxChild w11 = ((Gtk.Box.BoxChild)(this.vbox[this.invoke]));
             w11.Position = 2;
             w11.Expand = false;
             w11.Fill = false;
+            // Container child vbox.Gtk.Box+BoxChild
+            this.outputsBox = new Gtk.VBox();
+            this.outputsBox.Name = "outputsBox";
+            this.outputsBox.Spacing = 6;
+            this.vbox.Add(this.outputsBox);
+            Gtk.Box.BoxChild w12 = ((Gtk.Box.BoxChild)(this.vbox[this.outputsBox]));
+            w12.Position = 3;
             this.Add(this.vbox);
             if ((this.Child != null)) {
                 this.Child.ShowAll();
             }
             this.Show();
+            this.invoke.Clicked += new System.EventHandler(this.OnInvokeClicked);
         }
     }
 }

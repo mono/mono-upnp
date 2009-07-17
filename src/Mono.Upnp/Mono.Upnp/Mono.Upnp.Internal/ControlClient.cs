@@ -65,15 +65,21 @@ namespace Mono.Upnp.Internal
             request.Method = "POST";
             request.ContentType = @"text/xml; charset=""utf-8""";
             request.UserAgent = Protocol.UserAgent;
-            request.Headers.Add ("SOAPACTION", string.Format ("{0}#{1}", service_type, actionName));
+            request.Headers.Add ("SOAPACTION", string.Format (@"""{0}#{1}""", service_type, actionName));
             using (var stream = request.GetRequestStream ()) {
                 serializer.Serialize (new SoapEnvelope<Arguments> (new Arguments (service_type, actionName, arguments)), stream);
             }
             using (var response = (HttpWebResponse)request.GetResponse ()) {
                 if (response.StatusCode == HttpStatusCode.OK) {
                     using (var reader = XmlReader.Create (response.GetResponseStream ())) {
-                        reader.ReadToFollowing ("Envelope", Protocol.SoapEnvelopeSchema);
+                        reader.MoveToContent ();
                         var envelope = deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
+                        if (envelope == null) {
+                            Log.Error (string.Format ("The response to the {0} action request on {1} has no envelope.", actionName, url));
+                        }
+                        if (envelope.Body == null) {
+                            Log.Error (string.Format ("The response to the {0} action request on {1} has no envelope body.", actionName, url));
+                        }
                         return new Map<string, string> (envelope.Body.Values);
                     }
                 } else {
