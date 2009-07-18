@@ -107,7 +107,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         T CreateObject<T> (string filter, XPathNavigator navigator) where T : Object
         {
             navigator.MoveToChild ("class", Schemas.UpnpSchema);
-            var type = ClassManager.GetTypeFromClass (navigator.Value);
+            var type = ClassManager.GetTypeFromClassName (navigator.Value);
             navigator.MoveToParent ();
             
             if (type == null || (type != typeof (T) && !type.IsSubclassOf (typeof (T)))) {

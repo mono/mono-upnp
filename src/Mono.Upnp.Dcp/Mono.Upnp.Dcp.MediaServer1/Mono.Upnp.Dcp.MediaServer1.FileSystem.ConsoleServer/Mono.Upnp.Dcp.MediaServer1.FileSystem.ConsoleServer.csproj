@@ -19,6 +19,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Commandlineparameters>-p /home/scott/Music/</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -35,7 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\Main.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\ConsoleServer.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\DummyConnectionManager.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\Options.cs" />
   </ItemGroup>
@@ -53,4 +54,11 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Deployment.LinuxDeployData scriptName="mono-upnp-simple-media-server" />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

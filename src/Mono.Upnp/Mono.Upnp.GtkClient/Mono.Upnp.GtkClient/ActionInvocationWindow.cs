@@ -39,7 +39,8 @@ namespace Mono.Upnp.GtkClient
         readonly ServiceAction action;
         readonly Table table;
         
-        public ActionInvocationWindow (ServiceAction action) : base (WindowType.Toplevel)
+        public ActionInvocationWindow (ServiceController service, ServiceAction action)
+            : base (WindowType.Toplevel)
         {
             this.action = action;
             
@@ -60,7 +61,19 @@ namespace Mono.Upnp.GtkClient
             
             foreach (var argument in arguments) {
                 table.Attach (new Label (argument.Name), (uint)0, (uint)1, row, row + 1);
-                table.Attach (new Entry (), (uint)1, (uint)2, row, row + 1);
+                Widget widget;
+                var related_state_variable = service.StateVariables[argument.RelatedStateVariable];
+                if (related_state_variable.AllowedValues != null) {
+                    var combobox = ComboBox.NewText ();
+                    foreach (var allowed_value in related_state_variable.AllowedValues) {
+                        combobox.AppendText (allowed_value);
+                    }
+                    combobox.Active = 0;
+                    widget = combobox;
+                } else {
+                    widget = new Entry ();
+                }
+                table.Attach (widget, (uint)1, (uint)2, row, row + 1);
                 row++;
             }
             
@@ -70,10 +83,22 @@ namespace Mono.Upnp.GtkClient
 
         protected virtual void OnInvokeClicked (object sender, System.EventArgs e)
         {
+            foreach (var child in outputsBox.Children) {
+                outputsBox.Remove (child);
+            }
+            
             var arguments = new Dictionary<string, string> ();
             var children = table.Children;
             for (var i = children.Length - 1; i > 0; i -= 2) {
-                arguments[((Label)children[i]).Text] = ((Entry)children[i - 1]).Text;
+                string value;
+                var child = children[i - 1];
+                var entry = child as Entry;
+                if (entry != null) {
+                    value = entry.Text;
+                } else {
+                    value = ((ComboBox)child).ActiveText;
+                }
+                arguments[((Label)children[i]).Text] = value;
             }
             
             inputsBox.Sensitive = false;

@@ -60,7 +60,8 @@ namespace Mono.Upnp.Internal
             context.Response.ContentType = @"text/xml; charset=""utf-8""";
             
             using (var reader = XmlReader.Create (context.Request.InputStream)) {
-                if (!reader.ReadToFollowing ("Envelope", Protocol.SoapEnvelopeSchema)) {
+                // FIXME this is a workaround for mono bug 523151
+                if (reader.MoveToContent () != XmlNodeType.Element) {
                     Log.Error (string.Format (
                         "A control request from {0} to {1} does not have a SOAP envelope.",
                         context.Request.RemoteEndPoint, context.Request.Url));

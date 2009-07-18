@@ -45,9 +45,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
             
-            this.content_directory = contentDirectory;
-            this.Id = contentDirectory.GetNewObjectId ();
-            this.ParentId = parent == null ? "-1" : parent.Id;
+            content_directory = contentDirectory;
+            Id = contentDirectory.GetNewObjectId ();
+            ParentId = parent == null ? "-1" : parent.Id;
+            Class = new Class (ClassManager.GetClassNameFromType (GetType ()));
         }
         
         protected void OnUpdate ()
@@ -55,13 +56,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             content_directory.OnSystemUpdate ();
         }
 
-        [XmlAttribute ("id", Schemas.DidlLiteSchema)]
+        [XmlAttribute ("id")]
         public virtual string Id { get; protected set; }
         
-        [XmlAttribute ("parentId", Schemas.DidlLiteSchema)]
+        [XmlAttribute ("parentId")]
         public virtual string ParentId { get; protected set; }
         
-        [XmlAttribute ("restricted", Schemas.DidlLiteSchema)]
+        [XmlAttribute ("restricted")]
         protected virtual string IsRestrictedValue {
             get { return IsRestricted ? "true" : "false"; }
             set { IsRestricted = value == "true"; }

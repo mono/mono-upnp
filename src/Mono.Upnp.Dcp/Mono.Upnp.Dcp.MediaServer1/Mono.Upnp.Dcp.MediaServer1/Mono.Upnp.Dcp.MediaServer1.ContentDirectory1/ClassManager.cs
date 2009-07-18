@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-//using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
@@ -45,7 +45,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             RegisterType<Object> ();
             RegisterType<Item> ();
             RegisterType<Container> ();
-            /*RegisterType<Album> ();
+            RegisterType<Album> ();
             RegisterType<AudioBook> ();
             RegisterType<AudioBroadcast> ();
             RegisterType<AudioItem> ();
@@ -68,7 +68,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             RegisterType<StorageVolume> ();
             RegisterType<TextItem> ();
             RegisterType<VideoBroadcast> ();
-            RegisterType<VideoItem> ();*/
+            RegisterType<VideoItem> ();
         }
         
         public static void RegisterType<T> () where T : Object
@@ -79,10 +79,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             names[type] = name;
         }
         
-        public static string GetClassFromType<T> () where T : Object
+        public static string GetClassNameFromType<T> () where T : Object
+        {
+            return GetClassNameFromTypeCore (typeof (T));
+        }
+        
+        public static string GetClassNameFromType (Type type)
+        {
+            if (type == null) throw new ArgumentNullException ("type");
+            if (!typeof (Object).IsAssignableFrom (type))
+                throw new ArgumentException ("The type does not inherit from Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object.");
+            
+            return GetClassNameFromTypeCore (type);
+        }
+        
+        static string GetClassNameFromTypeCore (Type type)
         {
             string name;
-            var type = typeof (T);
             if (names.TryGetValue (type, out name)) {
                 return name;
             } else {
@@ -91,7 +104,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
         
-        internal static string CreateClassName (Type type, Type rootType)
+        public static Type GetTypeFromClassName (string @class)
+        {
+            while (!types.ContainsKey (@class)) {
+                var dot = @class.LastIndexOf ('.');
+                if (dot == -1) {
+                    return null;
+                }
+                @class = @class.Substring (0, dot);
+            }
+            return types[@class];
+        }
+        
+        static string CreateClassName (Type type, Type rootType)
         {
             var builder = new StringBuilder ();
             BuildClassName (type, rootType, builder);
@@ -117,18 +142,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             for (var i = 1; i < type.Name.Length; i++) {
                 builder.Append (type.Name[i]);
             }
-        }
-        
-        public static Type GetTypeFromClass (string @class)
-        {
-            while (!types.ContainsKey (@class)) {
-                var dot = @class.LastIndexOf ('.');
-                if (dot == -1) {
-                    return null;
-                }
-                @class = @class.Substring (0, dot);
-            }
-            return types[@class];
         }
     }
 }

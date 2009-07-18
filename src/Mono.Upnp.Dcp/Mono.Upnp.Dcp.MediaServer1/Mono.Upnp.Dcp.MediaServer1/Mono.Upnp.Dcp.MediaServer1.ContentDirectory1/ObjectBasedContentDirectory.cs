@@ -38,25 +38,25 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [XmlNamespace (Schemas.UpnpSchema, "upnp")]
         class ResultsWrapper : IXmlSerializable
         {
-            readonly IEnumerable<Object> results;
+            readonly IEnumerable<IXmlSerializable> results;
             
-            public ResultsWrapper (Object result)
+            public ResultsWrapper (IXmlSerializable result)
                 : this (Single (result))
             {
             }
             
-            public ResultsWrapper (IEnumerable<Object> results)
+            public ResultsWrapper (IEnumerable<IXmlSerializable> results)
             {
                 this.results = results;
             }
             
-            public IEnumerable<Object> Results {
+            public IEnumerable<IXmlSerializable> Results {
                 get { return results; }
             }
             
             public int ResultsCount { get; private set; }
             
-            static IEnumerable<Object> Single (Object item)
+            static IEnumerable<IXmlSerializable> Single (IXmlSerializable item)
             {
                 yield return item;
             }
@@ -69,7 +69,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             public void SerializeMembersOnly (XmlSerializationContext context)
             {
                 foreach (var result in Results) {
-                    context.AutoSerializeObjectAndMembers (result);
+                    result.SerializeSelfAndMembers (context);
                     ResultsCount++;
                 }
             }
@@ -101,9 +101,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
         
-        protected abstract IEnumerable<Object> GetChildren (string objectId, int startIndex, int requestCount,
-                                                            string sortCriteria, out int totalMatches);
+        protected abstract IEnumerable<IXmlSerializable> GetChildren (string objectId, int startIndex, int requestCount,
+                                                                        string sortCriteria, out int totalMatches);
         
-        protected abstract Object GetObject (string objectId);
+        protected abstract IXmlSerializable GetObject (string objectId);
     }
 }

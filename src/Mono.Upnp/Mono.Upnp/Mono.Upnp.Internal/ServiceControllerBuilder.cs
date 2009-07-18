@@ -88,12 +88,25 @@ namespace Mono.Upnp.Internal
                 return new ServiceAction (name, Combine (arguments, return_argument), args => {
                     var argument_array = new object[arguments.Length];
                     for (var i = 0; i < arguments.Length; i++) {
-                        if (arguments[i].Argument.Direction == ArgumentDirection.Out) {
+                        var argument = arguments[i];
+                        if (argument.Argument.Direction == ArgumentDirection.Out) {
                             continue;
                         }
+                        
                         string value;
-                        if (args.TryGetValue (arguments[i].Argument.Name, out value)) {
-                            argument_array[i] = Convert.ChangeType (value, arguments[i].ParameterInfo.ParameterType);
+                        if (args.TryGetValue (argument.Argument.Name, out value)) {
+                            var parameter_type = argument.ParameterInfo.ParameterType;
+                            if (parameter_type.IsEnum) {
+                                // TODO handle attributes
+                                foreach (var enum_value in Enum.GetValues (parameter_type)) {
+                                    if (Enum.GetName (parameter_type, enum_value) == value) {
+                                        argument_array[i] = enum_value;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                argument_array[i] = Convert.ChangeType (value, parameter_type);
+                            }
                         } else {
                             // TODO throw
                         }
@@ -104,7 +117,8 @@ namespace Mono.Upnp.Internal
                         if (arguments[i].Argument.Direction == ArgumentDirection.In) {
                             continue;
                         }
-                        out_arguments.Add (arguments[i].Argument.Name, argument_array[i].ToString ());
+                        var value = argument_array[i];
+                        out_arguments.Add (arguments[i].Argument.Name, value != null ? value.ToString () : "");
                     }
                     if (return_argument != null) {
                         out_arguments.Add (return_argument.Argument.Name, result.ToString ());

@@ -48,6 +48,14 @@
       <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
       <Name>Mono.Upnp</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.FileSystem\Mono.Upnp.Dcp.MediaServer1.FileSystem.csproj">
+      <Project>{5AD8D852-8ADA-477E-AA76-0958CAB1D881}</Project>
+      <Name>Mono.Upnp.Dcp.MediaServer1.FileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">
+      <Project>{D095ADE0-D74E-449C-BAF2-174A952B2056}</Project>
+      <Name>Mono.Upnp.Dcp.MediaServer1</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

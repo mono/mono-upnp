@@ -44,6 +44,10 @@
       <Project>{D095ADE0-D74E-449C-BAF2-174A952B2056}</Project>
       <Name>Mono.Upnp.Dcp.MediaServer1</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
+      <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
+      <Name>Mono.Upnp</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\" />

@@ -30,7 +30,22 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public class Class
     {
-        [XmlAttribute ("name")]
+        protected Class ()
+        {
+        }
+        
+        public Class (string fullClassName)
+            : this (fullClassName, null)
+        {
+        }
+        
+        public Class (string fullClassName, string friendlyClassName)
+        {
+            FullClassName = fullClassName;
+            FriendlyClassName = friendlyClassName;
+        }
+        
+        [XmlAttribute ("name", OmitIfNull = true)]
         public string FriendlyClassName { get; private set; }
         
         [XmlValue]

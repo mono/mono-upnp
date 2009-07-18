@@ -53,6 +53,8 @@ namespace Mono.Upnp.GtkClient
             client = new Client ();
             client.DeviceAdded += ClientDeviceAdded;
             client.ServiceAdded += ClientServiceAdded;
+            client.DeviceRemoved += ClientDeviceRemoved;
+            client.ServiceRemoved += ClientServiceRemoved;
             client.BrowseAll ();
         }
 
@@ -84,6 +86,33 @@ namespace Mono.Upnp.GtkClient
         void ClientServiceAdded (object sender, ServiceEventArgs e)
         {
             model.AppendValues (Style.LookupIconSet ("Service").RenderIcon (Style, TextDirection.Ltr, StateType.Normal, IconSize.Menu, this, null), e.Service);
+        }
+        
+        void ClientDeviceRemoved (object sender, DeviceEventArgs e)
+        {
+            Remove (e.Device);
+        }
+
+        void ClientServiceRemoved (object sender, ServiceEventArgs e)
+        {
+            Remove (e.Service);
+        }
+        
+        void Remove<T> (T item)
+            where T : class
+        {
+            TreeIter iter;
+            if (!model.GetIterFirst (out iter)) {
+                return;
+            }
+            
+            do {
+                var value = model.GetValue (iter, 1) as T;
+                if (item.Equals (value)) {
+                    model.Remove (ref iter);
+                    break;
+                }
+            } while (model.IterNext (ref iter));
         }
         
         void RenderCell (TreeViewColumn column, CellRenderer cell, TreeModel model, TreeIter iter)

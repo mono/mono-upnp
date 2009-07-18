@@ -102,7 +102,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         public Results<T> SearchForType<T> (ResultsSettings settings) where T : Object
         {
-            var class_name = ClassManager.GetClassFromType<T> ();
+            var class_name = ClassManager.GetClassNameFromType<T> ();
             return Search<T> (string.Format (@"upnp:class derivedfrom ""{0}""", class_name), settings);
         }
         
@@ -162,7 +162,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             if (classes.Count == 0) {
                 return true;
             }
-            var type = ClassManager.GetClassFromType<T> ();
+            var type = ClassManager.GetClassNameFromType<T> ();
             foreach (var @class in classes) {
                 var class_name = @class.FullClassName;
                 var compare = type.CompareTo (class_name);

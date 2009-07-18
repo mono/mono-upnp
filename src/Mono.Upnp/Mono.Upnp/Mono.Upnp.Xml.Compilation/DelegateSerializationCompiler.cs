@@ -189,7 +189,7 @@ namespace Mono.Upnp.Xml.Compilation
         
         static Serializer<TContext> CreateSerializer (PropertyInfo property, Serializer<TContext> serializer)
         {
-            return (obj, context) => serializer (property.GetValue (obj, null), context);
+            return (obj, context) => { if (obj == null) Console.WriteLine (property); serializer (property.GetValue (obj, null), context); };
         }
         
         static Serializer<TContext> CreateSerializer (Serializer<TContext> serializer, bool omitIfNull)

@@ -137,7 +137,7 @@ namespace Mono.Upnp.GtkClient
             
             if (actionModel.IterDepth (iter) == 0) {
                 var value = (string)actionModel.GetValue (iter, 0);
-                var window = new ActionInvocationWindow (service.Actions[value]);
+                var window = new ActionInvocationWindow (service, service.Actions[value]);
                 window.ShowAll ();
             }
         }

@@ -87,8 +87,12 @@ namespace Mono.Upnp.Internal
             ActionName = reader.LocalName;
             ServiceType = reader.NamespaceURI;
             var depth = reader.Depth;
-            while (Helper.ReadToNextElement (reader) && reader.Depth > depth) {
+            Helper.ReadToNextElement (reader);
+            while (reader.NodeType == XmlNodeType.Element && reader.Depth > depth) {
                 arguments.Add (reader.LocalName, reader.ReadElementContentAsString ());
+                while (reader.NodeType != XmlNodeType.Element && reader.Depth > depth) {
+                    reader.Read ();
+                }
             }
         }
     }
