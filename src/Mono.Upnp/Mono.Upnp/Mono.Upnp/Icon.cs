@@ -78,12 +78,11 @@ namespace Mono.Upnp
         }
 
         [XmlElement ("url")]
-        protected virtual string UrlFragment {
-            get { return CollapseUrl (Url); }
-            set { Url = ExpandUrl (value); }
-        }
+        protected virtual string UrlFragment { get; set; }
         
-        public virtual Uri Url { get; protected set; }
+        public virtual Uri Url {
+            get { return ExpandUrl (UrlFragment); }
+        }
         
         [XmlElement ("mimetype")]
         public virtual string MimeType { get; protected set; }
@@ -97,13 +96,13 @@ namespace Mono.Upnp
         [XmlElement ("depth")]
         public virtual int Depth { get; protected set; }
         
-        protected internal virtual void Initialize (Root root, Uri iconUrl)
+        protected internal virtual void Initialize (Root root, string iconUrlFragment)
         {
-            if (iconUrl == null) throw new ArgumentNullException ("iconUrl");
+            if (iconUrlFragment == null) throw new ArgumentNullException ("iconUrlFragment");
             
             Initialize (root);
-            Url = iconUrl;
-            server = new DataServer (Data, iconUrl);
+            UrlFragment = iconUrlFragment;
+            server = new DataServer (Data, Url);
         }
         
         protected internal virtual void Start ()

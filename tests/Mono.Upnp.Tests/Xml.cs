@@ -129,6 +129,47 @@ namespace Mono.Upnp.Tests
                 "</device>" +
             "</root>";
         
+        public const string UrlBaseDeviceDescription =
+           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<root configId=""1"" xmlns=""urn:schemas-upnp-org:device-1-0"">" +
+                "<specVersion>" +
+                    "<major>1</major>" +
+                    "<minor>1</minor>" +
+                "</specVersion>" +
+                "<device>" +
+                    "<deviceType>urn:schemas-upnp-org:device:mono-upnp-tests-full-device:1</deviceType>" +
+                    "<friendlyName>Mono.Upnp.Tests Full Device</friendlyName>" +
+                    "<manufacturer>Mono Project</manufacturer>" +
+                    "<manufacturerURL>http://www.mono-project.org/</manufacturerURL>" +
+                    "<modelDescription>A device description with all optional information.</modelDescription>" +
+                    "<modelName>Full Device</modelName>" +
+                    "<modelNumber>1</modelNumber>" +
+                    "<modelURL>http://www.mono-project.org/Mono.Upnp/</modelURL>" +
+                    "<serialNumber>12345</serialNumber>" +
+                    "<UDN>uuid:fd1</UDN>" +
+                    "<UPC>67890</UPC>" +
+                    "<iconList>" +
+                        "<icon>" +
+                            "<mimetype>image/png</mimetype>" +
+                            "<width>100</width>" +
+                            "<height>100</height>" +
+                            "<depth>32</depth>" +
+                            "<url>icon/0/</url>" +
+                        "</icon>" +
+                    "</iconList>" +
+                    "<serviceList>" +
+                        "<service>" +
+                            "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:1</serviceType>" +
+                            "<serviceId>urn:upnp-org:serviceId:testService1</serviceId>" +
+                            "<SCPDURL>service/0/scpd/</SCPDURL>" +
+                            "<controlURL>service/0/control/</controlURL>" +
+                            "<eventSubURL>service/0/event/</eventSubURL>" +
+                        "</service>" +
+                    "</serviceList>" +
+                "</device>" +
+                "<URLBase>http://www.mono-project.com/</URLBase>" +
+            "</root>";
+        
         public const string FullScpd =
            @"<?xml version=""1.0"" encoding=""utf-8""?>" +
            @"<scpd configId="""" xmlns=""urn:schemas-upnp-org:service-1-0"">" +

@@ -90,7 +90,7 @@ namespace Mono.Upnp
             return settings.Icons;
         }
         
-        [XmlArray ("iconList")]
+        [XmlArray ("iconList", OmitIfEmpty = true)]
         protected virtual ICollection<Icon> IconCollection {
             get { return icons; }
         }
@@ -99,7 +99,7 @@ namespace Mono.Upnp
             get { return icons; }
         }
         
-        [XmlArray ("serviceList")]
+        [XmlArray ("serviceList", OmitIfEmpty = true)]
         protected virtual ICollection<Service> ServiceCollection {
             get { return services; }
         }
@@ -150,21 +150,21 @@ namespace Mono.Upnp
         [XmlElement ("UPC", OmitIfNull = true)]
         public virtual string Upc { get; protected set; }
 
-        protected internal virtual void Initialize (XmlSerializer serializer, Root root, Uri deviceUrl)
+        protected internal virtual void Initialize (XmlSerializer serializer, Root root, string deviceUrlFragment)
         {
-            if (deviceUrl == null) throw new ArgumentNullException ("deviceUrl");
+            if (deviceUrlFragment == null) throw new ArgumentNullException ("deviceUrlFragment");
             if (Deserializer != null) throw new InvalidOperationException ("The device was constructed for deserialization and cannot be initalized. Use one of the other constructors.");
             
             for (var i = 0; i < devices.Count; i++) {
-                devices[i].Initialize (serializer, root, new Uri (deviceUrl, string.Format ("device/{0}/", i)));
+                devices[i].Initialize (serializer, root, string.Format ("{0}device/{1}/", deviceUrlFragment, i));
             }
             
             for (var i = 0; i < services.Count; i++) {
-                services[i].Initialize (serializer, root, new Uri (deviceUrl, string.Format ("service/{0}/", i)));
+                services[i].Initialize (serializer, root, string.Format ("{0}service/{1}/", deviceUrlFragment, i));
             }
             
             for (var i = 0; i < icons.Count; i++) {
-                icons[i].Initialize (root, new Uri (deviceUrl, string.Format ("icon/{0}/", i)));
+                icons[i].Initialize (root, string.Format ("{0}icon/{1}/", deviceUrlFragment, i));
             }
         }
 

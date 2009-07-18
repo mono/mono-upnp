@@ -78,38 +78,35 @@ namespace Mono.Upnp
         public virtual string Id { get; protected set; }
         
         [XmlElement ("SCPDURL")]
-        protected virtual string ScpdUrlFragment {
-            get { return CollapseUrl (ScpdUrl); }
-            set { ScpdUrl = ExpandUrl (value); }
-        }
+        protected virtual string ScpdUrlFragment { get; set; }
         
-        public virtual Uri ScpdUrl { get; protected set; }
+        public virtual Uri ScpdUrl {
+            get { return ExpandUrl (ScpdUrlFragment); }
+        }
         
         [XmlElement ("controlURL")]
-        protected virtual string ControlUrlFragment {
-            get { return CollapseUrl (ControlUrl); }
-            set { ControlUrl = ExpandUrl (value); }
-        }   
+        protected virtual string ControlUrlFragment { get; set; }
         
-        public virtual Uri ControlUrl { get; protected set; }
-        
-        [XmlElement ("eventSubURL")]
-        protected virtual string EventUrlFragment {
-            get { return CollapseUrl (EventUrl); }
-            set { EventUrl = ExpandUrl (value); }
+        public virtual Uri ControlUrl {
+            get { return ExpandUrl (ControlUrlFragment); }
         }
         
-        public virtual Uri EventUrl { get; protected set; }
+        [XmlElement ("eventSubURL")]
+        protected virtual string EventUrlFragment { get; set; }
         
-        protected internal virtual void Initialize (XmlSerializer serializer, Root root, Uri serviceUrl)
+        public virtual Uri EventUrl {
+            get { return ExpandUrl (EventUrlFragment); }
+        }
+        
+        protected internal virtual void Initialize (XmlSerializer serializer, Root root, string serviceUrlFragment)
         {
             Initialize (root);
-            if (serviceUrl == null) throw new ArgumentNullException ("serviceUrl");
+            if (serviceUrlFragment == null) throw new ArgumentNullException ("serviceUrlFragment");
             if (controller == null) throw new InvalidOperationException ("The service was created for deserialization and cannot be initialized.");
             
-            ScpdUrl = new Uri (serviceUrl, "scpd/");
-            ControlUrl = new Uri (serviceUrl, "control/");
-            EventUrl = new Uri (serviceUrl, "event/");
+            ScpdUrlFragment = serviceUrlFragment + "scpd/";
+            ControlUrlFragment = serviceUrlFragment + "control/";
+            EventUrlFragment = serviceUrlFragment + "event/";
             controller.Initialize (serializer, this);
         }
         

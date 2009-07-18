@@ -150,7 +150,7 @@ namespace Mono.Upnp.Tests
         }
         
         [Test]
-        public void OfflineFullDescriptionTest ()
+        public void OfflineFullDeviceDescriptionTest ()
         {
             var source_root = CreateRoot ();
             source_root.Initialize ();
@@ -159,7 +159,7 @@ namespace Mono.Upnp.Tests
         }
         
         [Test]
-        public void FullDescriptionDeserializationTest ()
+        public void FullDeviceDescriptionDeserializationTest ()
         {
             var root = deserializer.DeserializeRoot (Xml.FullDeviceDescription);
             Assert.AreEqual ("1", root.ConfigurationId);
@@ -248,6 +248,20 @@ namespace Mono.Upnp.Tests
             var empty_devices = devices.Current.Devices.GetEnumerator ();
             Assert.IsFalse (empty_devices.MoveNext ());
             Assert.IsFalse (devices.MoveNext ());
+        }
+        
+        [Test]
+        public void UrlBaseDeviceDescriptionDeserializationTest ()
+        {
+            var root = deserializer.DeserializeRoot (Xml.UrlBaseDeviceDescription);
+            var icons = root.RootDevice.Icons.GetEnumerator ();
+            Assert.IsTrue (icons.MoveNext ());
+            Assert.AreEqual (new Uri ("http://www.mono-project.com/icon/0/"), icons.Current.Url);
+            var services = root.RootDevice.Services.GetEnumerator ();
+            Assert.IsTrue (services.MoveNext ());
+            Assert.AreEqual (new Uri ("http://www.mono-project.com/service/0/scpd/"), services.Current.ScpdUrl);
+            Assert.AreEqual (new Uri ("http://www.mono-project.com/service/0/control/"), services.Current.ControlUrl);
+            Assert.AreEqual (new Uri ("http://www.mono-project.com/service/0/event/"), services.Current.EventUrl);
         }
         
         [Test]
