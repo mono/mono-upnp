@@ -40,7 +40,7 @@ namespace Mono.Upnp.Internal
                     enabled = Environment.GetEnvironmentVariable ("MONO_UPNP_DEBUG") != null;
                 }
 
-                return enabled.Value;
+                return enabled.Value || true;
             }
         }
 

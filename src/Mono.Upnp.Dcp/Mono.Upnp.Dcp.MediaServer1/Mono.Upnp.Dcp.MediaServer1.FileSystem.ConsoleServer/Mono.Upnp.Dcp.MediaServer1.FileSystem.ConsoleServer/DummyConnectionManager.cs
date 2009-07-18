@@ -1,5 +1,5 @@
 // 
-// DeviceDescriptionInfo.cs
+// DummyConnectionManager.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -26,32 +26,27 @@
 
 using System;
 
-using Gtk;
+using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 
-namespace Mono.Upnp.GtkClient
+namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
 {
-    [System.ComponentModel.ToolboxItem(true)]
-    public partial class DeviceDescriptionInfo : Bin
+    public class DummyConnectionManager : ConnectionManager
     {
-        public DeviceDescriptionInfo (Device device)
-        {
-            this.Build ();
-            
-            deviceType.Text = device.Type.ToString ();
-            udn.Text = device.Udn;
-            friendlyName.Text = device.FriendlyName;
-            manufacturer.Text = device.Manufacturer;
-            manufacturerUrl.Text = device.ManufacturerUrl != null ? device.ManufacturerUrl.ToString () : null;
-            modelName.Text = device.ModelName;
-            modelNumber.Text = device.ModelNumber;
-            modelUrl.Text = device.ModelUrl != null ? device.ModelUrl.ToString () : null;
-            serialNumber.Text = device.SerialNumber;
-            upc.Text = device.Upc;
-            foreach (var icon in device.Icons) {
-                var expander = new Expander (string.Format ("{0}, {1}x{2}x{3}", icon.MimeType, icon.Width, icon.Height, icon.Depth));
-                expander.Add (new LazyIcon (icon));
-                iconBox.PackStart (expander);
+        protected override string CurrentConnectionIDs {
+            get {
+                throw new System.NotImplementedException ();
             }
+        }
+        
+        protected override void GetProtocolInfoCore (out string source, out string sink)
+        {
+            throw new System.NotImplementedException ();
+        }
+
+
+        protected override void GetCurrentConnectionInfoCore (int connectionId, out int resId, out int avTransportId, out string protocolInfo, out string peerConnectionManager, out int peerConnectionId, out Mono.Upnp.Dcp.MediaServer1.ConnectionManager1.Direction direction, out Mono.Upnp.Dcp.MediaServer1.ConnectionManager1.ConnectionStatus status)
+        {
+            throw new System.NotImplementedException ();
         }
     }
 }

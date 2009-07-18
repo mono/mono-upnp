@@ -97,7 +97,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\Direction.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
+    <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
       <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
       <Name>Mono.Upnp</Name>
     </ProjectReference>
