@@ -28,6 +28,7 @@ using System;
 
 using Gtk;
 
+using Mono.Unix;
 using Mono.Upnp.Control;
 
 namespace Mono.Upnp.GtkClient
@@ -54,33 +55,33 @@ namespace Mono.Upnp.GtkClient
                 foreach (var argument in action.Value.Arguments) {
                     var argument_iter = actionModel.AppendValues (iter, argument.Key);
                     
-                    actionModel.AppendValues (argument_iter,
-                        "Direction: " + (argument.Value.Direction == ArgumentDirection.In ? "In" : "Out"));
-                    actionModel.AppendValues (argument_iter, "Is Return Value: " + argument.Value.IsReturnValue);
-                    actionModel.AppendValues (argument_iter, "Related State Variable: " + argument.Value.RelatedStateVariable);
+                    actionModel.AppendValues (argument_iter, Catalog.GetString ("Direction: ") +
+                        (argument.Value.Direction == ArgumentDirection.In ? "In" : "Out"));
+                    actionModel.AppendValues (argument_iter, Catalog.GetString ("Is Return Value: ") + argument.Value.IsReturnValue);
+                    actionModel.AppendValues (argument_iter, Catalog.GetString ("Related State Variable: ") + argument.Value.RelatedStateVariable);
                 }
             }
             
             foreach (var stateVariable in service.StateVariables) {
                 var iter = stateVariableModel.AppendValues (stateVariable.Key);
                 
-                stateVariableModel.AppendValues (iter, "Data Type: " + stateVariable.Value.DataType);
-                stateVariableModel.AppendValues (iter, "Sends Events: " + stateVariable.Value.SendsEvents);
-                stateVariableModel.AppendValues (iter, "Is Multicast: " + stateVariable.Value.IsMulticast);
+                stateVariableModel.AppendValues (iter, Catalog.GetString ("Data Type: ") + stateVariable.Value.DataType);
+                stateVariableModel.AppendValues (iter, Catalog.GetString ("Sends Events: ") + stateVariable.Value.SendsEvents);
+                stateVariableModel.AppendValues (iter, Catalog.GetString ("Is Multicast: ") + stateVariable.Value.IsMulticast);
                 
                 if (stateVariable.Value.DefaultValue != null) {
-                    stateVariableModel.AppendValues (iter, "Default Value: " + stateVariable.Value.DefaultValue);
+                    stateVariableModel.AppendValues (iter, Catalog.GetString ("Default Value: ") + stateVariable.Value.DefaultValue);
                 }
                 
                 if (stateVariable.Value.AllowedValues != null) {
-                    var allowed_values_iter = stateVariableModel.AppendValues (iter, "Allowed Values");
+                    var allowed_values_iter = stateVariableModel.AppendValues (iter, Catalog.GetString ("Allowed Values"));
                     foreach (var value in stateVariable.Value.AllowedValues) {
                         stateVariableModel.AppendValues (allowed_values_iter, value);
                     }
                 }
                 
                 if (stateVariable.Value.AllowedValueRange != null) {
-                    var allowed_value_range_iter = stateVariableModel.AppendValues (iter, "Allowed Value Range");
+                    var allowed_value_range_iter = stateVariableModel.AppendValues (iter, Catalog.GetString ("Allowed Value Range"));
                     stateVariableModel.AppendValues (allowed_value_range_iter,
                         "Minimum: " + stateVariable.Value.AllowedValueRange.Minimum);
                     stateVariableModel.AppendValues (allowed_value_range_iter,
@@ -92,11 +93,11 @@ namespace Mono.Upnp.GtkClient
                 }
             }
             
-            actions.AppendColumn ("Actions", new CellRendererText (), "text", 0);
+            actions.AppendColumn (Catalog.GetString ("Actions"), new CellRendererText (), "text", 0);
             actions.Model = actionModel;
             actions.Selection.Changed += ActionsSelectionChanged;
             
-            stateVariables.AppendColumn ("State Variables", new CellRendererText (), "text", 0);
+            stateVariables.AppendColumn (Catalog.GetString ("State Variables"), new CellRendererText (), "text", 0);
             stateVariables.Model = stateVariableModel;
         }
 

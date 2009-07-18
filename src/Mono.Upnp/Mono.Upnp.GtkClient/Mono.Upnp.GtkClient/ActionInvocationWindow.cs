@@ -109,7 +109,7 @@ namespace Mono.Upnp.GtkClient
                 Application.Invoke ((o, a) => {
                     foreach (var result in results) {
                         var expander = new Expander (result.Key);
-                        expander.Add (new Label (result.Value) { LineWrap = true });
+                        expander.Add (new Label (result.Value) { LineWrap = true, Selectable = true });
                         outputsBox.PackStart (expander, false, false, 0);
                     }
                     outputsBox.ShowAll ();

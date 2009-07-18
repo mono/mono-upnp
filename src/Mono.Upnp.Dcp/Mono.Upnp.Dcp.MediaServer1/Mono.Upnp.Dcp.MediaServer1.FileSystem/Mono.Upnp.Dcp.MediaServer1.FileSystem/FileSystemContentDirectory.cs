@@ -27,6 +27,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
@@ -50,6 +52,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
         }
         
+        struct ObjectInfo
+        {
+            public readonly Object Object;
+            public readonly string Path;
+            
+            public ObjectInfo (Object @object, string path)
+            {
+                Object = @object;
+                Path = path;
+            }
+        }
+        
         class FolderInfo
         {
             public readonly StorageFolder Folder;
@@ -64,15 +78,90 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
         }
         
-        readonly List<Object> object_cache = new List<Object> ();
+        readonly List<ObjectInfo> object_cache = new List<ObjectInfo> ();
         readonly Dictionary<string, Range> object_hierarchy = new Dictionary<string, Range> ();
         readonly Dictionary<string, FolderInfo> folder_cache = new Dictionary<string, FolderInfo> ();
+        readonly string prefix = GeneratePrefix ();
+        readonly HttpListener listener;
         
         public FileSystemContentDirectory (string path)
         {
             if (path == null) throw new ArgumentNullException ("path");
             
             CreateFolder (path);
+            
+            listener = new HttpListener { IgnoreWriteExceptions = true };
+            listener.Prefixes.Add (prefix);
+        }
+        
+        public override void Start ()
+        {
+            base.Start ();
+            
+            lock (listener) {
+                listener.Start ();
+                listener.BeginGetContext (OnGotContext, null);
+            }
+        }
+
+        public override void Stop ()
+        {
+            base.Stop ();
+            
+            lock (listener) {
+                listener.Stop ();
+            }
+        }
+        
+        void OnGotContext (IAsyncResult result)
+        {
+            lock (listener) {
+                if (!listener.IsListening) {
+                    return;
+                }
+                
+                var context = listener.EndGetContext (result);
+                GetFile (context.Response, context.Request.Url.Query);
+                
+                listener.BeginGetContext (OnGotContext, null);
+            }
+        }
+        
+        void GetFile (HttpListenerResponse response, string query)
+        {
+            using (response) {
+                if (query.Length < 5) {
+                    return;
+                }
+                
+                int id;
+                
+                if (!int.TryParse (query.Substring (4), out id)) {
+                    return;
+                }
+                
+                if (id >= object_cache.Count) {
+                    return;
+                }
+                
+                try {
+                    using (var reader = File.OpenRead (object_cache[id].Path)) {
+                        response.ContentType = "audio/mpeg";
+                        response.ContentLength64 = reader.Length;
+                        using (var stream = response.OutputStream) {
+                            using (var writer = new BinaryWriter (stream)) {
+                                var buffer = new byte[8192];
+                                var read = reader.Read (buffer, 0, buffer.Length);
+                                while (read > 0) {
+                                    writer.Write (buffer, 0, read);
+                                    read = reader.Read (buffer, 0, buffer.Length);
+                                }
+                            }
+                        }
+                    }
+                } catch {
+                }
+            }
         }
         
         protected override string SearchCapabilities {
@@ -85,13 +174,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         
         protected override IXmlSerializable GetObject (string objectId)
         {
-            return object_cache[int.Parse (objectId)];
+            return object_cache[int.Parse (objectId)].Object;
         }
         
         protected override IEnumerable<IXmlSerializable> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria, out int totalMatches)
         {
             var id = int.Parse (objectId);
-            var container = (Container)object_cache[id];
+            var container = (Container)object_cache[id].Object;
             totalMatches = container.ChildCount.Value;
             return GetChildren (objectId, startIndex, requestCount, sortCriteria);
         }
@@ -107,10 +196,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             
             for (int i = range.Lower + startIndex, numberReturned = 0; i < range.Upper && numberReturned <= requestCount; i++) {
                 numberReturned++;
-                var obj = object_cache[i];
-                if (obj != null) {
-                    yield return obj;
-                }
+                yield return object_cache[i].Object;
             }
         }
         
@@ -124,7 +210,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
             
             foreach (var file in container.Files) {
-                object_cache.Add (CreateObject (file, container.Folder));
+                var obj = CreateObject (file, container.Folder);
+                obj.AddResource (new Resource (new ResourceSettings (new Uri (string.Format ("{0}object?id={1}", prefix, obj.Id)))));
+                if (obj != null) {
+                    object_cache.Add (new ObjectInfo (obj, file));
+                }
             }
             
             folder_cache.Remove (id);
@@ -140,7 +230,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                     Title = Path.GetFileNameWithoutExtension (path)
                 };
             case ".avi":
-                return new Movie (this, parent);
+                return new Movie (this, parent) {
+                    Title = Path.GetFileNameWithoutExtension (path)
+                };
             default:
                 return null;
             }
@@ -154,8 +246,22 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 Title = Path.GetDirectoryName (path),
                 ChildCount = directories.Length + files.Length
             };
-            object_cache.Add (folder);
+            object_cache.Add (new ObjectInfo (folder, path));
             folder_cache[folder.Id] = new FolderInfo (folder, directories, files);
+        }
+        
+        readonly static Random random = new Random ();
+                
+        static string GeneratePrefix ()
+        {
+            foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
+                if (address.AddressFamily == AddressFamily.InterNetwork) {
+                    return string.Format (
+                        "http://{0}:{1}/upnp/media-server/", address, random.Next (1024, 5000));
+                }
+            }
+            
+            return null;
         }
     }
 }
