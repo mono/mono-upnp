@@ -86,8 +86,16 @@ namespace Mono.Upnp.GtkClient
                         Value = related_state_variable.DefaultValue != null
                             ? double.Parse (related_state_variable.DefaultValue) : 0
                     };
+                } else if (related_state_variable.DataType == "ui4") {
+                    widget = new SpinButton (int.MinValue, int.MaxValue, 1.0) {
+                        Value = related_state_variable.DefaultValue != null
+                            ? double.Parse (related_state_variable.DefaultValue) : 0
+                    };
                 } else {
-                    widget = new Entry { Text = related_state_variable.DefaultValue };
+                    widget = new Entry {
+                        Text = related_state_variable.DefaultValue != null
+                            ? related_state_variable.DefaultValue : ""
+                    };
                 }
                 table.Attach (widget, (uint)1, (uint)2, row, row + 1);
                 row++;

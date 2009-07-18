@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 
 using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
@@ -46,9 +47,9 @@ namespace Mono.Upnp.Dcp.MediaServer1
             
             this.content_directory = contentDirectory;
             
-            var connectionManagerService = new Service<ConnectionManager> (ConnectionManager.ServiceType, "ConnectionManager", connectionManager);
-            var contentDirectoryService = new Service<ContentDirectory> (ContentDirectory.ServiceType, "ContentDirectory", contentDirectory);
-            settings.Services = new Service[] { contentDirectoryService, connectionManagerService };
+            var connectionManagerService = new Service<ConnectionManager> (ConnectionManager.ServiceType, "urn:upnp-org:serviceId:ConnectionManager", connectionManager);
+            var contentDirectoryService = new Service<ContentDirectory> (ContentDirectory.ServiceType, "urn:upnp-org:serviceId:ContentDirectory", contentDirectory);
+            settings.Services = Combine (new Service[] { connectionManagerService, contentDirectoryService }, settings.Services);
             server = new Server (new Root (settings));
         }
         
@@ -68,6 +69,17 @@ namespace Mono.Upnp.Dcp.MediaServer1
         {
             server.Dispose ();
             content_directory.Dispose ();
+        }
+        
+        IEnumerable<Service> Combine (IEnumerable<Service> first, IEnumerable<Service> second)
+        {
+            foreach (var service in first) {
+                yield return service;
+            }
+            
+            foreach (var service in second) {
+                yield return service;
+            }
         }
     }
 }

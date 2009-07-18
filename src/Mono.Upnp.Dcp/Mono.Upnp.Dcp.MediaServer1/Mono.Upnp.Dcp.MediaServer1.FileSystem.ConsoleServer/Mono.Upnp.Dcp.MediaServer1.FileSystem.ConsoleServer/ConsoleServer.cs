@@ -30,6 +30,9 @@ using System.Collections.Generic;
 
 using NDesk.Options;
 
+using Mono.Upnp.Control;
+using Mono.Upnp.Dcp.MSMediaServerRegistrar1;
+
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
 {
     class ConsoleServer
@@ -43,9 +46,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
             var model_name = "Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleClient";
             var manufacturer_url = new Uri ("http://www.mono-project.org/");
             var model_description = "A console client for sharing file system folders over the MediaServer1 spec.";
-            string model_number = null;
-            Uri model_url = null;
-            string serial_number = null;
+            var model_number = "1";
+            var model_url = new Uri ("http://www.mono-project.org/Mono.Upnp");
+            var serial_number = "MONO-UPNP-MEDIA-SERVER-1";
             string upc = null;
             var help = false;
             
@@ -109,12 +112,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
             
             var connection_manager = new DummyConnectionManager ();
             var content_directory = new FileSystemContentDirectory (path);
+            var ms_media_server_registrar = new Service<MSMediaServerRegistrar> (
+                MSMediaServerRegistrar.ServiceType, "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar", new DummyMSMediaServerRegistrar ());
             var media_server = new MediaServer (
                 new MediaServerSettings (
                     udn,
                     friendly_name,
                     manufacturer,
                     model_name) {
+                    Services = new Service[] { ms_media_server_registrar },
                     ManufacturerUrl = manufacturer_url,
                     ModelDescription = model_description,
                     ModelNumber = model_number,

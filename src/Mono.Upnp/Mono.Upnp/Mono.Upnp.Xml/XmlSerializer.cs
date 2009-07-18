@@ -57,6 +57,11 @@ namespace Mono.Upnp.Xml
             return serializer.GetBytes (obj, new Nothing ());
         }
         
+        public byte[] GetBytes<TObject> (TObject obj, Encoding encoding)
+        {
+            return serializer.GetBytes (obj, new Nothing (), encoding);
+        }
+        
         public string GetString<TObject> (TObject obj)
         {
             return serializer.GetString (obj, new Nothing ());
@@ -95,12 +100,17 @@ namespace Mono.Upnp.Xml
                 SerializeCore (obj, writer, context);
             }
         }
-                
+        
         public byte[] GetBytes<TObject> (TObject obj, TContext context)
         {
+            return GetBytes<TObject> (obj, context, null);
+        }
+                
+        public byte[] GetBytes<TObject> (TObject obj, TContext context, Encoding encoding)
+        {
             using (var stream = new MemoryStream ()) {
-                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
-                    writer.WriteStartDocument ();
+                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = encoding ?? utf8 })) {
+                    writer.WriteProcessingInstruction ("xml", @"version=""1.0""");
                     SerializeCore (obj, writer, context);
                 }
                 return stream.ToArray ();
@@ -109,7 +119,7 @@ namespace Mono.Upnp.Xml
         
         public string GetString<TObject> (TObject obj, TContext context)
         {
-            return utf8.GetString (GetBytes (obj, context));
+            return utf8.GetString (GetBytes (obj, context, utf8));
         }
         
         void SerializeCore<TObject> (TObject obj, XmlWriter writer, TContext context)

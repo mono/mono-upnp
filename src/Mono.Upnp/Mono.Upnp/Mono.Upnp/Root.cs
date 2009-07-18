@@ -84,7 +84,7 @@ namespace Mono.Upnp
         {
             UrlBase = url;
             if (RootDevice != null) {
-                RootDevice.Initialize (serializer, this, string.Empty);
+                RootDevice.Initialize (serializer, this, "/");
             }
         }
         

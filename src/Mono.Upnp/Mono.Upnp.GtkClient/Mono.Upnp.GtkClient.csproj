@@ -49,7 +49,7 @@
     <Compile Include="gtk-gui\generated.cs" />
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Mono.Upnp.GtkClient\MainWindow.cs" />
-    <Compile Include="Mono.Upnp.GtkClient\Main.cs" />
+    <Compile Include="Mono.Upnp.GtkClient\GtkClient.cs" />
     <Compile Include="Mono.Upnp.GtkClient\DeviceDescriptionInfo.cs" />
     <Compile Include="Mono.Upnp.GtkClient\DeviceAnnouncementInfo.cs" />
     <Compile Include="gtk-gui\Mono.Upnp.GtkClient.DeviceAnnouncementInfo.cs" />

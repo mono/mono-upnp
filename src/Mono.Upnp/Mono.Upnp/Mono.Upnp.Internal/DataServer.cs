@@ -36,17 +36,23 @@ namespace Mono.Upnp.Internal
     sealed class DataServer : UpnpServer
     {
         readonly byte[] data;
+        readonly string content_type;
 
-        public DataServer (byte[] data, Uri url)
+        public DataServer (byte[] data, string contentType, Uri url)
             : base (url)
         {
             this.data = data;
+            this.content_type = contentType;
         }
 
         protected override void HandleContext (HttpListenerContext context)
         {
+            base.HandleContext (context);
+            
+            context.Response.SendChunked = false;
+            context.Response.ContentLength64 = data.LongLength;
+            context.Response.ContentType = content_type;
             context.Response.OutputStream.Write (data, 0, data.Length);
-            context.Response.Close ();
             
             Log.Information (string.Format ("{0} requested {1}.", context.Request.RemoteEndPoint, context.Request.Url));
         }

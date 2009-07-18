@@ -97,15 +97,5 @@ namespace Mono.Upnp
                 throw new UpnpDeserializationException ("The URL fragment is not valid.");
             }
         }
-        
-        internal string CollapseUrl (Uri url)
-        {
-            if (Root.UrlBase.IsBaseOf (url)) {
-                return Root.UrlBase.MakeRelativeUri (url).ToString ();
-            } else {
-                // TODO throw
-                return url.ToString ();
-            }
-        }
     }
 }

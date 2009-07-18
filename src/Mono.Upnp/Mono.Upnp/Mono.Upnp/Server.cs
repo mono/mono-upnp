@@ -64,7 +64,8 @@ namespace Mono.Upnp
         {
             var serializer = Helper.Get<XmlSerializer> (static_serializer);
             root.Initialize (serializer, url);
-            description_server = new DataServer (serializer.GetBytes (root), url);
+            // FIXME this is a test
+            description_server = new DataServer (serializer.GetBytes (root), @"text/xml", url);
             Announce (url);
         }
         

@@ -74,9 +74,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public static void RegisterType<T> () where T : Object
         {
             var type = typeof (T);
-            var name = CreateClassName (type, typeof (Object));
+            var name = GetClassNameFromTypeCore (type);
             types[name] = type;
-            names[type] = name;
         }
         
         public static string GetClassNameFromType<T> () where T : Object
@@ -96,12 +95,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         static string GetClassNameFromTypeCore (Type type)
         {
             string name;
-            if (names.TryGetValue (type, out name)) {
-                return name;
-            } else {
-                throw new InvalidOperationException (string.Format (
-                    "The type {0} has not been registered with the ClassManager.", type));
+            
+            if (!names.TryGetValue (type, out name)) {
+                name = CreateClassName (type, typeof (Object));
+                names[type] = name;
             }
+            
+            return name;
         }
         
         public static Type GetTypeFromClassName (string @class)

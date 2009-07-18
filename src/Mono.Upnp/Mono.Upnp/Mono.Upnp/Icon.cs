@@ -102,7 +102,7 @@ namespace Mono.Upnp
             
             Initialize (root);
             UrlFragment = iconUrlFragment;
-            server = new DataServer (Data, Url);
+            server = new DataServer (Data, MimeType, Url);
         }
         
         protected internal virtual void Start ()

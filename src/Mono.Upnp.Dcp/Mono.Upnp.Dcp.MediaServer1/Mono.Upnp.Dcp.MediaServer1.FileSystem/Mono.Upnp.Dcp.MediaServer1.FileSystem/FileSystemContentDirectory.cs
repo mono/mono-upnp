@@ -211,7 +211,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             
             foreach (var file in container.Files) {
                 var obj = CreateObject (file, container.Folder);
-                obj.AddResource (new Resource (new ResourceSettings (new Uri (string.Format ("{0}object?id={1}", prefix, obj.Id)))));
                 if (obj != null) {
                     object_cache.Add (new ObjectInfo (obj, file));
                 }
@@ -226,9 +225,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         {
             switch (Path.GetExtension (path)) {
             case ".mp3":
-                return new MusicTrack (this, parent) {
+                var music_track = new MusicTrack (this, parent) {
                     Title = Path.GetFileNameWithoutExtension (path)
                 };
+                music_track.AddResource (new Resource (new ResourceSettings (
+                    new Uri (string.Format ("{0}object?id={1}", prefix, music_track.Id)) ) {
+                    ProtocolInfo = "http-get:*:audio/mpeg:*"
+                }));
+                return music_track;
             case ".avi":
                 return new Movie (this, parent) {
                     Title = Path.GetFileNameWithoutExtension (path)
