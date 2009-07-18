@@ -65,13 +65,29 @@ namespace Mono.Upnp.GtkClient
                 var related_state_variable = service.StateVariables[argument.RelatedStateVariable];
                 if (related_state_variable.AllowedValues != null) {
                     var combobox = ComboBox.NewText ();
+                    var i = 0;
+                    var index = i;
                     foreach (var allowed_value in related_state_variable.AllowedValues) {
                         combobox.AppendText (allowed_value);
+                        if (allowed_value == related_state_variable.DefaultValue) {
+                            index = i;
+                        }
+                        i++;
                     }
-                    combobox.Active = 0;
+                    combobox.Active = index;
                     widget = combobox;
+                } else if (related_state_variable.AllowedValueRange != null) {
+                    widget = new SpinButton (
+                        double.Parse (related_state_variable.AllowedValueRange.Minimum),
+                        double.Parse (related_state_variable.AllowedValueRange.Maximum),
+                        double.Parse (related_state_variable.AllowedValueRange.Step));
+                } else if (related_state_variable.DataType == "i4") {
+                    widget = new SpinButton (int.MinValue, int.MaxValue, 1.0) {
+                        Value = related_state_variable.DefaultValue != null
+                            ? double.Parse (related_state_variable.DefaultValue) : 0
+                    };
                 } else {
-                    widget = new Entry ();
+                    widget = new Entry { Text = related_state_variable.DefaultValue };
                 }
                 table.Attach (widget, (uint)1, (uint)2, row, row + 1);
                 row++;
