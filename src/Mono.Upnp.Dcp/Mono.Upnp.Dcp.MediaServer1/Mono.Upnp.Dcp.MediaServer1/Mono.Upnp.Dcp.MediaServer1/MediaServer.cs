@@ -77,8 +77,10 @@ namespace Mono.Upnp.Dcp.MediaServer1
                 yield return service;
             }
             
-            foreach (var service in second) {
-                yield return service;
+            if (second != null) {
+                foreach (var service in second) {
+                    yield return service;
+                }
             }
         }
     }
