@@ -134,7 +134,8 @@ namespace Mono.Upnp.Xml
                 settings = new XmlSerializationSettings<TContext> ();
             }
             
-            using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = settings.Encoding ?? utf8 })) {
+            using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
+                Encoding = settings.Encoding ?? utf8, OmitXmlDeclaration = true })) {
                 WriteXmlDeclaration (writer, settings.XmlDeclarationType);
                 SerializeCore (obj, writer, settings.Context);
             }
@@ -152,7 +153,8 @@ namespace Mono.Upnp.Xml
             }
             
             using (var stream = new MemoryStream ()) {
-                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = settings.Encoding ?? utf8 })) {
+                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
+                    Encoding = settings.Encoding ?? utf8, OmitXmlDeclaration = true })) {
                     WriteXmlDeclaration (writer, settings.XmlDeclarationType);
                     SerializeCore (obj, writer, settings.Context);
                 }
