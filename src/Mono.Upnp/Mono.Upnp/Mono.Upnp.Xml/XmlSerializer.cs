@@ -49,22 +49,47 @@ namespace Mono.Upnp.Xml
         
         public void Serialize<TObject> (TObject obj, Stream stream)
         {
-            serializer.Serialize (obj, stream, new Nothing ());
+            Serialize (obj, stream, null);
+        }
+        
+        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationSettings settings)
+        {
+            if (settings == null) {
+                serializer.Serialize (obj, stream);
+            } else {
+                serializer.Serialize (obj, stream, new XmlSerializerSettings<Nothing> {
+                    Encoding = settings.Encoding, XmlDeclarationType = settings.XmlDeclarationType });
+            }
         }
         
         public byte[] GetBytes<TObject> (TObject obj)
         {
-            return serializer.GetBytes (obj, new Nothing ());
+            return GetBytes (obj, null);
         }
         
-        public byte[] GetBytes<TObject> (TObject obj, Encoding encoding)
+        public byte[] GetBytes<TObject> (TObject obj, XmlSerializationSettings settings)
         {
-            return serializer.GetBytes (obj, new Nothing (), encoding);
+            if (settings == null) {
+                return serializer.GetBytes (obj);
+            } else {
+                return serializer.GetBytes (obj, new XmlSerializerSettings<Nothing> {
+                    Encoding = settings.Encoding, XmlDeclarationType = settings.XmlDeclarationType }); 
+            }
         }
         
         public string GetString<TObject> (TObject obj)
         {
-            return serializer.GetString (obj, new Nothing ());
+            return GetString (obj, null);
+        }
+        
+        public string GetString<TObject> (TObject obj, XmlSerializationSettings settings)
+        {
+            if (settings == null) {
+                return serializer.GetString (obj);
+            } else {
+                return serializer.GetString (obj, new XmlSerializerSettings<Nothing> {
+                    Encoding = settings.Encoding, XmlDeclarationType = settings.XmlDeclarationType }); 
+            }
         }
     }
     
@@ -85,6 +110,11 @@ namespace Mono.Upnp.Xml
             this.compiler_factory = compilerFactory ?? new DelegateSerializationCompilerFactory<TContext> ();
         }
         
+        public void Serialize<TObject> (TObject obj, XmlWriter writer)
+        {
+            Serialize (obj, writer, default (TContext));
+        }
+        
         public void Serialize<TObject> (TObject obj, XmlWriter writer, TContext context)
         {
             if (writer == null) throw new ArgumentNullException ("writer");
@@ -92,34 +122,70 @@ namespace Mono.Upnp.Xml
             SerializeCore (obj, writer, context);
         }
         
-        public void Serialize<TObject> (TObject obj, Stream stream, TContext context)
+        public void Serialize<TObject> (TObject obj, Stream stream)
+        {
+            Serialize (obj, stream, null);
+        }
+        
+        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializerSettings<TContext> settings)
         {
             if (stream == null) throw new ArgumentNullException ("stream");
+            if (settings == null) {
+                settings = new XmlSerializerSettings<TContext> ();
+            }
             
-            using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
-                SerializeCore (obj, writer, context);
+            using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = settings.Encoding ?? utf8 })) {
+                WriteXmlDeclaration (writer, settings.XmlDeclarationType);
+                SerializeCore (obj, writer, settings.Context);
             }
         }
         
-        public byte[] GetBytes<TObject> (TObject obj, TContext context)
+        public byte[] GetBytes<TObject> (TObject obj)
         {
-            return GetBytes<TObject> (obj, context, null);
+            return GetBytes (obj, null);
         }
-                
-        public byte[] GetBytes<TObject> (TObject obj, TContext context, Encoding encoding)
+        
+        public byte[] GetBytes<TObject> (TObject obj, XmlSerializerSettings<TContext> settings)
         {
+            if (settings == null) {
+                settings = new XmlSerializerSettings<TContext> ();
+            }
+            
             using (var stream = new MemoryStream ()) {
-                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = encoding ?? utf8 })) {
-                    writer.WriteProcessingInstruction ("xml", @"version=""1.0""");
-                    SerializeCore (obj, writer, context);
+                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = settings.Encoding ?? utf8 })) {
+                    WriteXmlDeclaration (writer, settings.XmlDeclarationType);
+                    SerializeCore (obj, writer, settings.Context);
                 }
                 return stream.ToArray ();
             }
         }
         
-        public string GetString<TObject> (TObject obj, TContext context)
+        public string GetString<TObject> (TObject obj)
         {
-            return utf8.GetString (GetBytes (obj, context, utf8));
+            return GetString (obj, null);
+        }
+        
+        public string GetString<TObject> (TObject obj, XmlSerializerSettings<TContext> settings)
+        {
+            if (settings == null) {
+                settings = new XmlSerializerSettings<TContext> ();
+            }
+            
+            var encoding = settings.Encoding ?? utf8;
+            
+            return encoding.GetString (GetBytes (obj, settings));
+        }
+        
+        void WriteXmlDeclaration (XmlWriter writer, XmlDeclarationType xmlDeclarationType)
+        {
+            switch (xmlDeclarationType) {
+            case XmlDeclarationType.Version:
+                writer.WriteProcessingInstruction ("xml", @"version=""1.0""");
+                break;
+            case XmlDeclarationType.VersionAndEncoding:
+                writer.WriteStartDocument ();
+                break;
+            }
         }
         
         void SerializeCore<TObject> (TObject obj, XmlWriter writer, TContext context)

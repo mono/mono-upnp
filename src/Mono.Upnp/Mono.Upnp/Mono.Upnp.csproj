@@ -128,6 +128,8 @@
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompilerFactory.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompilerFactory.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlDeclarationType.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlSerializerSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
