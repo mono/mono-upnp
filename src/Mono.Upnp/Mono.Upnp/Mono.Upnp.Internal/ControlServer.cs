@@ -91,8 +91,7 @@ namespace Mono.Upnp.Internal
                     try {
                         serializer.Serialize (
                             new SoapEnvelope<Arguments> (new Arguments (service_type, action.Name, action.Execute (arguments.Values), true)),
-                            context.Response.OutputStream,
-                            new XmlSerializationSettings { XmlDeclarationType = XmlDeclarationType.None }
+                            context.Response.OutputStream
                         );
                         
                         Log.Information (string.Format ("{0} invoked {1} on {2}.",

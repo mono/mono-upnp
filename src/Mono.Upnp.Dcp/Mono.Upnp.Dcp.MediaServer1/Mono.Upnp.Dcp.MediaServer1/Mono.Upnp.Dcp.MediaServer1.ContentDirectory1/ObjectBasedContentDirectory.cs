@@ -97,7 +97,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     numberReturned = 1;
                     totalMatches = 1;
                 }
-                return serializer.GetString (new ResultsWrapper (@object));
+                return serializer.GetString (new ResultsWrapper (@object),
+                    new XmlSerializationSettings { XmlDeclarationType = XmlDeclarationType.None });
             }
         }
         

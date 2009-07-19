@@ -46,7 +46,7 @@ namespace Mono.Upnp.Xml
         }
     }
     
-    public class XmlSerializerSettings<TContext> : XmlSerializationSettings
+    public class XmlSerializationSettings<TContext> : XmlSerializationSettings
     {
         public TContext Context { get; set; }
     }
