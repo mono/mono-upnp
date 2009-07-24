@@ -101,7 +101,7 @@ namespace Mono.Upnp.GtkClient
                 row++;
             }
             
-            inputsBox.PackStart (table);
+            inputsBox.PackStart (table, true, true, 0);
             inputsBox.ShowAll ();
         }
 

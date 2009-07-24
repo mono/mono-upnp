@@ -50,7 +50,7 @@ namespace Mono.Upnp.GtkClient
             foreach (var icon in device.Icons) {
                 var expander = new Expander (string.Format ("{0}, {1}x{2}x{3}", icon.MimeType, icon.Width, icon.Height, icon.Depth));
                 expander.Add (new LazyIcon (icon));
-                iconBox.PackStart (expander);
+                iconBox.PackStart (expander, true, true, 0);
             }
         }
     }

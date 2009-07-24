@@ -39,7 +39,7 @@ namespace Mono.Upnp.GtkClient
             deviceType.Text = device.Type.ToString ();
             udn.Text = device.Udn;
             foreach (var location in device.Locations) {
-                locationBox.PackStart (new Gtk.Label (location) { Selectable = true, Xalign = 0F });
+                locationBox.PackStart (new Gtk.Label (location) { Selectable = true, Xalign = 0F }, true, true, 0);
             }
         }
     }

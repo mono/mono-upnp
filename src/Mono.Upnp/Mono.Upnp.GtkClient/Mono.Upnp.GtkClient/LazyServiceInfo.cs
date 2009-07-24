@@ -60,7 +60,7 @@ namespace Mono.Upnp.GtkClient
                         widget = provider.ProvideInfo (service);
                     } catch (Exception exception) {
                         var vbox = new VBox ();
-                        vbox.PackStart (new Gtk.Label ("Failed to Load " + provider.Name));
+                        vbox.PackStart (new Gtk.Label ("Failed to Load " + provider.Name), true, true, 0);
                         var expander = new Expander ("Error");
                         expander.Add (new Label (exception.ToString ()));
                         widget = vbox;
