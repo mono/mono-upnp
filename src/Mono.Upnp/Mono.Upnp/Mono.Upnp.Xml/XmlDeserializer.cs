@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 
-using Mono.Upnp.Xml.Internal;
+using Mono.Upnp.Xml.Compilation;
 
 namespace Mono.Upnp.Xml
 {
@@ -36,7 +36,18 @@ namespace Mono.Upnp.Xml
     
     public sealed class XmlDeserializer
     {
-        readonly Dictionary<Type, DeserializationInfo> infos = new Dictionary<Type, DeserializationInfo> ();
+        readonly DeserializationCompilerFactory factory;
+        readonly Dictionary<Type, DeserializationCompiler> compilers = new Dictionary<Type, DeserializationCompiler> ();
+        
+        public XmlDeserializer ()
+            : this (null)
+        {
+        }
+        
+        public XmlDeserializer (DeserializationCompilerFactory factory)
+        {
+            this.factory = factory ?? new DelegateDeserializationCompilerFactory ();
+        }
         
         public T Deserialize<T> (XmlReader reader)
         {
@@ -56,42 +67,37 @@ namespace Mono.Upnp.Xml
             if (typeDeserializer != null) {
                 return typeDeserializer (context);
             } else {
-                var deserializer = GetDeserializer (typeof (T));
+                var deserializer = GetCompilerForType (typeof (T)).Deserializer;
                 return (T) deserializer (context);
             }
         }
         
         internal void AutoDeserialize<T> (T obj, XmlDeserializationContext context)
         {
-            var deserializer = GetInfo (typeof (T)).AutoDeserializer;
+            var deserializer = GetCompilerForType (typeof (T)).AutoDeserializer;
             deserializer (obj, context);
         }
         
         internal void AutoDeserializeAttribute<T> (T obj, XmlDeserializationContext context)
         {
-            var deserializer = GetInfo (typeof (T)).AttributeAutoDeserializer;
+            var deserializer = GetCompilerForType (typeof (T)).AttributeAutoDeserializer;
             deserializer (obj, context);
         }
         
         internal void AutoDeserializeElement<T> (T obj, XmlDeserializationContext context)
         {
-            var deserializer = GetInfo (typeof (T)).ElementAutoDeserializer;
+            var deserializer = GetCompilerForType (typeof (T)).ElementAutoDeserializer;
             deserializer (obj, context);
         }
         
-        internal Mono.Upnp.Xml.Internal.Deserializer GetDeserializer (Type type)
+        internal DeserializationCompiler GetCompilerForType (Type type)
         {
-            return GetInfo (type).Deserializer;
-        }
-        
-        DeserializationInfo GetInfo (Type type)
-        {
-            DeserializationInfo info;
-            if (!infos.TryGetValue (type, out info)) {
-                info = new DeserializationInfo (this, type);
-                infos[type] = info;
+            DeserializationCompiler compiler;
+            if (!compilers.TryGetValue (type, out compiler)) {
+                compiler = factory.CreateDeserializationCompiler (this, type);
+                compilers[type] = compiler;
             }
-            return info;
+            return compiler;
         }
     }
 }

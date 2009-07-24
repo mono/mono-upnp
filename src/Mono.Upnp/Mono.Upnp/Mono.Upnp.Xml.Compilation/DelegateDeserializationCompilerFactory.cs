@@ -1,5 +1,5 @@
 // 
-// Compiler.cs
+// DelegateDeserializationCompilerFactory.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -25,46 +25,15 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 
-namespace Mono.Upnp.Xml.Internal
+namespace Mono.Upnp.Xml.Compilation
 {
-    class Compiler
+    public class DelegateDeserializationCompilerFactory : DeserializationCompilerFactory
     {
-        readonly Type type;
-        
-        protected Compiler (Type type)
+        public override DeserializationCompiler CreateDeserializationCompiler (XmlDeserializer xmlDeserializer, Type type)
         {
-            this.type = type;
+            return new DelegateDeserializationCompiler (xmlDeserializer, type);
         }
-        
-        protected Type Type {
-            get { return type; }
-        }
-        
-        protected IEnumerable<PropertyInfo> Properties {
-            get {
-                foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public)) {
-                    yield return property;
-                }
-                
-                foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.NonPublic)) {
-                    yield return property;
-                }
-            }
-        }
-        
-        protected IEnumerable<MethodInfo> Methods {
-            get {
-                foreach (var method in type.GetMethods (BindingFlags.Instance | BindingFlags.Public)) {
-                    yield return method;
-                }
-                
-                foreach (var method in type.GetMethods (BindingFlags.Instance | BindingFlags.NonPublic)) {
-                    yield return method;
-                }
-            }
-        }
+
     }
 }

@@ -89,13 +89,6 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        protected SerializationCompiler<TContext> GetCompilerForType (Type type)
-        {
-            if (type == null) throw new ArgumentNullException ("type");
-            
-            return xml_serializer.GetCompilerForType (type);
-        }
-        
         protected virtual Serializer<TContext> CreateTypeSerializer ()
         {
             if (typeof (IXmlSerializable<TContext>).IsAssignableFrom (Type)) {
@@ -140,6 +133,13 @@ namespace Mono.Upnp.Xml.Compilation
                 dictionary.Add (field.GetValue (null), name);
             }
             return dictionary;
+        }
+        
+        protected SerializationCompiler<TContext> GetCompilerForType (Type type)
+        {
+            if (type == null) throw new ArgumentNullException ("type");
+            
+            return xml_serializer.GetCompilerForType (type);
         }
     }
 }

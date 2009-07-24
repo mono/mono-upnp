@@ -1,5 +1,5 @@
 // 
-// DeserializationInfo.cs
+// DeserializationCompiler.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -25,24 +25,25 @@
 // THE SOFTWARE.
 
 using System;
+using System.Xml;
 
-namespace Mono.Upnp.Xml.Internal
+namespace Mono.Upnp.Xml.Compilation
 {
-    delegate object Deserializer (XmlDeserializationContext context);
-    delegate void ObjectDeserializer (object obj, XmlDeserializationContext context);
-    
-    class DeserializationInfo
+    public abstract class DeserializationCompiler : Compiler
     {
-        readonly DeserializationCompiler compiler;
+        readonly XmlDeserializer xml_deserializer;
         
         Deserializer deserializer;
         ObjectDeserializer auto_deserializer;
         ObjectDeserializer attribute_auto_deserializer;
         ObjectDeserializer element_auto_deserializer;
         
-        public DeserializationInfo (XmlDeserializer xmlDeserializer, Type type)
+        public DeserializationCompiler (XmlDeserializer xmlDeserializer, Type type)
+            : base (type)
         {
-            compiler = new DeserializationCompiler (xmlDeserializer, this, type);
+            if (xmlDeserializer == null) throw new ArgumentNullException ("xmlDeserializer");
+            
+            this.xml_deserializer = xmlDeserializer;
         }
         
         public Deserializer Deserializer {
@@ -50,7 +51,7 @@ namespace Mono.Upnp.Xml.Internal
                 if (this.deserializer == null) {
                     Deserializer deserializer = null;
                     this.deserializer = context => deserializer (context);
-                    deserializer = compiler.CreateDeserializer ();
+                    deserializer = CreateDeserializer ();
                     this.deserializer = deserializer;
                 }
                 return this.deserializer;
@@ -60,7 +61,7 @@ namespace Mono.Upnp.Xml.Internal
         public ObjectDeserializer AutoDeserializer {
             get {
                 if (auto_deserializer == null) {
-                    auto_deserializer = compiler.CreateAutoDeserializer ();
+                    auto_deserializer = CreateAutoDeserializer ();
                 }
                 return auto_deserializer;
             }
@@ -69,7 +70,7 @@ namespace Mono.Upnp.Xml.Internal
         public ObjectDeserializer AttributeAutoDeserializer {
             get {
                 if (attribute_auto_deserializer == null) {
-                    attribute_auto_deserializer = compiler.CreateAttributeAutoDeserializer ();
+                    attribute_auto_deserializer = CreateAttributeAutoDeserializer ();
                 }
                 return attribute_auto_deserializer;
             }
@@ -78,10 +79,30 @@ namespace Mono.Upnp.Xml.Internal
         public ObjectDeserializer ElementAutoDeserializer {
             get {
                 if (element_auto_deserializer == null) {
-                    element_auto_deserializer = compiler.CreateElementAutoDeserializer ();
+                    element_auto_deserializer = CreateElementAutoDeserializer ();
                 }
                 return element_auto_deserializer;
             }
+        }
+        
+        protected abstract Deserializer CreateDeserializer ();
+        
+        protected abstract ObjectDeserializer CreateAutoDeserializer ();
+        
+        protected abstract ObjectDeserializer CreateAttributeAutoDeserializer ();
+        
+        protected abstract ObjectDeserializer CreateElementAutoDeserializer ();
+        
+        protected XmlDeserializationContext CreateDeserializationContext (XmlReader reader)
+        {
+            return new XmlDeserializationContext (xml_deserializer, reader);
+        }
+        
+        protected Deserializer GetDeserializerForType (Type type)
+        {
+            if (type == null) throw new ArgumentNullException ("type");
+            
+            return xml_deserializer.GetCompilerForType (type).Deserializer;
         }
     }
 }

@@ -117,9 +117,6 @@
     <Compile Include="Mono.Upnp.Control\ServiceActionExecutor.cs" />
     <Compile Include="Mono.Upnp.Control\StateVariableEventer.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlValueAttribute.cs" />
-    <Compile Include="Mono.Upnp.Xml.Internal\DeserializationInfo.cs" />
-    <Compile Include="Mono.Upnp.Xml.Internal\DeserializationCompiler.cs" />
-    <Compile Include="Mono.Upnp.Xml.Internal\Compiler.cs" />
     <Compile Include="Mono.Upnp.Internal\IMappable.cs" />
     <Compile Include="Mono.Upnp.Internal\CollectionMap.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompiler.cs" />
@@ -130,6 +127,12 @@
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompilerFactory.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlDeclarationType.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlSerializationSettings.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DelegateDeserializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\Deserializer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\ObjectDeserializer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompilerFactory.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DelegateDeserializationCompilerFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -139,7 +142,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Mono.Upnp.Xml.Internal\" />
     <Folder Include="Mono.Upnp.Xml.Compilation\" />
   </ItemGroup>
 </Project>
