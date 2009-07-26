@@ -52,13 +52,13 @@ namespace Mono.Upnp.Xml
             Serialize (obj, stream, null);
         }
         
-        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationOptions settings)
+        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationOptions options)
         {
-            if (settings == null) {
+            if (options == null) {
                 serializer.Serialize (obj, stream);
             } else {
-                serializer.Serialize (obj, stream, new XmlSerializationSettings<Nothing> {
-                    Encoding = settings.Encoding, XmlDeclarationType = settings.XmlDeclarationType });
+                serializer.Serialize (obj, stream, new XmlSerializationOptions<Nothing> {
+                    Encoding = options.Encoding, XmlDeclarationType = options.XmlDeclarationType });
             }
         }
         
@@ -67,13 +67,13 @@ namespace Mono.Upnp.Xml
             return GetBytes (obj, null);
         }
         
-        public byte[] GetBytes<TObject> (TObject obj, XmlSerializationOptions settings)
+        public byte[] GetBytes<TObject> (TObject obj, XmlSerializationOptions options)
         {
-            if (settings == null) {
+            if (options == null) {
                 return serializer.GetBytes (obj);
             } else {
-                return serializer.GetBytes (obj, new XmlSerializationSettings<Nothing> {
-                    Encoding = settings.Encoding, XmlDeclarationType = settings.XmlDeclarationType }); 
+                return serializer.GetBytes (obj, new XmlSerializationOptions<Nothing> {
+                    Encoding = options.Encoding, XmlDeclarationType = options.XmlDeclarationType }); 
             }
         }
         
@@ -82,13 +82,13 @@ namespace Mono.Upnp.Xml
             return GetString (obj, null);
         }
         
-        public string GetString<TObject> (TObject obj, XmlSerializationOptions settings)
+        public string GetString<TObject> (TObject obj, XmlSerializationOptions options)
         {
-            if (settings == null) {
+            if (options == null) {
                 return serializer.GetString (obj);
             } else {
-                return serializer.GetString (obj, new XmlSerializationSettings<Nothing> {
-                    Encoding = settings.Encoding, XmlDeclarationType = settings.XmlDeclarationType }); 
+                return serializer.GetString (obj, new XmlSerializationOptions<Nothing> {
+                    Encoding = options.Encoding, XmlDeclarationType = options.XmlDeclarationType }); 
             }
         }
     }
@@ -127,17 +127,17 @@ namespace Mono.Upnp.Xml
             Serialize (obj, stream, null);
         }
         
-        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationSettings<TContext> settings)
+        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationOptions<TContext> options)
         {
             if (stream == null) throw new ArgumentNullException ("stream");
-            if (settings == null) {
-                settings = new XmlSerializationSettings<TContext> ();
+            if (options == null) {
+                options = new XmlSerializationOptions<TContext> ();
             }
             
             using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
-                Encoding = settings.Encoding ?? utf8, OmitXmlDeclaration = true })) {
-                WriteXmlDeclaration (writer, settings.XmlDeclarationType);
-                SerializeCore (obj, writer, settings.Context);
+                Encoding = options.Encoding ?? utf8, OmitXmlDeclaration = true })) {
+                WriteXmlDeclaration (writer, options.XmlDeclarationType);
+                SerializeCore (obj, writer, options.Context);
             }
         }
         
@@ -146,17 +146,17 @@ namespace Mono.Upnp.Xml
             return GetBytes (obj, null);
         }
         
-        public byte[] GetBytes<TObject> (TObject obj, XmlSerializationSettings<TContext> settings)
+        public byte[] GetBytes<TObject> (TObject obj, XmlSerializationOptions<TContext> options)
         {
-            if (settings == null) {
-                settings = new XmlSerializationSettings<TContext> ();
+            if (options == null) {
+                options = new XmlSerializationOptions<TContext> ();
             }
             
             using (var stream = new MemoryStream ()) {
                 using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
-                    Encoding = settings.Encoding ?? utf8, OmitXmlDeclaration = true })) {
-                    WriteXmlDeclaration (writer, settings.XmlDeclarationType);
-                    SerializeCore (obj, writer, settings.Context);
+                    Encoding = options.Encoding ?? utf8, OmitXmlDeclaration = true })) {
+                    WriteXmlDeclaration (writer, options.XmlDeclarationType);
+                    SerializeCore (obj, writer, options.Context);
                 }
                 return stream.ToArray ();
             }
@@ -167,15 +167,15 @@ namespace Mono.Upnp.Xml
             return GetString (obj, null);
         }
         
-        public string GetString<TObject> (TObject obj, XmlSerializationSettings<TContext> settings)
+        public string GetString<TObject> (TObject obj, XmlSerializationOptions<TContext> options)
         {
-            if (settings == null) {
-                settings = new XmlSerializationSettings<TContext> ();
+            if (options == null) {
+                options = new XmlSerializationOptions<TContext> ();
             }
             
-            var encoding = settings.Encoding ?? utf8;
+            var encoding = options.Encoding ?? utf8;
             
-            return encoding.GetString (GetBytes (obj, settings));
+            return encoding.GetString (GetBytes (obj, options));
         }
         
         void WriteXmlDeclaration (XmlWriter writer, XmlDeclarationType xmlDeclarationType)
