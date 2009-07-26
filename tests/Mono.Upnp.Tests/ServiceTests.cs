@@ -557,7 +557,7 @@ namespace Mono.Upnp.Tests
                 },
                 new[] {
                     new StateVariable ("A_ARG_bar", "string"),
-                    new StateVariable ("A_ARG_Bar_bar", new string[] { "Foo", "Bar" })
+                    new StateVariable ("A_ARG_Bar_bar", new[] { "Foo", "Bar" })
                 }
             );
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());

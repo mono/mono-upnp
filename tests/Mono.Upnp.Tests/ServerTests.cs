@@ -252,10 +252,10 @@ namespace Mono.Upnp.Tests
         static ServiceController CreateServiceController (StateVariable stateVariable1, StateVariable stateVariable2)
         {
             return new ServiceController (
-                new ServiceAction[] {
+                new[] {
                     new ServiceAction (
                         "Foo",
-                        new Argument[] {
+                        new[] {
                             new Argument ("bar", "X_ARG_bar", ArgumentDirection.In),
                             new Argument ("result", "X_ARG_result", ArgumentDirection.Out)
                         },
@@ -266,7 +266,7 @@ namespace Mono.Upnp.Tests
                         }
                     )
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("X_ARG_bar", "string"),
                     new StateVariable ("X_ARG_result", "string"),
                     stateVariable1,
@@ -415,11 +415,11 @@ namespace Mono.Upnp.Tests
         public void IconTest ()
         {
             var root = CreateRoot (
-                new Icon[] {
+                new[] {
                     new Icon (100, 100, 32, "image/jpeg", new byte[] { 0 }),
                     new Icon (100, 100, 32, "image/png", new byte[] { 1 })
                 },
-                new Icon[] {
+                new[] {
                     new Icon (100, 100, 32, "image/jpeg", new byte[] { 2 }),
                     new Icon (100, 100, 32, "image/png", new byte[] { 3 })
                 }

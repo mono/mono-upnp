@@ -406,7 +406,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayTestClass><Items><Item Name=""Foo"" /><Item Name=""Bar"" /></Items></ArrayTestClass>",
-                serializer.GetString (new ArrayTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -420,7 +420,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayNameTestClass><items><Item Name=""Foo"" /><Item Name=""Bar"" /></items></ArrayNameTestClass>",
-                serializer.GetString (new ArrayNameTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayNameTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -434,7 +434,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayNameFallbackTestClass><Items><Item Name=""Foo"" /><Item Name=""Bar"" /></Items></ArrayNameFallbackTestClass>",
-                serializer.GetString (new ArrayNameFallbackTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayNameFallbackTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -448,7 +448,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayNamespaceTestClass><items xmlns=""udn:mono-upnp:tests""><Item Name=""Foo"" /><Item Name=""Bar"" /></items></ArrayNamespaceTestClass>",
-                serializer.GetString (new ArrayNamespaceTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayNamespaceTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -462,7 +462,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayPrefixTestClass><test:items xmlns:test=""udn:mono-upnp:tests""><Item Name=""Foo"" /><Item Name=""Bar"" /></test:items></ArrayPrefixTestClass>",
-                serializer.GetString (new ArrayPrefixTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayPrefixTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -482,7 +482,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><NamedArrayItemTestClass><Items><item Value=""Foo"" /><item Value=""Bar"" /></Items></NamedArrayItemTestClass>",
-                serializer.GetString (new NamedArrayItemTestClass { Items = new NamedItem[] { new NamedItem { Value = "Foo" }, new NamedItem { Value = "Bar"} } })
+                serializer.GetString (new NamedArrayItemTestClass { Items = new[] { new NamedItem { Value = "Foo" }, new NamedItem { Value = "Bar"} } })
             );
         }
         
@@ -496,7 +496,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><NamelessArrayItemTestClass><Items><Item Name=""Foo"" /><Item Name=""Bar"" /></Items></NamelessArrayItemTestClass>",
-                serializer.GetString (new NamelessArrayItemTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new NamelessArrayItemTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -510,7 +510,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayItemNameTestClass><Items><item Name=""Foo"" /><item Name=""Bar"" /></Items></ArrayItemNameTestClass>",
-                serializer.GetString (new ArrayItemNameTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayItemNameTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -524,7 +524,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayItemNameFallbackTestClass><Items><Item Name=""Foo"" /><Item Name=""Bar"" /></Items></ArrayItemNameFallbackTestClass>",
-                serializer.GetString (new ArrayItemNameFallbackTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayItemNameFallbackTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -538,7 +538,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayItemNamespaceTestClass><Items><item Name=""Foo"" xmlns=""udn:mono-upnp:tests"" /><item Name=""Bar"" xmlns=""udn:mono-upnp:tests"" /></Items></ArrayItemNamespaceTestClass>",
-                serializer.GetString (new ArrayItemNamespaceTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayItemNamespaceTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -552,7 +552,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayItemPrefixTestClass><Items><test:item Name=""Foo"" xmlns:test=""udn:mono-upnp:tests"" /><test:item Name=""Bar"" xmlns:test=""udn:mono-upnp:tests"" /></Items></ArrayItemPrefixTestClass>",
-                serializer.GetString (new ArrayItemPrefixTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayItemPrefixTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -566,7 +566,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><ArrayIEnumerableTestClass><Items><Item Name=""Foo"" /><Item Name=""Bar"" /></Items></ArrayIEnumerableTestClass>",
-                serializer.GetString (new ArrayIEnumerableTestClass { Items = new Item[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
+                serializer.GetString (new ArrayIEnumerableTestClass { Items = new[] { new Item { Name = "Foo" }, new Item { Name = "Bar"} } })
             );
         }
         
@@ -819,7 +819,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><FreeArrayItemTestClass><Foo>foo</Foo><Foo>bar</Foo><Foo>bat</Foo></FreeArrayItemTestClass>",
-                serializer.GetString (new FreeArrayItemTestClass { Foos = new string[] { "foo", "bar", "bat" } }));
+                serializer.GetString (new FreeArrayItemTestClass { Foos = new[] { "foo", "bar", "bat" } }));
         }
         
         class FreeNamelessArrayItemTestClass
@@ -832,7 +832,7 @@ namespace Mono.Upnp.Xml.Tests
         {
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><FreeNamelessArrayItemTestClass><test>Blarg!</test><test>Blarg!</test></FreeNamelessArrayItemTestClass>",
-                serializer.GetString (new FreeNamelessArrayItemTestClass { Foos = new TypeTestClass[] { new TypeTestClass (), new TypeTestClass () } }));
+                serializer.GetString (new FreeNamelessArrayItemTestClass { Foos = new[] { new TypeTestClass (), new TypeTestClass () } }));
         }
         
         class NullableOmitIfNullClass
