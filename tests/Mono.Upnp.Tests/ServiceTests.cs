@@ -47,7 +47,7 @@ namespace Mono.Upnp.Tests
         public void ActionTest ()
         {
             var service = new DummyService<ActionTestClass> ();
-            var controller = new ServiceController (new ServiceAction[] { new DummyServiceAction ("Foo") }, null);
+            var controller = new ServiceController (new[] { new DummyServiceAction ("Foo") }, null);
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
         }
         
@@ -63,7 +63,7 @@ namespace Mono.Upnp.Tests
         public void ActionNameTest ()
         {
             var service = new DummyService<ActionNameTestClass> ();
-            var controller = new ServiceController (new ServiceAction[] { new DummyServiceAction ("foo") }, null);
+            var controller = new ServiceController (new[] { new DummyServiceAction ("foo") }, null);
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
         }
         
@@ -80,10 +80,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<ArgumentTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "string")
                 }
             );
@@ -104,10 +104,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<OutArgumentTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.Out) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.Out) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "string")
                 }
             );
@@ -127,10 +127,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RefArgumentTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.Out) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.Out) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "string")
                 }
             );
@@ -151,10 +151,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<ReturnArgumentTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("result", "A_ARG_result", ArgumentDirection.Out, true) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("result", "A_ARG_result", ArgumentDirection.Out, true) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_result", "string")
                 }
             );
@@ -174,10 +174,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<ArgumentNameTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("Bar", "A_ARG_Bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("Bar", "A_ARG_Bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_Bar", "string")
                 }
             );
@@ -199,10 +199,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<ReturnArgumentNameTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("foo", "A_ARG_foo", ArgumentDirection.Out, true) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("foo", "A_ARG_foo", ArgumentDirection.Out, true) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_foo", "string")
                 }
             );
@@ -222,10 +222,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableNameTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "X_ARG_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "X_ARG_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("X_ARG_bar", "string")
                 }
             );
@@ -247,10 +247,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<ReturnArgumentRelatedStateVariableNameTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("result", "X_ARG_foo", ArgumentDirection.Out, true) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("result", "X_ARG_foo", ArgumentDirection.Out, true) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("X_ARG_foo", "string")
                 }
             );
@@ -270,10 +270,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableDataTypeTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "string.foo")
                 }
             );
@@ -293,11 +293,11 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableDefaultValueTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
-                    new StateVariable ("A_ARG_bar", "string", "hey")
+                new[] {
+                    new StateVariable ("A_ARG_bar", "string", new StateVariableOptions { DefaultValue = "hey" })
                 }
             );
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
@@ -316,10 +316,10 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableAllowedValueRangeTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "i4", new AllowedValueRange ("0", "100", "2"))
                 }
             );
@@ -345,11 +345,11 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<EnumArgumentTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
-                    new StateVariable ("A_ARG_bar", new string[] { "Foo", "Bar" })
+                new[] {
+                    new StateVariable ("A_ARG_bar", new[] { "Foo", "Bar" })
                 }
             );
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
@@ -374,11 +374,11 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<EnumArgumentNameTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
-                    new StateVariable ("A_ARG_bar", new string[] { "foo", "bar" })
+                new[] {
+                    new StateVariable ("A_ARG_bar", new[] { "foo", "bar" })
                 }
             );
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
@@ -402,11 +402,11 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<ArgumentNameAgreementTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
-                    new DummyServiceAction ("Bar", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
+                    new DummyServiceAction ("Bar", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "string")
                 }
             );
@@ -431,11 +431,11 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<ArgumentTypeConflictTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
-                    new DummyServiceAction ("Bar", new Argument[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
+                    new DummyServiceAction ("Bar", new[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "string"),
                     new StateVariable ("A_ARG_Bar_bar", "i4")
                 }
@@ -461,11 +461,11 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableAllowedValueRangeConflictTest1Class> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
-                    new DummyServiceAction ("Bar", new Argument[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
+                    new DummyServiceAction ("Bar", new[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "i4"),
                     new StateVariable ("A_ARG_Bar_bar", "i4", new AllowedValueRange ("0", "100"))
                 }
@@ -491,11 +491,11 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableAllowedValueRangeConflictTest2Class> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
-                    new DummyServiceAction ("Bar", new Argument[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
+                    new DummyServiceAction ("Bar", new[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "i4", new AllowedValueRange ("0", "100")),
                     new StateVariable ("A_ARG_Bar_bar", "i4")
                 }
@@ -521,11 +521,11 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableAllowedValueRangeConflictTest3Class> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
-                    new DummyServiceAction ("Bar", new Argument[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
+                    new DummyServiceAction ("Bar", new[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "i4", new AllowedValueRange ("0", "100")),
                     new StateVariable ("A_ARG_Bar_bar", "i4", new AllowedValueRange ("0", "101"))
                 }
@@ -551,11 +551,11 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableAllowedValuesConflictTest1Class> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
-                    new DummyServiceAction ("Bar", new Argument[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
+                    new DummyServiceAction ("Bar", new[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_bar", "string"),
                     new StateVariable ("A_ARG_Bar_bar", new string[] { "Foo", "Bar" })
                 }
@@ -581,12 +581,12 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableAllowedValuesConflictTest2Class> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
-                    new DummyServiceAction ("Bar", new Argument[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
+                    new DummyServiceAction ("Bar", new[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
-                    new StateVariable ("A_ARG_bar", new string[] { "Foo", "Bar" }),
+                new[] {
+                    new StateVariable ("A_ARG_bar", new[] { "Foo", "Bar" }),
                     new StateVariable ("A_ARG_Bar_bar", "string")
                 }
             );
@@ -611,13 +611,13 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<RelatedStateVariableAllowedValuesConflictTest3Class> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
-                    new DummyServiceAction ("Bar", new Argument[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }),
+                    new DummyServiceAction ("Bar", new[] { new Argument ("bar", "A_ARG_Bar_bar", ArgumentDirection.In) })
                 },
-                new StateVariable[] {
-                    new StateVariable ("A_ARG_bar", new string[] { "Foo", "Bar" }),
-                    new StateVariable ("A_ARG_Bar_bar", new string[] { "foo", "bar" })
+                new[] {
+                    new StateVariable ("A_ARG_bar", new[] { "Foo", "Bar" }),
+                    new StateVariable ("A_ARG_Bar_bar", new[] { "foo", "bar" })
                 }
             );
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
@@ -638,8 +638,8 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<ArgumentsTestClass> ();
             var controller = new ServiceController (
-                new ServiceAction[] {
-                    new DummyServiceAction ("Foo", new Argument[] {
+                new[] {
+                    new DummyServiceAction ("Foo", new[] {
                         new Argument ("stringArg", "A_ARG_stringArg", ArgumentDirection.In),
                         new Argument ("intArg", "A_ARG_intArg", ArgumentDirection.In),
                         new Argument ("byteArg", "A_ARG_byteArg", ArgumentDirection.In),
@@ -657,7 +657,7 @@ namespace Mono.Upnp.Tests
                         new Argument ("uriArg", "A_ARG_uriArg", ArgumentDirection.In)
                     })
                 },
-                new StateVariable[] {
+                new[] {
                     new StateVariable ("A_ARG_stringArg", "string"),
                     new StateVariable ("A_ARG_intArg", "i4"),
                     new StateVariable ("A_ARG_byteArg", "ui1"),
@@ -689,7 +689,7 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<StateVariableTestClass> ();
             var controller = new ServiceController (null,
-                new StateVariable[] {
+                new[] {
                     new DummyStateVariable ("FooChanged", "string")
                 }
             );
@@ -707,7 +707,7 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<StateVariableNameTestClass> ();
             var controller = new ServiceController (null,
-                new StateVariable[] {
+                new[] {
                     new DummyStateVariable ("fooChanged", "string")
                 }
             );
@@ -725,7 +725,7 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<StateVariableDataTypeTestClass> ();
             var controller = new ServiceController (null,
-                new StateVariable[] {
+                new[] {
                     new DummyStateVariable ("FooChanged", "string.foo")
                 }
             );
@@ -743,7 +743,7 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<StateVariableIsMulticastTestClass> ();
             var controller = new ServiceController (null,
-                new StateVariable[] {
+                new[] {
                     new DummyStateVariable ("FooChanged", "string", true)
                 }
             );
@@ -773,7 +773,7 @@ namespace Mono.Upnp.Tests
         {
             var service = new DummyService<StateVariablesTestClass> ();
             var controller = new ServiceController (null,
-                new StateVariable[] {
+                new[] {
                     new DummyStateVariable ("StringChanged", "string"),
                     new DummyStateVariable ("IntChanged", "i4"),
                     new DummyStateVariable ("ByteChanged", "ui1"),

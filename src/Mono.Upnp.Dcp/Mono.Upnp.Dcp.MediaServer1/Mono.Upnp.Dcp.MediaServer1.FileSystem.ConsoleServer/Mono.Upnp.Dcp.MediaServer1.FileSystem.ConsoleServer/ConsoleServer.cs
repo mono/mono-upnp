@@ -115,12 +115,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
             var ms_media_server_registrar = new Service<MSMediaServerRegistrar> (
                 MSMediaServerRegistrar.ServiceType, "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar", new DummyMSMediaServerRegistrar ());
             var media_server = new MediaServer (
-                new MediaServerSettings (
-                    udn,
-                    friendly_name,
-                    manufacturer,
-                    model_name) {
-                    Services = new Service[] { ms_media_server_registrar },
+                udn,
+                friendly_name,
+                manufacturer,
+                model_name,
+                new RootDeviceOptions {
+                    Services = new[] { ms_media_server_registrar },
                     ManufacturerUrl = manufacturer_url,
                     ModelDescription = model_description,
                     ModelNumber = model_number,

@@ -48,7 +48,6 @@
     <Compile Include="Mono.Upnp\Description.cs" />
     <Compile Include="Mono.Upnp\Device.cs" />
     <Compile Include="Mono.Upnp\DeviceAnnouncement.cs" />
-    <Compile Include="Mono.Upnp\DeviceSettings.cs" />
     <Compile Include="Mono.Upnp\DeviceType.cs" />
     <Compile Include="Mono.Upnp\DisposedEventArgs.cs" />
     <Compile Include="Mono.Upnp\Icon.cs" />
@@ -133,6 +132,9 @@
     <Compile Include="Mono.Upnp.Xml.Compilation\ObjectDeserializer.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompilerFactory.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateDeserializationCompilerFactory.cs" />
+    <Compile Include="Mono.Upnp.Control\StateVariableOptions.cs" />
+    <Compile Include="Mono.Upnp\DeviceOptions.cs" />
+    <Compile Include="Mono.Upnp\RootDeviceOptions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

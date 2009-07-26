@@ -64,7 +64,6 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectBasedContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\MediaServer.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1\MediaServerSettings.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionManagerController.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionManagerClient.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Album.cs" />

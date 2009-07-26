@@ -36,6 +36,10 @@ namespace Mono.Upnp
     [XmlType ("root", Protocol.DeviceSchema)]
     public class Root : Description
     {
+        protected Root ()
+        {
+        }
+        
         protected internal Root (Deserializer deserializer, Uri url)
             : base (deserializer)
         {
@@ -44,27 +48,16 @@ namespace Mono.Upnp
             UrlBase = url;
         }
         
-        public Root (DeviceSettings rootDeviceSettings)
-            : this (rootDeviceSettings, null)
+        public Root (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName)
+            : this (type, udn, friendlyName, manufacturer, modelName, null)
         {
         }
         
-        public Root (DeviceSettings rootDeviceSettings, IEnumerable<Device> embeddedDevices)
-            : this (CreateRootDevice (rootDeviceSettings, embeddedDevices))
+        public Root (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, RootDeviceOptions options)
         {
-        }
-        
-        protected Root (Device rootDevice)
-        {
-            RootDevice = rootDevice;
+            var embedded_devices = options != null ? options.EmbeddedDevices : null;
+            RootDevice = new Device (type, udn, friendlyName, manufacturer, modelName, options, embedded_devices);
             SpecVersion = new SpecVersion (1, 1);
-        }
-        
-        static Device CreateRootDevice (DeviceSettings rootDeviceSettings, IEnumerable<Device> embeddedDevices)
-        {
-            if (rootDeviceSettings == null) throw new ArgumentNullException ("rootDeviceSettings");
-            
-            return new Device (rootDeviceSettings, embeddedDevices);
         }
         
         [XmlAttribute ("configId")]

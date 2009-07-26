@@ -40,49 +40,51 @@ namespace Mono.Upnp.Tests
         static DummyRoot CreateRoot ()
         {
             return new DummyRoot (
-                new DeviceSettings (
-                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-device:1"),
-                    "uuid:fd1",
-                    "Mono.Upnp.Tests Full Device",
-                    "Mono Project",
-                    "Full Device") {
+                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-device:1"),
+                "uuid:fd1",
+                "Mono.Upnp.Tests Full Device",
+                "Mono Project",
+                "Full Device",
+                new RootDeviceOptions {
                     ManufacturerUrl = new Uri ("http://www.mono-project.org/"),
                     ModelDescription = "A device description with all optional information.",
                     ModelNumber = "1",
                     ModelUrl = new Uri ("http://www.mono-project.org/Mono.Upnp/"),
                     SerialNumber = "12345",
                     Upc = "67890",
-                    Icons = new Icon[] {
+                    Icons = new[] {
                         new DummyIcon (100, 100, 32, "image/png"),
                         new DummyIcon (100, 100, 32, "image/jpeg")
                     },
-                    Services = new Service[] {
+                    Services = new[] {
                         new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
                         new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                    },
+                    EmbeddedDevices = new[] {
+                        new Device (
+                            new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-embedded-device:1"),
+                            "uuid:fed1",
+                            "Mono.Upnp.Tests Full Embedded Device",
+                            "Mono Project",
+                            "Full Embedded Device",
+                            new DeviceOptions {
+                                ManufacturerUrl = new Uri ("http://www.mono-project.org/"),
+                                ModelDescription = "An embedded device description with all optional information.",
+                                ModelNumber = "1",
+                                ModelUrl = new Uri ("http://www.mono-project.org/Mono.Upnp/"),
+                                SerialNumber = "12345",
+                                Upc = "67890",
+                                Icons = new[] {
+                                    new DummyIcon (100, 100, 32, "image/png"),
+                                    new DummyIcon (100, 100, 32, "image/jpeg")
+                                },
+                                Services = new[] {
+                                    new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
+                                    new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                                }
+                            }
+                        )
                     }
-                }, 
-                new Device[] {
-                    new Device (new DeviceSettings (
-                        new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-embedded-device:1"),
-                        "uuid:fed1",
-                        "Mono.Upnp.Tests Full Embedded Device",
-                        "Mono Project",
-                        "Full Embedded Device") {
-                        ManufacturerUrl = new Uri ("http://www.mono-project.org/"),
-                        ModelDescription = "An embedded device description with all optional information.",
-                        ModelNumber = "1",
-                        ModelUrl = new Uri ("http://www.mono-project.org/Mono.Upnp/"),
-                        SerialNumber = "12345",
-                        Upc = "67890",
-                        Icons = new Icon[] {
-                            new DummyIcon (100, 100, 32, "image/png"),
-                            new DummyIcon (100, 100, 32, "image/jpeg")
-                        },
-                        Services = new Service[] {
-                            new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
-                            new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
-                        }
-                    })
                 }
             );
         }

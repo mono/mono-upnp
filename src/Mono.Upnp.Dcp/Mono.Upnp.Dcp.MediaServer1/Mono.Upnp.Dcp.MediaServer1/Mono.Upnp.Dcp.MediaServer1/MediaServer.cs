@@ -39,9 +39,13 @@ namespace Mono.Upnp.Dcp.MediaServer1
         readonly Server server;
         readonly ContentDirectory content_directory;
         
-        public MediaServer (MediaServerSettings settings, ConnectionManager connectionManager, ContentDirectory contentDirectory)
+        public MediaServer (string udn, string friendlyName, string manufacturer, string modelName, ConnectionManager connectionManager, ContentDirectory contentDirectory)
+            : this (udn, friendlyName, manufacturer, modelName, null, connectionManager, contentDirectory)
         {
-            if (settings == null) throw new ArgumentNullException ("settings");
+        }
+        
+        public MediaServer (string udn, string friendlyName, string manufacturer, string modelName, RootDeviceOptions options, ConnectionManager connectionManager, ContentDirectory contentDirectory)
+        {
             if (connectionManager == null) throw new ArgumentNullException ("connnectionManager");
             if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
             
@@ -49,8 +53,8 @@ namespace Mono.Upnp.Dcp.MediaServer1
             
             var connectionManagerService = new Service<ConnectionManager> (ConnectionManager.ServiceType, "urn:upnp-org:serviceId:ConnectionManager", connectionManager);
             var contentDirectoryService = new Service<ContentDirectory> (ContentDirectory.ServiceType, "urn:upnp-org:serviceId:ContentDirectory", contentDirectory);
-            settings.Services = Combine (new Service[] { connectionManagerService, contentDirectoryService }, settings.Services);
-            server = new Server (new Root (settings));
+            options.Services = Combine (new Service[] { connectionManagerService, contentDirectoryService }, options.Services);
+            server = new Server (new Root (DeviceType, udn, friendlyName, manufacturer, modelName, options));
         }
         
         public void Start ()

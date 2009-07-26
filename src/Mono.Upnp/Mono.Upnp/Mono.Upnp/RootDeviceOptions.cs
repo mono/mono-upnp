@@ -1,5 +1,5 @@
 // 
-// DummyStateVariable.cs
+// RootDeviceOptions.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -24,22 +24,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
+using System.Collections.Generic;
 
-namespace Mono.Upnp.Control.Tests
+namespace Mono.Upnp
 {
-    public class DummyStateVariable : StateVariable
+    public class RootDeviceOptions : DeviceOptions
     {
-        static readonly DummyStateVariableEventer eventer = new DummyStateVariableEventer ();
-        
-        public DummyStateVariable (string name, string dataType)
-            : this (name, dataType, false)
-        {
-        }
-        
-        public DummyStateVariable (string name, string dataType, bool isMulticast)
-            : base (name, dataType, new StateVariableOptions { Eventer = eventer, IsMulticast = isMulticast })
-        {
-        }
+        public IEnumerable<Device> EmbeddedDevices { get; set; }
     }
 }

@@ -44,12 +44,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
             var content_directory = new FileSystemContentDirectory (path);
             
             media_server = new MediaServer (
-                new MediaServerSettings (
-                    "uuid:mono-upnp-dcp-mediaserver1-filesystem-test",
-                    "Mono.Upnp Test FileSystem MediaServer",
-                    "Mono Project",
-                    "FileSystem MediaServer"
-                ),
+                "uuid:mono-upnp-dcp-mediaserver1-filesystem-test",
+                "Mono.Upnp Test FileSystem MediaServer",
+                "Mono Project",
+                "FileSystem MediaServer",
                 connection_manager,
                 content_directory
             );

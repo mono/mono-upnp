@@ -41,10 +41,10 @@ namespace Mono.Upnp.Control.Tests
         static ServiceController CreateServiceController ()
         {
             return new ServiceController (
-                new ServiceAction[] {
+                new[] {
                     new DummyServiceAction (
                         "Browse",
-                        new Argument[] {
+                        new[] {
                             new Argument ("browseFlag", "A_ARG_TYPE_BrowseFlag", ArgumentDirection.In),
                             new Argument ("offset", "A_ARG_TYPE_Offset", ArgumentDirection.In),
                             new Argument ("requestCount", "A_ARG_TYPE_RequestCount", ArgumentDirection.In),
@@ -54,7 +54,7 @@ namespace Mono.Upnp.Control.Tests
                     ),
                     new DummyServiceAction (
                         "Search",
-                        new Argument[] {
+                        new[] {
                             new Argument ("searchFlag", "A_ARG_TYPE_SearchFlag", ArgumentDirection.In),
                             new Argument ("offset", "A_ARG_TYPE_Offset", ArgumentDirection.In),
                             new Argument ("requestCount", "A_ARG_TYPE_RequestCount", ArgumentDirection.In),
@@ -63,11 +63,11 @@ namespace Mono.Upnp.Control.Tests
                         }
                     ),
                 },
-                new StateVariable[] {
-                    new StateVariable ("A_ARG_TYPE_BrowseFlag", new string[] { "BrowseMetadata", "BrowseObjects" }),
-                    new StateVariable ("A_ARG_TYPE_SearchFlag", new string[] { "SearchMetadata", "SearchObjects" }),
+                new[] {
+                    new StateVariable ("A_ARG_TYPE_BrowseFlag", new[] { "BrowseMetadata", "BrowseObjects" }),
+                    new StateVariable ("A_ARG_TYPE_SearchFlag", new[] { "SearchMetadata", "SearchObjects" }),
                     new StateVariable ("A_ARG_TYPE_Offset", "ui4"),
-                    new StateVariable ("A_ARG_TYPE_RequestCount", "ui4", new AllowedValueRange ("1", "100"), "50"),
+                    new StateVariable ("A_ARG_TYPE_RequestCount", "ui4", new AllowedValueRange ("1", "100"), new StateVariableOptions { DefaultValue = "50" }),
                     new StateVariable ("A_ARG_TYPE_ResultCount", "ui4"),
                     new StateVariable ("A_ARG_TYPE_Result", "string"),
                     new DummyStateVariable ("SystemId", "ui4")

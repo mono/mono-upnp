@@ -1,10 +1,10 @@
 // 
-// MediaServerSettings.cs
+// StateVariableOptions.cs
 //  
 // Author:
-//       Scott Thomas <lunchtimemama@gmail.com>
+//       Scott Peterson <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Thomas
+// Copyright (c) 2009 Scott Peterson
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,20 +24,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-
-namespace Mono.Upnp.Dcp.MediaServer1
+namespace Mono.Upnp.Control
 {
-    public class MediaServerSettings : DeviceSettings
+    public class StateVariableOptions
     {
-        readonly string udn;
-        readonly string friendly_name;
-        readonly string manufacturer;
-        readonly string model_name;
+        public string DefaultValue { get; set; }
         
-        public MediaServerSettings (string udn, string friendlyName, string manufacturer, string modelName)
-            : base (MediaServer.DeviceType, udn, friendlyName, manufacturer, modelName)
-        {
-        }
+        public StateVariableEventer Eventer { get; set; }
+        
+        public bool IsMulticast { get; set; }
     }
 }

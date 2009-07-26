@@ -200,13 +200,13 @@ namespace Mono.Upnp.Tests
         public void ControlTest ()
         {
             var root = new Root (
-                new DeviceSettings (
-                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
-                    "uuid:d1",
-                    "Mono.Upnp.Tests Device",
-                    "Mono Project",
-                    "Device") {
-                    Services = new Service [] {
+                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                "uuid:d1",
+                "Mono.Upnp.Tests Device",
+                "Mono Project",
+                "Device",
+                new RootDeviceOptions {
+                    Services = new[] {
                         new Service<ControlTestClass> (
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
                             "urn:upnp-org:serviceId:testService1",
@@ -293,13 +293,13 @@ namespace Mono.Upnp.Tests
         {
             var service = new EventTestClass ();
             var root = new Root (
-                new DeviceSettings (
-                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
-                    "uuid:d1",
-                    "Mono.Upnp.Tests Device",
-                    "Mono Project",
-                    "Device") {
-                    Services = new Service [] {
+                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                "uuid:d1",
+                "Mono.Upnp.Tests Device",
+                "Mono Project",
+                "Device",
+                new RootDeviceOptions {
+                    Services = new[] {
                         new Service<EventTestClass> (
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
                             "urn:upnp-org:serviceId:testService1",
@@ -330,13 +330,13 @@ namespace Mono.Upnp.Tests
         static Root CreateRoot ()
         {
             return new DummyRoot (
-                new DeviceSettings (
-                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
-                    "uuid:d1",
-                    "Mono.Upnp.Tests Device",
-                    "Mono Project",
-                    "Device") {
-                    Services = new Service[] {
+                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                "uuid:d1",
+                "Mono.Upnp.Tests Device",
+                "Mono Project",
+                "Device",
+                new RootDeviceOptions {
+                    Services = new[] {
                         new DummyService (
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
                             "urn:upnp-org:serviceId:testService1"

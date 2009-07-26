@@ -1,5 +1,5 @@
 // 
-// DeviceSettings.cs
+// DeviceOptions.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -29,54 +29,8 @@ using System.Collections.Generic;
 
 namespace Mono.Upnp
 {
-    public class DeviceSettings
+    public class DeviceOptions
     {
-        readonly DeviceType type;
-        readonly string udn;
-        readonly string friendly_name;
-        readonly string manufacturer;
-        readonly string model_name;
-        
-        protected DeviceSettings ()
-        {
-        }
-        
-        public DeviceSettings (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName)
-        {
-            if (type == null) throw new ArgumentNullException ("type");
-            if (udn == null) throw new ArgumentNullException ("udn");
-            if (!udn.StartsWith ("uuid:")) throw new ArgumentException (@"The udn must begin with ""uuid:"".", "udn");
-            if (friendlyName == null) throw new ArgumentNullException ("friendlyName");
-            if (manufacturer == null) throw new ArgumentException ("manufacturer");
-            if (modelName == null) throw new ArgumentNullException ("modelName");
-            
-            this.type = type;
-            this.udn = udn;
-            this.friendly_name = friendlyName;
-            this.manufacturer = manufacturer;
-            this.model_name = modelName;
-        }
-        
-        public DeviceType Type {
-            get { return type; }
-        }
-        
-        public string Udn {
-            get { return udn; }
-        }
-        
-        public string FriendlyName {
-            get { return friendly_name; }
-        }
-        
-        public string Manufacturer {
-            get { return manufacturer; }
-        }
-        
-        public string ModelName {
-            get { return model_name; }
-        }
-        
         public IEnumerable<Service> Services { get; set; }
         
         public IEnumerable<Icon> Icons { get; set; }

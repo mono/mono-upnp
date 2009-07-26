@@ -53,28 +53,24 @@ namespace Mono.Upnp.Control
             this.controller = serviceController;
         }
         
-        public StateVariable (string name, string dataType, StateVariableEventer eventer)
-            : this (name, dataType, eventer, false)
-        {
-        }
-        
-        public StateVariable (string name, string dataType, StateVariableEventer eventer, bool isMulticast)
-            : this (name, dataType, null, true, isMulticast)
-        {
-            if (eventer == null) throw new ArgumentNullException ("eventer");
-            
-            // TODO do we need to store this to unlink this event?
-            eventer.StateVariableUpdated += OnStateVariableUpdated;
-        }
-        
         public StateVariable (string name, string dataType)
-            : this (name, dataType, null, false, false)
         {
+            if (name == null) throw new ArgumentNullException ("name");
+            if (dataType == null) throw new ArgumentNullException ("dataType");
+            
+            Name = name;
+            DataType = dataType;
         }
         
-        public StateVariable (string name, string dataType, string defaultValue)
-            : this (name, dataType, defaultValue, false, false)
+        public StateVariable (string name, string dataType, StateVariableOptions options)
+            : this (name, dataType)
         {
+            if (options != null) {
+                DefaultValue = options.DefaultValue;
+                if (options.Eventer != null) {
+                    SetEventer (options.Eventer, options.IsMulticast);
+                }
+            }
         }
         
         public StateVariable (string name, IEnumerable<string> allowedValues)
@@ -82,8 +78,8 @@ namespace Mono.Upnp.Control
         {
         }
         
-        public StateVariable (string name, IEnumerable<string> allowedValues, string defaultValue)
-            : this (name, "string", defaultValue, false, false)
+        public StateVariable (string name, IEnumerable<string> allowedValues, StateVariableOptions options)
+            : this (name, "string", options)
         {
             allowed_values = Helper.MakeReadOnlyCopy (allowedValues);
         }
@@ -93,22 +89,10 @@ namespace Mono.Upnp.Control
         {
         }
         
-        public StateVariable (string name, string dataType, AllowedValueRange allowedValueRange, string defaultValue)
-            : this (name, dataType, defaultValue, false, false)
+        public StateVariable (string name, string dataType, AllowedValueRange allowedValueRange, StateVariableOptions options)
+            : this (name, dataType, options)
         {
             AllowedValueRange = allowedValueRange;
-        }
-        
-        StateVariable (string name, string dataType, string defaultValue, bool sendsEvents, bool isMulticast)
-        {
-            if (name == null) throw new ArgumentNullException ("name");
-            if (dataType == null) throw new ArgumentNullException ("dataType");
-            
-            Name = name;
-            DataType = dataType;
-            DefaultValue = defaultValue;
-            SendsEvents = sendsEvents;
-            IsMulticast = isMulticast;
         }
         
         [XmlElement ("name")]
@@ -181,6 +165,13 @@ namespace Mono.Upnp.Control
                     handler (this, new StateVariableChangedArgs<string> (value));
                 }
             }
+        }
+        
+        internal void SetEventer (StateVariableEventer eventer, bool isMulticast)
+        {
+            eventer.StateVariableUpdated += OnStateVariableUpdated;
+            SendsEvents = true;
+            IsMulticast = isMulticast;
         }
         
         protected internal virtual void Initialize (ServiceController serviceController)

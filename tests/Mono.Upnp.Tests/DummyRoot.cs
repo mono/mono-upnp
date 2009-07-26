@@ -31,15 +31,14 @@ namespace Mono.Upnp.Tests
 {
     public class DummyRoot : Root
     {
-        public DummyRoot (DeviceSettings rootDeviceSettings)
-            : this (rootDeviceSettings, null)
+        public DummyRoot (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName)
+            : this (type, udn, friendlyName, manufacturer, modelName, null)
         {
         }
         
-        public DummyRoot (DeviceSettings rootDeviceSettings, IEnumerable<Device> embeddedDevices)
-            : base (rootDeviceSettings, embeddedDevices)
+        public DummyRoot (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, RootDeviceOptions options)
+            : base (type, udn, friendlyName, manufacturer, modelName, options)
         {
-            ConfigurationId = "1";
         }
         
         public void Initialize ()

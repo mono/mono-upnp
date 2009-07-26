@@ -50,7 +50,7 @@ namespace Mono.Upnp.Tests
         public void InitialUnicastEventTest ()
         {
             var eventer = new DummyStateVariableEventer ();
-            var root = CreateRoot (CreateServiceController (new StateVariable ("Foo", "string", eventer)));
+            var root = CreateRoot (CreateServiceController (new StateVariable ("Foo", "string", new StateVariableOptions { Eventer = eventer })));
             eventer.SetValue ("foo");
             
             using (var server = new Server (root)) {
@@ -80,8 +80,8 @@ namespace Mono.Upnp.Tests
             var eventer1 = new DummyStateVariableEventer ();
             var eventer2 = new DummyStateVariableEventer ();
             var root = CreateRoot (CreateServiceController (
-                new StateVariable ("Foo", "string", eventer1),
-                new StateVariable ("Bar", "string", eventer2)
+                new StateVariable ("Foo", "string", new StateVariableOptions { Eventer = eventer1 }),
+                new StateVariable ("Bar", "string", new StateVariableOptions { Eventer = eventer2 })
             ));
             eventer1.SetValue ("foo");
             eventer2.SetValue ("bar");
@@ -121,8 +121,8 @@ namespace Mono.Upnp.Tests
             var eventer1 = new DummyStateVariableEventer ();
             var eventer2 = new DummyStateVariableEventer ();
             var root = CreateRoot (CreateServiceController (
-                new StateVariable ("Foo", "string", eventer1),
-                new StateVariable ("Bar", "string", eventer2)
+                new StateVariable ("Foo", "string", new StateVariableOptions { Eventer = eventer1 }),
+                new StateVariable ("Bar", "string", new StateVariableOptions { Eventer = eventer2 })
             ));
             eventer1.SetValue ("foo");
             eventer2.SetValue ("bar");
@@ -190,7 +190,7 @@ namespace Mono.Upnp.Tests
         {
             string sid = null;
             var eventer = new DummyStateVariableEventer ();
-            var root = CreateRoot (CreateServiceController (new StateVariable ("Foo", "string", eventer)));
+            var root = CreateRoot (CreateServiceController (new StateVariable ("Foo", "string", new StateVariableOptions { Eventer = eventer })));
             eventer.SetValue ("foo");
             
             using (var server = new Server (root)) {
@@ -305,13 +305,13 @@ namespace Mono.Upnp.Tests
         static Root CreateRoot (ServiceController controller)
         {
             return new DummyRoot (
-                new DeviceSettings (
-                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
-                    "uuid:d1",
-                    "Mono.Upnp.Tests Device",
-                    "Mono Project",
-                    "Device") {
-                    Services = new Service[] {
+                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                "uuid:d1",
+                "Mono.Upnp.Tests Device",
+                "Mono Project",
+                "Device",
+                new RootDeviceOptions {
+                    Services = new[] {
                         new Service (
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
                             "urn:upnp-org:serviceId:testService1",
@@ -330,31 +330,33 @@ namespace Mono.Upnp.Tests
         static Root CreateRoot (IEnumerable<Icon> icons1, IEnumerable<Icon> icons2)
         {
             return new DummyRoot (
-                new DeviceSettings (
-                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
-                    "uuid:d1",
-                    "Mono.Upnp.Tests Device",
-                    "Mono Project",
-                    "Device") {
+                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                "uuid:d1",
+                "Mono.Upnp.Tests Device",
+                "Mono Project",
+                "Device",
+                new RootDeviceOptions {
                     Icons = icons1,
-                    Services = new Service[] {
+                    Services = new[] {
                         new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
                         new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                    },
+                    EmbeddedDevices = new[] {
+                        new Device (
+                            new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-embedded-device:1"),
+                            "uuid:ed1",
+                            "Mono.Upnp.Tests Embedded Device",
+                            "Mono Project",
+                            "Embedded Device",
+                            new DeviceOptions {
+                                Icons = icons2,
+                                Services = new[] {
+                                    new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
+                                    new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                                }
+                            }
+                        )
                     }
-                }, 
-                new Device[] {
-                    new Device (new DeviceSettings (
-                        new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-embedded-device:1"),
-                        "uuid:ed1",
-                        "Mono.Upnp.Tests Embedded Device",
-                        "Mono Project",
-                        "Embedded Device") {
-                        Icons = icons2,
-                        Services = new Service[] {
-                            new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
-                            new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
-                        }
-                    })
                 }
             );
         }
@@ -381,13 +383,13 @@ namespace Mono.Upnp.Tests
         {
             var controller = CreateServiceController ();
             var root = new DummyRoot (
-                new DeviceSettings (
-                    new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
-                    "uuid:d1",
-                    "Mono.Upnp.Tests Device",
-                    "Mono Project",
-                    "Device") {
-                    Services = new Service[] {
+                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                "uuid:d1",
+                "Mono.Upnp.Tests Device",
+                "Mono Project",
+                "Device",
+                new RootDeviceOptions {
+                    Services = new[] {
                         new Service (
                             new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
                             "urn:upnp-org:serviceId:testService1",

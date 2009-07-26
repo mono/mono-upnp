@@ -175,16 +175,16 @@ namespace Mono.Upnp.Internal
             
             if (allowed_values != null) {
                 state_variable_info = new StateVariableInfo {
-                    StateVariable = new StateVariable (name, allowed_values, default_value),
+                    StateVariable = new StateVariable (name, allowed_values, new StateVariableOptions { DefaultValue = default_value }),
                     Type = parameterInfo.ParameterType
                 };
             } else if (allowed_value_range != null) {
                 state_variable_info = new StateVariableInfo {
-                    StateVariable = new StateVariable (name, data_type, allowed_value_range, default_value)
+                    StateVariable = new StateVariable (name, data_type, allowed_value_range, new StateVariableOptions { DefaultValue = default_value })
                 };
             } else {
                 state_variable_info = new StateVariableInfo {
-                    StateVariable = new StateVariable (name, data_type, default_value)
+                    StateVariable = new StateVariable (name, data_type, new StateVariableOptions { DefaultValue = default_value })
                 };
             }
             stateVariables[name] = state_variable_info;
@@ -242,39 +242,49 @@ namespace Mono.Upnp.Internal
             foreach (var state_variable_info in stateVariables.Values) {
                 yield return state_variable_info.StateVariable;
             }
+            
             foreach (var event_info in typeof (T).GetEvents (BindingFlags.Public | BindingFlags.Instance)) {
-                var state_variable = BuildStateVariable (event_info, service);
+                var state_variable = BuildStateVariable (event_info, service, stateVariables);
                 if (state_variable != null) {
                     yield return state_variable;
                 }
             }
         }
         
-        static StateVariable BuildStateVariable (EventInfo eventInfo, object service)
+        static StateVariable BuildStateVariable (EventInfo eventInfo, object service, Dictionary<string, StateVariableInfo> stateVariables)
         {
             var attributes = eventInfo.GetCustomAttributes (typeof (UpnpStateVariableAttribute), false);
             if (attributes.Length != 0) {
-                var type = eventInfo.EventHandlerType;
-                if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (EventHandler<>)) {
-                    // TODO throw
-                    return null;
-                }
-                type = type.GetGenericArguments ()[0];
-                if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (StateVariableChangedArgs<>)) {
-                    // TODO throw
-                    return null;
-                }
-                type = type.GetGenericArguments ()[0];
-                var eventer = new Eventer ();
-                var method = Eventer.HandlerMethod.MakeGenericMethod (new Type[] { type });
-                var handler = Delegate.CreateDelegate (eventInfo.EventHandlerType, eventer, method);
-                eventInfo.AddEventHandler (service, handler);
-                var attribute = (UpnpStateVariableAttribute)attributes[0];
-                var name = string.IsNullOrEmpty (attribute.Name) ? eventInfo.Name : attribute.Name;
-                var data_type = string.IsNullOrEmpty (attribute.DataType) ? GetDataType (type) : attribute.DataType;
-                return new StateVariable (name, data_type, eventer, attribute.IsMulticast);
-            } else {
                 return null;
+            }
+            
+            var type = eventInfo.EventHandlerType;
+            if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (EventHandler<>)) {
+                // TODO throw
+                return null;
+            }
+            
+            type = type.GetGenericArguments ()[0];
+            if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (StateVariableChangedArgs<>)) {
+                // TODO throw
+                return null;
+            }
+            
+            type = type.GetGenericArguments ()[0];
+            var eventer = new Eventer ();
+            var method = Eventer.HandlerMethod.MakeGenericMethod (new[] { type });
+            var handler = Delegate.CreateDelegate (eventInfo.EventHandlerType, eventer, method);
+            eventInfo.AddEventHandler (service, handler);
+            var attribute = (UpnpStateVariableAttribute)attributes[0];
+            var name = string.IsNullOrEmpty (attribute.Name) ? eventInfo.Name : attribute.Name;
+            var data_type = string.IsNullOrEmpty (attribute.DataType) ? GetDataType (type) : attribute.DataType;
+            StateVariableInfo info;
+            if (stateVariables.TryGetValue (name, out info)) {
+                // TODO check type
+                info.StateVariable.SetEventer (eventer, attribute.IsMulticast);
+                return null;
+            } else {
+                return new StateVariable (name, data_type, new StateVariableOptions { Eventer = eventer, IsMulticast = attribute.IsMulticast });
             }
         }
         

@@ -42,25 +42,40 @@ namespace Mono.Upnp
         IList<Service> services;
         IList<Icon> icons;
         
-        public Device (DeviceSettings settings)
-            : this (settings, null)
+        public Device (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName)
+            : this (type, udn, friendlyName, manufacturer, modelName, null)
         {
         }
         
-        protected internal Device (DeviceSettings settings, IEnumerable<Device> devices)
-            : this (devices, GetServices (settings), GetIcons (settings))
+        public Device (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, DeviceOptions options)
+            : this (null, GetServices (options), GetIcons (options))
         {
-            Type = settings.Type;
-            Udn = settings.Udn;
-            FriendlyName = settings.FriendlyName;
-            Manufacturer = settings.Manufacturer;
-            ManufacturerUrl = settings.ManufacturerUrl;
-            ModelDescription = settings.ModelDescription;
-            ModelName = settings.ModelName;
-            ModelNumber = settings.ModelNumber;
-            ModelUrl = settings.ModelUrl;
-            SerialNumber = settings.SerialNumber;
-            Upc = settings.Upc;
+            if (type == null) throw new ArgumentNullException ("type");
+            if (udn == null) throw new ArgumentNullException ("udn");
+            if (!udn.StartsWith ("uuid:")) throw new ArgumentException (@"The udn must begin with ""uuid:"".", "udn");
+            if (friendlyName == null) throw new ArgumentNullException ("friendlyName");
+            if (manufacturer == null) throw new ArgumentException ("manufacturer");
+            if (modelName == null) throw new ArgumentNullException ("modelName");
+            
+            Type = type;
+            Udn = udn;
+            FriendlyName = friendlyName;
+            Manufacturer = manufacturer;
+            ModelName = modelName;
+            
+            if (options != null) {
+                ManufacturerUrl = options.ManufacturerUrl;
+                ModelDescription = options.ModelDescription;
+                ModelNumber = options.ModelNumber;
+                ModelUrl = options.ModelUrl;
+                SerialNumber = options.SerialNumber;
+                Upc = options.Upc;
+            }
+        }
+        
+        protected internal Device (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, DeviceOptions options, IEnumerable<Device> devices)
+            : this (devices, GetServices (options), GetIcons (options))
+        {
         }
         
         protected internal Device (IEnumerable<Device> devices, IEnumerable<Service> services, IEnumerable<Icon> icons)
@@ -78,16 +93,22 @@ namespace Mono.Upnp
             icons = new List<Icon> ();
         }
         
-        static IEnumerable<Service> GetServices (DeviceSettings settings)
+        static IEnumerable<Service> GetServices (DeviceOptions options)
         {
-            if (settings == null) throw new ArgumentNullException ("settings");
-            
-            return settings.Services;
+            if (options != null) {
+                return options.Services;
+            } else {
+                return null;
+            }
         }
         
-        static IEnumerable<Icon> GetIcons (DeviceSettings settings)
+        static IEnumerable<Icon> GetIcons (DeviceOptions options)
         {
-            return settings.Icons;
+            if (options != null) {
+                return options.Icons;
+            } else {
+                return null;
+            }
         }
         
         [XmlArray ("iconList", OmitIfEmpty = true)]
