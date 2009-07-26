@@ -48,7 +48,12 @@ namespace Mono.Upnp
         }
         
         public Device (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, DeviceOptions options)
-            : this (null, GetServices (options), GetIcons (options))
+            : this (type, udn, friendlyName, manufacturer, modelName, options, null)
+        {
+        }
+        
+        protected internal Device (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, DeviceOptions options, IEnumerable<Device> devices)
+            : this (devices, GetServices (options), GetIcons (options))
         {
             if (type == null) throw new ArgumentNullException ("type");
             if (udn == null) throw new ArgumentNullException ("udn");
@@ -71,11 +76,6 @@ namespace Mono.Upnp
                 SerialNumber = options.SerialNumber;
                 Upc = options.Upc;
             }
-        }
-        
-        protected internal Device (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, DeviceOptions options, IEnumerable<Device> devices)
-            : this (devices, GetServices (options), GetIcons (options))
-        {
         }
         
         protected internal Device (IEnumerable<Device> devices, IEnumerable<Service> services, IEnumerable<Icon> icons)

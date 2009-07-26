@@ -34,7 +34,6 @@ namespace Mono.Upnp.Internal
 {
     static class ServiceControllerBuilder
     {
-        // TODO this file could use some clean-up (mainly readability)
         class Eventer : StateVariableEventer
         {
             public static readonly MethodInfo HandlerMethod = typeof (Eventer).GetMethod ("Handler");
@@ -254,7 +253,7 @@ namespace Mono.Upnp.Internal
         static StateVariable BuildStateVariable (EventInfo eventInfo, object service, Dictionary<string, StateVariableInfo> stateVariables)
         {
             var attributes = eventInfo.GetCustomAttributes (typeof (UpnpStateVariableAttribute), false);
-            if (attributes.Length != 0) {
+            if (attributes.Length == 0) {
                 return null;
             }
             

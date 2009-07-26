@@ -115,6 +115,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                           int requestCount, string sortCriteria, out int numberReturned,
                                           out int totalMatches, out string updateId);
         
+        [UpnpStateVariable ("SystemUpdateID")]
+        public virtual event EventHandler<StateVariableChangedArgs<string>> SystemUpdateIdChanged;
+        
         public void Dispose ()
         {
             Dispose (true);

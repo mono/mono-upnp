@@ -49,6 +49,10 @@ namespace Mono.Upnp.Dcp.MediaServer1
             if (connectionManager == null) throw new ArgumentNullException ("connnectionManager");
             if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
             
+            if (options == null) {
+                options = new RootDeviceOptions ();
+            }
+            
             this.content_directory = contentDirectory;
             
             var connectionManagerService = new Service<ConnectionManager> (ConnectionManager.ServiceType, "urn:upnp-org:serviceId:ConnectionManager", connectionManager);
