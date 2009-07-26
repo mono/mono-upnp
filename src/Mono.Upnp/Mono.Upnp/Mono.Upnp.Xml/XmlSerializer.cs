@@ -52,7 +52,7 @@ namespace Mono.Upnp.Xml
             Serialize (obj, stream, null);
         }
         
-        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationSettings settings)
+        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationOptions settings)
         {
             if (settings == null) {
                 serializer.Serialize (obj, stream);
@@ -67,7 +67,7 @@ namespace Mono.Upnp.Xml
             return GetBytes (obj, null);
         }
         
-        public byte[] GetBytes<TObject> (TObject obj, XmlSerializationSettings settings)
+        public byte[] GetBytes<TObject> (TObject obj, XmlSerializationOptions settings)
         {
             if (settings == null) {
                 return serializer.GetBytes (obj);
@@ -82,7 +82,7 @@ namespace Mono.Upnp.Xml
             return GetString (obj, null);
         }
         
-        public string GetString<TObject> (TObject obj, XmlSerializationSettings settings)
+        public string GetString<TObject> (TObject obj, XmlSerializationOptions settings)
         {
             if (settings == null) {
                 return serializer.GetString (obj);

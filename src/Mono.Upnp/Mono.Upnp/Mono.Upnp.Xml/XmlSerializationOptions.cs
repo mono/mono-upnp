@@ -1,5 +1,5 @@
 // 
-// XmlSerializationSettings.cs
+// XmlSerializationOptions.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -29,7 +29,7 @@ using System.Text;
 
 namespace Mono.Upnp.Xml
 {
-    public class XmlSerializationSettings
+    public class XmlSerializationOptions
     {
         XmlDeclarationType xml_declaration_type;
         
@@ -46,7 +46,7 @@ namespace Mono.Upnp.Xml
         }
     }
     
-    public class XmlSerializationSettings<TContext> : XmlSerializationSettings
+    public class XmlSerializationSettings<TContext> : XmlSerializationOptions
     {
         public TContext Context { get; set; }
     }
