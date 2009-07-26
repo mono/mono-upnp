@@ -892,7 +892,7 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual (
                 @"<?xml version=""1.0"" encoding=""utf-8""?><SerializationContextTestClass depth=""0""><Child depth=""1""><Child depth=""2"" /></Child></SerializationContextTestClass>",
                 serializer.GetString (new SerializationContextTestClass { Child = new SerializationContextTestClass { Child = new SerializationContextTestClass () } },
-                new XmlSerializationSettings<int> { Context = 0 }));
+                new XmlSerializationOptions<int> { Context = 0 }));
         }
     }
 }

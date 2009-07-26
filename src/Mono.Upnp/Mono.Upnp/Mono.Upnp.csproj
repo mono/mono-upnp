@@ -125,7 +125,6 @@
     <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompilerFactory.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompilerFactory.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlDeclarationType.cs" />
-    <Compile Include="Mono.Upnp.Xml\XmlSerializationSettings.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateDeserializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\Deserializer.cs" />
@@ -135,6 +134,7 @@
     <Compile Include="Mono.Upnp.Control\StateVariableOptions.cs" />
     <Compile Include="Mono.Upnp\DeviceOptions.cs" />
     <Compile Include="Mono.Upnp\RootDeviceOptions.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlSerializationOptions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

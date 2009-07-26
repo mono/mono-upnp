@@ -792,5 +792,32 @@ namespace Mono.Upnp.Tests
             );
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
         }
+        
+        class EventedRelatedStateVariableTestClass
+        {
+            [UpnpAction]
+            public void GetFoo ([UpnpRelatedStateVariable ("Foo")] out string foo)
+            {
+                foo = null;
+            }
+            
+            [UpnpStateVariable ("Foo")]
+            public event EventHandler<StateVariableChangedArgs<string>> FooChanged;
+        }
+        
+        [Test]
+        public void EventedRelatedStateVariableTest ()
+        {
+            var service = new DummyService<EventedRelatedStateVariableTestClass> ();
+            var controller = new ServiceController (
+                new[] {
+                    new DummyServiceAction ("GetFoo", new[] { new Argument ("foo", "Foo", ArgumentDirection.Out) })
+                },
+                new[] {
+                    new DummyStateVariable ("Foo", "string")
+                }
+            );
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
     }
 }
