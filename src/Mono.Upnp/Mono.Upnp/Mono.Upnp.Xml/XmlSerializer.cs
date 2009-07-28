@@ -30,7 +30,6 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-using Mono.Upnp.Internal;
 using Mono.Upnp.Xml.Compilation;
 
 namespace Mono.Upnp.Xml
@@ -135,7 +134,8 @@ namespace Mono.Upnp.Xml
                 options = new XmlSerializationOptions<TContext> ();
             }
             
-            using (var writer = new EscapingXmlTextWriter (stream, options.Encoding)) {
+            using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
+                Encoding = options.Encoding ?? utf8, OmitXmlDeclaration = true })) {
                 WriteXmlDeclaration (writer, options.XmlDeclarationType);
                 SerializeCore (obj, writer, options.Context);
             }
@@ -153,7 +153,8 @@ namespace Mono.Upnp.Xml
             }
             
             using (var stream = new MemoryStream ()) {
-                using (var writer = new EscapingXmlTextWriter (stream, options.Encoding)) {
+                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
+                    Encoding = options.Encoding ?? utf8, OmitXmlDeclaration = true })) {
                     WriteXmlDeclaration (writer, options.XmlDeclarationType);
                     SerializeCore (obj, writer, options.Context);
                 }

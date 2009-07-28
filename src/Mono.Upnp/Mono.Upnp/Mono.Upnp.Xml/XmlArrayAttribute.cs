@@ -61,5 +61,7 @@ namespace Mono.Upnp.Xml
         public bool OmitIfNull { get; set; }
         
         public bool OmitIfEmpty { get; set; }
+        
+        public int Order { get; set; }
     }
 }

@@ -59,5 +59,7 @@ namespace Mono.Upnp.Xml
         public string Prefix { get; set; }
         
         public bool OmitIfNull { get; set; }
+        
+        public int Order { get; set; }
     }
 }

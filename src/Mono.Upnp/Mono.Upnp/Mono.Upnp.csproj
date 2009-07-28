@@ -135,7 +135,6 @@
     <Compile Include="Mono.Upnp\DeviceOptions.cs" />
     <Compile Include="Mono.Upnp\RootDeviceOptions.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlSerializationOptions.cs" />
-    <Compile Include="Mono.Upnp.Internal\EscapingXmlTextWriter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
