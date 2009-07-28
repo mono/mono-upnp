@@ -55,6 +55,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             content_directory.OnSystemUpdate ();
         }
+        
+        [XmlElement ("class", Schemas.UpnpSchema)]
+        public virtual Class Class {
+            get { return @class; }
+            set { @class = value; }
+        }
 
         [XmlAttribute ("id")]
         public virtual string Id { get; protected set; }
@@ -92,12 +98,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public virtual string Creator {
             get { return creator; }
             set { creator = value; }
-        }
-        
-        [XmlElement ("class", Schemas.UpnpSchema)]
-        public virtual Class Class {
-            get { return @class; }
-            set { @class = value; }
         }
         
         [XmlElement ("writeStatus", Schemas.UpnpSchema, OmitIfNull = true)]

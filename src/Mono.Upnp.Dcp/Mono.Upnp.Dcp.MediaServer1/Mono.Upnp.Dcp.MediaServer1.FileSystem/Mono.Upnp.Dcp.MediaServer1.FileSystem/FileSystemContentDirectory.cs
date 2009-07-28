@@ -88,7 +88,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         {
             if (path == null) throw new ArgumentNullException ("path");
             
-            CreateFolder (path);
+            var root = new StorageFolder (this) {
+                IsRestricted = true,
+                Title = "root",
+                ChildCount = 1
+            };
+            object_cache.Add (new ObjectInfo (root, null));
+            object_hierarchy.Add ("0", new Range (1, 2));
+            CreateFolder (path, root);
             
             listener = new HttpListener { IgnoreWriteExceptions = true };
             listener.Prefixes.Add (prefix);
@@ -194,7 +201,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 object_hierarchy[objectId] = range;
             }
             
-            for (int i = range.Lower + startIndex, numberReturned = 0; i < range.Upper && numberReturned <= requestCount; i++) {
+            for (int i = range.Lower + startIndex, numberReturned = 0; i < range.Upper && numberReturned < requestCount; i++) {
                 numberReturned++;
                 yield return object_cache[i].Object;
             }
@@ -206,7 +213,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             var lower = object_cache.Count;
             
             foreach (var directory in container.Directories) {
-                CreateFolder (directory);
+                CreateFolder (directory, container.Folder);
             }
             
             foreach (var file in container.Files) {
@@ -226,7 +233,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             switch (Path.GetExtension (path)) {
             case ".mp3":
                 var music_track = new MusicTrack (this, parent) {
-                    Title = Path.GetFileNameWithoutExtension (path)
+                    Title = Path.GetFileNameWithoutExtension (path),
+                    IsRestricted = true
                 };
                 music_track.AddResource (new Resource (new ResourceSettings (
                     new Uri (string.Format ("{0}object?id={1}", prefix, music_track.Id)) ) {
@@ -235,20 +243,22 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 return music_track;
             case ".avi":
                 return new Movie (this, parent) {
-                    Title = Path.GetFileNameWithoutExtension (path)
+                    Title = Path.GetFileNameWithoutExtension (path),
+                    IsRestricted = true
                 };
             default:
                 return null;
             }
         }
         
-        void CreateFolder (string path)
+        void CreateFolder (string path, StorageFolder parent)
         {
             var directories = Directory.GetDirectories (path);
             var files = Directory.GetFiles (path);
-            var folder = new StorageFolder (this) {
+            var folder = new StorageFolder (this, parent) {
                 Title = Path.GetDirectoryName (path),
-                ChildCount = directories.Length + files.Length
+                ChildCount = directories.Length + files.Length,
+                IsRestricted = true
             };
             object_cache.Add (new ObjectInfo (folder, path));
             folder_cache[folder.Id] = new FolderInfo (folder, directories, files);

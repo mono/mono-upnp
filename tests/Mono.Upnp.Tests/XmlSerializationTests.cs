@@ -894,5 +894,18 @@ namespace Mono.Upnp.Xml.Tests
                 serializer.GetString (new SerializationContextTestClass { Child = new SerializationContextTestClass { Child = new SerializationContextTestClass () } },
                 new XmlSerializationOptions<int> { Context = 0 }));
         }
+        
+        class EscapeTestClass
+        {
+            [XmlElement] public string Foo { get { return @"<""stuff 'n things & such"">"; } }
+        }
+        
+        [Test]
+        public void EscapeTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0""?><EscapeTestClass><Foo>&lt;&quot;stuff &apos;n things &amp; such&quot;&gt;</Foo></EscapeTestClass>",
+                serializer.GetString (new EscapeTestClass ()));
+        }
     }
 }

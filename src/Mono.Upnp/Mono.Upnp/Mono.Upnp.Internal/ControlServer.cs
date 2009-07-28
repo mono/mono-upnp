@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.IO;
 using System.Net;
 using System.Xml;
 
@@ -43,6 +44,15 @@ namespace Mono.Upnp.Internal
         readonly string service_type;
         readonly XmlSerializer serializer;
         readonly XmlDeserializer deserializer;
+        
+        const string fake = @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/"" s:encodingStyle=""http://schemas.xmlsoap.org/soap/encoding/""><s:Body>
+<u:BrowseResponse xmlns:u=""urn:schemas-upnp-org:service:ContentDirectory:1"">
+<Result>&lt;DIDL-Lite xmlns=&quot;urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/&quot; xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot; xmlns:upnp=&quot;urn:schemas-upnp-org:metadata-1-0/upnp/&quot;&gt;&lt;container id=&quot;1&quot; parentID=&quot;0&quot; childCount=&quot;11&quot; restricted=&quot;true&quot;&gt;&lt;upnp:class&gt;object.container.storageFolder&lt;/upnp:class&gt;&lt;dc:title&gt;.&lt;/dc:title&gt;&lt;/container&gt;&lt;/DIDL-Lite&gt;</Result>
+<NumberReturned>1</NumberReturned>
+<TotalMatches>1</TotalMatches>
+<UpdateID>0</UpdateID>
+</u:BrowseResponse>
+</s:Body> </s:Envelope>";
 
         public ControlServer (IMap<string, ServiceAction> actions, string serviceType, Uri url, XmlSerializer serializer)
             : base (url)
@@ -88,16 +98,19 @@ namespace Mono.Upnp.Internal
                 
                 ServiceAction action;
                 if (actions.TryGetValue (arguments.ActionName, out action)) {
+                    var stream = context.Response.OutputStream;
                     try {
                         serializer.Serialize (
                             new SoapEnvelope<Arguments> (new Arguments (service_type, action.Name, action.Execute (arguments.Values), true)),
-                            context.Response.OutputStream
+                            stream
                         );
                         
                         Log.Information (string.Format ("{0} invoked {1} on {2}.",
                             context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
                     } catch {
                         // TODO handle faults
+                    } finally {
+                        stream.Close ();
                     }
                 } else {
                     Log.Error (string.Format (

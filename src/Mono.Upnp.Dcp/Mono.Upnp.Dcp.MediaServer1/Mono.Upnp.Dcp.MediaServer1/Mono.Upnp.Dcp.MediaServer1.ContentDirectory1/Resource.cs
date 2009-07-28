@@ -59,37 +59,37 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [XmlValue]
         public virtual Uri Uri { get; protected set; }
         
-        [XmlAttribute ("size", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("size", OmitIfNull = true)]
         public virtual ulong? Size { get; protected set; }
         
-        [XmlAttribute ("duration", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("duration", OmitIfNull = true)]
         public virtual TimeSpan? Duration { get; protected set; }
 
-        [XmlAttribute ("bitrate", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("bitrate", OmitIfNull = true)]
         public virtual uint? Bitrate { get; protected set; }
 
-        [XmlAttribute ("samplyFrequency", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("samplyFrequency", OmitIfNull = true)]
         public virtual uint? SampleFrequency { get; protected set; }
 
-        [XmlAttribute ("bitsPerSample", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("bitsPerSample", OmitIfNull = true)]
         public virtual uint? BitsPerSample { get; protected set; }
 
-        [XmlAttribute ("nrAudioChannels", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("nrAudioChannels", OmitIfNull = true)]
         public virtual uint? NrAudioChannels { get; protected set; }
 
-        [XmlAttribute ("resolution", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("resolution", OmitIfNull = true)]
         public virtual Resolution? Resolution { get; protected set; }
 
-        [XmlAttribute ("colorDepth", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("colorDepth", OmitIfNull = true)]
         public virtual uint? ColorDepth { get; protected set; }
 
-        [XmlAttribute ("protocolInfo", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("protocolInfo", OmitIfNull = true)]
         public virtual string ProtocolInfo { get; protected set; }
 
-        [XmlAttribute ("protection", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("protection", OmitIfNull = true)]
         public virtual string Protection { get; protected set; }
 
-        [XmlAttribute ("importUri", Schemas.DidlLiteSchema, OmitIfNull = true)]
+        [XmlAttribute ("importUri", OmitIfNull = true)]
         public virtual Uri ImportUri { get; protected set; }
         
         protected override void Deserialize (XmlDeserializationContext context)

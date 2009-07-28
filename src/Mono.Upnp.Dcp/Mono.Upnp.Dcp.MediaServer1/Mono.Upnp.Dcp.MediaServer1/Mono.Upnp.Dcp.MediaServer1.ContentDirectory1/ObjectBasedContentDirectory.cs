@@ -81,11 +81,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                           int requestCount, string sortCriteria, out int numberReturned,
                                           out int totalMatches, out string updateId)
         {
-            updateId = null;
+            updateId = "0";
             if (browseFlag == BrowseFlag.BrowseDirectChildren) {
                 var children = GetChildren (objectId, startIndex, requestCount, sortCriteria, out totalMatches);
                 var results = new ResultsWrapper (children);
-                var xml = serializer.GetString (results);
+                var xml = serializer.GetString (results,
+                    new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.None });
                 numberReturned = results.ResultsCount;
                 return xml;
             } else {
