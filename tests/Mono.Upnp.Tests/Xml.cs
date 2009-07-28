@@ -29,7 +29,7 @@ namespace Mono.Upnp.Tests
     public static class Xml
     {
         public const string FullDeviceDescription =
-           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<?xml version=""1.0""?>" +
            @"<root configId=""1"" xmlns=""urn:schemas-upnp-org:device-1-0"">" +
                 "<specVersion>" +
                     "<major>1</major>" +
@@ -130,7 +130,7 @@ namespace Mono.Upnp.Tests
             "</root>";
         
         public const string UrlBaseDeviceDescription =
-           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<?xml version=""1.0""?>" +
            @"<root configId=""1"" xmlns=""urn:schemas-upnp-org:device-1-0"">" +
                 "<specVersion>" +
                     "<major>1</major>" +
@@ -171,7 +171,7 @@ namespace Mono.Upnp.Tests
             "</root>";
         
         public const string FullScpd =
-           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<?xml version=""1.0""?>" +
            @"<scpd configId="""" xmlns=""urn:schemas-upnp-org:service-1-0"">" +
                 "<specVersion>" +
                     "<major>1</major>" +
@@ -287,7 +287,7 @@ namespace Mono.Upnp.Tests
             "</scpd>";
         
         public const string SimpleSoapRequest =
-           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<?xml version=""1.0""?>" +
            @"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/"" s:encodingStyle=""http://schemas.xmlsoap.org/soap/encoding/"">" +
                 "<s:Body>" +
                    @"<u:Foo xmlns:u=""urn:schemas-upnp-org:service:mono-upnp-test-service:1"">" +
@@ -297,7 +297,7 @@ namespace Mono.Upnp.Tests
             "</s:Envelope>";
         
         public const string SingleEventReport =
-           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<?xml version=""1.0""?>" +
            @"<e:propertyset xmlns:e=""urn:schemas-upnp-org:event-1-0"">" +
                 "<e:property>" +
                     "<Foo>foo</Foo>" +
@@ -305,7 +305,7 @@ namespace Mono.Upnp.Tests
             "</e:propertyset>";
         
         public const string DoubleEventReport =
-           @"<?xml version=""1.0"" encoding=""utf-8""?>" +
+           @"<?xml version=""1.0""?>" +
            @"<e:propertyset xmlns:e=""urn:schemas-upnp-org:event-1-0"">" +
                 "<e:property>" +
                     "<Foo>foo</Foo>" +
