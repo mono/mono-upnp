@@ -101,7 +101,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                     [UpnpArgument ("BrowseFlag")] BrowseFlag browseFlag,
                                     [UpnpArgument ("Filter")] string filter,
                                     [UpnpArgument ("StartingIndex")] int startingIndex,
-                                    [UpnpArgument ("RequestCount")] int requestCount,
+                                    [UpnpArgument ("RequestedCount")] int requestCount,
                                     [UpnpArgument ("SortCriteria")] string sortCriteria,
                                     [UpnpArgument ("Result")] out string result,
                                     [UpnpArgument ("NumberReturned")] out int numberReturned,

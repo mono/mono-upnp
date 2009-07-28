@@ -202,8 +202,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
             
             for (int i = range.Lower + startIndex, numberReturned = 0; i < range.Upper && numberReturned < requestCount; i++) {
-                numberReturned++;
                 yield return object_cache[i].Object;
+                numberReturned++;
             }
         }
         
@@ -255,8 +255,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         {
             var directories = Directory.GetDirectories (path);
             var files = Directory.GetFiles (path);
+            var name = path;
+            var seperator = name.LastIndexOf (Path.DirectorySeparatorChar);
+            if (seperator == name.Length) {
+                var start = System.Math.Max (0, name.LastIndexOf (Path.DirectorySeparatorChar, seperator - 1));
+                name = name.Substring (start, seperator - start);
+            } else if (seperator != -1) {
+                seperator += 1;
+                name = name.Substring (seperator, name.Length - seperator);
+            }
             var folder = new StorageFolder (this, parent) {
-                Title = Path.GetDirectoryName (path),
+                Title = name,
                 ChildCount = directories.Length + files.Length,
                 IsRestricted = true
             };

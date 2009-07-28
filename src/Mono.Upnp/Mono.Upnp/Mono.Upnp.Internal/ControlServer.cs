@@ -44,7 +44,7 @@ namespace Mono.Upnp.Internal
         readonly string service_type;
         readonly XmlSerializer serializer;
         readonly XmlDeserializer deserializer;
-
+        
         public ControlServer (IMap<string, ServiceAction> actions, string serviceType, Uri url, XmlSerializer serializer)
             : base (url)
         {

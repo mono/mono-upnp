@@ -65,7 +65,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [XmlAttribute ("id")]
         public virtual string Id { get; protected set; }
         
-        [XmlAttribute ("parentId")]
+        [XmlAttribute ("parentID")]
         public virtual string ParentId { get; protected set; }
         
         [XmlAttribute ("restricted")]
