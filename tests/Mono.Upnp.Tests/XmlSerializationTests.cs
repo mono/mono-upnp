@@ -1037,5 +1037,37 @@ namespace Mono.Upnp.Xml.Tests
         {
             AssertOrderCorrectness<OrderTest7Class> ();
         }
+        
+        [Test]
+        public void DeclarationTest ()
+        {
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-8""?><EmptyTestClass>Blarg!</EmptyTestClass>",
+                serializer.GetString (new EmptyTestClass (),
+                    new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.VersionAndEncoding })
+            );
+            
+            Assert.AreEqual (
+                @"<?xml version=""1.0"" encoding=""utf-32""?><EmptyTestClass>Blarg!</EmptyTestClass>",
+                serializer.GetString (new EmptyTestClass (),
+                    new XmlSerializationOptions {
+                        XmlDeclarationType = XmlDeclarationType.VersionAndEncoding,
+                        Encoding = Encoding.UTF32
+                    }
+                )
+            );
+            
+            Assert.AreEqual (
+                @"<?xml version=""1.0""?><EmptyTestClass>Blarg!</EmptyTestClass>",
+                serializer.GetString (new EmptyTestClass (),
+                    new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.Version })
+            );
+            
+            Assert.AreEqual (
+                @"<EmptyTestClass>Blarg!</EmptyTestClass>",
+                serializer.GetString (new EmptyTestClass (),
+                    new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.None })
+            );
+        }
     }
 }
