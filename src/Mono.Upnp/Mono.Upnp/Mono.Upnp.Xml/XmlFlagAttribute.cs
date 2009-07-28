@@ -57,7 +57,5 @@ namespace Mono.Upnp.Xml
         public string Namespace { get; set; }
         
         public string Prefix { get; set; }
-        
-        public int Order { get; set; }
     }
 }

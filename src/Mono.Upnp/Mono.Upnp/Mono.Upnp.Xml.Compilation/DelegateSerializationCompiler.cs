@@ -33,18 +33,6 @@ namespace Mono.Upnp.Xml.Compilation
 {
     public class DelegateSerializationCompiler<TContext> : SerializationCompiler<TContext>
     {
-        protected struct SerializerInfo
-        {
-            public readonly Serializer<TContext> Serializer;
-            public readonly int Order;
-            
-            public SerializerInfo (Serializer<TContext> serializer, int order)
-            {
-                Serializer = serializer;
-                Order = order;
-            }
-        }
-        
         public DelegateSerializationCompiler (XmlSerializer<TContext> xmlSerializer, Type type)
             : base (xmlSerializer, type)
         {
@@ -103,52 +91,32 @@ namespace Mono.Upnp.Xml.Compilation
         
         protected override Serializer<TContext> CreateMemberAutoSerializer ()
         {
-            var attribute_serializers = new LinkedList<SerializerInfo> ();
-            var element_serializers = new LinkedList<SerializerInfo> ();
-            var attribute_serializers_head = attribute_serializers.Last;
-            var element_serializers_head = attribute_serializers.Last;
+            var attribute_serializers = new List<Serializer<TContext>> ();
+            var element_serializers = new List<Serializer<TContext>> ();
             
             foreach (var property in Properties) {
-                ProcessProperty (property,
-                                 attribute_serializers,
-                                 ref attribute_serializers_head,
-                                 element_serializers,
-                                 ref element_serializers_head);
+                ProcessProperty (property, attribute_serializers, element_serializers);
             }
             
-            var count = attribute_serializers.Count + element_serializers.Count;
+            attribute_serializers.AddRange (element_serializers);
             
-            if (count == 0) {
+            if (attribute_serializers.Count == 0) {
                 return (obj, context) => {
                     if (obj != null) {
                         context.Writer.WriteValue (obj.ToString ());
                     }
                 };
+            } else {
+                var serializers = attribute_serializers.ToArray ();
+                return (obj, context) => {
+                    foreach (var serializer in serializers) {
+                        serializer (obj, context);
+                    }
+                };
             }
-            
-            var serializers = new Serializer<TContext>[count];
-            var i = 0;
-            foreach (var attribute_serializer in attribute_serializers) {
-                serializers[i] = attribute_serializer.Serializer;
-                i++;
-            }
-            foreach (var element_serializer in element_serializers) {
-                serializers[i] = element_serializer.Serializer;
-                i++;
-            }
-            
-            return (obj, context) => {
-                foreach (var serializer in serializers) {
-                    serializer (obj, context);
-                }
-            };
         }
         
-        protected virtual void ProcessProperty (PropertyInfo property,
-                                                LinkedList<SerializerInfo> attributeSerializers,
-                                                ref LinkedListNode<SerializerInfo> attributeSerializersHead,
-                                                LinkedList<SerializerInfo> elementSerializers,
-                                                ref LinkedListNode<SerializerInfo> elementSerializersHead)
+        protected virtual void ProcessProperty (PropertyInfo property, List<Serializer<TContext>> attributeSerializers, List<Serializer<TContext>> elementSerializers)
         {
             XmlAttributeAttribute attribute_attribute = null;
             XmlElementAttribute element_attribute = null;
@@ -205,72 +173,17 @@ namespace Mono.Upnp.Xml.Compilation
             }
             
             if (attribute_attribute != null) {
-                Insert (CreateSerializer (property, CreateAttributeSerializer (property, attribute_attribute)),
-                        attribute_attribute.Order, attributeSerializers, ref attributeSerializersHead);
+                attributeSerializers.Add (CreateSerializer (property, CreateAttributeSerializer (property, attribute_attribute)));
             } else if (element_attribute != null) {
-                Insert (CreateSerializer (property, CreateElementSerializer (property, element_attribute)),
-                        element_attribute.Order, elementSerializers, ref elementSerializersHead);
+                elementSerializers.Add (CreateSerializer (property, CreateElementSerializer (property, element_attribute)));
             } else if (flag_attribute != null) {
-                Insert (CreateSerializer (property, CreateFlagSerializer (property, flag_attribute)),
-                        flag_attribute.Order, elementSerializers, ref elementSerializersHead);
+                elementSerializers.Add (CreateSerializer (property, CreateFlagSerializer (property, flag_attribute)));
             } else if (array_attribute != null) {
-                Insert (CreateSerializer (property, CreateArraySerializer (property, array_attribute, array_item_attribute)),
-                        array_attribute.Order, elementSerializers, ref elementSerializersHead);
+                elementSerializers.Add (CreateSerializer (property, CreateArraySerializer (property, array_attribute, array_item_attribute)));
             } else if (array_item_attribute != null) {
-                Insert (CreateSerializer (property, CreateArrayItemSerializer (property, array_item_attribute)),
-                        array_item_attribute.Order, elementSerializers, ref elementSerializersHead);
+                elementSerializers.Add (CreateSerializer (property, CreateArrayItemSerializer (property, array_item_attribute)));
             } else if (value_attribute != null) {
-                elementSerializers.AddFirst (new SerializerInfo (
-                    CreateSerializer (property, CreateValueSerializer (property)), 0));
-            }
-        }
-        
-        protected static void Insert (Serializer<TContext> serializer, int order, LinkedList<SerializerInfo> serializers, ref LinkedListNode<SerializerInfo> serializersHead)
-        {
-            if (order < 0) {
-                if (serializers.Count == 0) {
-                    serializers.AddFirst (new SerializerInfo (serializer, order));
-                } else {
-                    InsertAfterFirst (serializer, order, serializers);
-                }
-            } else if (order > 0) {
-                if (serializers.Count == 0) {
-                    serializers.AddLast (new SerializerInfo (serializer, order));
-                } else {
-                    InsertBeforeLast (serializer, order, serializers);
-                }
-            } else {
-                if (serializersHead == null) {
-                    serializersHead = InsertAfterFirst (serializer, order, serializers);
-                } else {
-                    serializers.AddAfter (serializersHead, new SerializerInfo (serializer, order));
-                }
-            }
-        }
-        
-        static LinkedListNode<SerializerInfo> InsertAfterFirst (Serializer<TContext> serializer, int order, LinkedList<SerializerInfo> serializers)
-        {
-            var node = serializers.First;
-            while (node.Value.Order < order && node.Next != null) {
-                node = node.Next;
-            }
-            if (node.Value.Order < order) {
-                return serializers.AddAfter (node, new SerializerInfo (serializer, order));
-            } else {
-                return serializers.AddBefore (node, new SerializerInfo (serializer, order));
-            }
-        }
-        
-        static LinkedListNode<SerializerInfo> InsertBeforeLast (Serializer<TContext> serializer, int order, LinkedList<SerializerInfo> serializers)
-        {
-            var node = serializers.Last;
-            while (node.Value.Order > order && node.Previous != null) {
-                node = node.Previous;
-            }
-            if (node.Value.Order > order) {
-                return serializers.AddBefore (node, new SerializerInfo (serializer, order));
-            } else {
-                return serializers.AddAfter (node, new SerializerInfo (serializer, order));
+                elementSerializers.Add (CreateSerializer (property, CreateValueSerializer (property)));
             }
         }
         
