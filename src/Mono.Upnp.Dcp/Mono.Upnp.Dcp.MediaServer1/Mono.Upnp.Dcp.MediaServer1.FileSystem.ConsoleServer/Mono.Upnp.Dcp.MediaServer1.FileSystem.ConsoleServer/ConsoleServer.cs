@@ -132,12 +132,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
                 content_directory
             );
             
-            media_server.Start ();
-            
-            Console.WriteLine ("Press ENTER to exit.");
-                while (true) {
-                     System.Threading.Thread.Sleep (1000);
-                }
+            using (media_server) {
+                media_server.Start ();
+                Console.WriteLine ("Press ENTER to exit.");
+                Console.ReadLine ();
+            }
         }
         
         static void ShowHelp (OptionSet options)

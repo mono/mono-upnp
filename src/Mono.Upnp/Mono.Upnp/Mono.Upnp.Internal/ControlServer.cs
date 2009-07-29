@@ -59,6 +59,7 @@ namespace Mono.Upnp.Internal
             base.HandleContext (context);
             
             context.Response.ContentType = @"text/xml; charset=""utf-8""";
+            context.Response.AddHeader ("EXT", string.Empty);
             
             using (var reader = XmlReader.Create (context.Request.InputStream)) {
                 // FIXME this is a workaround for mono bug 523151

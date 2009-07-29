@@ -270,8 +270,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             var folder = new StorageFolder (this, parent) {
                 Title = name,
                 ChildCount = directories.Length + files.Length,
-                IsRestricted = true,
-                Searchable = true
+                IsRestricted = true
             };
             object_cache.Add (new ObjectInfo (folder, path));
             folder_cache[folder.Id] = new FolderInfo (folder, directories, files);
