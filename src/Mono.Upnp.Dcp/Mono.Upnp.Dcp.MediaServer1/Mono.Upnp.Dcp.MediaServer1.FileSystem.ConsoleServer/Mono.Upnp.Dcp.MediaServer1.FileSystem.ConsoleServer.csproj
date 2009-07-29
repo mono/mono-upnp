@@ -21,7 +21,6 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Commandlineparameters>"/home/scott/Music/Starfucker - Starfucker (V0)"</Commandlineparameters>
     <Externalconsole>true</Externalconsole>
-    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>

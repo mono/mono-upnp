@@ -88,7 +88,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         protected abstract string SortCapabilities { get; }
         
-        [UpnpAction]
+        [UpnpAction ("GetSystemUpdateID")]
         public virtual void GetSystemUpdateId ([UpnpArgument ("Id")]
                                                [UpnpRelatedStateVariable ("SystemUpdateID")]
                                                out string systemUpdateId)
