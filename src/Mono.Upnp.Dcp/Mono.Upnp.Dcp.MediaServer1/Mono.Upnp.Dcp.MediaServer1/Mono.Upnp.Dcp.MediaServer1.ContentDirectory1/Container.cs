@@ -71,7 +71,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             set { Searchable = value == "true"; }
         }
         
-        public bool Searchable { get; protected set; }
+        public bool Searchable { get; set; }
         
         public Results<Object> Browse ()
         {

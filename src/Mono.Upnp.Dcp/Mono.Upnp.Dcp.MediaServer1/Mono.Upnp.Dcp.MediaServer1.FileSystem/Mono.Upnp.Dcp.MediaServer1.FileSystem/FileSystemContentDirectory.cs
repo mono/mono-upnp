@@ -152,7 +152,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 }
                 
                 try {
-                    using (var reader = File.OpenRead (object_cache[id].Path)) {
+                    using (var reader = System.IO.File.OpenRead (object_cache[id].Path)) {
                         response.ContentType = "audio/mpeg";
                         response.ContentLength64 = reader.Length;
                         using (var stream = response.OutputStream) {
@@ -237,7 +237,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                     IsRestricted = true
                 };
                 music_track.AddResource (new Resource (new ResourceSettings (
-                    new Uri (string.Format ("{0}object?id={1}", prefix, music_track.Id)) ) {
+                    new Uri (string.Format ("{0}object?id={1}", prefix, music_track.Id))) {
                     ProtocolInfo = "http-get:*:audio/mpeg:*"
                 }));
                 return music_track;
@@ -247,7 +247,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                     IsRestricted = true
                 };
             default:
-                return null;
+                return new File (this, parent) {
+                    Title = Path.GetFileNameWithoutExtension (path),
+                    IsRestricted = true
+                };
             }
         }
         
@@ -267,7 +270,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             var folder = new StorageFolder (this, parent) {
                 Title = name,
                 ChildCount = directories.Length + files.Length,
-                IsRestricted = true
+                IsRestricted = true,
+                Searchable = true
             };
             object_cache.Add (new ObjectInfo (folder, path));
             folder_cache[folder.Id] = new FolderInfo (folder, directories, files);
