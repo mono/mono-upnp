@@ -83,6 +83,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         readonly Dictionary<string, FolderInfo> folder_cache = new Dictionary<string, FolderInfo> ();
         readonly string prefix = GeneratePrefix ();
         readonly HttpListener listener;
+        volatile bool stop;
         
         public FileSystemContentDirectory (string path)
         {
@@ -113,6 +114,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
         public override void Stop ()
         {
+            stop = true;
+            
             base.Stop ();
             
             lock (listener) {
@@ -162,6 +165,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                                 while (read > 0) {
                                     writer.Write (buffer, 0, read);
                                     read = reader.Read (buffer, 0, buffer.Length);
+                                    if (stop) {
+                                        break;
+                                    }
                                 }
                             }
                         }
