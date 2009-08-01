@@ -6,7 +6,7 @@ using Mono.Upnp.Dcp.MediaServer1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class ContentDirectoryClient
+    public class ContentDirectoryClient : IDisposable
     {
         readonly Client client;
 
@@ -54,6 +54,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             var handler = ContentDirectoryAdded;
             if (handler != null) {
                 handler (this, e);
+            }
+        }
+        
+        public void Dispose ()
+        {
+            Dispose (true);
+            GC.SuppressFinalize (this);
+        }
+        
+        protected virtual void Dispose (bool disposing)
+        {
+            if (disposing) {
+                client.Dispose ();
             }
         }
     }

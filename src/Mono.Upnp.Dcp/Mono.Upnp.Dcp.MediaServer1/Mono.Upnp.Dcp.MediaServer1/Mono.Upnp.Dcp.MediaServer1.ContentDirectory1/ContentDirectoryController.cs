@@ -17,7 +17,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             if (controller == null) throw new ArgumentNullException ("controller");
             
             this.controller = controller;
-            Verify ();
         }
         
         public ServiceController ServiceController {

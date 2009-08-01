@@ -41,10 +41,10 @@ namespace Mono.Upnp
 {
     public class Server : IDisposable
     {
-        static WeakReference static_serializer = new WeakReference (null);
+        static readonly WeakReference static_serializer = new WeakReference (null);
         
-        DataServer description_server;
-        SsdpServer ssdp_server;
+        readonly DataServer description_server;
+        readonly SsdpServer ssdp_server;
         Root root;
         
         public Server (Root root)
@@ -57,16 +57,18 @@ namespace Mono.Upnp
             if (root == null) throw new ArgumentNullException ("root");
             
             this.root = root;
-            Initialize (url ?? MakeUrl ());
-        }
-        
-        void Initialize (Uri url)
-        {
+            
+            if (url == null) {
+                url = MakeUrl ();
+            }
+            
             var serializer = Helper.Get<XmlSerializer> (static_serializer);
             root.Initialize (serializer, url);
             // FIXME this is a test
             description_server = new DataServer (serializer.GetBytes (root), @"text/xml", url);
-            Announce (url);
+            ssdp_server = new SsdpServer (url.ToString ());
+            ssdp_server.Announce ("upnp:rootdevice", root.RootDevice.Udn + "::upnp:rootdevice", false);
+            AnnounceDevice (root.RootDevice);
         }
         
         public bool Started { get; private set; }
@@ -74,7 +76,10 @@ namespace Mono.Upnp
         public void Start ()
         {
             CheckDisposed ();
-            if (Started) throw new InvalidOperationException ("The server is already started.");
+            
+            if (Started) {
+                return;
+            }
 
             root.Start ();
             description_server.Start ();
@@ -94,13 +99,6 @@ namespace Mono.Upnp
             root.Stop ();
             description_server.Stop ();
             Started = false;
-        }
-
-        void Announce (Uri url)
-        {
-            ssdp_server = new SsdpServer (url.ToString ());
-            ssdp_server.Announce ("upnp:rootdevice", root.RootDevice.Udn + "::upnp:rootdevice", false);
-            AnnounceDevice (root.RootDevice);
         }
 
         void AnnounceDevice (Device device)
@@ -151,29 +149,36 @@ namespace Mono.Upnp
             return null;
         }
         
+        public bool IsDisposed {
+            get { return root == null; }
+        }
+        
         void CheckDisposed ()
         {
-            if (root == null) throw new ObjectDisposedException (ToString ());
+            if (IsDisposed) {
+                throw new ObjectDisposedException (ToString ());
+            }
         }
 
         public void Dispose ()
         {
-            if (root != null) {
-                Dispose (true);
-                GC.SuppressFinalize (this);
-            }
+            Dispose (true);
+            GC.SuppressFinalize (this);
         }
 
         protected virtual void Dispose (bool disposing)
         {
+            if (IsDisposed) {
+                return;
+            }
+            
             if (disposing) {
                 Stop ();
-                //root_device.Dispose ();
-                if (description_server != null) {
-                    description_server.Dispose ();
-                    ssdp_server.Dispose ();
-                }
+                root.Dispose ();
+                description_server.Dispose ();
+                ssdp_server.Dispose ();
             }
+            
             root = null;
         }
     }

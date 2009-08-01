@@ -82,8 +82,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         readonly Dictionary<string, Range> object_hierarchy = new Dictionary<string, Range> ();
         readonly Dictionary<string, FolderInfo> folder_cache = new Dictionary<string, FolderInfo> ();
         readonly string prefix = GeneratePrefix ();
-        readonly HttpListener listener;
-        volatile bool stop;
+        volatile bool started;
+        HttpListener listener;
         
         public FileSystemContentDirectory (string path)
         {
@@ -102,9 +102,25 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             listener.Prefixes.Add (prefix);
         }
         
+        public bool IsStarted {
+            get { return started; }
+        }
+        
+        public bool IsDisposed {
+            get { return listener == null; }
+        }
+        
         public override void Start ()
         {
+            CheckDisposed ();
+            
+            if (started) {
+                return;
+            }
+            
             base.Start ();
+            
+            started = true;
             
             lock (listener) {
                 listener.Start ();
@@ -114,13 +130,35 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
         public override void Stop ()
         {
-            stop = true;
+            CheckDisposed ();
+            
+            if (!started) {
+                return;
+            }
+            
+            started = false;
             
             base.Stop ();
             
             lock (listener) {
                 listener.Stop ();
             }
+        }
+        
+        protected override void Dispose (bool disposing)
+        {
+            if (IsDisposed) {
+                return;
+            }
+            
+            base.Dispose (disposing);
+            
+            if (disposing) {
+                Stop ();
+                listener.Close ();
+            }
+            
+            listener = null;
         }
         
         void OnGotContext (IAsyncResult result)
@@ -141,16 +179,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         {
             using (response) {
                 if (query.Length < 5) {
+                    response.StatusCode = 404;
                     return;
                 }
                 
                 int id;
                 
                 if (!int.TryParse (query.Substring (4), out id)) {
+                    response.StatusCode = 404;
                     return;
                 }
                 
                 if (id >= object_cache.Count) {
+                    response.StatusCode = 404;
                     return;
                 }
                 
@@ -161,19 +202,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                         using (var stream = response.OutputStream) {
                             using (var writer = new BinaryWriter (stream)) {
                                 var buffer = new byte[8192];
-                                var read = reader.Read (buffer, 0, buffer.Length);
-                                while (read > 0) {
-                                    writer.Write (buffer, 0, read);
+                                int read;
+                                do {
                                     read = reader.Read (buffer, 0, buffer.Length);
-                                    if (stop) {
-                                        break;
-                                    }
-                                }
+                                    writer.Write (buffer, 0, read);
+                                } while (started && read > 0);
                             }
                         }
                     }
                 } catch {
                 }
+            }
+        }
+        
+        void CheckDisposed ()
+        {
+            if (IsDisposed) {
+                throw new ObjectDisposedException (ToString ());
             }
         }
         

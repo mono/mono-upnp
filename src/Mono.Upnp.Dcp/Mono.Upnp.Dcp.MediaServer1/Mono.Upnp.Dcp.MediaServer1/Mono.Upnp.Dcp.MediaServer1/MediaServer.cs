@@ -36,7 +36,7 @@ namespace Mono.Upnp.Dcp.MediaServer1
     {
         public static readonly DeviceType DeviceType = new DeviceType ("urn:schemas-upnp-org:device:MediaServer:1");
         
-        readonly Server server;
+        Server server;
         readonly ContentDirectory content_directory;
         
         public MediaServer (string udn, string friendlyName, string manufacturer, string modelName, ConnectionManager connectionManager, ContentDirectory contentDirectory)
@@ -61,22 +61,51 @@ namespace Mono.Upnp.Dcp.MediaServer1
             server = new Server (new Root (DeviceType, udn, friendlyName, manufacturer, modelName, options));
         }
         
+        public bool IsDisposed {
+            get { return server == null; }
+        }
+        
         public void Start ()
         {
+            CheckDisposed ();
+            
             content_directory.Start ();
             server.Start ();
         }
         
         public void Stop ()
         {
+            CheckDisposed ();
+            
             server.Stop ();
             content_directory.Stop ();
         }
         
         public void Dispose ()
         {
-            server.Dispose ();
-            content_directory.Dispose ();
+            Dispose (true);
+            GC.SuppressFinalize (this);
+        }
+        
+        protected virtual void Dispose (bool disposing)
+        {
+            if (IsDisposed) {
+                return;
+            }
+            
+            if (disposing) {
+                server.Dispose ();
+                content_directory.Dispose ();
+            }
+            
+            server = null;
+        }
+        
+        void CheckDisposed ()
+        {
+            if (IsDisposed) {
+                throw new ObjectDisposedException (ToString ());
+            }
         }
         
         IEnumerable<Service> Combine (IEnumerable<Service> first, IEnumerable<Service> second)

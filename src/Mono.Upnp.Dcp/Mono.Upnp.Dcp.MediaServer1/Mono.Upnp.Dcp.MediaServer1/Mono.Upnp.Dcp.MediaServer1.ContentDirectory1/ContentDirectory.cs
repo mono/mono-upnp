@@ -36,11 +36,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         ulong system_id;
         ulong ids;
         
-        ~ContentDirectory()
-        {
-            Dispose (false);
-        }
-        
         internal string GetNewObjectId ()
         {
             var id = ids.ToString ();
