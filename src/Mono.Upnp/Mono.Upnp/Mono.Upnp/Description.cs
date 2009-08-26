@@ -88,9 +88,8 @@ namespace Mono.Upnp
         
         internal Uri ExpandUrl (string urlFragment)
         {
-            // TODO handle NRE
             Uri url;
-            if (Uri.TryCreate (Root.UrlBase, urlFragment, out url)) {
+            if (Root != null && Uri.TryCreate (Root.UrlBase, urlFragment, out url)) {
                 return url;
             } else if (Uri.TryCreate (urlFragment, UriKind.Absolute, out url)) {
                 return url;
