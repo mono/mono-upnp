@@ -34,19 +34,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
     {
         protected override string CurrentConnectionIDs {
             get {
-                throw new System.NotImplementedException ();
+                throw new NotImplementedException ();
             }
         }
         
         protected override void GetProtocolInfoCore (out string source, out string sink)
         {
-            throw new System.NotImplementedException ();
+            throw new NotImplementedException ();
         }
 
 
         protected override void GetCurrentConnectionInfoCore (int connectionId, out int resId, out int avTransportId, out string protocolInfo, out string peerConnectionManager, out int peerConnectionId, out Mono.Upnp.Dcp.MediaServer1.ConnectionManager1.Direction direction, out Mono.Upnp.Dcp.MediaServer1.ConnectionManager1.ConnectionStatus status)
         {
-            throw new System.NotImplementedException ();
+            throw new NotImplementedException ();
         }
     }
 }
