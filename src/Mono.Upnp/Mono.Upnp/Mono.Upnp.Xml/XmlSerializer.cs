@@ -130,14 +130,13 @@ namespace Mono.Upnp.Xml
         public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationOptions<TContext> options)
         {
             if (stream == null) throw new ArgumentNullException ("stream");
-            if (options == null) {
-                options = new XmlSerializationOptions<TContext> ();
-            }
+            
+            var serializationOptions = new XmlSerializationOptions(options);
             
             using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
-                Encoding = options.Encoding ?? utf8, OmitXmlDeclaration = true })) {
-                WriteXmlDeclaration (writer, options.XmlDeclarationType);
-                SerializeCore (obj, writer, options.Context);
+                Encoding = serializationOptions.Encoding, OmitXmlDeclaration = true })) {
+                WriteXmlDeclaration (writer, serializationOptions);
+                SerializeCore (obj, writer, serializationOptions.Context);
             }
         }
         
@@ -148,15 +147,13 @@ namespace Mono.Upnp.Xml
         
         public byte[] GetBytes<TObject> (TObject obj, XmlSerializationOptions<TContext> options)
         {
-            if (options == null) {
-                options = new XmlSerializationOptions<TContext> ();
-            }
+            var serializationOptions = new XmlSerializationOptions(options);
             
             using (var stream = new MemoryStream ()) {
                 using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
-                    Encoding = options.Encoding ?? utf8, OmitXmlDeclaration = true })) {
-                    WriteXmlDeclaration (writer, options.XmlDeclarationType);
-                    SerializeCore (obj, writer, options.Context);
+                    Encoding = serializationOptions.Encoding ?? utf8, OmitXmlDeclaration = true, })) {
+                    WriteXmlDeclaration (writer, serializationOptions);
+                    SerializeCore (obj, writer, serializationOptions.Context);
                 }
                 return stream.ToArray ();
             }
@@ -178,14 +175,14 @@ namespace Mono.Upnp.Xml
             return encoding.GetString (GetBytes (obj, options));
         }
         
-        void WriteXmlDeclaration (XmlWriter writer, XmlDeclarationType xmlDeclarationType)
+        void WriteXmlDeclaration (XmlWriter writer, XmlSerializationOptions options)
         {
-            switch (xmlDeclarationType) {
+            switch (options.XmlDeclarationType) {
             case XmlDeclarationType.Version:
                 writer.WriteProcessingInstruction ("xml", @"version=""1.0""");
                 break;
             case XmlDeclarationType.VersionAndEncoding:
-                writer.WriteStartDocument ();
+                writer.WriteProcessingInstruction ("xml", string.Format(@"version=""1.0"" encoding=""{0}""", options.Encoding.HeaderName));
                 break;
             }
         }
@@ -218,6 +215,26 @@ namespace Mono.Upnp.Xml
                 compilers[type] = compiler;
             }
             return compiler;
+        }
+        
+        struct XmlSerializationOptions
+        {
+            public readonly Encoding Encoding;
+            public readonly TContext Context;
+            public readonly XmlDeclarationType XmlDeclarationType;
+            
+            public XmlSerializationOptions (XmlSerializationOptions<TContext> options)
+            {
+                if (options == null) {
+                    Encoding = utf8;
+                    Context = default(TContext);
+                    XmlDeclarationType = 0;
+                } else {
+                    Encoding = options.Encoding ?? utf8;
+                    Context = options.Context;
+                    XmlDeclarationType = options.XmlDeclarationType;
+                }
+            }
         }
     }
 }

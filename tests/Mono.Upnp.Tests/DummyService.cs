@@ -37,7 +37,7 @@ namespace Mono.Upnp.Tests
         public DummyService (ServiceType type, string id)
             : base (type, id, controller)
         {
-            //ScpdUrl = ControlUrl = EventUrl = new Uri ("http://localhost/");
+            ScpdUrlFragment = ControlUrlFragment = EventUrlFragment = "http://localhost/";
         }
     }
     

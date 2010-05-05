@@ -30,7 +30,7 @@ namespace Mono.Upnp.Tests
     {
         public const string FullDeviceDescription =
            @"<?xml version=""1.0""?>" +
-           @"<root configId=""1"" xmlns=""urn:schemas-upnp-org:device-1-0"">" +
+           @"<root configId="""" xmlns=""urn:schemas-upnp-org:device-1-0"">" +
                 "<specVersion>" +
                     "<major>1</major>" +
                     "<minor>1</minor>" +
@@ -131,7 +131,7 @@ namespace Mono.Upnp.Tests
         
         public const string UrlBaseDeviceDescription =
            @"<?xml version=""1.0""?>" +
-           @"<root configId=""1"" xmlns=""urn:schemas-upnp-org:device-1-0"">" +
+           @"<root configId="""" xmlns=""urn:schemas-upnp-org:device-1-0"">" +
                 "<specVersion>" +
                     "<major>1</major>" +
                     "<minor>1</minor>" +

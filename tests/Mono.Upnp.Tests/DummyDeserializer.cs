@@ -53,7 +53,7 @@ namespace Mono.Upnp.Tests
         
         public Root DeserializeRoot (XmlReader reader)
         {
-            return DeserializeRoot (reader, new Uri ("http://localhost:8080/"));
+            return DeserializeRoot (reader, new Uri ("http://localhost:8080"));
         }
         
         public Root DeserializeRoot (XmlReader reader, Uri url)

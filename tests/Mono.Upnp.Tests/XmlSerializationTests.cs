@@ -780,8 +780,8 @@ namespace Mono.Upnp.Xml.Tests
             );
         }
         
-        [XmlNamespace ("udn:mono-upnp:foo", "f")]
         [XmlNamespace ("udn:mono-upnp:bar", "b")]
+        [XmlNamespace ("udn:mono-upnp:foo", "f")]
         class NamespaceTestClass
         {
             [XmlElement (Namespace = "udn:mono-upnp:foo")] public string Foo { get; set; }
@@ -909,7 +909,7 @@ namespace Mono.Upnp.Xml.Tests
                 serializer.GetString (new EmptyTestClass (),
                     new XmlSerializationOptions {
                         XmlDeclarationType = XmlDeclarationType.VersionAndEncoding,
-                        Encoding = Encoding.UTF32
+                        Encoding = new UTF32Encoding(false, false)
                     }
                 )
             );

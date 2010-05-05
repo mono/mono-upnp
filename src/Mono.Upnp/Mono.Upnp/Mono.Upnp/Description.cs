@@ -94,7 +94,7 @@ namespace Mono.Upnp
             } else if (Uri.TryCreate (urlFragment, UriKind.Absolute, out url)) {
                 return url;
             } else {
-                throw new UpnpDeserializationException ("The URL fragment is not valid: " + urlFragment);
+                throw new UpnpDeserializationException (string.Format(@"The URL fragment is not valid: ""{0}""", urlFragment));
             }
         }
     }

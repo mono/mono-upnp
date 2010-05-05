@@ -8,6 +8,7 @@
     <ProjectGuid>{1203E9D4-B1F3-4838-8275-91782C8EC6E4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <RootNamespace>Mono.Upnp.Dcp.MSMediaServerRegistrar1</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
