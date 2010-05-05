@@ -309,7 +309,6 @@ namespace Mono.Upnp.Tests
                 }
             );
             using (var server = new Server (root)) {
-                service.Foo = "Hello World!";
                 using (var client = new Client ()) {
                     client.ServiceAdded += (sender, args) => {
                         var controller = args.Service.GetService ().GetController ();
@@ -319,6 +318,7 @@ namespace Mono.Upnp.Tests
                     client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
                     lock (mutex) {
                         server.Start ();
+                        service.Foo = "Hello World!";
                         if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
                             Assert.Fail ("The event timed out.");
                         }

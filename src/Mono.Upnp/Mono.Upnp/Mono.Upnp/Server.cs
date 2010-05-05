@@ -141,7 +141,7 @@ namespace Mono.Upnp
 
         Uri MakeUrl ()
         {
-            foreach (IPAddress address in Dns.GetHostAddresses (Dns.GetHostName ())) {
+            foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
                 if (address.AddressFamily == AddressFamily.InterNetwork) {
                     return new Uri (String.Format ("http://{0}:{1}/upnp/", Host, port));
                 }

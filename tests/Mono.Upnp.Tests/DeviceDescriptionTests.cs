@@ -164,7 +164,7 @@ namespace Mono.Upnp.Tests
         public void FullDeviceDescriptionDeserializationTest ()
         {
             var root = deserializer.DeserializeRoot (Xml.FullDeviceDescription);
-            Assert.AreEqual ("1", root.ConfigurationId);
+            Assert.AreEqual ("", root.ConfigurationId);
             Assert.AreEqual (1, root.SpecVersion.Major);
             Assert.AreEqual (1, root.SpecVersion.Minor);
             Assert.AreEqual (new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-full-device:1"), root.RootDevice.Type);
