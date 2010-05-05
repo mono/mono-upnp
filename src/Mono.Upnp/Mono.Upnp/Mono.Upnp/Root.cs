@@ -34,7 +34,7 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp
 {
     [XmlType ("root", Protocol.DeviceSchema)]
-    public class Root : Description
+    public class Root : Description, IXmlDeserializer<Device>
     {
         protected Root ()
         {
@@ -95,7 +95,11 @@ namespace Mono.Upnp
             }
         }
         
-        [XmlTypeDeserializer]
+        Device IXmlDeserializer<Device>.Deserialize (XmlDeserializationContext context)
+        {
+            return DeserializeDevice (context);
+        }
+        
         protected virtual Device DeserializeDevice (XmlDeserializationContext context)
         {
             return Deserializer != null ? Deserializer.DeserializeDevice (context) : null;

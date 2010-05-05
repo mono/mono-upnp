@@ -86,7 +86,6 @@
     <Compile Include="Mono.Upnp.Xml\XmlSerializationContext.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlSerializer.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlTypeAttribute.cs" />
-    <Compile Include="Mono.Upnp.Xml\XmlTypeDeserializerAttribute.cs" />
     <Compile Include="Mono.Upnp.Internal\Map.cs" />
     <Compile Include="Mono.Upnp.Control\ServiceController.cs" />
     <Compile Include="Mono.Upnp.Internal\EventClient.cs" />
@@ -134,6 +133,7 @@
     <Compile Include="Mono.Upnp\DeviceOptions.cs" />
     <Compile Include="Mono.Upnp\RootDeviceOptions.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlSerializationOptions.cs" />
+    <Compile Include="Mono.Upnp.Xml\IXmlDeserializer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

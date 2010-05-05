@@ -547,11 +547,15 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual ("bat", deserialized_object.Bar);
         }
         
-        class TypeDeserializerTestClass
+        class TypeDeserializerTestClass : IXmlDeserializer<DeserializerTestClass>
         {
             [XmlElement] public DeserializerTestClass Child { get; set; }
             
-            [XmlTypeDeserializer]
+            DeserializerTestClass IXmlDeserializer<DeserializerTestClass>.Deserialize (XmlDeserializationContext context)
+            {
+                return DeserializeChild (context);
+            }
+            
             protected virtual DeserializerTestClass DeserializeChild (XmlDeserializationContext context)
             {
                 var child = new DeserializerTestClass ("hello world");
@@ -611,11 +615,15 @@ namespace Mono.Upnp.Xml.Tests
             }
         }
         
-        class XmlDeserializableContainerTestBaseClass
+        class XmlDeserializableContainerTestBaseClass : IXmlDeserializer<XmlDeserializableTestBaseClass>
         {
             [XmlElement] public XmlDeserializableTestBaseClass Child { get; set; }
             
-            [XmlTypeDeserializer]
+            XmlDeserializableTestBaseClass IXmlDeserializer<XmlDeserializableTestBaseClass>.Deserialize (XmlDeserializationContext context)
+            {
+                return DeserializeChild (context);
+            }
+            
             protected virtual XmlDeserializableTestBaseClass DeserializeChild (XmlDeserializationContext context)
             {
                 var child = new XmlDeserializableTestBaseClass ();
@@ -626,7 +634,6 @@ namespace Mono.Upnp.Xml.Tests
         
         class XmlDeserializableContainerTestSubClass : XmlDeserializableContainerTestBaseClass
         {
-            [XmlTypeDeserializer]
             protected override XmlDeserializableTestBaseClass DeserializeChild (XmlDeserializationContext context)
             {
                 var child = new XmlDeserializableTestSubClass ();
@@ -644,12 +651,11 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual ("Child", deserialized_object.Child.ElementName);
         }
         
-        class XmlDeserializableTypeDeserializerTestClass : XmlDeserializable
+        class XmlDeserializableTypeDeserializerTestClass : XmlDeserializable, IXmlDeserializer<DeserializerTestClass>
         {
             [XmlElement] public DeserializerTestClass Child { get; private set; }
             
-            [XmlTypeDeserializer]
-            protected DeserializerTestClass ChildDeserializer (XmlDeserializationContext context)
+            DeserializerTestClass IXmlDeserializer<DeserializerTestClass>.Deserialize (XmlDeserializationContext context)
             {
                 var child = new DeserializerTestClass ("blah");
                 context.AutoDeserialize (child);
@@ -672,13 +678,12 @@ namespace Mono.Upnp.Xml.Tests
             Assert.AreEqual ("bat", deserialized_object.Child.Bar);
         }
         
-        class DeserializerArrayTestClass
+        class DeserializerArrayTestClass : IXmlDeserializer<DeserializerTestClass>
         {
             readonly List<DeserializerTestClass> list = new List<DeserializerTestClass> ();
             [XmlArray] public List<DeserializerTestClass> Children { get { return list; } }
             
-            [XmlTypeDeserializer]
-            protected DeserializerTestClass ChildDeserializer (XmlDeserializationContext context)
+            DeserializerTestClass IXmlDeserializer<DeserializerTestClass>.Deserialize (XmlDeserializationContext context)
             {
                 var child = new DeserializerTestClass ("blah");
                 context.AutoDeserialize (child);

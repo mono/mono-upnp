@@ -236,24 +236,15 @@ namespace Mono.Upnp.Xml.Compilation
         
         void ProcessTypeDeserializers ()
         {
-            foreach (var method in Methods) {
-                var attributes =  method.GetCustomAttributes (typeof (XmlTypeDeserializerAttribute), false);
-                if (attributes.Length != 0) {
-                    if (method.ReturnType == typeof (void)) {
-                        // TODO throw
-                        continue;
-                    }
-                    var parameters = method.GetParameters ();
-                    if (parameters.Length != 1 || parameters[0].ParameterType != typeof (XmlDeserializationContext)) {
-                        // TODO throw
-                        continue;
-                    }
+            foreach (var @interface in Type.GetInterfaces ()) {
+                if (@interface.IsGenericType && @interface.GetGenericTypeDefinition () == typeof (IXmlDeserializer<>)) {
+                    var type = @interface.GetGenericArguments()[0];
                     if (type_deserializers == null) {
                         type_deserializers = new Dictionary<Type, MethodInfo> ();
-                    } else if (type_deserializers.ContainsKey (method.ReturnType)) {
+                    } else if (type_deserializers.ContainsKey (type)) {
                         // TODO throw
                     }
-                    type_deserializers[method.ReturnType] = method;
+                    type_deserializers[type] = Type.GetInterfaceMap (@interface).TargetMethods[0];
                 }
             }
         }

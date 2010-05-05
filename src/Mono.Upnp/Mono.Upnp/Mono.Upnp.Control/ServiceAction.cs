@@ -35,7 +35,7 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Control
 {
     [XmlType ("action")]
-    public class ServiceAction : Description, IMappable<string>
+    public class ServiceAction : Description, IMappable<string>, IXmlDeserializer<Argument>
     {
         readonly static Dictionary<string, string> emptyArguments = new Dictionary<string, string> ();
         
@@ -155,7 +155,11 @@ namespace Mono.Upnp.Control
 //            }
 //        }
         
-        [XmlTypeDeserializer]
+        Argument IXmlDeserializer<Argument>.Deserialize (XmlDeserializationContext context)
+        {
+            return DeserializeArgument (context);
+        }
+        
         protected virtual Argument DeserializeArgument (XmlDeserializationContext context)
         {
             return Deserializer != null ? Deserializer.DeserializeArgument (context) : null;

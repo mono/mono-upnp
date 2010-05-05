@@ -36,7 +36,13 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp
 {
     [XmlType ("device")]
-    public class Device : Description, IXmlDeserializable
+    public class Device :
+        Description,
+        IXmlDeserializable,
+        IXmlDeserializer<DeviceType>,
+        IXmlDeserializer<Device>,
+        IXmlDeserializer<Service>,
+        IXmlDeserializer<Icon>
     {
         IList<Device> devices;
         IList<Service> services;
@@ -219,7 +225,11 @@ namespace Mono.Upnp
             }
         }
         
-        [XmlTypeDeserializer]
+        DeviceType IXmlDeserializer<DeviceType>.Deserialize (XmlDeserializationContext context)
+        {
+            return DeserializeDeviceType (context);
+        }
+        
         protected virtual DeviceType DeserializeDeviceType (XmlDeserializationContext context)
         {
             if (context == null) throw new ArgumentNullException ("context");
@@ -227,19 +237,31 @@ namespace Mono.Upnp
             return new DeviceType (context.Reader.ReadElementContentAsString ());
         }
         
-        [XmlTypeDeserializer]
+        Device IXmlDeserializer<Device>.Deserialize (XmlDeserializationContext context)
+        {
+            return DeserializeDevice (context);
+        }
+        
         protected virtual Device DeserializeDevice (XmlDeserializationContext context)
         {
             return Deserializer != null ? Deserializer.DeserializeDevice (context) : null;
         }
         
-        [XmlTypeDeserializer]
+        Service IXmlDeserializer<Service>.Deserialize (XmlDeserializationContext context)
+        {
+            return DeserializeService (context);
+        }
+        
         protected virtual Service DeserializeService (XmlDeserializationContext context)
         {
             return Deserializer != null ? Deserializer.DeserializeService (context) : null;
         }
         
-        [XmlTypeDeserializer]
+        Icon IXmlDeserializer<Icon>.Deserialize (XmlDeserializationContext context)
+        {
+            return DeserializeIcon (context);
+        }
+        
         protected virtual Icon DeserializeIcon (XmlDeserializationContext context)
         {
             return Deserializer != null ? Deserializer.DeserializeIcon (context) : null;

@@ -35,7 +35,11 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Control
 {
     [XmlType ("scpd", Protocol.ServiceSchema)]
-    public class ServiceController : Description, IXmlDeserializable
+    public class ServiceController :
+        Description,
+        IXmlDeserializable,
+        IXmlDeserializer<ServiceAction>,
+        IXmlDeserializer<StateVariable>
     {
         readonly CollectionMap<string, ServiceAction> actions;
         readonly CollectionMap<string, StateVariable> state_variables;
@@ -148,13 +152,21 @@ namespace Mono.Upnp.Control
             event_server.QueueUpdate (stateVariable);
         }
         
-        [XmlTypeDeserializer]
+        ServiceAction IXmlDeserializer<ServiceAction>.Deserialize (XmlDeserializationContext context)
+        {
+            return DeserializeAction (context);
+        }
+        
         protected virtual ServiceAction DeserializeAction (XmlDeserializationContext context)
         {
             return Deserializer != null ? Deserializer.DeserializeAction (this, context) : null;
         }
         
-        [XmlTypeDeserializer]
+        StateVariable IXmlDeserializer<StateVariable>.Deserialize (XmlDeserializationContext context)
+        {
+            return DeserializeStateVariable (context);
+        }
+        
         protected virtual StateVariable DeserializeStateVariable (XmlDeserializationContext context)
         {
             return Deserializer != null ? Deserializer.DeserializeStateVariable (this, context) : null;

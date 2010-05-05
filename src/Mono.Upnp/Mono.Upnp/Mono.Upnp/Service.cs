@@ -48,7 +48,7 @@ namespace Mono.Upnp
     }
     
     [XmlType ("service")]
-    public class Service : Description
+    public class Service : Description, IXmlDeserializer<ServiceType>
     {
         ServiceController controller;
 
@@ -136,7 +136,11 @@ namespace Mono.Upnp
             return controller;
         }
         
-        [XmlTypeDeserializer]
+        ServiceType IXmlDeserializer<ServiceType>.Deserialize (XmlDeserializationContext context)
+        {
+            return DeserializeServiceType (context);
+        }
+        
         protected virtual ServiceType DeserializeServiceType (XmlDeserializationContext context)
         {
             if (context == null) throw new ArgumentNullException ("context");
