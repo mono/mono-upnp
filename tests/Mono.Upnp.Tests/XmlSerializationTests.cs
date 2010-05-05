@@ -688,7 +688,7 @@ namespace Mono.Upnp.Xml.Tests
         public void OverrideOmitTest ()
         {
             Assert.AreEqual (
-                @"<?xml version=""1.0""?><OverrideOmitTestSubClass />",
+                @"<?xml version=""1.0""?><OverrideOmitTestSubClass></OverrideOmitTestSubClass>",
                 serializer.GetString (new OverrideOmitTestSubClass { Foo = "bar" })
             );
             
