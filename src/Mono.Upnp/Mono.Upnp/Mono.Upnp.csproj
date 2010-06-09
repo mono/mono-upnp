@@ -134,6 +134,7 @@
     <Compile Include="Mono.Upnp\RootDeviceOptions.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlSerializationOptions.cs" />
     <Compile Include="Mono.Upnp.Xml\IXmlDeserializer.cs" />
+    <Compile Include="Mono.Upnp.Internal\EmptyDictionary.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

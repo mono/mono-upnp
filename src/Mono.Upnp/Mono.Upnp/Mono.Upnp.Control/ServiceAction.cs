@@ -37,7 +37,7 @@ namespace Mono.Upnp.Control
     [XmlType ("action")]
     public class ServiceAction : Description, IMappable<string>, IXmlDeserializer<Argument>
     {
-        readonly static Dictionary<string, string> emptyArguments = new Dictionary<string, string> ();
+        readonly static IDictionary<string, string> emptyArguments = new EmptyDictionary ();
         
         readonly ServiceController controller;
         readonly CollectionMap<string, Argument> arguments;
