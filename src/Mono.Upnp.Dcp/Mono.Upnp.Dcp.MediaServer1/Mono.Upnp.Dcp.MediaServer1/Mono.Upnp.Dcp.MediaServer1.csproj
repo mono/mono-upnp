@@ -95,6 +95,8 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionManager.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionStatus.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\Direction.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\Arguments.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\StripedCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
@@ -105,5 +107,6 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\" />
+    <Folder Include="Mono.Upnp.Dcp.MediaServer1.Internal\" />
   </ItemGroup>
 </Project>

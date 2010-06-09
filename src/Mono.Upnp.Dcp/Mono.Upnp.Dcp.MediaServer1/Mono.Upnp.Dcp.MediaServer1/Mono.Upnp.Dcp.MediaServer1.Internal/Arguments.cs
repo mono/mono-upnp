@@ -1,10 +1,10 @@
 // 
-// EmptyDictionary.cs
+// Arguments.cs
 //  
 // Author:
-//       Scott Thomas <lunchtimemama@gmail.com>
+//       Scott Peterson <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2010 Scott Thomas
+// Copyright (c) 2010 Scott Peterson
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,95 +28,98 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Mono.Upnp.Internal
+namespace Mono.Upnp.Dcp.MediaServer1.Internal
 {
-    class EmptyDictionary : IDictionary<string, string>
+    class Arguments : StripedCollection<KeyValuePair<string, string>>, IDictionary<string, string>
     {
+        public Arguments (params string[] keyValuePairs)
+            : base (keyValuePairs)
+        {
+        }
+        
         public void Add (string key, string value)
         {
             throw new NotSupportedException ();
         }
-
+        
         public bool ContainsKey (string key)
         {
-            return false;
+            string value;
+            return TryGetValue (key, out value);
         }
-
+        
+        
         public bool Remove (string key)
         {
             return false;
         }
-
+        
         public bool TryGetValue (string key, out string value)
         {
+            for (var i = 0; i < StripedArray.Length; i += 2) {
+                if (StripedArray[i] == key) {
+                    value = StripedArray[i + 1];
+                    return true;
+                }
+            }
             value = null;
             return false;
         }
-
+        
         public string this[string key] {
             get {
-                return null;
+                string value;
+                if (TryGetValue (key, out value)) {
+                    return value;
+                } else {
+                    throw new KeyNotFoundException ();
+                }
             }
             set {
                 throw new NotSupportedException ();
             }
         }
-
+        
         public ICollection<string> Keys {
             get {
-                return new string[0];
+                return new KeyCollection (StripedArray);
             }
         }
-
+        
         public ICollection<string> Values {
             get {
-                return new string[0];
+                return new ValueCollection (StripedArray);
             }
         }
-
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator ()
+        
+        protected override KeyValuePair<string, string> GetValue (KeyValuePair<string, string> keyValuePair)
         {
-            yield break;
+            return keyValuePair;
         }
-
-        IEnumerator IEnumerable.GetEnumerator ()
+        
+        class KeyCollection : StripedCollection<string>
         {
-            return GetEnumerator();
-        }
-
-        public void Add (KeyValuePair<string, string> item)
-        {
-            throw new NotSupportedException ();
-        }
-
-        public void Clear ()
-        {
-            throw new NotSupportedException ();
-        }
-
-        public bool Contains (KeyValuePair<string, string> item)
-        {
-            return false;
-        }
-
-        public void CopyTo (KeyValuePair<string, string>[] array, int arrayIndex)
-        {
-        }
-
-        public bool Remove (KeyValuePair<string, string> item)
-        {
-            throw new NotSupportedException ();
-        }
-
-        public int Count {
-            get {
-                return 0;
+            public KeyCollection (string[] stripedArray)
+                : base (stripedArray)
+            {
+            }
+            
+            protected override string GetValue (KeyValuePair<string, string> keyValuePair)
+            {
+                return keyValuePair.Key;
             }
         }
-
-        public bool IsReadOnly {
-            get {
-                return true;
+        
+        class ValueCollection : StripedCollection<string>
+        {
+            public ValueCollection (string[] stripedArray)
+                : base (stripedArray)
+            {
+            }
+            
+            protected override string GetValue (KeyValuePair<string, string> keyValuePair)
+            {
+                return keyValuePair.Value;
             }
         }
     }

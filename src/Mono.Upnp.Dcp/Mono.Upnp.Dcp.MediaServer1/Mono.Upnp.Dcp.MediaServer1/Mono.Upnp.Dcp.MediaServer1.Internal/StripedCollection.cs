@@ -1,10 +1,10 @@
 // 
-// EmptyDictionary.cs
+// StripedCollection.cs
 //  
 // Author:
-//       Scott Thomas <lunchtimemama@gmail.com>
+//       Scott Peterson <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2010 Scott Thomas
+// Copyright (c) 2010 Scott Peterson
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,92 +28,74 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Mono.Upnp.Internal
+namespace Mono.Upnp.Dcp.MediaServer1.Internal
 {
-    class EmptyDictionary : IDictionary<string, string>
+    abstract class StripedCollection<T> : ICollection<T>
     {
-        public void Add (string key, string value)
+        protected string[] StripedArray;
+        
+        protected StripedCollection (string[] striped_array)
         {
-            throw new NotSupportedException ();
+            StripedArray = striped_array;
         }
-
-        public bool ContainsKey (string key)
+        
+        protected abstract T GetValue (KeyValuePair<string, string> keyValuePair);
+        
+        public IEnumerator<T> GetEnumerator ()
         {
-            return false;
-        }
-
-        public bool Remove (string key)
-        {
-            return false;
-        }
-
-        public bool TryGetValue (string key, out string value)
-        {
-            value = null;
-            return false;
-        }
-
-        public string this[string key] {
-            get {
-                return null;
-            }
-            set {
-                throw new NotSupportedException ();
+            for (var i = 0; i < StripedArray.Length; i += 2) {
+                yield return GetValue (new KeyValuePair<string, string> (StripedArray[i], StripedArray[i + 1]));
             }
         }
-
-        public ICollection<string> Keys {
-            get {
-                return new string[0];
-            }
-        }
-
-        public ICollection<string> Values {
-            get {
-                return new string[0];
-            }
-        }
-
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator ()
-        {
-            yield break;
-        }
-
+        
         IEnumerator IEnumerable.GetEnumerator ()
         {
             return GetEnumerator();
         }
-
-        public void Add (KeyValuePair<string, string> item)
+        
+        public void Add (T item)
         {
             throw new NotSupportedException ();
         }
-
+        
         public void Clear ()
         {
             throw new NotSupportedException ();
         }
-
-        public bool Contains (KeyValuePair<string, string> item)
+        
+        public bool Contains (T item)
         {
+            foreach (var keyValuePair in this) {
+                if (keyValuePair.Equals (item)) {
+                    return true;
+                }
+            }
             return false;
         }
-
-        public void CopyTo (KeyValuePair<string, string>[] array, int arrayIndex)
+        
+        public void CopyTo (T[] array, int arrayIndex)
         {
+            if (arrayIndex + Count >= array.Length) {
+                throw new ArgumentException ("The array is too small.");
+            }
+            
+            foreach (var keyValuePair in this) {
+                array[arrayIndex] = keyValuePair;
+                arrayIndex++;
+            }
         }
-
-        public bool Remove (KeyValuePair<string, string> item)
+        
+        public bool Remove (T item)
         {
             throw new NotSupportedException ();
         }
-
+        
         public int Count {
             get {
-                return 0;
+                return StripedArray.Length / 2;
             }
         }
-
+        
         public bool IsReadOnly {
             get {
                 return true;
