@@ -1,10 +1,10 @@
 // 
-// XmlDeserializationContext.cs
+// SoapFault.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Scott Peterson
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,48 +25,33 @@
 // THE SOFTWARE.
 
 using System;
-using System.Xml;
 
-namespace Mono.Upnp.Xml
+using Mono.Upnp.Internal;
+using Mono.Upnp.Xml;
+
+namespace Mono.Upnp.Internal
 {
-    public class XmlDeserializationContext
+    [XmlType ("Fault", Protocol.SoapEnvelopeSchema, "s")]
+    class SoapFault<T>
     {
-        readonly XmlDeserializer deserializer;
-        readonly XmlReader reader;
-        
-        internal XmlDeserializationContext (XmlDeserializer deserializer, XmlReader reader)
+        public SoapFault ()
         {
-            this.deserializer = deserializer;
-            this.reader = reader;
         }
         
-        public XmlReader Reader {
-            get { return reader; }
-        }
-        
-        public XmlDeserializer Deserializer {
-            get { return deserializer; }
-        }
-        
-        public void AutoDeserialize<T> (T obj)
+        public SoapFault (T detail)
         {
-            if (obj == null) throw new ArgumentNullException ("obj");
-            
-            deserializer.AutoDeserialize (obj, this);
+            FaultCode = "s:Client";
+            FaultString = "UPnPError";
+            Detail = detail;
         }
         
-        public void AutoDeserializeAttribute<T> (T obj)
-        {
-            if (obj == null) throw new ArgumentNullException ("obj");
-            
-            deserializer.AutoDeserializeAttribute (obj, this);
-        }
+        [XmlElement ("faultcode")]
+        public string FaultCode { get; set; }
         
-        public void AutoDeserializeElement<T> (T obj)
-        {
-            if (obj == null) throw new ArgumentNullException ("obj");
-            
-            deserializer.AutoDeserializeElement (obj, this);
-        }
+        [XmlElement ("faultstring")]
+        public string FaultString { get; set; }
+        
+        [XmlElement ("detail")]
+        public T Detail { get; set; }
     }
 }
