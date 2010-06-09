@@ -34,7 +34,7 @@ namespace Mono.Upnp.Internal
     {
         static readonly string local_name;
         static readonly string @namespace;
-        //static readonly string prefix;
+        static readonly string prefix;
         
         static XmlShell ()
         {
@@ -45,7 +45,7 @@ namespace Mono.Upnp.Internal
             var xml_type = (XmlTypeAttribute)xml_types[0];
             local_name = xml_type.Name;
             @namespace = xml_type.Namespace;
-            //prefix = xml_type.Prefix;
+            prefix = xml_type.Prefix;
         }
         
         public XmlShell ()
@@ -64,19 +64,21 @@ namespace Mono.Upnp.Internal
             if (context.Reader.ReadToDescendant (local_name, @namespace)) {
                 using (var reader = context.Reader.ReadSubtree ()) {
                     reader.Read ();
-                    Value = context.Deserializer.Deserialize<T> (reader);
+                    Value = context.Deserialize<T> ();
                 }
             }
         }
         
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
-            throw new System.NotImplementedException ();
+            context.Writer.WriteStartElement (prefix, local_name, @namespace);
+            context.Serialize (Value);
+            context.Writer.WriteEndElement ();
         }
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            throw new System.NotImplementedException ();
+            throw new InvalidOperationException ("A XmlShell cannot be the root of a serialization operation.");
         }
     }
 }

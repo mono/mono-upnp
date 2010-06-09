@@ -189,10 +189,15 @@ namespace Mono.Upnp.Xml
         
         void SerializeCore<TObject> (TObject obj, XmlWriter writer, TContext context)
         {
+            Serialize (obj, new XmlSerializationContext<TContext> (this, writer, context));
+        }
+        
+        internal void Serialize<TObject> (TObject obj, XmlSerializationContext<TContext> context)
+        {
             if (obj == null) throw new ArgumentNullException ("obj");
             
             var serializer = GetCompilerForType (typeof (TObject)).TypeSerializer;
-            serializer (obj, new XmlSerializationContext<TContext> (this, writer, context));
+            serializer (obj, context);
         }
 
         internal void AutoSerializeObjectAndMembers<TObject> (TObject obj, XmlSerializationContext<TContext> context)

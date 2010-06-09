@@ -42,10 +42,15 @@ namespace Mono.Upnp.Control
             ErrorDescription = errorDescription;
         }
         
-        [XmlElement ("errorCode")]
+        public override string ToString ()
+        {
+            return string.Format("{0}: {1}", ErrorCode, ErrorDescription);
+        }
+        
+        [XmlElement ("errorCode", Protocol.ControlSchema)]
         public int ErrorCode { get; protected set; }
         
-        [XmlElement ("errorDescription", OmitIfNull = true )]
+        [XmlElement ("errorDescription", Protocol.ControlSchema, OmitIfNull = true )]
         public string ErrorDescription { get; protected set; }
         
         public static UpnpError Unknown ()

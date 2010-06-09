@@ -144,9 +144,9 @@ namespace Mono.Upnp.GtkClient
                         inputsBox.Sensitive = true;
                         invoke.Sensitive = true;
                     });
-                } catch (Exception exception) {
+                } catch (UpnpControlException exception) {
                     // TODO report error to the UI
-                    Console.WriteLine (exception);
+                    Console.WriteLine ("Upnp error: " + exception.UpnpError);
                 }
             });
         }

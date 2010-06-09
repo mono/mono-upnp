@@ -44,10 +44,6 @@ namespace Mono.Upnp.Xml
             get { return reader; }
         }
         
-        public XmlDeserializer Deserializer {
-            get { return deserializer; }
-        }
-        
         public void AutoDeserialize<T> (T obj)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
@@ -67,6 +63,11 @@ namespace Mono.Upnp.Xml
             if (obj == null) throw new ArgumentNullException ("obj");
             
             deserializer.AutoDeserializeElement (obj, this);
+        }
+        
+        public T Deserialize<T> ()
+        {
+            return deserializer.Deserialize<T> (Reader);
         }
     }
 }
