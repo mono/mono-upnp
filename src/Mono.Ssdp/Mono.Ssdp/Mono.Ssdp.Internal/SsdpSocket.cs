@@ -34,7 +34,8 @@ namespace Mono.Ssdp.Internal
 {
     class SsdpSocket : Socket
     {
-        static readonly IPEndPoint ssdp_endpoint = new IPEndPoint (Protocol.IPAddress, Protocol.Port);
+        static readonly IPEndPoint ssdp_send_point = new IPEndPoint (Protocol.IPAddress, Protocol.Port);
+        static readonly IPEndPoint ssdp_receive_point = new IPEndPoint (IPAddress.Any, Protocol.Port);
         
         public SsdpSocket ()
             : this (true)
@@ -54,7 +55,7 @@ namespace Mono.Ssdp.Internal
         
         public IAsyncResult BeginSendTo (byte [] data, AsyncCallback callback)
         {
-            return BeginSendTo (data, callback, ssdp_endpoint);
+            return BeginSendTo (data, callback, ssdp_send_point);
         }
 
         public IAsyncResult BeginSendTo (byte[] data, AsyncCallback callback, IPEndPoint endPoint)
@@ -70,7 +71,7 @@ namespace Mono.Ssdp.Internal
         
         public void Bind ()
         {
-            Bind (ssdp_endpoint);
+            Bind (ssdp_receive_point);
         }
     }
 }

@@ -55,7 +55,6 @@ namespace Mono.Upnp.Internal
                 if (!listener.IsListening) {
                     return;
                 }
-                
                 var context = listener.EndGetContext (asyncResult);
                 HandleContext (context);
                 context.Response.Close ();
