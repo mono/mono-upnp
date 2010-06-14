@@ -116,7 +116,7 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        protected virtual void ProcessProperty (PropertyInfo property, List<Serializer<TContext>> attributeSerializers, List<Serializer<TContext>> elementSerializers)
+        protected virtual void ProcessProperty (PropertyInfo property, ICollection<Serializer<TContext>> attributeSerializers, ICollection<Serializer<TContext>> elementSerializers)
         {
             XmlAttributeAttribute attribute_attribute = null;
             XmlElementAttribute element_attribute = null;
@@ -187,9 +187,9 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        static Serializer<TContext> CreateSerializer (PropertyInfo property, Serializer<TContext> serializer)
+        protected virtual Serializer<TContext> CreateSerializer (PropertyInfo property, Serializer<TContext> serializer)
         {
-            return (obj, context) => { if (obj == null) Console.WriteLine (property); serializer (property.GetValue (obj, null), context); };
+            return (obj, context) => serializer (property.GetValue (obj, null), context);
         }
         
         static Serializer<TContext> CreateSerializer (Serializer<TContext> serializer, bool omitIfNull)

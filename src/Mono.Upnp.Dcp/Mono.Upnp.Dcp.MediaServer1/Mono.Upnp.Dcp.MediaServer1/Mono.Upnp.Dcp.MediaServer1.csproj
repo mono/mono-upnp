@@ -20,14 +20,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>.</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System">
@@ -97,6 +99,11 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\Direction.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\Arguments.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\StripedCollection.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateDelegateSerializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateContext.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateDelegateSerialzationCompilerFactory.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateTextWriter.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateXmlSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
@@ -108,5 +115,6 @@
   <ItemGroup>
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Internal\" />
+    <Folder Include="Mono.Upnp.Dcp.MediaServer1.Xml\" />
   </ItemGroup>
 </Project>

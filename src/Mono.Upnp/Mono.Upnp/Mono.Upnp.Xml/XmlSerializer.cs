@@ -95,7 +95,7 @@ namespace Mono.Upnp.Xml
     
     public sealed class XmlSerializer<TContext>
     {
-        static UTF8Encoding utf8 = new UTF8Encoding (false);
+        static readonly UTF8Encoding utf8 = new UTF8Encoding (false);
         
         readonly SerializationCompilerFactory<TContext> compiler_factory;
         readonly Dictionary<Type, SerializationCompiler<TContext>> compilers = new Dictionary<Type, SerializationCompiler<TContext>> ();

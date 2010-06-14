@@ -115,6 +115,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                           int requestCount, string sortCriteria, out int numberReturned,
                                           out int totalMatches, out string updateId);
         
+        [UpnpAction]
+        public virtual void UpdateObject ([UpnpArgument ("ObjectID")] string objectId,
+                                          [UpnpArgument ("CurrentTagValue"), UpnpRelatedStateVariable ("A_ARG_TYPE_TagValueList")] string currentTagValue,
+                                          [UpnpArgument ("NewTagValue"), UpnpRelatedStateVariable ("A_ARG_TYPE_TagValueList")] string newTagValue)
+        {
+        }
+        
+        //protected abstract void UpdateObject (string objectId, IEnumerable<XmlReader> currentTagValues, IEnumerable<XmlReader> newTagValues);
+        
         [UpnpStateVariable ("SystemUpdateID")]
         public virtual event EventHandler<StateVariableChangedArgs<string>> SystemUpdateIdChanged;
         

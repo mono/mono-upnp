@@ -88,10 +88,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         internal void FetchResults ()
         {
-            uint returned_count, total_count, update_id;
-            var xml = FetchXml (out returned_count, out total_count, out update_id);
-            ReturnedCount = returned_count;
-            TotalCount = total_count;
+            //uint returned_count, total_count, update_id;
+            //var xml = FetchXml (out returned_count, out total_count, out update_id);
+            //ReturnedCount = returned_count;
+            //TotalCount = total_count;
 //            if (content_directory.CheckIfContainerIsOutOfDate (object_id, update_id) && offset != 0) {
 //                IsOutOfDate = true;
 //            } else {
