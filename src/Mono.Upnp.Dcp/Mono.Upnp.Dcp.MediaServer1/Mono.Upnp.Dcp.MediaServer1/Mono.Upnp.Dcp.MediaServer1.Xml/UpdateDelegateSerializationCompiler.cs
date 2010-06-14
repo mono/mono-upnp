@@ -65,7 +65,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
             return (obj, context) => {
                 var other_obj = context.Context.OtherValue;
                 if (other_obj != null) {
-                    if (!property.GetValue (obj, empty_args).Equals (property.GetValue (other_obj, empty_args))) {
+                    if (!object.Equals (property.GetValue (obj, empty_args), property.GetValue (other_obj, empty_args))) {
                         context.Writer.Flush ();
                         context.Context.DelineateUpdate ();
                         serializerDelegate (obj, CreateContext (context.Writer, new UpdateContext ()));

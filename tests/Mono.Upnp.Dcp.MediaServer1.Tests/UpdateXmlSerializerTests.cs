@@ -42,12 +42,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         
         class Data
         {
-            [XmlElement]
-            public string Foo { get; set; }
-            [XmlElement]
-            public int Bar { get; set; }
-            [XmlElement]
-            public bool Bat { get; set; }
+            [XmlElement] public string Foo { get; set; }
+            [XmlElement] public int Bar { get; set; }
+            [XmlElement] public bool Bat { get; set; }
         }
         
         [Test]
@@ -64,6 +61,22 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertAreEqual ("<Foo>foo</Foo>",
                 new Data { Foo = "foo", Bar = 42, Bat = true },
                 new Data { Foo = "bar", Bar = 42, Bat = true });
+        }
+        
+        [Test]
+        public void OneMadeNotNull ()
+        {
+            AssertAreEqual ("<Foo />",
+                new Data { Foo = null, Bar = 42, Bat = true },
+                new Data { Foo = "foo", Bar = 42, Bat = true });
+        }
+        
+        [Test]
+        public void OneMadeNull ()
+        {
+            AssertAreEqual ("<Foo>foo</Foo>",
+                new Data { Foo = "foo", Bar = 42, Bat = true },
+                new Data { Foo = null, Bar = 42, Bat = true });
         }
         
         [Test]
@@ -90,12 +103,48 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 new Data { Foo = "bar", Bar = 13, Bat = false });
         }
         
+        class OmitIfNullData
+        {
+            [XmlElement (OmitIfNull = true)] public string Foo { get; set; }
+            [XmlElement (OmitIfNull = true)] public string Bar { get; set; }
+        }
+        
+        [Test]
+        public void OneOmitIfNullMadeNotNull ()
+        {
+            AssertAreEqual ("",
+                new OmitIfNullData (),
+                new OmitIfNullData { Foo = "foo" });
+        }
+        
+        [Test]
+        public void OneOmitIfNullMadeNull ()
+        {
+            AssertAreEqual ("<Foo>foo</Foo>",
+                new OmitIfNullData { Foo = "foo" },
+                new OmitIfNullData ());
+        }
+        
+        [Test]
+        public void TwoOmitIfNullMadeNotNull ()
+        {
+            AssertAreEqual (",",
+                new OmitIfNullData (),
+                new OmitIfNullData { Foo = "foo", Bar = "bar" });
+        }
+        
+        [Test]
+        public void TwoOmitIfNullMadeNull ()
+        {
+            AssertAreEqual ("<Foo>foo</Foo>,<Bar>bar</Bar>",
+                new OmitIfNullData { Foo = "foo", Bar = "bar" },
+                new OmitIfNullData ());
+        }
+        
         class DataWithFlag
         {
-            [XmlElement]
-            public string Foo { get; set; }
-            [XmlFlag]
-            public bool Bar { get; set; }
+            [XmlElement] public string Foo { get; set; }
+            [XmlFlag] public bool Bar { get; set; }
         }
         
         [Test]
@@ -128,6 +177,26 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertAreEqual ("<Foo>foo</Foo>,<Bar />",
                 new DataWithFlag { Foo = "foo", Bar = true },
                 new DataWithFlag { Foo = "bar", Bar = false });
+        }
+        
+        class NestedData
+        {
+            [XmlElement] public string Foo { get; set; }
+            [XmlElement (OmitIfNull = true)] public NestedData Child { get; set; }
+            
+            public override bool Equals (object obj)
+            {
+                var data = (NestedData)obj;
+                return data.Foo == Foo && data.Child.Equals (Child);
+            }
+        }
+        
+        [Test]
+        public void NestedObjectChanged ()
+        {
+            AssertAreEqual ("<Child><Foo>foo</Foo></Child>",
+                new NestedData { Child = new NestedData { Foo = "foo" } },
+                new NestedData { Child = new NestedData { Foo = "bar" } });
         }
         
         void AssertAreEqual<T> (string expected, T obj1, T obj2)
