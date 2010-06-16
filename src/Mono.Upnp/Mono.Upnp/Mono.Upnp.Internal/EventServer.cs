@@ -141,7 +141,7 @@ namespace Mono.Upnp.Internal
             
             using (var stream = request.GetRequestStream ()) {
                 using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
-                    writer.WriteStartDocument ();
+                    writer.WriteProcessingInstruction ("xml", @"version=""1.0""");
                     writer.WriteStartElement ("e", "propertyset", Protocol.EventSchema);
                     foreach (var state_variable in stateVariables) {
                         writer.WriteStartElement ("property", Protocol.EventSchema);
@@ -232,11 +232,11 @@ namespace Mono.Upnp.Internal
                 subscribers.Add (uuid, subscriber);
             }
             
-            context.Response.Close ();
-            
             Log.Information (string.Format (
                 "{0} from {1} subscribed to {2} as {3}.",
                 subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, subscriber.Sid));
+            
+            context.Response.Close ();
             
             PublishUpdates (subscriber, state_variables);
         }
