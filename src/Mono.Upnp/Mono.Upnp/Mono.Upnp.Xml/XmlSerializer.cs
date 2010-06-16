@@ -97,7 +97,7 @@ namespace Mono.Upnp.Xml
     {
         static readonly UTF8Encoding utf8 = new UTF8Encoding (false);
         
-        readonly SerializationCompilerFactory<TContext> compiler_factory;
+        readonly SerializationCompilerProvider<TContext> compiler_provider;
         readonly Dictionary<Type, SerializationCompiler<TContext>> compilers = new Dictionary<Type, SerializationCompiler<TContext>> ();
         
         public XmlSerializer ()
@@ -105,9 +105,13 @@ namespace Mono.Upnp.Xml
         {
         }
         
-        public XmlSerializer (SerializationCompilerFactory<TContext> compilerFactory)
+        public XmlSerializer (SerializationCompilerProvider<TContext> compilerProvider)
         {
-            this.compiler_factory = compilerFactory ?? new DelegateSerializationCompilerFactory<TContext> ();
+            if (compilerProvider == null) {
+                compiler_provider = (serializer, type) => new DelegateSerializationCompiler<TContext> (serializer, type);
+            } else {
+                compiler_provider = compilerProvider;
+            }
         }
         
         public void Serialize<TObject> (TObject obj, XmlWriter writer)
@@ -216,7 +220,7 @@ namespace Mono.Upnp.Xml
         {
             SerializationCompiler<TContext> compiler;
             if (!compilers.TryGetValue (type, out compiler)) {
-                compiler = compiler_factory.CreateSerializationCompiler (this, type);
+                compiler = compiler_provider (this, type);
                 compilers[type] = compiler;
             }
             return compiler;

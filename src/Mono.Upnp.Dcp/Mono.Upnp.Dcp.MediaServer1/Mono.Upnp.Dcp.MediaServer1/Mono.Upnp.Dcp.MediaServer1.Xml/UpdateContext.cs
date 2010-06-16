@@ -61,6 +61,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
             get { return other_value; }
         }
         
+        public bool Delineated {
+            get { return delineated; }
+        }
+        
         public void DelineateUpdate ()
         {
             if (stream == null) {

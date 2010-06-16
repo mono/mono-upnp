@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -62,6 +63,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
         protected override Serializer<UpdateContext> CreateSerializer (PropertyInfo property, Serializer<UpdateContext> serializer)
         {
             var serializerDelegate = base.CreateSerializer (property, serializer);
+            if (property.GetCustomAttributes (typeof (XmlArrayItemAttribute), false).Length != 0) {
+                return serializerDelegate;
+            }
             return (obj, context) => {
                 var other_obj = context.Context.OtherValue;
                 if (other_obj != null) {
@@ -72,6 +76,79 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
                     }
                 } else {
                     serializerDelegate (obj, context);
+                }
+            };
+        }
+        
+        protected override Serializer<UpdateContext> CreateArrayItemSerializer (PropertyInfo property)
+        {
+            var item_type = GetIEnumerable (property.PropertyType).GetGenericArguments ()[0];
+            var serializer = GetCompilerForType (item_type).TypeSerializer;
+            Serializer<UpdateContext> item_serializer = (obj, context) => serializer (obj, CreateContext (context.Writer, new UpdateContext ()));
+            return CreateArrayItemSerializer (property, item_serializer);
+        }
+        
+        protected override Serializer<UpdateContext> CreateArrayItemSerializer (PropertyInfo property, string name, string @namespace, string prefix)
+        {
+            var item_type = GetIEnumerable (property.PropertyType).GetGenericArguments ()[0];
+            var serializer = GetCompilerForType (item_type).MemberSerializer;
+            Serializer<UpdateContext> item_serializer = (obj, context) => {
+                context.Writer.WriteStartElement (prefix, name, @namespace);
+                serializer (obj, CreateContext (context.Writer, new UpdateContext ()));
+                context.Writer.WriteEndElement ();
+            };
+            return CreateArrayItemSerializer (property, item_serializer);
+        }
+        
+        static Serializer<UpdateContext> CreateArrayItemSerializer (PropertyInfo property, Serializer<UpdateContext> serializer)
+        {
+            return (obj, context) => {
+                var other_obj = context.Context.OtherValue;
+                if (other_obj != null) {
+                    var other_enumerable = property.GetValue (other_obj, empty_args) as IEnumerable;
+                    if (other_enumerable == null) {
+                        if (obj != null) {
+                            foreach (var item in (IEnumerable)obj)  {
+                                context.Writer.Flush ();
+                                context.Context.DelineateUpdate ();
+                                serializer (item, context);
+                            }
+                        }
+                    } else if (obj == null) {
+                        context.Writer.Flush ();
+                        var other_enumerator = other_enumerable.GetEnumerator ();
+                        while (other_enumerator.MoveNext ()) {
+                           context.Context.DelineateUpdate ();
+                        }
+                    } else {
+                        var enumerator = ((IEnumerable)obj).GetEnumerator ();
+                        var other_enumerator = other_enumerable.GetEnumerator ();
+                        while (enumerator.MoveNext ()) {
+                            if (other_enumerator.MoveNext ()) {
+                                if (!Object.Equals (enumerator.Current, other_enumerator.Current)) {
+                                    context.Writer.Flush ();
+                                    context.Context.DelineateUpdate ();
+                                    if (enumerator.Current != null) {
+                                        serializer (enumerator.Current, context);
+                                    }
+                                }
+                            } else {
+                                context.Writer.Flush ();
+                                context.Context.DelineateUpdate ();
+                                serializer (enumerator.Current, context);
+                            }
+                        }
+                        while (other_enumerator.MoveNext ()) {
+                            context.Writer.Flush ();
+                            context.Context.DelineateUpdate ();
+                        }
+                    }
+                } else if (obj != null) {
+                    foreach (var item in (IEnumerable)obj)  {
+                        context.Writer.Flush ();
+                        context.Context.DelineateUpdate ();
+                        serializer (item, context);
+                    }
                 }
             };
         }

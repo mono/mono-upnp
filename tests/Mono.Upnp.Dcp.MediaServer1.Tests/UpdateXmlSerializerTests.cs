@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -50,7 +51,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         [Test]
         public void NoUpdate ()
         {
-            AssertAreEqual ("",
+            AssertAreEqual (null,
                 new Data { Foo = "foo", Bar = 42, Bat = true },
                 new Data { Foo = "foo", Bar = 42, Bat = true });
         }
@@ -101,6 +102,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertAreEqual ("<Foo>foo</Foo>,<Bar>42</Bar>,<Bat>True</Bat>",
                 new Data { Foo = "foo", Bar = 42, Bat = true },
                 new Data { Foo = "bar", Bar = 13, Bat = false });
+        }
+        
+        class NamedData
+        {
+            [XmlElement ("foo")] public string Foo { get; set; }
+        }
+        
+        [Test]
+        public void NamedElementUpdate ()
+        {
+            AssertAreEqual ("<foo>foo</foo>",
+                new NamedData { Foo = "foo" },
+                new NamedData { Foo = "bar" });
         }
         
         class OmitIfNullData
@@ -199,10 +213,194 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 new NestedData { Child = new NestedData { Foo = "bar" } });
         }
         
+        class Item
+        {
+            readonly string foo;
+            
+            public Item (string foo)
+            {
+                this.foo = foo;
+            }
+            
+            public override bool Equals (object obj)
+            {
+                return foo == ((Item)obj).foo;
+            }
+            
+            public override string ToString ()
+            {
+                return foo;
+            }
+        }
+        
+        class ArrayItemData
+        {
+            [XmlArrayItem] public IEnumerable<Item> Data { get; set; }
+        }
+        
+        [Test]
+        public void NullArrayItemUnchanged ()
+        {
+            AssertAreEqual (null,
+                new ArrayItemData (),
+                new ArrayItemData ());
+        }
+        
+        [Test]
+        public void EmptyArrayItemUnchaged ()
+        {
+            AssertAreEqual (null,
+                new ArrayItemData { Data = new Item[0] },
+                new ArrayItemData { Data = new Item[0] });
+        }
+        
+        [Test]
+        public void SingleArrayItemUnchanged ()
+        {
+            AssertAreEqual (null,
+                new ArrayItemData { Data = new [] { new Item ("foo") } },
+                new ArrayItemData { Data = new [] { new Item ("foo") } });
+        }
+        
+        [Test]
+        public void TwoArrayItemsUnchanged ()
+        {
+            AssertAreEqual (null,
+                new ArrayItemData { Data = new [] { new Item ("foo"), new Item ("bar") } },
+                new ArrayItemData { Data = new [] { new Item ("foo"), new Item ("bar") } });
+        }
+        
+        [Test]
+        public void NullArrayItemMadeEmpty ()
+        {
+            AssertAreEqual (null,
+                new ArrayItemData (),
+                new ArrayItemData { Data = new Item[0] });
+        }
+        
+        [Test]
+        public void EmptyArrayItemMadeNull ()
+        {
+            AssertAreEqual (null,
+                new ArrayItemData { Data = new Item[0] },
+                new ArrayItemData ());
+        }
+        
+        [Test]
+        public void NullArrayItemMadeSingle ()
+        {
+            AssertAreEqual ("",
+                new ArrayItemData (),
+                new ArrayItemData { Data = new [] { new Item ("foo") } });
+        }
+        
+        [Test]
+        public void SingleArrayItemMadeNull ()
+        {
+            AssertAreEqual ("<Item>foo</Item>",
+                new ArrayItemData { Data = new [] { new Item ("foo") } },
+                new ArrayItemData ());
+        }
+        
+        [Test]
+        public void NullArrayItemMadeDouble ()
+        {
+            AssertAreEqual (",",
+                new ArrayItemData (),
+                new ArrayItemData { Data = new [] { new Item ("foo"), new Item ("bar") } });
+        }
+        
+        [Test]
+        public void DoubleArrayItemMadeNull ()
+        {
+            AssertAreEqual ("<Item>foo</Item>,<Item>bar</Item>",
+                new ArrayItemData { Data = new [] { new Item ("foo"), new Item ("bar") } },
+                new ArrayItemData ());
+        }
+        
+        [Test]
+        public void EmptyArrayItemMadeSingle ()
+        {
+            AssertAreEqual ("",
+                new ArrayItemData { Data = new Item[0] },
+                new ArrayItemData { Data = new [] { new Item ("foo") } });
+        }
+        
+        [Test]
+        public void SingleArrayItemMadeEmpty ()
+        {
+            AssertAreEqual ("<Item>foo</Item>",
+                new ArrayItemData { Data = new [] { new Item ("foo") } },
+                new ArrayItemData { Data = new Item[0] });
+        }
+        
+        [Test]
+        public void EmptyArrayItemMadeDouble ()
+        {
+            AssertAreEqual (",",
+                new ArrayItemData { Data = new Item[0] },
+                new ArrayItemData { Data = new [] { new Item ("foo"), new Item ("bar") } });
+        }
+        
+        [Test]
+        public void DoubleArrayItemMadeEmpty ()
+        {
+            AssertAreEqual ("<Item>foo</Item>,<Item>bar</Item>",
+                new ArrayItemData { Data = new [] { new Item ("foo"), new Item ("bar") } },
+                new ArrayItemData { Data = new Item[0] });
+        }
+        
+        [Test]
+        public void SingleArrayItemMadeDouble ()
+        {
+            AssertAreEqual ("",
+                new ArrayItemData { Data = new [] { new Item ("foo") } },
+                new ArrayItemData { Data = new [] { new Item ("foo"), new Item ("bar") } });
+        }
+        
+        [Test]
+        public void DoubleArrayItemMadeSingle ()
+        {
+            AssertAreEqual ("<Item>bar</Item>",
+                new ArrayItemData { Data = new [] { new Item ("foo"), new Item ("bar") } },
+                new ArrayItemData { Data = new [] { new Item ("foo") } });
+        }
+        
+        [Test]
+        public void ArrayItemsChanged ()
+        {
+            var data1 = new ArrayItemData { Data = new [] { new Item ("1"), new Item ("2"), new Item ("3") } };
+            var data2 = new ArrayItemData { Data = new [] { new Item ("a"), new Item ("b"), new Item ("c") } };
+            AssertAreEqual ("<Item>1</Item>,<Item>2</Item>,<Item>3</Item>", data1, data2);
+            AssertAreEqual ("<Item>a</Item>,<Item>b</Item>,<Item>c</Item>", data2, data1);
+        }
+        
+        [Test]
+        public void ArrayItemRemovedWithNull ()
+        {
+            var data1 = new ArrayItemData { Data = new [] { new Item ("foo") } };
+            var data2 = new ArrayItemData { Data = new Item[] { null } };
+            AssertAreEqual ("<Item>foo</Item>", data1, data2);
+            AssertAreEqual ("", data2, data1);
+        }
+        
+        [Test]
+        public void ArrayItemsChangedAndAddedAndRemovedWithNull ()
+        {
+            var data1 = new ArrayItemData { Data = new [] { new Item ("1"), new Item ("2"), new Item ("3") } };
+            var data2 = new ArrayItemData { Data = new [] { null, new Item ("2"), new Item ("three"), new Item ("4") } };
+            AssertAreEqual ("<Item>1</Item>,<Item>3</Item>,", data1, data2);
+            AssertAreEqual (",<Item>three</Item>,<Item>4</Item>", data2, data1);
+        }
+        
         void AssertAreEqual<T> (string expected, T obj1, T obj2)
         {
             using (var stream = new MemoryStream ()) {
-                serializer.Serialize (obj1, obj2, stream);
+                var updated = serializer.Serialize (obj1, obj2, stream);
+                if (expected == null) {
+                    Assert.IsFalse (updated);
+                    return;
+                }
                 stream.Seek (0, SeekOrigin.Begin);
                 var buffer = new byte[stream.Length];
                 stream.Read (buffer, 0, (int)stream.Length);

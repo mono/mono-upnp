@@ -101,7 +101,6 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\StripedCollection.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateDelegateSerializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateContext.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateDelegateSerialzationCompilerFactory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateTextWriter.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateXmlSerializer.cs" />
   </ItemGroup>

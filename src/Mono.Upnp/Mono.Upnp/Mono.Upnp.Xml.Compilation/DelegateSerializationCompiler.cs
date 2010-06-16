@@ -333,18 +333,23 @@ namespace Mono.Upnp.Xml.Compilation
             }
             
             if (string.IsNullOrEmpty (arrayItemAttribute.Name)) {
-                var item_type = GetIEnumerable (property.PropertyType).GetGenericArguments ()[0];
-                var serializer = GetCompilerForType (item_type).TypeSerializer;
-                return (obj, context) => {
-                    if (obj != null) {
-                        foreach (var item in (IEnumerable)obj)  {
-                            serializer (item, context);
-                        }
-                    }
-                };
+                return CreateArrayItemSerializer (property);
             } else {
                 return CreateArrayItemSerializer (property, arrayItemAttribute.Name, arrayItemAttribute.Namespace, arrayItemAttribute.Prefix);
             }
+        }
+        
+        protected virtual Serializer<TContext> CreateArrayItemSerializer (PropertyInfo property)
+        {
+            var item_type = GetIEnumerable (property.PropertyType).GetGenericArguments ()[0];
+            var serializer = GetCompilerForType (item_type).TypeSerializer;
+            return (obj, context) => {
+                if (obj != null) {
+                    foreach (var item in (IEnumerable)obj)  {
+                        serializer (item, context);
+                    }
+                }
+            };
         }
         
         protected virtual Serializer<TContext> CreateArrayItemSerializer (PropertyInfo property, string name, string @namespace, string prefix)
@@ -385,7 +390,7 @@ namespace Mono.Upnp.Xml.Compilation
             };
         }
         
-        static Type GetIEnumerable (Type type)
+        protected static Type GetIEnumerable (Type type)
         {
             if (type.IsGenericType && type.GetGenericTypeDefinition () == typeof (IEnumerable<>)) {
                 return type;

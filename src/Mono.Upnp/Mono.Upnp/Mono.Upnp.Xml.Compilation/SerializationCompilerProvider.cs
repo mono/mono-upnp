@@ -1,5 +1,5 @@
 // 
-// UpdateDelegateSerialzationCompilerFactory.cs
+// SerializationCompilerProvider.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -26,16 +26,7 @@
 
 using System;
 
-using Mono.Upnp.Xml;
-using Mono.Upnp.Xml.Compilation;
-
-namespace Mono.Upnp.Dcp.MediaServer1.Xml
+namespace Mono.Upnp.Xml.Compilation
 {
-    public class UpdateDelegateSerialzationCompilerFactory : SerializationCompilerFactory<UpdateContext>
-    {
-        public override SerializationCompiler<UpdateContext> CreateSerializationCompiler (XmlSerializer<UpdateContext> xmlSerializer, Type type)
-        {
-            return new UpdateDelegateSerializationCompiler (xmlSerializer, type);
-        }
-    }
+    public delegate SerializationCompiler<T> SerializationCompilerProvider<T> (XmlSerializer<T> xmlSerializer, Type type);
 }

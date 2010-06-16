@@ -119,8 +119,6 @@
     <Compile Include="Mono.Upnp.Xml.Compilation\Compiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\Serializer.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompiler.cs" />
-    <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompilerFactory.cs" />
-    <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompilerFactory.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlDeclarationType.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateDeserializationCompiler.cs" />
@@ -137,6 +135,7 @@
     <Compile Include="Mono.Upnp.Internal\SoapFault.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpError.cs" />
     <Compile Include="Mono.Upnp.Internal\XmlShell.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompilerProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

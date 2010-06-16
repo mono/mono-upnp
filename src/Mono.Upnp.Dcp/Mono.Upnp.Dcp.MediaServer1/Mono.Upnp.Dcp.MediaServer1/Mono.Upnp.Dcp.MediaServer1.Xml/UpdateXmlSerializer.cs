@@ -41,21 +41,21 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
         readonly XmlSerializer<UpdateContext> xml_serializer;
         
         public UpdateXmlSerializer ()
-            : this (new UpdateDelegateSerialzationCompilerFactory ())
+            : this ((serializer, type) => new UpdateDelegateSerializationCompiler (serializer, type))
         {
         }
         
-        public UpdateXmlSerializer (SerializationCompilerFactory<UpdateContext> compilerFactory)
+        public UpdateXmlSerializer (SerializationCompilerProvider<UpdateContext> compilerProvider)
         {
-            this.xml_serializer = new XmlSerializer<UpdateContext> (compilerFactory);
+            this.xml_serializer = new XmlSerializer<UpdateContext> (compilerProvider);
         }
         
-        public void Serialize<T> (T obj1, T obj2, Stream stream)
+        public bool Serialize<T> (T obj1, T obj2, Stream stream)
         {
-            Serialize (obj1, obj2, stream, null);
+            return Serialize (obj1, obj2, stream, null);
         }
         
-        public void Serialize<T> (T obj1, T obj2, Stream stream, XmlSerializationOptions options)
+        public bool Serialize<T> (T obj1, T obj2, Stream stream, XmlSerializationOptions options)
         {
             if (stream == null) {
                 throw new ArgumentNullException ("stream");
@@ -63,10 +63,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
             
             var encoding = options != null ? options.Encoding ?? utf8 : utf8;
             var update_writer = new UpdateTextWriter (new StreamWriter (stream, encoding));
+            var context = new UpdateContext (obj2, stream, encoding);
             using (var xml_writer = XmlWriter.Create (update_writer, new XmlWriterSettings {
                 Encoding = encoding, OmitXmlDeclaration = true })) {
-                xml_serializer.Serialize (obj1, xml_writer, new UpdateContext (obj2, stream, encoding));
+                xml_serializer.Serialize (obj1, xml_writer, context);
             }
+            return context.Delineated;
         }
     }
 }
