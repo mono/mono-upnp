@@ -30,6 +30,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
+using Mono.Upnp.Internal;
 using Mono.Upnp.Xml.Compilation;
 
 namespace Mono.Upnp.Xml
@@ -95,8 +96,6 @@ namespace Mono.Upnp.Xml
     
     public sealed class XmlSerializer<TContext>
     {
-        static readonly UTF8Encoding utf8 = new UTF8Encoding (false);
-        
         readonly SerializationCompilerProvider<TContext> compiler_provider;
         readonly Dictionary<Type, SerializationCompiler<TContext>> compilers = new Dictionary<Type, SerializationCompiler<TContext>> ();
         
@@ -155,7 +154,7 @@ namespace Mono.Upnp.Xml
             
             using (var stream = new MemoryStream ()) {
                 using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
-                    Encoding = serializationOptions.Encoding ?? utf8, OmitXmlDeclaration = true, })) {
+                    Encoding = serializationOptions.Encoding ?? Helper.UTF8Unsigned, OmitXmlDeclaration = true, })) {
                     WriteXmlDeclaration (writer, serializationOptions);
                     SerializeCore (obj, writer, serializationOptions.Context);
                 }
@@ -174,7 +173,7 @@ namespace Mono.Upnp.Xml
                 options = new XmlSerializationOptions<TContext> ();
             }
             
-            var encoding = options.Encoding ?? utf8;
+            var encoding = options.Encoding ?? Helper.UTF8Unsigned;
             
             return encoding.GetString (GetBytes (obj, options));
         }
@@ -235,11 +234,11 @@ namespace Mono.Upnp.Xml
             public XmlSerializationOptions (XmlSerializationOptions<TContext> options)
             {
                 if (options == null) {
-                    Encoding = utf8;
+                    Encoding = Helper.UTF8Unsigned;
                     Context = default(TContext);
                     XmlDeclarationType = 0;
                 } else {
-                    Encoding = options.Encoding ?? utf8;
+                    Encoding = options.Encoding ?? Helper.UTF8Unsigned;
                     Context = options.Context;
                     XmlDeclarationType = options.XmlDeclarationType;
                 }

@@ -55,8 +55,6 @@ namespace Mono.Upnp.Internal
             }
         }
         
-        readonly static Encoding utf8 = new UTF8Encoding (false);
-        
         readonly IEnumerable<StateVariable> state_variables;
         volatile bool started;
         
@@ -140,7 +138,7 @@ namespace Mono.Upnp.Internal
             subscriber.Seq++;
             
             using (var stream = request.GetRequestStream ()) {
-                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = utf8 })) {
+                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = Helper.UTF8Unsigned })) {
                     writer.WriteProcessingInstruction ("xml", @"version=""1.0""");
                     writer.WriteStartElement ("e", "propertyset", Protocol.EventSchema);
                     foreach (var state_variable in stateVariables) {
