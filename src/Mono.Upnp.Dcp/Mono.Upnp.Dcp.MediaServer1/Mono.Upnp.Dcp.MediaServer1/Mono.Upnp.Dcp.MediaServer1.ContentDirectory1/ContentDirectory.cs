@@ -246,6 +246,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [UpnpStateVariable ("SystemUpdateID")]
         public virtual event EventHandler<StateVariableChangedArgs<string>> SystemUpdateIdChanged;
         
+        [UpnpStateVariable ("TransferIDs", OmitUnless = "HasTransferIds")]
+        public virtual event EventHandler<StateVariableChangedArgs<string>> TransferIdsChanged;
+        
+        public virtual bool HasTransferIds {
+            get { return false; }
+        }
+        
         public void Dispose ()
         {
             Dispose (true);
