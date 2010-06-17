@@ -1,5 +1,5 @@
 // 
-// ServiceOptions.cs
+// ServiceOperation.cs
 //  
 // Author:
 //   Aaron Bockover <abockover@novell.com>

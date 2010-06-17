@@ -31,7 +31,7 @@ using NUnit.Framework;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
 {
-    [TestFixture]
+    [Ignore, TestFixture]
     public class Test
     {
         MediaServer media_server;

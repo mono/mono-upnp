@@ -234,8 +234,6 @@ namespace Mono.Upnp.Internal
                 "{0} from {1} subscribed to {2} as {3}.",
                 subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, subscriber.Sid));
             
-            context.Response.Close ();
-            
             PublishUpdates (subscriber, state_variables);
         }
         

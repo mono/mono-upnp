@@ -28,6 +28,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.NetworkInformation;
 
 using Mono.Ssdp.Internal;
 
@@ -41,6 +43,11 @@ namespace Mono.Ssdp
         private readonly object mutex = new object();
         private NotifyListener notify_listener;
         private Dictionary<string, Browser> browsers;
+        
+        private readonly NetworkInterfaceInfo network_interface_info;
+        internal NetworkInterfaceInfo NetworkInterfaceInfo {
+            get { return network_interface_info; }
+        }
 
         private readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher ();
         internal TimeoutDispatcher Dispatcher {
@@ -59,9 +66,15 @@ namespace Mono.Ssdp
         public event EventHandler<ServiceArgs> ServiceUpdated;
 
         public event EventHandler<ServiceArgs> ServiceRemoved;
-    
+        
         public Client ()
+            : this (null)
         {
+        }
+    
+        public Client (NetworkInterface networkInterface)
+        {
+            network_interface_info = NetworkInterfaceInfo.GetNetworkInterfaceInfo (networkInterface);
             service_cache = new ServiceCache (this);
             notify_listener = new NotifyListener (this);
             browsers = new Dictionary<string, Browser> ();

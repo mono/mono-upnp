@@ -44,7 +44,7 @@ namespace Mono.Ssdp.Tests
                     client.BrowseAll ();
                     lock (mutex) {
                         server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The announcement timed out.");
                         }
                     }
@@ -61,7 +61,7 @@ namespace Mono.Ssdp.Tests
                     client.ServiceAdded += ClientServiceAdded;
                     lock (mutex) {
                         client.BrowseAll ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The announcement timed out.");
                         }
                     }
@@ -88,7 +88,7 @@ namespace Mono.Ssdp.Tests
                     client.Browse ("upnp:test");
                     lock (mutex) {
                         server.Announce ("upnp:test", "uuid:mono-upnp-tests:test", "http://localhost/");
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The announcement timed out.");
                         }
                     }
@@ -113,7 +113,7 @@ namespace Mono.Ssdp.Tests
                         server.Announce ("upnp:test:fail", "uuid:mono-upnp-tests:test1", "http://localhost/");
                         server.Announce ("upnp", "uuid:mono-upnp-tests:test2", "http://localhost/");
                         server.Announce ("upnp:test", "uuid:mono-upnp-tests:test3", "http://localhost/");
-                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The client recieved invalid announcements.");
                         }
                     }

@@ -57,6 +57,8 @@ namespace Mono.Upnp.Internal
                 }
                 var context = listener.EndGetContext (asyncResult);
                 HandleContext (context);
+                // FIXME this is a bug in Mono
+                context.Response.OutputStream.Close ();
                 context.Response.Close ();
                 listener.BeginGetContext (OnGetContext, null);
             }

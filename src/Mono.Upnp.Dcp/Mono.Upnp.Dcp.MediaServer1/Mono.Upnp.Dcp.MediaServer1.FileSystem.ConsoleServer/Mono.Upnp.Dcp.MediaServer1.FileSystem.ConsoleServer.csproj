@@ -20,7 +20,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Commandlineparameters>"/home/scott/Music/Starfucker - Starfucker (V0)"</Commandlineparameters>
+    <Commandlineparameters>-f "mac: upnp" "/home/scott/Music/Starfucker - Starfucker (V0)"</Commandlineparameters>
     <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

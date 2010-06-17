@@ -35,22 +35,14 @@ namespace Mono.Ssdp.Internal
     class SsdpSocket : Socket
     {
         static readonly IPEndPoint ssdp_send_point = new IPEndPoint (Protocol.IPAddress, Protocol.Port);
-        static readonly IPEndPoint ssdp_receive_point = new IPEndPoint (IPAddress.Any, Protocol.Port);
         
-        public SsdpSocket ()
-            : this (true)
-        {
-        }
+        readonly IPEndPoint ssdp_receive_point;
         
-        public SsdpSocket (bool multicast)
+        public SsdpSocket (IPAddress address)
             : base (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
         {
+            ssdp_receive_point = new IPEndPoint (address, Protocol.Port);
             SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-            if (multicast) {
-                SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
-                SetSocketOption (SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, Protocol.SocketTtl);
-                SetSocketOption (SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption (Protocol.IPAddress, 0));
-            } 
         }
         
         public IAsyncResult BeginSendTo (byte [] data, AsyncCallback callback)

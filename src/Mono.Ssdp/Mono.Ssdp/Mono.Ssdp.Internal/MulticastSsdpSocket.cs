@@ -4,7 +4,7 @@
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Scott Peterson
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Net;
 using System.Net.Sockets;
 
@@ -31,11 +32,13 @@ namespace Mono.Ssdp.Internal
 {
     class MulticastSsdpSocket : SsdpSocket
     {
-        public MulticastSsdpSocket (IPAddress localAddress)
+        public MulticastSsdpSocket (NetworkInterfaceInfo networkInterfaceInfo)
+            : base (networkInterfaceInfo.Address)
         {
             SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
             SetSocketOption (SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, Protocol.SocketTtl);
-            SetSocketOption (SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption (Protocol.IPAddress, localAddress));
+            SetSocketOption (SocketOptionLevel.IP, SocketOptionName.AddMembership, new MulticastOption (Protocol.IPAddress, networkInterfaceInfo.Index));
         }
     }
 }
+

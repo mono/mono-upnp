@@ -228,7 +228,7 @@ namespace Mono.Upnp.Tests
                     Assert.IsNotNull (response.Headers["SID"]);
                     Assert.AreEqual ("Second-1800", response.Headers["TIMEOUT"]);
                 }
-                if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                     Assert.Fail ("Event publishing timed out.");
                 }
             }
@@ -249,25 +249,31 @@ namespace Mono.Upnp.Tests
                 using (var listener = new HttpListener ()) {
                     listener.Prefixes.Add (prefix);
                     listener.Start ();
+                    Exception exception = null;
                     listener.BeginGetContext (result => {
                         lock (mutex) {
-                            var context = listener.EndGetContext (result);
-                            using (var reader = new StreamReader (context.Request.InputStream)) {
-                                Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
-                            }
-                            context.Response.Close ();
-                            var unsub_request = WebRequest.Create (url);
-                            unsub_request.Method = "UNSUBSCRIBE";
-                            unsub_request.Headers.Add ("SID", sid);
-                            using (var response = (HttpWebResponse)unsub_request.GetResponse ()) {
-                                Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
-                            }
-                            listener.BeginGetContext (r => {
-                                lock (mutex) {
-                                    Monitor.Pulse (mutex);
+                            try {
+                                var context = listener.EndGetContext (result);
+                                using (var reader = new StreamReader (context.Request.InputStream)) {
+                                    Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
                                 }
-                            }, null);
-                            eventer.SetValue ("foo");
+                                context.Response.Close ();
+                                var unsub_request = WebRequest.Create (url);
+                                unsub_request.Method = "UNSUBSCRIBE";
+                                unsub_request.Headers.Add ("SID", sid);
+                                using (var response = (HttpWebResponse)unsub_request.GetResponse ()) {
+                                    Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                                }
+                                listener.BeginGetContext (r => {
+                                    lock (mutex) {
+                                        Monitor.Pulse (mutex);
+                                    }
+                                }, null);
+                                eventer.SetValue ("foo");
+                            } catch (Exception e) {
+                                exception = e;
+                                Monitor.Pulse (mutex);
+                            }
                         }
                     }, null);
                     var request = WebRequest.Create (url);
@@ -280,9 +286,13 @@ namespace Mono.Upnp.Tests
                             Assert.IsNotNull (response.Headers["SID"]);
                             sid = response.Headers["SID"];
                         }
-                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The event server sent updates to an unsubscribed client.");
                         }
+                    }
+                    
+                    if (exception != null) {
+                        throw exception;
                     }
                 }
             }
@@ -526,7 +536,7 @@ namespace Mono.Upnp.Tests
                     client.BrowseAll ();
                     lock (mutex) {
                         server.Start ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The UPnP server announcement timed out.");
                         }
                     }
