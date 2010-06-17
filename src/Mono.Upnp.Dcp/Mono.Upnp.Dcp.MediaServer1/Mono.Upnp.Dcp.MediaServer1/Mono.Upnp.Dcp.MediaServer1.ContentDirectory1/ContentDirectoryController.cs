@@ -239,7 +239,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 //            }
 //        }
 
-        void Verify ()
+       /* void Verify ()
         {
 //            if (!controller.Actions.ContainsKey ("GetSearchCapabilities"))
 //                throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSearchCapabilities.", controller.Description.Id));
@@ -251,6 +251,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 //                throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action Browse.", controller.Description.Id));
 //            if (!controller.StateVariables.ContainsKey ("SystemUpdateID"))
 //                throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required state variable SystemUpdateID.", controller.Description.Id));
-        }
+        }*/
     }
 }

@@ -49,13 +49,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             client.Browse (ContentDirectory.ServiceType);
         }
 
-        void OnContentDirectoryAdded (DiscoveryEventArgs<ContentDirectory> e)
+        /*void OnContentDirectoryAdded (DiscoveryEventArgs<ContentDirectory> e)
         {
             var handler = ContentDirectoryAdded;
             if (handler != null) {
                 handler (this, e);
             }
-        }
+        }*/
         
         public void Dispose ()
         {
