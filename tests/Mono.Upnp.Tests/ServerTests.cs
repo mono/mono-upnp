@@ -218,7 +218,7 @@ namespace Mono.Upnp.Tests
         
         void Subscribe (Root root, string prefix)
         {
-            var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/event/"));
+            var request = WebRequest.Create (new Uri (root.UrlBase, "/service/0/event/"));
             request.Method = "SUBSCRIBE";
             request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
             request.Headers.Add ("NT", "upnp:event");
@@ -245,7 +245,7 @@ namespace Mono.Upnp.Tests
             using (var server = new Server (root)) {
                 server.Start ();
                 var prefix = GeneratePrefix ();
-                var url = new Uri (root.UrlBase, "service/0/event/");
+                var url = new Uri (root.UrlBase, "/service/0/event/");
                 using (var listener = new HttpListener ()) {
                     listener.Prefixes.Add (prefix);
                     listener.Start ();
@@ -341,7 +341,7 @@ namespace Mono.Upnp.Tests
             
             using (var server = new Server (root)) {
                 server.Start ();
-                var request = (HttpWebRequest)WebRequest.Create (new Uri (root.UrlBase, "service/0/control/"));
+                var request = (HttpWebRequest)WebRequest.Create (new Uri (root.UrlBase, "/service/0/control/"));
                 request.Method = "POST";
                 request.Headers.Add ("SOAPACTION", "urn:schemas-upnp-org:service:mono-upnp-test-service:1#Foo");
                 request.ContentType = @"text/xml; charset=""utf-8""";
@@ -459,7 +459,7 @@ namespace Mono.Upnp.Tests
             );
             using (var server = new Server (root)) {
                 server.Start ();
-                var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/scpd/"));
+                var request = WebRequest.Create (new Uri (root.UrlBase, "/service/0/scpd/"));
                 using (var response = (HttpWebResponse)request.GetResponse ()) {
                     Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
                     using (var reader = XmlReader.Create (response.GetResponseStream ())) {
@@ -485,10 +485,10 @@ namespace Mono.Upnp.Tests
             );
             using (var server = new Server (root)) {
                 server.Start ();
-                var url = new Uri (root.UrlBase, "icon/");
+                var url = new Uri (root.UrlBase, "/icon/");
                 AssertEquality (url, 0, 0);
                 AssertEquality (url, 1, 1);
-                url = new Uri (root.UrlBase, "device/0/icon/");
+                url = new Uri (root.UrlBase, "/device/0/icon/");
                 AssertEquality (url, 0, 2);
                 AssertEquality (url, 1, 3);
             }

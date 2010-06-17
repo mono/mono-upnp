@@ -183,15 +183,15 @@ namespace Mono.Upnp
             if (Deserializer != null) throw new InvalidOperationException ("The device was constructed for deserialization and cannot be initalized. Use one of the other constructors.");
             
             for (var i = 0; i < devices.Count; i++) {
-                devices[i].Initialize (serializer, root, string.Format ("{0}device/{1}/", deviceUrlFragment, i));
+                devices[i].Initialize (serializer, root, string.Concat (deviceUrlFragment, "/device/", i.ToString ()));
             }
             
             for (var i = 0; i < services.Count; i++) {
-                services[i].Initialize (serializer, root, string.Format ("{0}service/{1}/", deviceUrlFragment, i));
+                services[i].Initialize (serializer, root, string.Concat (deviceUrlFragment, "/service/", i.ToString ()));
             }
             
             for (var i = 0; i < icons.Count; i++) {
-                icons[i].Initialize (root, string.Format ("{0}icon/{1}/", deviceUrlFragment, i));
+                icons[i].Initialize (root, string.Concat (deviceUrlFragment, "/icon/", i.ToString (), "/"));
             }
         }
 

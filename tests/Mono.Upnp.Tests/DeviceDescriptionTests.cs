@@ -46,10 +46,10 @@ namespace Mono.Upnp.Tests
                 "Mono Project",
                 "Full Device",
                 new RootDeviceOptions {
-                    ManufacturerUrl = new Uri ("http://www.mono-project.org/"),
+                    ManufacturerUrl = new Uri ("http://www.mono-project.org"),
                     ModelDescription = "A device description with all optional information.",
                     ModelNumber = "1",
-                    ModelUrl = new Uri ("http://www.mono-project.org/Mono.Upnp/"),
+                    ModelUrl = new Uri ("http://www.mono-project.org/Mono.Upnp"),
                     SerialNumber = "12345",
                     Upc = "67890",
                     Icons = new[] {
@@ -68,10 +68,10 @@ namespace Mono.Upnp.Tests
                             "Mono Project",
                             "Full Embedded Device",
                             new DeviceOptions {
-                                ManufacturerUrl = new Uri ("http://www.mono-project.org/"),
+                                ManufacturerUrl = new Uri ("http://www.mono-project.org"),
                                 ModelDescription = "An embedded device description with all optional information.",
                                 ModelNumber = "1",
-                                ModelUrl = new Uri ("http://www.mono-project.org/Mono.Upnp/"),
+                                ModelUrl = new Uri ("http://www.mono-project.org/Mono.Upnp"),
                                 SerialNumber = "12345",
                                 Upc = "67890",
                                 Icons = new[] {
@@ -174,7 +174,7 @@ namespace Mono.Upnp.Tests
             Assert.AreEqual ("A device description with all optional information.", root.RootDevice.ModelDescription);
             Assert.AreEqual ("Full Device", root.RootDevice.ModelName);
             Assert.AreEqual ("1", root.RootDevice.ModelNumber);
-            Assert.AreEqual (new Uri ("http://www.mono-project.org/Mono.Upnp/"), root.RootDevice.ModelUrl);
+            Assert.AreEqual (new Uri ("http://www.mono-project.org/Mono.Upnp"), root.RootDevice.ModelUrl);
             Assert.AreEqual ("12345", root.RootDevice.SerialNumber);
             Assert.AreEqual ("uuid:fd1", root.RootDevice.Udn);
             Assert.AreEqual ("67890", root.RootDevice.Upc);
@@ -215,7 +215,7 @@ namespace Mono.Upnp.Tests
             Assert.AreEqual ("An embedded device description with all optional information.", devices.Current.ModelDescription);
             Assert.AreEqual ("Full Embedded Device", devices.Current.ModelName);
             Assert.AreEqual ("1", devices.Current.ModelNumber);
-            Assert.AreEqual (new Uri ("http://www.mono-project.org/Mono.Upnp/"), devices.Current.ModelUrl);
+            Assert.AreEqual (new Uri ("http://www.mono-project.org/Mono.Upnp"), devices.Current.ModelUrl);
             Assert.AreEqual ("12345", devices.Current.SerialNumber);
             Assert.AreEqual ("uuid:fed1", devices.Current.Udn);
             Assert.AreEqual ("67890", devices.Current.Upc);

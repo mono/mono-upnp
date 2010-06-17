@@ -43,7 +43,7 @@ namespace Mono.Upnp.Tests
                     "<modelDescription>A device description with all optional information.</modelDescription>" +
                     "<modelName>Full Device</modelName>" +
                     "<modelNumber>1</modelNumber>" +
-                    "<modelURL>http://www.mono-project.org/Mono.Upnp/</modelURL>" +
+                    "<modelURL>http://www.mono-project.org/Mono.Upnp</modelURL>" +
                     "<serialNumber>12345</serialNumber>" +
                     "<UDN>uuid:fd1</UDN>" +
                     "<UPC>67890</UPC>" +
@@ -53,30 +53,30 @@ namespace Mono.Upnp.Tests
                             "<width>100</width>" +
                             "<height>100</height>" +
                             "<depth>32</depth>" +
-                            "<url>icon/0/</url>" +
+                            "<url>/icon/0/</url>" +
                         "</icon>" +
                         "<icon>" +
                             "<mimetype>image/jpeg</mimetype>" +
                             "<width>100</width>" +
                             "<height>100</height>" +
                             "<depth>32</depth>" +
-                            "<url>icon/1/</url>" +
+                            "<url>/icon/1/</url>" +
                         "</icon>" +
                     "</iconList>" +
                     "<serviceList>" +
                         "<service>" +
                             "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:1</serviceType>" +
                             "<serviceId>urn:upnp-org:serviceId:testService1</serviceId>" +
-                            "<SCPDURL>service/0/scpd/</SCPDURL>" +
-                            "<controlURL>service/0/control/</controlURL>" +
-                            "<eventSubURL>service/0/event/</eventSubURL>" +
+                            "<SCPDURL>/service/0/scpd/</SCPDURL>" +
+                            "<controlURL>/service/0/control/</controlURL>" +
+                            "<eventSubURL>/service/0/event/</eventSubURL>" +
                         "</service>" +
                         "<service>" +
                             "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:2</serviceType>" +
                             "<serviceId>urn:upnp-org:serviceId:testService2</serviceId>" +
-                            "<SCPDURL>service/1/scpd/</SCPDURL>" +
-                            "<controlURL>service/1/control/</controlURL>" +
-                            "<eventSubURL>service/1/event/</eventSubURL>" +
+                            "<SCPDURL>/service/1/scpd/</SCPDURL>" +
+                            "<controlURL>/service/1/control/</controlURL>" +
+                            "<eventSubURL>/service/1/event/</eventSubURL>" +
                         "</service>" +
                     "</serviceList>" +
                     "<deviceList>" +
@@ -88,7 +88,7 @@ namespace Mono.Upnp.Tests
                             "<modelDescription>An embedded device description with all optional information.</modelDescription>" +
                             "<modelName>Full Embedded Device</modelName>" +
                             "<modelNumber>1</modelNumber>" +
-                            "<modelURL>http://www.mono-project.org/Mono.Upnp/</modelURL>" +
+                            "<modelURL>http://www.mono-project.org/Mono.Upnp</modelURL>" +
                             "<serialNumber>12345</serialNumber>" +
                             "<UDN>uuid:fed1</UDN>" +
                             "<UPC>67890</UPC>" +
@@ -98,30 +98,30 @@ namespace Mono.Upnp.Tests
                                     "<width>100</width>" +
                                     "<height>100</height>" +
                                     "<depth>32</depth>" +
-                                    "<url>device/0/icon/0/</url>" +
+                                    "<url>/device/0/icon/0/</url>" +
                                 "</icon>" +
                                 "<icon>" +
                                     "<mimetype>image/jpeg</mimetype>" +
                                     "<width>100</width>" +
                                     "<height>100</height>" +
                                     "<depth>32</depth>" +
-                                    "<url>device/0/icon/1/</url>" +
+                                    "<url>/device/0/icon/1/</url>" +
                                 "</icon>" +
                             "</iconList>" +
                             "<serviceList>" +
                                 "<service>" +
                                     "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:1</serviceType>" +
                                     "<serviceId>urn:upnp-org:serviceId:testService1</serviceId>" +
-                                    "<SCPDURL>device/0/service/0/scpd/</SCPDURL>" +
-                                    "<controlURL>device/0/service/0/control/</controlURL>" +
-                                    "<eventSubURL>device/0/service/0/event/</eventSubURL>" +
+                                    "<SCPDURL>/device/0/service/0/scpd/</SCPDURL>" +
+                                    "<controlURL>/device/0/service/0/control/</controlURL>" +
+                                    "<eventSubURL>/device/0/service/0/event/</eventSubURL>" +
                                 "</service>" +
                                 "<service>" +
                                     "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:2</serviceType>" +
                                     "<serviceId>urn:upnp-org:serviceId:testService2</serviceId>" +
-                                    "<SCPDURL>device/0/service/1/scpd/</SCPDURL>" +
-                                    "<controlURL>device/0/service/1/control/</controlURL>" +
-                                    "<eventSubURL>device/0/service/1/event/</eventSubURL>" +
+                                    "<SCPDURL>/device/0/service/1/scpd/</SCPDURL>" +
+                                    "<controlURL>/device/0/service/1/control/</controlURL>" +
+                                    "<eventSubURL>/device/0/service/1/event/</eventSubURL>" +
                                 "</service>" +
                             "</serviceList>" +
                         "</device>" +
@@ -144,7 +144,7 @@ namespace Mono.Upnp.Tests
                     "<modelDescription>A device description with all optional information.</modelDescription>" +
                     "<modelName>Full Device</modelName>" +
                     "<modelNumber>1</modelNumber>" +
-                    "<modelURL>http://www.mono-project.org/Mono.Upnp/</modelURL>" +
+                    "<modelURL>http://www.mono-project.org/Mono.Upnp</modelURL>" +
                     "<serialNumber>12345</serialNumber>" +
                     "<UDN>uuid:fd1</UDN>" +
                     "<UPC>67890</UPC>" +
@@ -154,20 +154,20 @@ namespace Mono.Upnp.Tests
                             "<width>100</width>" +
                             "<height>100</height>" +
                             "<depth>32</depth>" +
-                            "<url>icon/0/</url>" +
+                            "<url>/icon/0/</url>" +
                         "</icon>" +
                     "</iconList>" +
                     "<serviceList>" +
                         "<service>" +
                             "<serviceType>urn:schemas-upnp-org:service:mono-upnp-test-service:1</serviceType>" +
                             "<serviceId>urn:upnp-org:serviceId:testService1</serviceId>" +
-                            "<SCPDURL>service/0/scpd/</SCPDURL>" +
-                            "<controlURL>service/0/control/</controlURL>" +
-                            "<eventSubURL>service/0/event/</eventSubURL>" +
+                            "<SCPDURL>/service/0/scpd/</SCPDURL>" +
+                            "<controlURL>/service/0/control/</controlURL>" +
+                            "<eventSubURL>/service/0/event/</eventSubURL>" +
                         "</service>" +
                     "</serviceList>" +
                 "</device>" +
-                "<URLBase>http://www.mono-project.com/</URLBase>" +
+                "<URLBase>http://www.mono-project.com</URLBase>" +
             "</root>";
         
         public const string FullScpd =
