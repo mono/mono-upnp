@@ -74,19 +74,25 @@ namespace Mono.Upnp.Internal
         
         readonly static object[] empty_args = new object[0];
         
+        static bool Omit (Type type, object service, string unless)
+        {
+            if (unless == null) {
+                return false;
+            }
+            var property = type.GetProperty (unless);
+            if (property == null || property.PropertyType != typeof (bool) || !property.CanRead) {
+                throw new UpnpServiceDefinitionException ("The OmitUnless property must reference a readable bool property in the same type.");
+            }
+            return property.GetValue (service, empty_args).Equals (false);
+        }
+        
         static ServiceAction BuildAction (MethodInfo method, object service, Dictionary<string, StateVariableInfo> stateVariables)
         {
             var attributes = method.GetCustomAttributes (typeof (UpnpActionAttribute), false);
             if (attributes.Length != 0) {
                 var attribute = (UpnpActionAttribute)attributes[0];
-                if (attribute.OmitUnless != null) {
-                    var property = method.DeclaringType.GetProperty (attribute.OmitUnless);
-                    if (property == null || property.PropertyType != typeof (bool) || !property.CanRead) {
-                        throw new UpnpServiceDefinitionException ("The OmitUnless property must reference a readable bool property in the same type.");
-                    }
-                    if (property.GetValue (service, empty_args).Equals (false)) {
-                        return null;
-                    }
+                if (Omit (method.DeclaringType, service, attribute.OmitUnless)) {
+                    return null;
                 }
                 var name = string.IsNullOrEmpty (attribute.Name) ? method.Name : attribute.Name;
                 var parameters = method.GetParameters ();
@@ -278,12 +284,16 @@ namespace Mono.Upnp.Internal
                 throw new UpnpServiceDefinitionException ("A event must be handled by the type EventHandler<StateVariableChangedArgs<T>>.");
             }
             
+            var attribute = (UpnpStateVariableAttribute)attributes[0];
+            if (Omit (eventInfo.DeclaringType, service, attribute.OmitUnless)) {
+                return null;
+            }
+            
             type = type.GetGenericArguments ()[0];
             var eventer = new Eventer ();
             var method = Eventer.HandlerMethod.MakeGenericMethod (new[] { type });
             var handler = Delegate.CreateDelegate (eventInfo.EventHandlerType, eventer, method);
             eventInfo.AddEventHandler (service, handler);
-            var attribute = (UpnpStateVariableAttribute)attributes[0];
             var name = string.IsNullOrEmpty (attribute.Name) ? eventInfo.Name : attribute.Name;
             var data_type = string.IsNullOrEmpty (attribute.DataType) ? GetDataType (type) : attribute.DataType;
             StateVariableInfo info;

@@ -51,5 +51,7 @@ namespace Mono.Upnp.Control
         public string DataType { get; set; }
         
         public bool IsMulticast { get; set; }
+        
+        public string OmitUnless { get; set; }
     }
 }

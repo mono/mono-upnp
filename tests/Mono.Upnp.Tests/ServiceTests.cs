@@ -873,5 +873,48 @@ namespace Mono.Upnp.Tests
         {
             new DummyService<ErroneousOptionalActionClass> ();
         }
+        
+        class OptionalStateVariablesClass
+        {
+            [UpnpStateVariable (OmitUnless = "HasFoo")]
+            public event EventHandler<StateVariableChangedArgs<string>> FooChanged;
+            
+            [UpnpStateVariable]
+            public event EventHandler<StateVariableChangedArgs<string>> BarChanged;
+            
+            public bool HasFoo { get; set; }
+        }
+        
+        [Test]
+        public void UnimplementedOptionalStateVariable ()
+        {
+            var service = new DummyService<OptionalStateVariablesClass> ();
+            var controller = new ServiceController (null,
+                new[] { new DummyStateVariable ("BarChanged", "string") });
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
+        
+        [Test]
+        public void ImplementedOptionalStateVariable ()
+        {
+            var service = new DummyService<OptionalStateVariablesClass> (new OptionalStateVariablesClass { HasFoo = true });
+            var controller = new ServiceController (null,
+                new[] {
+                    new DummyStateVariable ("FooChanged", "string"),
+                    new DummyStateVariable ("BarChanged", "string") });
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
+        
+        class ErroneousOptionalStateVariablesClass
+        {
+            [UpnpStateVariable (OmitUnless = "HasFoo")]
+            public event EventHandler<StateVariableChangedArgs<string>> FooChanged;
+        }
+        
+        [ExpectedException (typeof (UpnpServiceDefinitionException))]
+        public void ErroneousOptionalStateVariable ()
+        {
+            new DummyService<ErroneousOptionalStateVariablesClass> ();
+        }
     }
 }
