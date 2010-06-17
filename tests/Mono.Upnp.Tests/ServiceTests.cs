@@ -819,5 +819,59 @@ namespace Mono.Upnp.Tests
             );
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
         }
+        
+        class OptionalActionClass
+        {
+            [UpnpAction (IgnoreUnless = "CanFoo")]
+            public void Foo (string foo)
+            {
+            }
+            
+            [UpnpAction]
+            public void Bar (string bar)
+            {
+            }
+            
+            public bool CanFoo { get; set; }
+        }
+        
+        [Test]
+        public void UnimplementedOptionalAction ()
+        {
+            var service = new DummyService<OptionalActionClass> ();
+            var controller = new ServiceController (
+                new[] { new DummyServiceAction ("Bar", new [] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) }) },
+                new[] { new StateVariable ("A_ARG_bar", "string") });
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
+        
+        [Test]
+        public void ImplementedOptionalAction ()
+        {
+            var service = new DummyService<OptionalActionClass> (new OptionalActionClass { CanFoo = true });
+            var controller = new ServiceController (
+                new[] {
+                    new DummyServiceAction ("Foo", new [] { new Argument ("foo", "A_ARG_foo", ArgumentDirection.In) }),
+                    new DummyServiceAction ("Bar", new [] { new Argument ("bar", "A_ARG_bar", ArgumentDirection.In) })
+                },
+                new[] {
+                    new StateVariable ("A_ARG_foo", "string"),
+                    new StateVariable ("A_ARG_bar", "string") });
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
+        }
+        
+        class ErroneousOptionalActionClass
+        {
+            [UpnpAction (IgnoreUnless = "CanFoo")]
+            public void Foo ()
+            {
+            }
+        }
+        
+        [ExpectedException (typeof (UpnpServiceDefinitionException))]
+        public void ErroneousOptionalAction ()
+        {
+            new DummyService<ErroneousOptionalActionClass> ();
+        }
     }
 }

@@ -72,11 +72,22 @@ namespace Mono.Upnp.Internal
             }
         }
         
+        readonly static object[] empty_args = new object[0];
+        
         static ServiceAction BuildAction (MethodInfo method, object service, Dictionary<string, StateVariableInfo> stateVariables)
         {
             var attributes = method.GetCustomAttributes (typeof (UpnpActionAttribute), false);
             if (attributes.Length != 0) {
                 var attribute = (UpnpActionAttribute)attributes[0];
+                if (attribute.IgnoreUnless != null) {
+                    var property = method.DeclaringType.GetProperty (attribute.IgnoreUnless);
+                    if (property == null || property.PropertyType != typeof (bool) || !property.CanRead) {
+                        throw new UpnpServiceDefinitionException ("The IgnoreUnless property must reference a readable bool property in the same type.");
+                    }
+                    if (property.GetValue (service, empty_args).Equals (false)) {
+                        return null;
+                    }
+                }
                 var name = string.IsNullOrEmpty (attribute.Name) ? method.Name : attribute.Name;
                 var parameters = method.GetParameters ();
                 var arguments = new ArgumentInfo[parameters.Length];
@@ -220,7 +231,7 @@ namespace Mono.Upnp.Internal
             if (type == typeof (bool)) return "boolean";
             if (type == typeof (byte[])) return "bin";
             if (type == typeof (Uri)) return "uri";
-            throw new Exception (); // TODO proper exception
+            throw new UpnpServiceDefinitionException (string.Format ("The data type {0} is unsupported.", type));
         }
         
         static IEnumerable<string> BuildAllowedValues (Type type)
@@ -259,14 +270,12 @@ namespace Mono.Upnp.Internal
             
             var type = eventInfo.EventHandlerType;
             if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (EventHandler<>)) {
-                // TODO throw
-                return null;
+                throw new UpnpServiceDefinitionException ("A event must be handled by the type EventHandler<StateVariableChangedArgs<T>>.");
             }
             
             type = type.GetGenericArguments ()[0];
             if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (StateVariableChangedArgs<>)) {
-                // TODO throw
-                return null;
+                throw new UpnpServiceDefinitionException ("A event must be handled by the type EventHandler<StateVariableChangedArgs<T>>.");
             }
             
             type = type.GetGenericArguments ()[0];

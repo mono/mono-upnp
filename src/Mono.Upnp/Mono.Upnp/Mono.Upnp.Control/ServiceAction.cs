@@ -109,7 +109,8 @@ namespace Mono.Upnp.Control
         
         protected internal virtual IDictionary<string, string> Execute (IDictionary<string, string> arguments)
         {
-            if (executor == null) throw new InvalidOperationException ("This ServiceAction was create for deserialization and cannot be executed locally. Use the Invoke method to invoke the action across the network.");
+            if (executor == null) throw new InvalidOperationException (
+                "This ServiceAction was create for deserialization and cannot be executed locally. Use the Invoke method to invoke the action across the network.");
             
             return executor (arguments);
         }

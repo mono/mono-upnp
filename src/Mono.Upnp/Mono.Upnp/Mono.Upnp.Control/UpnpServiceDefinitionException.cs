@@ -1,10 +1,10 @@
 // 
-// DummyService.cs
+// UpnpServiceDefinitionException.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Scott Peterson
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,32 +26,14 @@
 
 using System;
 
-using Mono.Upnp.Control.Tests;
-
-namespace Mono.Upnp.Tests
+namespace Mono.Upnp.Control
 {
-    public class DummyService : Service
+    public class UpnpServiceDefinitionException : Exception
     {
-        static readonly DummyServiceController controller = new DummyServiceController ();
-        
-        public DummyService (ServiceType type, string id)
-            : base (type, id, controller)
-        {
-            ScpdUrlFragment = ControlUrlFragment = EventUrlFragment = "http://localhost/";
-        }
-    }
-    
-    public class DummyService<T> : Service<T>
-        where T : new ()
-    {
-        public DummyService ()
-            : base (new T ())
-        {
-        }
-        
-        public DummyService (T service)
-            : base (service)
+        public UpnpServiceDefinitionException (string message)
+            : base (message)
         {
         }
     }
 }
+
