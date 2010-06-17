@@ -42,6 +42,6 @@ namespace Mono.Upnp.Control
         
         public string Name { get; set; }
         
-        public string IgnoreUnless { get; set; }
+        public string OmitUnless { get; set; }
     }
 }

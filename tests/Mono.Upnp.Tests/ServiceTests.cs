@@ -822,7 +822,7 @@ namespace Mono.Upnp.Tests
         
         class OptionalActionClass
         {
-            [UpnpAction (IgnoreUnless = "CanFoo")]
+            [UpnpAction (OmitUnless = "CanFoo")]
             public void Foo (string foo)
             {
             }
@@ -862,7 +862,7 @@ namespace Mono.Upnp.Tests
         
         class ErroneousOptionalActionClass
         {
-            [UpnpAction (IgnoreUnless = "CanFoo")]
+            [UpnpAction (OmitUnless = "CanFoo")]
             public void Foo ()
             {
             }

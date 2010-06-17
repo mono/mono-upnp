@@ -79,10 +79,10 @@ namespace Mono.Upnp.Internal
             var attributes = method.GetCustomAttributes (typeof (UpnpActionAttribute), false);
             if (attributes.Length != 0) {
                 var attribute = (UpnpActionAttribute)attributes[0];
-                if (attribute.IgnoreUnless != null) {
-                    var property = method.DeclaringType.GetProperty (attribute.IgnoreUnless);
+                if (attribute.OmitUnless != null) {
+                    var property = method.DeclaringType.GetProperty (attribute.OmitUnless);
                     if (property == null || property.PropertyType != typeof (bool) || !property.CanRead) {
-                        throw new UpnpServiceDefinitionException ("The IgnoreUnless property must reference a readable bool property in the same type.");
+                        throw new UpnpServiceDefinitionException ("The OmitUnless property must reference a readable bool property in the same type.");
                     }
                     if (property.GetValue (service, empty_args).Equals (false)) {
                         return null;

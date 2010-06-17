@@ -115,14 +115,133 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                           int requestCount, string sortCriteria, out int numberReturned,
                                           out int totalMatches, out string updateId);
         
-        [UpnpAction]
+        [UpnpAction (OmitUnless = "CanSearch")]
+        public virtual void Search ([UpnpArgument ("ContainerID")] string containerId,
+                                    [UpnpArgument ("SearchCriteria")] string searchCriteria,
+                                    [UpnpArgument ("Filter")] string filter,
+                                    [UpnpArgument ("StartingIndex")] int startingIndex,
+                                    [UpnpArgument ("RequestedCount")] int requestCount,
+                                    [UpnpArgument ("SortCriteria")] string sortCriteria,
+                                    [UpnpArgument ("Result")] out string result,
+                                    [UpnpArgument ("NumberReturned")] out int numberReturned,
+                                    [UpnpArgument ("TotalMatches")] out int totalMatches,
+                                    [UpnpArgument ("UpdateID")] out string updateId)
+        {
+            result = Search (containerId, searchCriteria, filter, startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches, out updateId);
+        }
+        
+        public virtual bool CanSearch {
+            get { return false; }
+        }
+        
+        protected virtual string Search (string containerId, string searchCriteria, string filter, int startingIndex,
+                                         int requestCount, string sortCriteria, out int numberReturned,
+                                         out int totalMatches, out string updateId)
+        {
+            numberReturned = totalMatches = 0;
+            updateId = null;
+            return null;
+        }
+        
+        public virtual bool CanCreateObject {
+            get { return false; }
+        }
+        
+        [UpnpAction (OmitUnless = "CanCreateObject")]
+        public virtual void CreateObject ([UpnpArgument ("ContainerID")] string containerId,
+                                          [UpnpArgument ("Elements"), UpnpRelatedStateVariable ("A_ARG_TYPE_Result")] string elements,
+                                          [UpnpArgument ("ObjectID"), UpnpRelatedStateVariable ("A_ARG_TYPE_Result")] out string objectId,
+                                          [UpnpArgument ("Result"), UpnpRelatedStateVariable ("A_ARG_TYPE_Result")] out string result)
+        {
+            objectId = result = null;
+        }
+        
+        public virtual bool CanDestroyObject {
+            get { return false; }
+        }
+        
+        [UpnpAction (OmitUnless = "CanDestroyObject")]
+        public virtual void DestroyObject ([UpnpArgument ("ObjectID")] string objectId)
+        {
+        }
+        
+        public virtual bool CanUpdateObject {
+            get { return false; }
+        }
+        
+        [UpnpAction (OmitUnless = "CanUpdateObject")]
         public virtual void UpdateObject ([UpnpArgument ("ObjectID")] string objectId,
                                           [UpnpArgument ("CurrentTagValue"), UpnpRelatedStateVariable ("A_ARG_TYPE_TagValueList")] string currentTagValue,
                                           [UpnpArgument ("NewTagValue"), UpnpRelatedStateVariable ("A_ARG_TYPE_TagValueList")] string newTagValue)
         {
         }
         
-        //protected abstract void UpdateObject (string objectId, IEnumerable<XmlReader> currentTagValues, IEnumerable<XmlReader> newTagValues);
+        public virtual bool CanImportResource {
+            get { return false; }
+        }
+        
+        [UpnpAction (OmitUnless = "CanImportResource")]
+        public virtual void ImportResource ([UpnpArgument ("SourceURI"), UpnpRelatedStateVariable ("A_ARG_TYPE_URI")] Uri sourceUri,
+                                            [UpnpArgument ("DestinationURI"), UpnpRelatedStateVariable ("A_ARG_TYPE_URI")] Uri destinationUri,
+                                            [UpnpArgument ("TransferID")] out int transferId)
+        {
+            transferId = 0;
+        }
+        
+        public virtual bool CanExportResource {
+            get { return false; }
+        }
+        
+        [UpnpAction (OmitUnless = "CanExportResource")]
+        public virtual void ExportResource ([UpnpArgument ("SourceURI"), UpnpRelatedStateVariable ("A_ARG_TYPE_URI")] Uri sourceUri,
+                                            [UpnpArgument ("DestinationURI"), UpnpRelatedStateVariable ("A_ARG_TYPE_URI")] Uri destinationUri,
+                                            [UpnpArgument ("TransferID")] out int transferId)
+        {
+            transferId = 0;
+        }
+        
+        public virtual bool CanStopTransferResource {
+            get { return false; }
+        }
+        
+        [UpnpAction (OmitUnless = "CanStopTransferResource")]
+        public virtual void StopTransferResource ([UpnpArgument ("TransferId")] int transferId)
+        {
+        }
+        
+        public virtual bool CanGetTransferProgress {
+            get { return false; }
+        }
+        
+        [UpnpAction (OmitUnless = "CanGetTransferProgress")]
+        public virtual void GetTransferProgress ([UpnpArgument ("TransferId")] int transferId,
+                                                 [UpnpArgument ("TransferStatus")] out string transferStatus,
+                                                 [UpnpArgument ("TransferLength")] out string transferLength,
+                                                 [UpnpArgument ("TransferTotal")] out string transferTotal)
+        {
+            transferStatus = transferLength = transferTotal = null;
+        }
+        
+        public virtual bool CanDeleteResource {
+            get { return false; }
+        }
+        
+        [UpnpAction (OmitUnless = "CanDeleteResource")]
+        public virtual void DeleteResource ([UpnpArgument ("ResourceURI"), UpnpRelatedStateVariable ("A_ARG_TYPE_URI")] Uri resourceUri)
+        {
+        }
+        
+        public virtual bool CanCreateReference {
+            get { return false; }
+        }
+        
+        [UpnpAction (OmitUnless = "CanCreateReference")]
+        public virtual void CreateReference ([UpnpArgument ("ContainerId"), UpnpRelatedStateVariable ("A_ARG_TYPE_ObjectID")] string containerId,
+                                             [UpnpArgument ("ObjectID")] string objectId,
+                                             [UpnpArgument ("NewID"), UpnpRelatedStateVariable ("A_ARG_TYPE_ObjectID")] out string newId)
+        {
+            newId = null;
+        }
         
         [UpnpStateVariable ("SystemUpdateID")]
         public virtual event EventHandler<StateVariableChangedArgs<string>> SystemUpdateIdChanged;
