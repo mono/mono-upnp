@@ -868,7 +868,7 @@ namespace Mono.Upnp.Tests
             }
         }
         
-        [ExpectedException (typeof (UpnpServiceDefinitionException))]
+        [Test, ExpectedException (typeof (UpnpServiceDefinitionException))]
         public void ErroneousOptionalAction ()
         {
             new DummyService<ErroneousOptionalActionClass> ();
@@ -911,10 +911,24 @@ namespace Mono.Upnp.Tests
             public event EventHandler<StateVariableChangedArgs<string>> FooChanged;
         }
         
-        [ExpectedException (typeof (UpnpServiceDefinitionException))]
+        [Test, ExpectedException (typeof (UpnpServiceDefinitionException))]
         public void ErroneousOptionalStateVariable ()
         {
             new DummyService<ErroneousOptionalStateVariablesClass> ();
+        }
+        
+        class ErroneousArgumentTypeClass
+        {
+            [UpnpAction]
+            public void Foo (Exception e)
+            {
+            }
+        }
+        
+        [Test, ExpectedException (typeof (UpnpServiceDefinitionException))]
+        public void ErroneousArgumentType ()
+        {
+            new DummyService<ErroneousArgumentTypeClass> ();
         }
     }
 }
