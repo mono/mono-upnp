@@ -30,7 +30,6 @@ using System.Threading;
 using NUnit.Framework;
 
 using Mono.Upnp.Control;
-using Mono.Upnp.Control.Tests;
 
 namespace Mono.Upnp.Tests
 {

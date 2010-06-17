@@ -34,7 +34,6 @@ using System.Xml;
 
 using Mono.Ssdp;
 using Mono.Upnp.Control;
-using Mono.Upnp.Control.Tests;
 
 using NUnit.Framework;
 

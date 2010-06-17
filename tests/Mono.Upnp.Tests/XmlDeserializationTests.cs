@@ -31,7 +31,9 @@ using System.Xml;
 
 using NUnit.Framework;
 
-namespace Mono.Upnp.Xml.Tests
+using Mono.Upnp.Xml;
+
+namespace Mono.Upnp.Tests
 {
     [TestFixture]
     public class XmlDeserializationTests

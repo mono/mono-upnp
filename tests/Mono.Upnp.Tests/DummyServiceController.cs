@@ -26,9 +26,10 @@
 
 using System.Collections.Generic;
 
+using Mono.Upnp.Control;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Control.Tests
+namespace Mono.Upnp.Tests
 {
     public class DummyServiceController : ServiceController
     {

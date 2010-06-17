@@ -27,7 +27,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Mono.Upnp.Control.Tests
+using Mono.Upnp.Control;
+
+namespace Mono.Upnp.Tests
 {
     public class DummyServiceAction : ServiceAction
     {

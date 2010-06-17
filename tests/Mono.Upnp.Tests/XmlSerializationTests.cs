@@ -30,7 +30,9 @@ using System.Text;
 
 using NUnit.Framework;
 
-namespace Mono.Upnp.Xml.Tests
+using Mono.Upnp.Xml;
+
+namespace Mono.Upnp.Tests
 {
     [TestFixture]
     public class XmlSerializationTests
@@ -681,14 +683,14 @@ namespace Mono.Upnp.Xml.Tests
                 set { base.Foo = value; }
             }
             
-            public override string ToString () { return string.Empty; }
+            public override string ToString () { return null; }
         }
         
         [Test]
         public void OverrideOmitTest ()
         {
             Assert.AreEqual (
-                @"<?xml version=""1.0""?><OverrideOmitTestSubClass></OverrideOmitTestSubClass>",
+                @"<?xml version=""1.0""?><OverrideOmitTestSubClass />",
                 serializer.GetString (new OverrideOmitTestSubClass { Foo = "bar" })
             );
             

@@ -24,7 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.Control.Tests
+using Mono.Upnp.Control;
+
+namespace Mono.Upnp.Tests
 {
     public class DummyStateVariableEventer : StateVariableEventer
     {

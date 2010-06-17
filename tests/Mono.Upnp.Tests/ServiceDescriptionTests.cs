@@ -27,10 +27,10 @@
 using System;
 using NUnit.Framework;
 
-using Mono.Upnp.Tests;
+using Mono.Upnp.Control;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Control.Tests
+namespace Mono.Upnp.Tests
 {
     [TestFixture]
     public class ServiceDescriptionTests

@@ -26,8 +26,6 @@
 
 using System;
 
-using Mono.Upnp.Control.Tests;
-
 namespace Mono.Upnp.Tests
 {
     public class DummyService : Service
