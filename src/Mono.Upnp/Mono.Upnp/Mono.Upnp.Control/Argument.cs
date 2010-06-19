@@ -53,7 +53,7 @@ namespace Mono.Upnp.Control
         public Argument (string name, string relatedStateVariable, ArgumentDirection direction, bool isReturnValue)
             : this (name, relatedStateVariable, direction)
         {
-            if (direction == ArgumentDirection.In && isReturnValue)
+            if (isReturnValue && direction == ArgumentDirection.In)
                 throw new ArgumentException ("The direction is In, but isReturnValue is true. An IsReturnValue argument must have the direction Out.");
             
             IsReturnValue = isReturnValue;
@@ -85,7 +85,7 @@ namespace Mono.Upnp.Control
             context.AutoSerializeObjectAndMembers (this);
         }
 
-        protected override void SerializeMembersOnly (Mono.Upnp.Xml.XmlSerializationContext context)
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
             if (context == null) throw new ArgumentNullException ("context");
             

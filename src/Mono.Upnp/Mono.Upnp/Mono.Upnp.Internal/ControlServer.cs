@@ -101,8 +101,6 @@ namespace Mono.Upnp.Internal
                             context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
                     } catch {
                         // TODO handle faults
-                    } finally {
-                        stream.Close ();
                     }
                 } else {
                     Log.Error (string.Format (

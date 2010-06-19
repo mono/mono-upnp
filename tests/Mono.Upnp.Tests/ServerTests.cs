@@ -34,7 +34,6 @@ using System.Xml;
 
 using Mono.Ssdp;
 using Mono.Upnp.Control;
-using Mono.Upnp.Control.Tests;
 
 using NUnit.Framework;
 
@@ -59,17 +58,27 @@ namespace Mono.Upnp.Tests
                 using (var listener = new HttpListener ()) {
                     listener.Prefixes.Add (prefix);
                     listener.Start ();
+                    Exception exception = null;
                     listener.BeginGetContext (result => {
-                        lock (mutex) {
+                        try {
                             var context = listener.EndGetContext (result);
                             using (var reader = new StreamReader (context.Request.InputStream)) {
                                 Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
                             }
                             context.Response.Close ();
+                        } catch (Exception e) {
+                            exception = e;
+                        }
+                        lock (mutex) {
                             Monitor.Pulse (mutex);
                         }
                     }, null);
+                    
                     Subscribe (root, prefix);
+                    
+                    if (exception != null) {
+                        throw exception;
+                    }
                 }
             }
         }
@@ -92,25 +101,42 @@ namespace Mono.Upnp.Tests
                 using (var listener = new HttpListener ()) {
                     listener.Prefixes.Add (prefix);
                     listener.Start ();
+                    Exception exception = null;
                     listener.BeginGetContext (result => {
-                        var context = listener.EndGetContext (result);
-                        using (var reader = new StreamReader (context.Request.InputStream)) {
-                            Assert.AreEqual (Xml.DoubleEventReport, reader.ReadToEnd ());
-                        }
-                        context.Response.Close ();
-                        listener.BeginGetContext (r => {
-                            lock (mutex) {
-                                var c = listener.EndGetContext (r);
-                                using (var reader = new StreamReader (c.Request.InputStream)) {
-                                    Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
+                        try {
+                            var context = listener.EndGetContext (result);
+                            using (var reader = new StreamReader (context.Request.InputStream)) {
+                                Assert.AreEqual (Xml.DoubleEventReport, reader.ReadToEnd ());
+                            }
+                            context.Response.Close ();
+                            listener.BeginGetContext (r => {
+                                try {
+                                    var c = listener.EndGetContext (r);
+                                    using (var reader = new StreamReader (c.Request.InputStream)) {
+                                        Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
+                                    }
+                                    c.Response.Close ();
+                                } catch (Exception e) {
+                                    exception = e;
                                 }
-                                c.Response.Close ();
+                                lock (mutex) {
+                                    Monitor.Pulse (mutex);
+                                }
+                            }, null);
+                        } catch (Exception e) {
+                            exception = e;
+                            lock (mutex) {
                                 Monitor.Pulse (mutex);
                             }
-                        }, null);
+                        }
                         eventer1.SetValue ("foo");
                     }, null);
+                    
                     Subscribe (root, prefix);
+                    
+                    if (exception != null) {
+                        throw exception;
+                    }
                 }
             }
         }
@@ -133,43 +159,65 @@ namespace Mono.Upnp.Tests
                 using (var listener = new HttpListener ()) {
                     listener.Prefixes.Add (prefix);
                     listener.Start ();
+                    Exception exception = null;
                     listener.BeginGetContext (result => {
-                        var context = listener.EndGetContext (result);
-                        using (var reader = new StreamReader (context.Request.InputStream)) {
-                            Assert.AreEqual (Xml.DoubleEventReport, reader.ReadToEnd ());
-                        }
-                        context.Response.Close ();
-                        listener.BeginGetContext (resp => {
-                            var con = listener.EndGetContext (resp);
-                            using (var reader = new StreamReader (con.Request.InputStream)) {
-                                Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
+                        try {
+                            var context = listener.EndGetContext (result);
+                            using (var reader = new StreamReader (context.Request.InputStream)) {
+                                Assert.AreEqual (Xml.DoubleEventReport, reader.ReadToEnd ());
                             }
-                            con.Response.Close ();
-                            listener.BeginGetContext (r => {
-                                lock (mutex) {
-                                    var c = listener.EndGetContext (r);
-                                    using (var reader = new StreamReader (c.Request.InputStream)) {
-                                        var xml = reader.ReadToEnd ();
-                                        Console.WriteLine (xml);
-                                        Assert.AreEqual (Xml.DoubleEventReport, xml);
+                            context.Response.Close ();
+                            listener.BeginGetContext (resp => {
+                                try {
+                                    var con = listener.EndGetContext (resp);
+                                    using (var reader = new StreamReader (con.Request.InputStream)) {
+                                        Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
                                     }
-                                    c.Response.Close ();
-                                    Monitor.Pulse (mutex);
+                                    con.Response.Close ();
+                                    listener.BeginGetContext (r => {
+                                        try {
+                                            var c = listener.EndGetContext (r);
+                                            using (var reader = new StreamReader (c.Request.InputStream)) {
+                                                Assert.AreEqual (Xml.DoubleEventReport, reader.ReadToEnd ());
+                                            }
+                                            c.Response.Close ();
+                                        } catch (Exception e) {
+                                            exception = e;
+                                        }
+                                        lock (mutex) {
+                                            Monitor.Pulse (mutex);
+                                        }
+                                    }, null);
+                                    eventer1.SetValue ("foo");
+                                    eventer2.SetValue ("bar");
+                                } catch (Exception e) {
+                                    exception = e;
+                                    lock (mutex) {
+                                        Monitor.Pulse (mutex);
+                                    }
                                 }
                             }, null);
                             eventer1.SetValue ("foo");
-                            eventer2.SetValue ("bar");
-                        }, null);
-                        eventer1.SetValue ("foo");
+                        } catch (Exception e) {
+                            exception = e;
+                            lock (mutex) {
+                                Monitor.Pulse (mutex);
+                            }
+                        }
                     }, null);
+                    
                     Subscribe (root, prefix);
+                    
+                    if (exception != null) {
+                        throw exception;
+                    }
                 }
             }
         }
         
         void Subscribe (Root root, string prefix)
         {
-            var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/event/"));
+            var request = WebRequest.Create (new Uri (root.UrlBase, "/service/0/event/"));
             request.Method = "SUBSCRIBE";
             request.Headers.Add ("CALLBACK", string.Format ("<{0}>", prefix));
             request.Headers.Add ("NT", "upnp:event");
@@ -179,7 +227,7 @@ namespace Mono.Upnp.Tests
                     Assert.IsNotNull (response.Headers["SID"]);
                     Assert.AreEqual ("Second-1800", response.Headers["TIMEOUT"]);
                 }
-                if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                     Assert.Fail ("Event publishing timed out.");
                 }
             }
@@ -196,29 +244,35 @@ namespace Mono.Upnp.Tests
             using (var server = new Server (root)) {
                 server.Start ();
                 var prefix = GeneratePrefix ();
-                var url = new Uri (root.UrlBase, "service/0/event/");
+                var url = new Uri (root.UrlBase, "/service/0/event/");
                 using (var listener = new HttpListener ()) {
                     listener.Prefixes.Add (prefix);
                     listener.Start ();
+                    Exception exception = null;
                     listener.BeginGetContext (result => {
                         lock (mutex) {
-                            var context = listener.EndGetContext (result);
-                            using (var reader = new StreamReader (context.Request.InputStream)) {
-                                Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
-                            }
-                            context.Response.Close ();
-                            var unsub_request = WebRequest.Create (url);
-                            unsub_request.Method = "UNSUBSCRIBE";
-                            unsub_request.Headers.Add ("SID", sid);
-                            using (var response = (HttpWebResponse)unsub_request.GetResponse ()) {
-                                Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
-                            }
-                            listener.BeginGetContext (r => {
-                                lock (mutex) {
-                                    Monitor.Pulse (mutex);
+                            try {
+                                var context = listener.EndGetContext (result);
+                                using (var reader = new StreamReader (context.Request.InputStream)) {
+                                    Assert.AreEqual (Xml.SingleEventReport, reader.ReadToEnd ());
                                 }
-                            }, null);
-                            eventer.SetValue ("foo");
+                                context.Response.Close ();
+                                var unsub_request = WebRequest.Create (url);
+                                unsub_request.Method = "UNSUBSCRIBE";
+                                unsub_request.Headers.Add ("SID", sid);
+                                using (var response = (HttpWebResponse)unsub_request.GetResponse ()) {
+                                    Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
+                                }
+                                listener.BeginGetContext (r => {
+                                    lock (mutex) {
+                                        Monitor.Pulse (mutex);
+                                    }
+                                }, null);
+                                eventer.SetValue ("foo");
+                            } catch (Exception e) {
+                                exception = e;
+                                Monitor.Pulse (mutex);
+                            }
                         }
                     }, null);
                     var request = WebRequest.Create (url);
@@ -231,9 +285,13 @@ namespace Mono.Upnp.Tests
                             Assert.IsNotNull (response.Headers["SID"]);
                             sid = response.Headers["SID"];
                         }
-                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The event server sent updates to an unsubscribed client.");
                         }
+                    }
+                    
+                    if (exception != null) {
+                        throw exception;
                     }
                 }
             }
@@ -282,7 +340,7 @@ namespace Mono.Upnp.Tests
             
             using (var server = new Server (root)) {
                 server.Start ();
-                var request = (HttpWebRequest)WebRequest.Create (new Uri (root.UrlBase, "service/0/control/"));
+                var request = (HttpWebRequest)WebRequest.Create (new Uri (root.UrlBase, "/service/0/control/"));
                 request.Method = "POST";
                 request.Headers.Add ("SOAPACTION", "urn:schemas-upnp-org:service:mono-upnp-test-service:1#Foo");
                 request.ContentType = @"text/xml; charset=""utf-8""";
@@ -400,7 +458,7 @@ namespace Mono.Upnp.Tests
             );
             using (var server = new Server (root)) {
                 server.Start ();
-                var request = WebRequest.Create (new Uri (root.UrlBase, "service/0/scpd/"));
+                var request = WebRequest.Create (new Uri (root.UrlBase, "/service/0/scpd/"));
                 using (var response = (HttpWebResponse)request.GetResponse ()) {
                     Assert.AreEqual (HttpStatusCode.OK, response.StatusCode);
                     using (var reader = XmlReader.Create (response.GetResponseStream ())) {
@@ -426,10 +484,10 @@ namespace Mono.Upnp.Tests
             );
             using (var server = new Server (root)) {
                 server.Start ();
-                var url = new Uri (root.UrlBase, "icon/");
+                var url = new Uri (root.UrlBase, "/icon/");
                 AssertEquality (url, 0, 0);
                 AssertEquality (url, 1, 1);
-                url = new Uri (root.UrlBase, "device/0/icon/");
+                url = new Uri (root.UrlBase, "/device/0/icon/");
                 AssertEquality (url, 0, 2);
                 AssertEquality (url, 1, 3);
             }
@@ -477,7 +535,7 @@ namespace Mono.Upnp.Tests
                     client.BrowseAll ();
                     lock (mutex) {
                         server.Start ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The UPnP server announcement timed out.");
                         }
                     }

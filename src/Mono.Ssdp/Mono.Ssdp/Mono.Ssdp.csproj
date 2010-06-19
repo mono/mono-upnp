@@ -59,7 +59,9 @@
     <Compile Include="Mono.Ssdp.Internal\ServiceCache.cs" />
     <Compile Include="Mono.Ssdp.Internal\SsdpSocket.cs" />
     <Compile Include="Mono.Ssdp.Internal\TimeoutDispatcher.cs" />
-    <Compile Include="Mono.Ssdp\ServiceOptions.cs" />
+    <Compile Include="Mono.Ssdp.Internal\MulticastSsdpSocket.cs" />
+    <Compile Include="Mono.Ssdp.Internal\NetworkInterfaceInfo.cs" />
+    <Compile Include="Mono.Ssdp\ServiceOperation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

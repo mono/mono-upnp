@@ -36,7 +36,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 if (description != null) {
                     var controller = description.GetController ();
                     if (controller != null) {
-                        var service = new Deserializer (new ContentDirectoryController (controller));
+                        //var service = new Deserializer (new ContentDirectoryController (controller));
                         //OnContentDirectoryAdded (new DiscoveryEventArgs<Deserializer> (service));
                     }
                 }
@@ -49,13 +49,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             client.Browse (ContentDirectory.ServiceType);
         }
 
-        void OnContentDirectoryAdded (DiscoveryEventArgs<ContentDirectory> e)
+        /*void OnContentDirectoryAdded (DiscoveryEventArgs<ContentDirectory> e)
         {
             var handler = ContentDirectoryAdded;
             if (handler != null) {
                 handler (this, e);
             }
-        }
+        }*/
         
         public void Dispose ()
         {

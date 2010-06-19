@@ -27,6 +27,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Xml;
 
 namespace Mono.Upnp.Xml.Compilation
 {
@@ -140,6 +141,13 @@ namespace Mono.Upnp.Xml.Compilation
             if (type == null) throw new ArgumentNullException ("type");
             
             return xml_serializer.GetCompilerForType (type);
+        }
+        
+        protected XmlSerializationContext<TContext> CreateContext (XmlWriter writer, TContext context)
+        {
+            if (writer == null) throw new ArgumentNullException ("writer");
+            
+            return new XmlSerializationContext<TContext> (xml_serializer, writer, context);
         }
     }
 }

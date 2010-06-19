@@ -104,9 +104,9 @@ namespace Mono.Upnp
             if (serviceUrlFragment == null) throw new ArgumentNullException ("serviceUrlFragment");
             if (controller == null) throw new InvalidOperationException ("The service was created for deserialization and cannot be initialized.");
             
-            ScpdUrlFragment = serviceUrlFragment + "scpd/";
-            ControlUrlFragment = serviceUrlFragment + "control/";
-            EventUrlFragment = serviceUrlFragment + "event/";
+            ScpdUrlFragment = serviceUrlFragment + "/scpd/";
+            ControlUrlFragment = serviceUrlFragment + "/control/";
+            EventUrlFragment = serviceUrlFragment + "/event/";
             controller.Initialize (serializer, this);
         }
         

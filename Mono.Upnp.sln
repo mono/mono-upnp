@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.Tests", "tests\Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests", "tests\Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests\Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests.csproj", "{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Tests", "tests\Mono.Upnp.Dcp.MediaServer1.Tests\Mono.Upnp.Dcp.MediaServer1.Tests.csproj", "{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Ssdp", "Mono.Ssdp", "{10FB35F1-FBF6-42C7-85E2-9A52345FD0F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp", "src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj", "{AD422A19-BA07-4039-B843-84E386804DD1}"
@@ -47,6 +49,14 @@ Global
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Release Linq|Any CPU.Build.0 = Release Linq|Any CPU
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Debug Linq|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Debug Linq|Any CPU.Build.0 = Debug|Any CPU
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Release Linq|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Release Linq|Any CPU.Build.0 = Debug|Any CPU
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Debug Linq|Any CPU.ActiveCfg = Debug Linq|Any CPU
 		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Debug Linq|Any CPU.Build.0 = Debug Linq|Any CPU
 		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -110,6 +120,7 @@ Global
 		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
 		{D6ADBD6C-8A83-4429-8975-624822AF7D3D} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
 		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
 		{AD422A19-BA07-4039-B843-84E386804DD1} = {10FB35F1-FBF6-42C7-85E2-9A52345FD0F3}
 		{E2789A20-B336-4121-8C5A-2EC6DBD031CA} = {251579B4-B8E2-4ACD-B5BD-0DC208BB8114}
 		{D095ADE0-D74E-449C-BAF2-174A952B2056} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
@@ -118,7 +129,7 @@ Global
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = src\Mono.Upnp\Mono.Upnp.GtkClient\Mono.Upnp.GtkClient.csproj
+		StartupItem = src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = Flat

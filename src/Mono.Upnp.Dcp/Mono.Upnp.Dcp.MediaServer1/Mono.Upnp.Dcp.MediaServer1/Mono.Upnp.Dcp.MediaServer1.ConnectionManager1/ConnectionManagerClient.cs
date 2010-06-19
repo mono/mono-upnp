@@ -43,12 +43,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
             client.Browse (ConnectionManager.ServiceType);
         }
 
-        void OnConnectionManagerAdded (ConnectionManager service)
+        /*void OnConnectionManagerAdded (ConnectionManager service)
         {
             EventHandler<DiscoveryEventArgs<ConnectionManager>> handler = ConnectionManagerAdded;
             if (handler != null) {
                 handler (this, new DiscoveryEventArgs<ConnectionManager> (service));
             }
-        }
+        }*/
     }
 }

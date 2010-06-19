@@ -26,8 +26,6 @@
 
 using System;
 
-using Mono.Upnp.Control.Tests;
-
 namespace Mono.Upnp.Tests
 {
     public class DummyService : Service
@@ -46,6 +44,11 @@ namespace Mono.Upnp.Tests
     {
         public DummyService ()
             : base (new T ())
+        {
+        }
+        
+        public DummyService (T service)
+            : base (service)
         {
         }
     }

@@ -1,10 +1,10 @@
 // 
-// ServiceOptions.cs
+// SoapFault.cs
 //  
 // Author:
-//   Aaron Bockover <abockover@novell.com>
-//
-// Copyright (C) 2008 Novell, Inc.
+//       Scott Peterson <lunchtimemama@gmail.com>
+// 
+// Copyright (c) 2010 Scott Peterson
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Ssdp
+using System;
+
+using Mono.Upnp.Internal;
+using Mono.Upnp.Xml;
+
+namespace Mono.Upnp.Internal
 {
-    public enum ServiceOperation
+    [XmlType ("Fault", Protocol.SoapEnvelopeSchema, "s")]
+    class SoapFault<T>
     {
-        Added,
-        Updated,
-        Removed
+        public SoapFault ()
+        {
+        }
+        
+        public SoapFault (T detail)
+        {
+            FaultCode = "s:Client";
+            FaultString = "UPnPError";
+            Detail = detail;
+        }
+        
+        [XmlElement ("faultcode")]
+        public string FaultCode { get; set; }
+        
+        [XmlElement ("faultstring")]
+        public string FaultString { get; set; }
+        
+        [XmlElement ("detail")]
+        public T Detail { get; set; }
     }
 }

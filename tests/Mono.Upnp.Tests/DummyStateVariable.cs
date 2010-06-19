@@ -26,7 +26,9 @@
 
 using System;
 
-namespace Mono.Upnp.Control.Tests
+using Mono.Upnp.Control;
+
+namespace Mono.Upnp.Tests
 {
     public class DummyStateVariable : StateVariable
     {

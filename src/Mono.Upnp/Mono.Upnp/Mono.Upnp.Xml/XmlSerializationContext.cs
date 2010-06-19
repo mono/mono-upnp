@@ -45,6 +45,8 @@ namespace Mono.Upnp.Xml
         public abstract void AutoSerializeObjectAndMembers<TObject> (TObject obj);
         
         public abstract void AutoSerializeMembersOnly<TObject> (TObject obj);
+        
+        public abstract void Serialize<TObject> (TObject obj);
     }
     
     public sealed class XmlSerializationContext<TContext> : XmlSerializationContext
@@ -89,6 +91,16 @@ namespace Mono.Upnp.Xml
             if (obj == null) throw new ArgumentNullException ("obj");
             
             serializer.AutoSerializeMembersOnly (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
+        }
+        
+        public override void Serialize<TObject> (TObject obj)
+        {
+            serializer.Serialize (obj, this);
+        }
+        
+        public void Serialize<TObject> (TObject obj, TContext context)
+        {
+            serializer.Serialize (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
         }
     }
 }

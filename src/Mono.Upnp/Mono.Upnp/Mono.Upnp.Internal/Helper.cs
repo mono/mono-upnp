@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Xml;
 
 namespace Mono.Upnp.Internal
@@ -124,5 +125,7 @@ namespace Mono.Upnp.Internal
                 }
             }
         }
+        
+        public readonly static Encoding UTF8Unsigned = new UTF8Encoding (false);
     }
 }

@@ -129,17 +129,25 @@ namespace Mono.Upnp.GtkClient
             invoke.Sensitive = false;
             
             ThreadPool.QueueUserWorkItem (state => {
-                var results = action.Invoke (arguments);
-                Application.Invoke ((o, a) => {
-                    foreach (var result in results) {
-                        var expander = new Expander (result.Key);
-                        expander.Add (new Label (result.Value) { LineWrap = true, Selectable = true });
-                        outputsBox.PackStart (expander, false, false, 0);
+                try  {
+                    var results = action.Invoke (arguments);
+                    if (results == null) {
+                        return;
                     }
-                    outputsBox.ShowAll ();
-                    inputsBox.Sensitive = true;
-                    invoke.Sensitive = true;
-                });
+                    Application.Invoke ((o, a) => {
+                        foreach (var result in results) {
+                            var expander = new Expander (result.Key);
+                            expander.Add (new Label (result.Value) { LineWrap = true, Selectable = true });
+                            outputsBox.PackStart (expander, false, false, 0);
+                        }
+                        outputsBox.ShowAll ();
+                        inputsBox.Sensitive = true;
+                        invoke.Sensitive = true;
+                    });
+                } catch (UpnpControlException exception) {
+                    // TODO report error to the UI
+                    Console.WriteLine ("Upnp error: " + exception.UpnpError);
+                }
             });
         }
     }

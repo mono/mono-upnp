@@ -30,7 +30,6 @@ using System.Threading;
 using NUnit.Framework;
 
 using Mono.Upnp.Control;
-using Mono.Upnp.Control.Tests;
 
 namespace Mono.Upnp.Tests
 {
@@ -62,7 +61,7 @@ namespace Mono.Upnp.Tests
                     };
                     lock (mutex) {
                         server.Start ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The server announcement timed out.");
                         }
                         Assert.AreEqual (1, factory.InstantiationCount);
@@ -82,7 +81,7 @@ namespace Mono.Upnp.Tests
                     lock (mutex) {
                         flag = false;
                         server.Start ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The UPnP server announcement timed out.");
                         }
                     }
@@ -133,7 +132,7 @@ namespace Mono.Upnp.Tests
                     };
                     lock (mutex) {
                         server.Start ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The UPnP server announcement timed out.");
                         }
                     }
@@ -156,7 +155,7 @@ namespace Mono.Upnp.Tests
                     };
                     lock (mutex) {
                         server.Start ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The UPnP server announcement timed out.");
                         }
                     }
@@ -179,7 +178,7 @@ namespace Mono.Upnp.Tests
                     };
                     lock (mutex) {
                         server.Start ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The UPnP server announcement timed out.");
                         }
                     }
@@ -232,7 +231,7 @@ namespace Mono.Upnp.Tests
                 using (var server = new Server (root)) {
                     lock (mutex) {
                         server.Start ();
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The server control timed out.");
                         }
                     }
@@ -264,6 +263,8 @@ namespace Mono.Upnp.Tests
             readonly EventTestClass service;
             readonly object mutex;
             
+            public Exception Exception;
+            
             public EventTestHelperClass (EventTestClass service, object mutex)
             {
                 this.service = service;
@@ -272,16 +273,27 @@ namespace Mono.Upnp.Tests
         
             public void FirstEventHandler (object sender, StateVariableChangedArgs<string> args)
             {
-                Assert.AreEqual ("Hello World!", args.NewValue);
-                var state_variable = (StateVariable)sender;
-                state_variable.ValueChanged -= FirstEventHandler;
-                state_variable.ValueChanged += SecondEventHandler;
-                service.Foo = "Hello Universe!";
+                try {
+                    Assert.AreEqual ("Hello World!", args.NewValue);
+                    var state_variable = (StateVariable)sender;
+                    state_variable.ValueChanged -= FirstEventHandler;
+                    state_variable.ValueChanged += SecondEventHandler;
+                    service.Foo = "Hello Universe!";
+                } catch (Exception e) {
+                    Exception = e;
+                    lock (mutex) {
+                        Monitor.Pulse (mutex);
+                    }
+                }
             }
             
             public void SecondEventHandler (object sender, StateVariableChangedArgs<string> args)
             {
-                Assert.AreEqual ("Hello Universe!", args.NewValue);
+                try {
+                    Assert.AreEqual ("Hello Universe!", args.NewValue);
+                } catch (Exception e) {
+                    Exception = e;
+                }
                 lock (mutex) {
                     Monitor.Pulse (mutex);
                 }
@@ -308,22 +320,32 @@ namespace Mono.Upnp.Tests
                     }
                 }
             );
+            var helper = new EventTestHelperClass (service, mutex);
             using (var server = new Server (root)) {
                 using (var client = new Client ()) {
                     client.ServiceAdded += (sender, args) => {
-                        var controller = args.Service.GetService ().GetController ();
-                        var helper = new EventTestHelperClass (service, mutex);
-                        controller.StateVariables["FooChanged"].ValueChanged += helper.FirstEventHandler;
+                        try {
+                            var controller = args.Service.GetService ().GetController ();
+                            controller.StateVariables["FooChanged"].ValueChanged += helper.FirstEventHandler;
+                        } catch (Exception e) {
+                            helper.Exception = e;
+                            lock (mutex) {
+                                Monitor.Pulse (mutex);
+                            }
+                        }
                     };
                     client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
                     lock (mutex) {
                         server.Start ();
                         service.Foo = "Hello World!";
-                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (5))) {
+                        if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The event timed out.");
                         }
                     }
                 }
+            }
+            if (helper.Exception != null) {
+                throw helper.Exception;
             }
         }
         

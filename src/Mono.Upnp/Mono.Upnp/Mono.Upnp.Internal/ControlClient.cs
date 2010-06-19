@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Xml;
 
@@ -69,23 +70,64 @@ namespace Mono.Upnp.Internal
             using (var stream = request.GetRequestStream ()) {
                 serializer.Serialize (new SoapEnvelope<Arguments> (new Arguments (service_type, actionName, arguments)), stream);
             }
-            using (var response = (HttpWebResponse)request.GetResponse ()) {
-                if (response.StatusCode == HttpStatusCode.OK) {
+            
+            HttpWebResponse response;
+            WebException exception;
+            try {
+                response = (HttpWebResponse)request.GetResponse ();
+                exception = null;
+            } catch (WebException e) {
+                response = e.Response as HttpWebResponse;
+                if (response == null) {
+                    // TODO check for timeout
+                    throw new UpnpControlException (UpnpError.Unknown(), "The invokation failed.", e);
+                }
+                exception = e;
+            }
+            
+            using (response) {
+                switch (response.StatusCode) {
+                case HttpStatusCode.OK:
                     using (var reader = XmlReader.Create (response.GetResponseStream ())) {
                         // FIXME this is a workaround for Mono bug 523151
                         reader.MoveToContent ();
                         var envelope = deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
                         if (envelope == null) {
                             Log.Error (string.Format ("The response to the {0} action request on {1} has no envelope.", actionName, url));
-                        }
-                        if (envelope.Body == null) {
+                            throw new UpnpControlException (UpnpError.Unknown(), "The service did not provide a valid response (unable to deserialize SOAP envelope).");
+                        } else if (envelope.Body == null) {
                             Log.Error (string.Format ("The response to the {0} action request on {1} has no envelope body.", actionName, url));
+                            throw new UpnpControlException (UpnpError.Unknown(), "The service did not provide a valid response (unable to deserialize SOAP envelope body).");
                         }
                         return new Map<string, string> (envelope.Body.Values);
                     }
-                } else {
-                    // TODO handle else
-                    return null;
+                case HttpStatusCode.InternalServerError:
+                    using (var reader = XmlReader.Create (response.GetResponseStream ())) {
+                        // FIME this is a workaround for Mono bug 523151
+                        reader.MoveToContent ();
+                        var envelope = deserializer.Deserialize<SoapEnvelope<XmlShell<SoapFault<XmlShell<UpnpError>>>>> (reader);
+                        if (envelope == null) {
+                            Log.Error (string.Format ("The faulty response to the {0} action request on {1} has no envelope.", actionName, url));
+                            throw new UpnpControlException (UpnpError.Unknown(),
+                                "The invokation failed but the service did not provide valid fault information (unable to deserialize SOAP envelope).", exception);
+                        } else if (envelope.Body == null) {
+                            Log.Error (string.Format ("The faulty response to the {0} action request on {1} has no envelope body.", actionName, url));
+                            throw new UpnpControlException (UpnpError.Unknown(),
+                                "The invokation failed but the service did not provide valid fault information (unable to deserialize SOAP envelope body).", exception);
+                        } else if (envelope.Body.Value.Detail == null || envelope.Body.Value.Detail.Value == null) {
+                            Log.Error (string.Format (
+                                @"The faulty response to the {0} action request on {1} has no UPnPError. The faultcode and faultstring are ""{2}"" and ""{3}"" respectively.",
+                                actionName, url, envelope.Body.Value.FaultCode, envelope.Body.Value.FaultString));
+                            throw new UpnpControlException (UpnpError.Unknown(),
+                                "The invokation failed but the service did not provide valid fault information (unable to deserialize a UPnPError from the SOAP envelope).", exception);
+                        }
+                        throw new UpnpControlException (envelope.Body.Value.Detail.Value, "The invokation failed.", exception);
+                    }
+                default:
+                    Log.Error (string.Format (
+                        "The response to the {0} action request on {1} returned with status code {2}: {3}.",
+                        actionName, url, (int)response.StatusCode, response.StatusDescription));
+                    throw new UpnpControlException (UpnpError.Unknown(), "The invokation failed.", exception);
                 }
             }
         }

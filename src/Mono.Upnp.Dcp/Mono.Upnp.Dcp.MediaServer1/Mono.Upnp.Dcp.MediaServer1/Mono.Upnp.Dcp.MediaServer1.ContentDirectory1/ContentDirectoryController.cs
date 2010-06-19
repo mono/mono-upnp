@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Mono.Upnp;
 using Mono.Upnp.Control;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
+
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public class ContentDirectoryController
@@ -46,13 +48,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             if (browseFlag < BrowseFlag.BrowseMetadata || browseFlag > BrowseFlag.BrowseDirectChildren)
                 throw new ArgumentOutOfRangeException ("browseFlag");
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (6);
-            in_arguments.Add ("ObjectID", objectId);
-            in_arguments.Add ("BrowseFlag", browseFlag.ToString ());
-            in_arguments.Add ("Filter", filter);
-            in_arguments.Add ("StartingIndex", startingIndex.ToString ());
-            in_arguments.Add ("RequestedCount", requestedCount.ToString ());
-            in_arguments.Add ("SortCriteria", sortCriteria);
+            var in_arguments = new Arguments (
+                "ObjectID", objectId,
+                "BrowseFlag", browseFlag.ToString (),
+                "Filter", filter,
+                "StartingIndex", startingIndex.ToString (),
+                "RequestedCount", requestedCount.ToString (),
+                "SortCriteria", sortCriteria);
             var action_result = controller.Actions["Browse"].Invoke (in_arguments, 2);
             numberReturned = uint.Parse (action_result["NumberReturned"]);
             totalMatches = uint.Parse (action_result["TotalMatches"]);
@@ -68,13 +70,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanSearch) throw new NotImplementedException ();
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (6);
-            in_arguments.Add ("ContainerID", containerId);
-            in_arguments.Add ("SearchCriteria", searchCriteria);
-            in_arguments.Add ("Filter", filter);
-            in_arguments.Add ("StartingIndex", startingIndex.ToString ());
-            in_arguments.Add ("RequestedCount", requestedCount.ToString ());
-            in_arguments.Add ("SortCriteria", sortCriteria);
+            var in_arguments = new Arguments (
+                "ContainerID", containerId,
+                "SearchCriteria", searchCriteria,
+                "Filter", filter,
+                "StartingIndex", startingIndex.ToString (),
+                "RequestedCount", requestedCount.ToString (),
+                "SortCriteria", sortCriteria);
             var action_result = controller.Actions["Search"].Invoke (in_arguments, 2);
             numberReturned = uint.Parse (action_result["NumberReturned"]);
             totalMatches = uint.Parse (action_result["TotalMatches"]);
@@ -90,9 +92,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanCreateObject) throw new NotImplementedException ();
             
-            var in_arguments = new Dictionary<string, string> (2);
-            in_arguments.Add ("ContainerID", containerId);
-            in_arguments.Add ("Elements", elements);
+            var in_arguments = new Arguments (
+                "ContainerID", containerId,
+                "Elements", elements);
             var action_result = controller.Actions["CreateObject"].Invoke (in_arguments);
             return action_result["Result"];
         }
@@ -105,8 +107,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanDestroyObject) throw new NotImplementedException ();
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
-            in_arguments.Add ("ObjectID", objectId);
+            var in_arguments = new Arguments ("ObjectID", objectId);
             controller.Actions["DestroyObject"].Invoke (in_arguments);
         }
 
@@ -118,10 +119,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanUpdateObject) throw new NotImplementedException ();
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (3);
-            in_arguments.Add ("ObjectID", objectId);
-            in_arguments.Add ("CurrentTagValue", currentTagValue);
-            in_arguments.Add ("NewTagValue", newTagValue);
+            var in_arguments = new Arguments (
+                "ObjectID", objectId,
+                "CurrentTagValue", currentTagValue,
+                "NewTagValue", newTagValue);
             controller.Actions["UpdateObject"].Invoke (in_arguments);
         }
 
@@ -133,9 +134,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanImportResource) throw new NotImplementedException ();
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
-            in_arguments.Add ("SourceURI", sourceUri.ToString ());
-            in_arguments.Add ("DestinationURI", destinationUri.ToString ());
+            var in_arguments = new Arguments (
+                "SourceURI", sourceUri.ToString (),
+                "DestinationURI", destinationUri.ToString ());
             var action_result = controller.Actions["ImportResource"].Invoke (in_arguments);
             return action_result["TransferID"];
         }
@@ -148,9 +149,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanExportResource) throw new NotImplementedException ();
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
-            in_arguments.Add ("SourceURI", sourceUri.ToString ());
-            in_arguments.Add ("DestinationURI", destinationUri.ToString ());
+            var in_arguments = new Arguments (
+                "SourceURI", sourceUri.ToString (),
+                "DestinationURI", destinationUri.ToString ());
             var action_result = controller.Actions["ExportResource"].Invoke (in_arguments);
             return action_result["TransferID"];
         }
@@ -163,8 +164,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanStopTransferResource) throw new NotImplementedException ();
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
-            in_arguments.Add ("TransferID", transferId.ToString ());
+            var in_arguments = new Arguments ("TransferID", transferId.ToString ());
             controller.Actions["StopTransferResource"].Invoke (in_arguments);
         }
 
@@ -176,8 +176,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanGetTransferProgress) throw new NotImplementedException ();
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
-            in_arguments.Add ("TransferID", transferId.ToString ());
+            var in_arguments = new Arguments ("TransferID", transferId.ToString ());
             var action_result = controller.Actions["GetTransferProgress"].Invoke (in_arguments);
             transferStatus = action_result["TransferStatus"];
             transferLength = action_result["TransferLength"];
@@ -192,8 +191,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanDeleteResource) throw new NotImplementedException ();
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (1);
-            in_arguments.Add ("ResourceURI", resourceUri.ToString ());
+            var in_arguments = new Arguments ("ResourceURI", resourceUri.ToString ());
             controller.Actions["DeleteResource"].Invoke (in_arguments);
         }
 
@@ -205,9 +203,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             if (!CanCreateReference) throw new NotImplementedException ();
             
-            Dictionary<string, string> in_arguments = new Dictionary<string, string> (2);
-            in_arguments.Add ("ContainerID", containerId);
-            in_arguments.Add ("ObjectID", objectId);
+            var in_arguments = new Arguments (
+                "ContainerID", containerId,
+                "ObjectID", objectId);
             var action_result = controller.Actions["CreateReference"].Invoke (in_arguments);
             return action_result["NewID"];
         }
@@ -241,7 +239,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 //            }
 //        }
 
-        void Verify ()
+       /* void Verify ()
         {
 //            if (!controller.Actions.ContainsKey ("GetSearchCapabilities"))
 //                throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action GetSearchCapabilities.", controller.Description.Id));
@@ -253,6 +251,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 //                throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required action Browse.", controller.Description.Id));
 //            if (!controller.StateVariables.ContainsKey ("SystemUpdateID"))
 //                throw new UpnpDeserializationException (string.Format ("The service {0} claims to be of type urn:schemas-upnp-org:service:ContentDirectory:1 but it does not have the required state variable SystemUpdateID.", controller.Description.Id));
-        }
+        }*/
     }
 }

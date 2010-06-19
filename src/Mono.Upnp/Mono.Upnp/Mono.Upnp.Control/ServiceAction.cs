@@ -37,7 +37,7 @@ namespace Mono.Upnp.Control
     [XmlType ("action")]
     public class ServiceAction : Description, IMappable<string>, IXmlDeserializer<Argument>
     {
-        readonly static Dictionary<string, string> emptyArguments = new Dictionary<string, string> ();
+        readonly static IDictionary<string, string> emptyArguments = new EmptyDictionary ();
         
         readonly ServiceController controller;
         readonly CollectionMap<string, Argument> arguments;
@@ -109,7 +109,8 @@ namespace Mono.Upnp.Control
         
         protected internal virtual IDictionary<string, string> Execute (IDictionary<string, string> arguments)
         {
-            if (executor == null) throw new InvalidOperationException ("This ServiceAction was create for deserialization and cannot be executed locally. Use the Invoke method to invoke the action across the network.");
+            if (executor == null) throw new InvalidOperationException (
+                "This ServiceAction was create for deserialization and cannot be executed locally. Use the Invoke method to invoke the action across the network.");
             
             return executor (arguments);
         }

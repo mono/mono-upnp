@@ -65,7 +65,6 @@
     <Compile Include="Mono.Upnp.Control\StateVariable.cs" />
     <Compile Include="Mono.Upnp.Control\StateVariableChangedArgs.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpControlException.cs" />
-    <Compile Include="Mono.Upnp.Control\UpnpControlExceptionStatus.cs" />
     <Compile Include="Mono.Upnp.Internal\ControlServer.cs" />
     <Compile Include="Mono.Upnp.Internal\DataServer.cs" />
     <Compile Include="Mono.Upnp.Internal\EventServer.cs" />
@@ -120,8 +119,6 @@
     <Compile Include="Mono.Upnp.Xml.Compilation\Compiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\Serializer.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompiler.cs" />
-    <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompilerFactory.cs" />
-    <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompilerFactory.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlDeclarationType.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateDeserializationCompiler.cs" />
@@ -134,6 +131,12 @@
     <Compile Include="Mono.Upnp\RootDeviceOptions.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlSerializationOptions.cs" />
     <Compile Include="Mono.Upnp.Xml\IXmlDeserializer.cs" />
+    <Compile Include="Mono.Upnp.Internal\EmptyDictionary.cs" />
+    <Compile Include="Mono.Upnp.Internal\SoapFault.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpError.cs" />
+    <Compile Include="Mono.Upnp.Internal\XmlShell.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompilerProvider.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpServiceDefinitionException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

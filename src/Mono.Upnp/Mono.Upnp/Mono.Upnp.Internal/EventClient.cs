@@ -121,16 +121,24 @@ namespace Mono.Upnp.Internal
                 try {
                     using (var stream = context.Request.InputStream) {
                         using (var reader = XmlReader.Create (stream)) {
-                            while (reader.ReadToFollowing ("property", Protocol.EventSchema)) {
-                                reader.Read ();
-                                StateVariable state_variable;
-                                if (state_variables.TryGetValue (reader.Name, out state_variable)) {
-                                    state_variable.Value = reader.ReadElementContentAsString ();
-                                } else {
-                                    Log.Warning (string.Format (
-                                        "{0} published an event update to {1} which includes unknown state variable {2}.",
-                                        context.Request.RemoteEndPoint, context.Request.Url, reader.Name));
-                                }
+                            if (reader.MoveToContent () != XmlNodeType.Element) {
+                                Log.Warning ("The event update has no root XML element.");
+                            } else if (reader.LocalName != "propertyset" && reader.NamespaceURI != Protocol.EventSchema) {
+                                Log.Warning ("The event update has no propertyset.");
+                            } else if (!reader.ReadToDescendant ("property", Protocol.EventSchema)) {
+                                Log.Warning ("The event update has an empty propertyset.");
+                            } else {
+                                do {
+                                    reader.Read ();
+                                    StateVariable state_variable;
+                                    if (state_variables.TryGetValue (reader.Name, out state_variable)) {
+                                        state_variable.Value = reader.ReadElementContentAsString ();
+                                    } else {
+                                        Log.Warning (string.Format (
+                                            "{0} published an event update to {1} which includes unknown state variable {2}.",
+                                            context.Request.RemoteEndPoint, context.Request.Url, reader.Name));
+                                    }
+                                } while (reader.ReadToNextSibling ("property", Protocol.EventSchema));
                             }
                         }
                     }

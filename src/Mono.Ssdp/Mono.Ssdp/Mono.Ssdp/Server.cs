@@ -29,6 +29,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Threading;
 
 using Mono.Ssdp.Internal;
@@ -44,6 +45,11 @@ namespace Mono.Ssdp
 
         readonly RequestListener request_listener;
         readonly Dictionary<string, Announcer> announcers;
+        
+        readonly NetworkInterfaceInfo network_interface_info;
+        internal NetworkInterfaceInfo NetworkInterfaceInfo {
+            get { return network_interface_info; }
+        }
 
         public bool Started { get; private set; }
         
@@ -61,15 +67,26 @@ namespace Mono.Ssdp
         internal SsdpSocket RespondSocket { get; private set; }
 
         public Server ()
+            : this (null, null)
         {
+        }
+        
+        public Server (string defaultLocation)
+            : this (defaultLocation, null)
+        {
+        }
+        
+        public Server (NetworkInterface networkInterface)
+            : this (null, networkInterface)
+        {
+        }
+        
+        public Server (string defaultLocation, NetworkInterface networkInterface)
+        {
+            default_location = defaultLocation;
+            network_interface_info = NetworkInterfaceInfo.GetNetworkInterfaceInfo (networkInterface);
             request_listener = new RequestListener (this);
             announcers = new Dictionary<string, Announcer> ();
-        }
-
-        public Server (string location)
-            : this ()
-        {
-            default_location = location;
         }
 
         public Announcer Announce (string type, string name)
@@ -137,9 +154,9 @@ namespace Mono.Ssdp
 
                 Started = true;
                 request_listener.Start ();
-                AnnounceSocket = new SsdpSocket ();
+                AnnounceSocket = new MulticastSsdpSocket (network_interface_info);
                 AnnounceSocket.Bind (new IPEndPoint (IPAddress.Any, 0));
-                RespondSocket = new SsdpSocket (false);
+                RespondSocket = new SsdpSocket (network_interface_info.Address);
                 RespondSocket.Bind (new IPEndPoint (IPAddress.Any, Protocol.Port));
 
                 if (startAnnouncers) {

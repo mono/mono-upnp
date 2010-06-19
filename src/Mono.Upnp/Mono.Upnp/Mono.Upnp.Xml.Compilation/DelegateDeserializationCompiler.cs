@@ -106,7 +106,10 @@ namespace Mono.Upnp.Xml.Compilation
             } else if (Type == typeof (DateTime)) {
                 return context => context.Reader.ReadElementContentAsDateTime ();
             } else if (Type == typeof (Uri)) {
-                return context => new Uri (context.Reader.ReadElementContentAsString ());
+                return context => {
+                    var url = context.Reader.ReadElementContentAsString ();
+                    return url.Length == 0 ? null : new Uri (url);
+                };
             } else if (Type.IsEnum) {
                 var map = GetEnumMap (Type);
                 return context => map[context.Reader.ReadElementContentAsString ()];

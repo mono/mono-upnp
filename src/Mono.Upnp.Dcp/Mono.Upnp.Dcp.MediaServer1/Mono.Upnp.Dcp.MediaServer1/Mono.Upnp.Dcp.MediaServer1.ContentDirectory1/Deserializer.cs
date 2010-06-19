@@ -38,8 +38,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         readonly Dictionary<string, uint> container_update_ids = new Dictionary<string, uint> ();
         
         readonly ContentDirectoryController controller;
-        readonly string search_capabilities;
-        readonly string sort_capabilities;
+        //readonly string search_capabilities;
+        //readonly string sort_capabilities;
         Container root_container;
         
         public Deserializer (ContentDirectoryController controller)
@@ -47,8 +47,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             if (controller == null) throw new ArgumentNullException ("controller");
             
             this.controller = controller;
-            search_capabilities = controller.GetSearchCapabilities ();
-            sort_capabilities = controller.GetSortCapabilities ();
+            //search_capabilities = controller.GetSearchCapabilities ();
+            //sort_capabilities = controller.GetSortCapabilities ();
         }
         
         public ContentDirectoryController Controller { get { return controller; } }

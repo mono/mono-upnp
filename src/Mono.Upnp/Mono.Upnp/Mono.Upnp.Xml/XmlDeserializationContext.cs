@@ -64,5 +64,10 @@ namespace Mono.Upnp.Xml
             
             deserializer.AutoDeserializeElement (obj, this);
         }
+        
+        public T Deserialize<T> ()
+        {
+            return deserializer.Deserialize<T> (Reader);
+        }
     }
 }
