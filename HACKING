@@ -40,7 +40,7 @@ Design Guidelines [2]. If you use MonoDevelop, the solution file will specify th
            ...
        }
 
-     NEVER omit the braces from statement blocks, event if they contain only one expression.
+     NEVER omit the braces from statement blocks, even if they contain only one expression.
   
   4. Properties look like this:
 
