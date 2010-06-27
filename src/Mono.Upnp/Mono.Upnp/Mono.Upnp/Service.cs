@@ -159,7 +159,7 @@ namespace Mono.Upnp
                 throw new ArgumentNullException ("context");
             }
             
-            return new ServiceType (context.Reader.ReadElementContentAsString ());
+            return ServiceType.Parse (context.Reader.ReadElementContentAsString ());
         }
 
         protected override void DeserializeElement (XmlDeserializationContext context)

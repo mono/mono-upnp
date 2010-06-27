@@ -258,7 +258,7 @@ namespace Mono.Upnp
                 throw new ArgumentNullException ("context");
             }
             
-            return new DeviceType (context.Reader.ReadElementContentAsString ());
+            return DeviceType.Parse (context.Reader.ReadElementContentAsString ());
         }
         
         Device IXmlDeserializer<Device>.Deserialize (XmlDeserializationContext context)

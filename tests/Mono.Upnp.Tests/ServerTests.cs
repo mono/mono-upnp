@@ -363,7 +363,7 @@ namespace Mono.Upnp.Tests
         static Root CreateRoot (ServiceController controller)
         {
             return new DummyRoot (
-                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                new DeviceType ("schemas-upnp-org", "mono-upnp-tests-device", new Version (1, 0)),
                 "uuid:d1",
                 "Mono.Upnp.Tests Device",
                 "Mono Project",
@@ -371,7 +371,7 @@ namespace Mono.Upnp.Tests
                 new RootDeviceOptions {
                     Services = new[] {
                         new Service (
-                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)),
                             "urn:upnp-org:serviceId:testService1",
                             controller
                         )
@@ -388,7 +388,7 @@ namespace Mono.Upnp.Tests
         static Root CreateRoot (IEnumerable<Icon> icons1, IEnumerable<Icon> icons2)
         {
             return new DummyRoot (
-                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                new DeviceType ("schemas-upnp-org", "mono-upnp-tests-device", new Version (1, 0)),
                 "uuid:d1",
                 "Mono.Upnp.Tests Device",
                 "Mono Project",
@@ -396,12 +396,12 @@ namespace Mono.Upnp.Tests
                 new RootDeviceOptions {
                     Icons = icons1,
                     Services = new[] {
-                        new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
-                        new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                        new DummyService (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)), "urn:upnp-org:serviceId:testService1"),
+                        new DummyService (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (2, 0)), "urn:upnp-org:serviceId:testService2"),
                     },
                     EmbeddedDevices = new[] {
                         new Device (
-                            new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-embedded-device:1"),
+                            new DeviceType ("schemas-upnp-org", "mono-upnp-tests-embedded-device", new Version (1, 0)),
                             "uuid:ed1",
                             "Mono.Upnp.Tests Embedded Device",
                             "Mono Project",
@@ -409,8 +409,8 @@ namespace Mono.Upnp.Tests
                             new DeviceOptions {
                                 Icons = icons2,
                                 Services = new[] {
-                                    new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "urn:upnp-org:serviceId:testService1"),
-                                    new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"), "urn:upnp-org:serviceId:testService2"),
+                                    new DummyService (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)), "urn:upnp-org:serviceId:testService1"),
+                                    new DummyService (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (2, 0)), "urn:upnp-org:serviceId:testService2"),
                                 }
                             }
                         )
@@ -441,7 +441,7 @@ namespace Mono.Upnp.Tests
         {
             var controller = CreateServiceController ();
             var root = new DummyRoot (
-                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                new DeviceType ("schemas-upnp-org", "mono-upnp-tests-device", new Version (1, 0)),
                 "uuid:d1",
                 "Mono.Upnp.Tests Device",
                 "Mono Project",
@@ -449,7 +449,7 @@ namespace Mono.Upnp.Tests
                 new RootDeviceOptions {
                     Services = new[] {
                         new Service (
-                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            new ServiceType ("uschemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)),
                             "urn:upnp-org:serviceId:testService1",
                             controller
                         )

@@ -72,6 +72,7 @@
     <Compile Include="ServiceTests.cs" />
     <Compile Include="DummyStateVariable.cs" />
     <Compile Include="DummyDeserializerFactory.cs" />
+    <Compile Include="TypeInfoTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>

@@ -32,7 +32,7 @@ namespace Mono.Upnp.Dcp.MSMediaServerRegistrar1
 {
     public abstract class MSMediaServerRegistrar
     {
-        public static readonly ServiceType ServiceType = new ServiceType ("urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1");
+        public static readonly ServiceType ServiceType = new ServiceType ("microsoft.com", "X_MS_MediaReceiverRegistrar", new Version (1, 0));
         
         [UpnpAction]
         public virtual void IsAuthorized ([UpnpArgument ("DeviceId")] string deviceId, [UpnpArgument ("Result")] out long result)

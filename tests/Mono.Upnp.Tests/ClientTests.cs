@@ -45,8 +45,8 @@ namespace Mono.Upnp.Tests
             var factory = new DummyDeserializerFactory ();
             using (var server = new Server (CreateRoot ())) {
                 using (var client = new Client (factory.CreateDeserializer)) {
-                    client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
-                    client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"));
+                    client.Browse (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)));
+                    client.Browse (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (2, 0)));
                     flag = false;
                     client.ServiceAdded += (sender, args) => {
                         lock (mutex) {
@@ -92,7 +92,7 @@ namespace Mono.Upnp.Tests
         void AnnouncementTestClientServiceAdded (object sender, ServiceEventArgs e)
         {
             lock (mutex) {
-                Assert.AreEqual (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), e.Service.Type);
+                Assert.AreEqual (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)), e.Service.Type);
                 Assert.AreEqual ("uuid:d1", e.Service.DeviceUdn);
                 Assert.IsTrue (e.Service.Locations.GetEnumerator ().MoveNext ());
                 if (flag) {
@@ -106,7 +106,7 @@ namespace Mono.Upnp.Tests
         void AnnouncementTestClientDeviceAdded (object sender, DeviceEventArgs e)
         {
             lock (mutex) {
-                Assert.AreEqual (new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"), e.Device.Type);
+                Assert.AreEqual (new DeviceType ("schemas-upnp-org", "mono-upnp-test-device", new Version (1, 0)), e.Device.Type);
                 Assert.AreEqual ("uuid:d1", e.Device.Udn);
                 Assert.IsTrue (e.Device.Locations.GetEnumerator ().MoveNext ());
                 if (flag) {
@@ -199,7 +199,7 @@ namespace Mono.Upnp.Tests
         public void ControlTest ()
         {
             var root = new Root (
-                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                new DeviceType ("schemas-upnp-org", "mono-upnp-test-device", new Version (1, 0)),
                 "uuid:d1",
                 "Mono.Upnp.Tests Device",
                 "Mono Project",
@@ -207,7 +207,7 @@ namespace Mono.Upnp.Tests
                 new RootDeviceOptions {
                     Services = new[] {
                         new Service<ControlTestClass> (
-                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)),
                             "urn:upnp-org:serviceId:testService1",
                             new ControlTestClass ()
                         )
@@ -216,7 +216,7 @@ namespace Mono.Upnp.Tests
             );
             
             using (var client = new Client ()) {
-                client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
+                client.Browse (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)));
                 client.ServiceAdded += (sender, args) => {
                     lock (mutex) {
                         var controller = args.Service.GetService ().GetController ();
@@ -305,7 +305,7 @@ namespace Mono.Upnp.Tests
         {
             var service = new EventTestClass ();
             var root = new Root (
-                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                new DeviceType ("schemas-upnp-org", "mono-upnp-test-device", new Version (1, 0)),
                 "uuid:d1",
                 "Mono.Upnp.Tests Device",
                 "Mono Project",
@@ -313,7 +313,7 @@ namespace Mono.Upnp.Tests
                 new RootDeviceOptions {
                     Services = new[] {
                         new Service<EventTestClass> (
-                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)),
                             "urn:upnp-org:serviceId:testService1",
                             service
                         )
@@ -334,7 +334,7 @@ namespace Mono.Upnp.Tests
                             }
                         }
                     };
-                    client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
+                    client.Browse (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)));
                     lock (mutex) {
                         server.Start ();
                         service.Foo = "Hello World!";
@@ -352,7 +352,7 @@ namespace Mono.Upnp.Tests
         static Root CreateRoot ()
         {
             return new DummyRoot (
-                new DeviceType ("urn:schemas-upnp-org:device:mono-upnp-tests-device:1"),
+                new DeviceType ("schemas-upnp-org", "mono-upnp-test-device", new Version (1, 0)),
                 "uuid:d1",
                 "Mono.Upnp.Tests Device",
                 "Mono Project",
@@ -360,11 +360,11 @@ namespace Mono.Upnp.Tests
                 new RootDeviceOptions {
                     Services = new[] {
                         new DummyService (
-                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"),
+                            new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)),
                             "urn:upnp-org:serviceId:testService1"
                         ),
                         new DummyService (
-                            new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"),
+                            new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (2, 0)),
                             "urn:upnp-org:serviceId:testService2"
                         )
                     }

@@ -143,11 +143,11 @@ namespace Mono.Upnp
             var usn = colon == -1 ? args.Usn : args.Usn.Substring (0, colon);
 
             if (args.Usn.Contains (":device:")) {
-                var type = new DeviceType (args.Service.ServiceType);
+                var type = DeviceType.Parse (args.Service.ServiceType);
                 var device = new DeviceAnnouncement (this, type, usn, args.Service.Locations);
                 deviceHandler (device);
             } else if (args.Usn.Contains (":service:")) {
-                var type = new ServiceType (args.Service.ServiceType);
+                var type = ServiceType.Parse (args.Service.ServiceType);
                 var service = new ServiceAnnouncement (this, type, usn, args.Service.Locations);
                 serviceHandler (service);
             }

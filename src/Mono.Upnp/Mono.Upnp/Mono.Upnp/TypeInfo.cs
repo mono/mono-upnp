@@ -36,32 +36,20 @@ namespace Mono.Upnp
         readonly string type;
         readonly Version version;
         readonly string kind;
-        
-        internal TypeInfo (string typeDescription, string kind)
+
+        internal TypeInfo (string domainName, string type, Version version, string kind)
         {
-            var sections = typeDescription.Trim ().Split (':');
-            if (sections.Length < 5) {
-                throw new UpnpDeserializationException (string.Format (
-                    @"The type description string contained too few components: ""{0}"".", typeDescription));
+            if (domainName == null) {
+                throw new ArgumentNullException ("domainName");
+            } else if (type == null) {
+                throw new ArgumentNullException ("type");
+            } else if (version == null) {
+                throw new ArgumentNullException ("version");
             }
-            var versions = sections[4].Split ('.');
-            int major;
-            if (!int.TryParse (versions[0], out major)) {
-                throw new UpnpDeserializationException (string.Format (
-                    "The type description version number could not be parsed: {0}.", versions[0]));
-            }
-            if (versions.Length == 1) {
-                version = new Version (major, 0);
-            } else {
-                int minor;
-                if (!int.TryParse (versions[1], out minor)) {
-                    throw new UpnpDeserializationException (string.Format (
-                        "The type description minor version number could not be parsed: {0}.", versions[1]));
-                }
-                version = new Version (major, minor);
-            }
-            domain_name = sections[1];
-            type = sections[3];
+
+            this.domain_name = domainName;
+            this.type = type;
+            this.version = version;
             this.kind = kind;
         }
 
@@ -119,6 +107,40 @@ namespace Mono.Upnp
         public static bool operator != (TypeInfo type1, TypeInfo type2)
         {
             return !(type1 == type2);
+        }
+
+        internal static void Parse (string typeDescription,
+                                    out string domainName,
+                                    out string type,
+                                    out Version version)
+        {
+            if (typeDescription == null) {
+                throw new ArgumentNullException ("typeDescription");
+            }
+
+            var sections = typeDescription.Trim ().Split (':');
+            if (sections.Length < 5) {
+                throw new UpnpDeserializationException (string.Format (
+                    @"The type description string contained too few components: ""{0}"".", typeDescription));
+            }
+            var versions = sections[4].Split ('.');
+            int major;
+            if (!int.TryParse (versions[0], out major)) {
+                throw new UpnpDeserializationException (string.Format (
+                    "The type description version number could not be parsed: {0}.", versions[0]));
+            }
+            if (versions.Length == 1) {
+                version = new Version (major, 0);
+            } else {
+                int minor;
+                if (!int.TryParse (versions[1], out minor)) {
+                    throw new UpnpDeserializationException (string.Format (
+                        "The type description minor version number could not be parsed: {0}.", versions[1]));
+                }
+                version = new Version (major, minor);
+            }
+            domainName = sections[1];
+            type = sections[3];
         }
     }
 }

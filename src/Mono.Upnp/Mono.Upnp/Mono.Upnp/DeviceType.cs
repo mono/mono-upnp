@@ -26,13 +26,23 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using System;
+
 namespace Mono.Upnp
 {
     public sealed class DeviceType : TypeInfo
     {
-        public DeviceType (string typeDescription)
-            : base (typeDescription, "device")
+        public DeviceType (string domainName, string type, Version version)
+            : base (domainName, type, version, "device")
         {
+        }
+
+        public static DeviceType Parse (string deviceType)
+        {
+            string domainName, type;
+            Version version;
+            Parse (deviceType, out domainName, out type, out version);
+            return new DeviceType (domainName, type, version);
         }
     }
 }
