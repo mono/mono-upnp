@@ -123,7 +123,9 @@ namespace Mono.Upnp.Internal
                         using (var reader = XmlReader.Create (stream)) {
                             if (reader.MoveToContent () != XmlNodeType.Element) {
                                 Log.Warning ("The event update has no root XML element.");
-                            } else if (reader.LocalName != "propertyset" && reader.NamespaceURI != Protocol.EventSchema) {
+                            } else if (reader.LocalName != "propertyset"
+                                && reader.NamespaceURI != Protocol.EventSchema)
+                            {
                                 Log.Warning ("The event update has no propertyset.");
                             } else if (!reader.ReadToDescendant ("property", Protocol.EventSchema)) {
                                 Log.Warning ("The event update has an empty propertyset.");
@@ -135,7 +137,8 @@ namespace Mono.Upnp.Internal
                                         state_variable.Value = reader.ReadElementContentAsString ();
                                     } else {
                                         Log.Warning (string.Format (
-                                            "{0} published an event update to {1} which includes unknown state variable {2}.",
+                                            "{0} published an event update to {1} " +
+                                            "which includes unknown state variable {2}.",
                                             context.Request.RemoteEndPoint, context.Request.Url, reader.Name));
                                     }
                                 } while (reader.ReadToNextSibling ("property", Protocol.EventSchema));

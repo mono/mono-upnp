@@ -44,7 +44,7 @@ namespace Mono.Upnp.Tests
         {
             var factory = new DummyDeserializerFactory ();
             using (var server = new Server (CreateRoot ())) {
-                using (var client = new Client (factory)) {
+                using (var client = new Client (factory.CreateDeserializer)) {
                     client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"));
                     client.Browse (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:2"));
                     flag = false;

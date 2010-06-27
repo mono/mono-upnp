@@ -48,7 +48,10 @@ namespace Mono.Upnp.Internal
         {
         }
         
-        public Arguments (string serviceType, string actionName, IDictionary<string, string> arguments, bool response)
+        public Arguments (string serviceType,
+                          string actionName,
+                          IDictionary<string, string> arguments,
+                          bool response)
         {
             ServiceType = serviceType;
             ActionName = actionName;

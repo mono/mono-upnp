@@ -28,18 +28,14 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Tests
 {
-    public class DummyDeserializerFactory : DeserializerFactory
+    public class DummyDeserializerFactory
     {
         public int InstantiationCount;
         
-        public DummyDeserializerFactory ()
-        {
-        }
-        
-        public override Deserializer CreateDeserializer (XmlDeserializer xmlDeserializer)
+        public Deserializer CreateDeserializer (XmlDeserializer xmlDeserializer)
         {
             InstantiationCount++;
-            return base.CreateDeserializer (xmlDeserializer);
+            return new Deserializer (xmlDeserializer);
         }
     }
 }

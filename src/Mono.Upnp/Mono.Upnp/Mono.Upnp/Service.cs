@@ -64,7 +64,9 @@ namespace Mono.Upnp
         
         public Service (ServiceType type, string id, ServiceController controller)
         {
-            if (controller == null) throw new ArgumentNullException ("controller");
+            if (controller == null) {
+                throw new ArgumentNullException ("controller");
+            }
             
             this.controller = controller;
             Type = type;
@@ -101,8 +103,12 @@ namespace Mono.Upnp
         protected internal virtual void Initialize (XmlSerializer serializer, Root root, string serviceUrlFragment)
         {
             Initialize (root);
-            if (serviceUrlFragment == null) throw new ArgumentNullException ("serviceUrlFragment");
-            if (controller == null) throw new InvalidOperationException ("The service was created for deserialization and cannot be initialized.");
+            if (serviceUrlFragment == null) {
+                throw new ArgumentNullException ("serviceUrlFragment");
+            } else if (controller == null) {
+                throw new InvalidOperationException (
+                    "The service was created for deserialization and cannot be initialized.");
+            }
             
             ScpdUrlFragment = serviceUrlFragment + "/scpd/";
             ControlUrlFragment = serviceUrlFragment + "/control/";
@@ -112,14 +118,20 @@ namespace Mono.Upnp
         
         protected internal virtual void Start ()
         {
-            if (controller == null) throw new InvalidOperationException ("The service was created for deserialization and cannot be started.");
+            if (controller == null) {
+                throw new InvalidOperationException (
+                    "The service was created for deserialization and cannot be started.");
+            }
             
             controller.Start ();
         }
         
         protected internal virtual void Stop ()
         {
-            if (controller == null) throw new InvalidOperationException ("The service was created for deserialization and cannot be stopped.");
+            if (controller == null) {
+                throw new InvalidOperationException (
+                    "The service was created for deserialization and cannot be stopped.");
+            }
             
             controller.Stop ();
         }
@@ -143,30 +155,26 @@ namespace Mono.Upnp
         
         protected virtual ServiceType DeserializeServiceType (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
             
             return new ServiceType (context.Reader.ReadElementContentAsString ());
         }
 
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoDeserializeElement (this);
+            AutoDeserializeElement (this, context);
         }
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeObjectAndMembers (this);
+            AutoSerializeObjectAndMembers (this, context);
         }
         
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembersOnly (this, context);
         }
 
         public override string ToString ()

@@ -49,25 +49,27 @@ namespace Mono.Upnp
             new Dictionary<string, Root> ();
 
         readonly Mono.Ssdp.Client client = new Mono.Ssdp.Client ();
-        DeserializerFactory deserializer_facotry;
+        DeserializerProducer deserializer_producer;
 
         public Client ()
             : this (null)
         {
         }
         
-        public Client (DeserializerFactory deserializerFactory)
+        public Client (DeserializerProducer deserializerProducer)
         {
-            DeserializerFactory = deserializerFactory ?? new DeserializerFactory ();
+            DeserializerProducer = deserializerProducer ?? (xmlDeserializer => new Deserializer (xmlDeserializer));
             client.ServiceAdded += ClientServiceAdded;
             client.ServiceRemoved += ClientServiceRemoved;
         }
         
-        public DeserializerFactory DeserializerFactory {
-            get { return deserializer_facotry; }
+        public DeserializerProducer DeserializerProducer {
+            get { return deserializer_producer; }
             set {
-                if (value == null) throw new ArgumentNullException ("value");
-                deserializer_facotry = value;
+                if (value == null) {
+                    throw new ArgumentNullException ("value");
+                }
+                deserializer_producer = value;
             }
         }
         
@@ -189,7 +191,9 @@ namespace Mono.Upnp
             return GetDescription<DeviceAnnouncement, Device> (announcement.Locations, announcement, GetDevice);
         }
         
-        TResult GetDescription<TAnnouncement, TResult> (IEnumerable<string> urls, TAnnouncement announcement, Func<TAnnouncement, Device, TResult> getter)
+        TResult GetDescription<TAnnouncement, TResult> (IEnumerable<string> urls,
+                                                        TAnnouncement announcement,
+                                                        Func<TAnnouncement, Device, TResult> getter)
             where TResult : class
         {
             foreach (var url in urls) {
@@ -205,7 +209,7 @@ namespace Mono.Upnp
                 
                 try {
                     var deserializer = Helper.Get<XmlDeserializer> (static_deserializer);
-                    var root = DeserializerFactory.CreateDeserializer (deserializer).DeserializeRoot (new Uri (url));
+                    var root = deserializer_producer (deserializer).DeserializeRoot (new Uri (url));
                     if (root == null) {
                         continue;
                     }

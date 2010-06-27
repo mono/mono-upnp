@@ -45,7 +45,10 @@ namespace Mono.Upnp.Internal
         readonly XmlSerializer serializer;
         readonly XmlDeserializer deserializer;
         
-        public ControlServer (IMap<string, ServiceAction> actions, string serviceType, Uri url, XmlSerializer serializer)
+        public ControlServer (IMap<string, ServiceAction> actions,
+                              string serviceType,
+                              Uri url,
+                              XmlSerializer serializer)
             : base (url)
         {
             this.actions = actions;
@@ -93,7 +96,8 @@ namespace Mono.Upnp.Internal
                     var stream = context.Response.OutputStream;
                     try {
                         serializer.Serialize (
-                            new SoapEnvelope<Arguments> (new Arguments (service_type, action.Name, action.Execute (arguments.Values), true)),
+                            new SoapEnvelope<Arguments> (
+                                new Arguments (service_type, action.Name, action.Execute (arguments.Values), true)),
                             stream
                         );
                         

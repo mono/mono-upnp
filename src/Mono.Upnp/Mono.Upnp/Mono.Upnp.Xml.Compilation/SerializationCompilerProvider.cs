@@ -28,5 +28,6 @@ using System;
 
 namespace Mono.Upnp.Xml.Compilation
 {
-    public delegate SerializationCompiler<T> SerializationCompilerProvider<T> (XmlSerializer<T> xmlSerializer, Type type);
+    public delegate SerializationCompiler<T> SerializationCompilerProvider<T> (XmlSerializer<T> xmlSerializer,
+                                                                               Type type);
 }

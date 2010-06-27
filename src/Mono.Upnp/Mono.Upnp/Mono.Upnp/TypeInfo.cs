@@ -39,19 +39,29 @@ namespace Mono.Upnp
         
         internal TypeInfo (string typeDescription, string kind)
         {
-            try {
-                var sections = typeDescription.Trim ().Split (':');
-                var versions = sections[4].Split ('.');
-                if (versions.Length == 1) {
-                    version = new Version (int.Parse (versions[0]), 0);
-                } else {
-                    version = new Version (int.Parse (versions[0]), int.Parse (versions[1]));
-                }
-                domain_name = sections[1];
-                type = sections[3];
-            } catch (Exception e) {
-                throw new UpnpDeserializationException ("There was a problem deseriailizing a type description.", e);
+            var sections = typeDescription.Trim ().Split (':');
+            if (sections.Length < 5) {
+                throw new UpnpDeserializationException (string.Format (
+                    @"The type description string contained too few components: ""{0}"".", typeDescription));
             }
+            var versions = sections[4].Split ('.');
+            int major;
+            if (!int.TryParse (versions[0], out major)) {
+                throw new UpnpDeserializationException (string.Format (
+                    "The type description version number could not be parsed: {0}.", versions[0]));
+            }
+            if (versions.Length == 1) {
+                version = new Version (major, 0);
+            } else {
+                int minor;
+                if (!int.TryParse (versions[1], out minor)) {
+                    throw new UpnpDeserializationException (string.Format (
+                        "The type description minor version number could not be parsed: {0}.", versions[1]));
+                }
+                version = new Version (major, minor);
+            }
+            domain_name = sections[1];
+            type = sections[3];
             this.kind = kind;
         }
 

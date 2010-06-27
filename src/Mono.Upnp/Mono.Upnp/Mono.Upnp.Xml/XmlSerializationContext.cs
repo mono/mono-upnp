@@ -76,7 +76,8 @@ namespace Mono.Upnp.Xml
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            serializer.AutoSerializeObjectAndMembers (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
+            serializer.AutoSerializeObjectAndMembers (obj,
+                new XmlSerializationContext<TContext> (serializer, Writer, context));
         }
         
         public override void AutoSerializeMembersOnly<TObject> (TObject obj)
@@ -90,7 +91,8 @@ namespace Mono.Upnp.Xml
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            serializer.AutoSerializeMembersOnly (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
+            serializer.AutoSerializeMembersOnly (obj,
+                new XmlSerializationContext<TContext> (serializer, Writer, context));
         }
         
         public override void Serialize<TObject> (TObject obj)

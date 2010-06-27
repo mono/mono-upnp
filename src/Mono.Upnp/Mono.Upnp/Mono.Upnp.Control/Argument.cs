@@ -42,8 +42,9 @@ namespace Mono.Upnp.Control
         
         public Argument (string name, string relatedStateVariable, ArgumentDirection direction)
         {
-            if (direction < ArgumentDirection.In || direction > ArgumentDirection.Out)
+            if (direction < ArgumentDirection.In || direction > ArgumentDirection.Out) {
                 throw new ArgumentOutOfRangeException ("direction");
+            }
             
             Name = name;
             RelatedStateVariable = relatedStateVariable;
@@ -53,8 +54,10 @@ namespace Mono.Upnp.Control
         public Argument (string name, string relatedStateVariable, ArgumentDirection direction, bool isReturnValue)
             : this (name, relatedStateVariable, direction)
         {
-            if (isReturnValue && direction == ArgumentDirection.In)
-                throw new ArgumentException ("The direction is In, but isReturnValue is true. An IsReturnValue argument must have the direction Out.");
+            if (isReturnValue && direction == ArgumentDirection.In) {
+                throw new ArgumentException ("The direction is In, but isReturnValue is true. " +
+                    "An IsReturnValue argument must have the direction Out.");
+            }
             
             IsReturnValue = isReturnValue;
         }
@@ -73,23 +76,17 @@ namespace Mono.Upnp.Control
         
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoDeserializeElement (this);
+            AutoDeserializeElement (this, context);
         }
 
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeObjectAndMembers (this);
+            AutoSerializeObjectAndMembers (this, context);
         }
 
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembersOnly (this, context);
         }
         
         string IMappable<string>.Map ()

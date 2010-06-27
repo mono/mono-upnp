@@ -1,10 +1,10 @@
 // 
-// DeserializerFactory.cs
+// DeserializerProducer.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Scott Peterson
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +28,6 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp
 {
-    public class DeserializerFactory
-    {
-        public virtual Deserializer CreateDeserializer (XmlDeserializer xmlDeserializer)
-        {
-            return new Deserializer (xmlDeserializer);
-        }
-    }
+    public delegate Deserializer DeserializerProducer (XmlDeserializer xmlDeserializer);
 }
+

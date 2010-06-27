@@ -240,7 +240,9 @@ namespace Mono.Upnp.Xml.Compilation
         void ProcessTypeDeserializers ()
         {
             foreach (var @interface in Type.GetInterfaces ()) {
-                if (@interface.IsGenericType && @interface.GetGenericTypeDefinition () == typeof (IXmlDeserializer<>)) {
+                if (@interface.IsGenericType
+                    && @interface.GetGenericTypeDefinition () == typeof (IXmlDeserializer<>))
+                {
                     var type = @interface.GetGenericArguments()[0];
                     if (type_deserializers == null) {
                         type_deserializers = new Dictionary<Type, MethodInfo> ();
@@ -483,7 +485,8 @@ namespace Mono.Upnp.Xml.Compilation
                     var item_reader = context.Reader.ReadSubtree ();
                     item_reader.Read ();
                     try {
-                        add.Invoke (collection, new[] { item_deserializer (obj, CreateDeserializationContext (item_reader)) }); 
+                        add.Invoke (collection,
+                            new[] { item_deserializer (obj, CreateDeserializationContext (item_reader)) });
                     } catch {
                         throw;
                     } finally {
@@ -522,7 +525,9 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        static void AddDeserializer (Dictionary<string, ObjectDeserializer> deserializers, string name, ObjectDeserializer deserializer)
+        static void AddDeserializer (Dictionary<string, ObjectDeserializer> deserializers,
+                                     string name,
+                                     ObjectDeserializer deserializer)
         {
             if (deserializers.ContainsKey (name)) {
                 // TODO throw

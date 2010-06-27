@@ -36,17 +36,19 @@ namespace Mono.Upnp.Xml
     
     public sealed class XmlDeserializer
     {
-        readonly DeserializationCompilerFactory factory;
-        readonly Dictionary<Type, DeserializationCompiler> compilers = new Dictionary<Type, DeserializationCompiler> ();
+        readonly DeserializationCompilerProvider compiler_provider;
+        readonly Dictionary<Type, DeserializationCompiler> compilers =
+            new Dictionary<Type, DeserializationCompiler> ();
         
         public XmlDeserializer ()
             : this (null)
         {
         }
         
-        public XmlDeserializer (DeserializationCompilerFactory factory)
+        public XmlDeserializer (DeserializationCompilerProvider compilerProvider)
         {
-            this.factory = factory ?? new DelegateDeserializationCompilerFactory ();
+            this.compiler_provider = compilerProvider ?? ((xmlDeserializer, type) =>
+                new DelegateDeserializationCompiler (xmlDeserializer, type));
         }
         
         public T Deserialize<T> (XmlReader reader)
@@ -94,7 +96,7 @@ namespace Mono.Upnp.Xml
         {
             DeserializationCompiler compiler;
             if (!compilers.TryGetValue (type, out compiler)) {
-                compiler = factory.CreateDeserializationCompiler (this, type);
+                compiler = compiler_provider (this, type);
                 compilers[type] = compiler;
             }
             return compiler;

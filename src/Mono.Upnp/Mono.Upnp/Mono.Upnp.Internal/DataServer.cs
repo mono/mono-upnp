@@ -54,7 +54,8 @@ namespace Mono.Upnp.Internal
             context.Response.ContentType = content_type;
             context.Response.OutputStream.Write (data, 0, data.Length);
             
-            Log.Information (string.Format ("{0} requested {1}.", context.Request.RemoteEndPoint, context.Request.Url));
+            Log.Information (string.Format (
+                "{0} requested {1}.", context.Request.RemoteEndPoint, context.Request.Url));
         }
     }
 }

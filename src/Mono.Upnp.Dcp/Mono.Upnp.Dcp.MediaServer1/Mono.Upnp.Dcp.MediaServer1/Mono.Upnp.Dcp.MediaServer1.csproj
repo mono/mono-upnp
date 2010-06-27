@@ -103,6 +103,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateContext.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateTextWriter.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateXmlSerializer.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\FilteringDelegateSerializationCompiler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">

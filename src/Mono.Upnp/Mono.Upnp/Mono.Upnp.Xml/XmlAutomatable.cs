@@ -24,6 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Mono.Upnp.Xml
 {
     public abstract class XmlAutomatable : XmlDeserializable, IXmlSerializable
@@ -41,6 +43,24 @@ namespace Mono.Upnp.Xml
         protected abstract void SerializeSelfAndMembers (XmlSerializationContext context);
         
         protected abstract void SerializeMembersOnly (XmlSerializationContext context);
+
+        internal static void AutoSerializeObjectAndMembers<T> (T @this, XmlSerializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoSerializeObjectAndMembers (@this);
+        }
+
+        internal static void AutoSerializeMembersOnly<T> (T @this, XmlSerializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoSerializeMembersOnly (@this);
+        }
     }
     
     public abstract class XmlAutomatable<TContext> : XmlDeserializable, IXmlSerializable<TContext>
@@ -58,5 +78,23 @@ namespace Mono.Upnp.Xml
         protected abstract void SerializeSelfAndMembers (XmlSerializationContext<TContext> context);
         
         protected abstract void SerializeMembersOnly (XmlSerializationContext<TContext> context);
+
+        internal static void AutoSerializeObjectAndMembers<T> (T @this, XmlSerializationContext<TContext> context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoSerializeObjectAndMembers (@this);
+        }
+
+        internal static void AutoSerializeMembersOnly<T> (T @this, XmlSerializationContext<TContext> context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoSerializeMembersOnly (@this);
+        }
     }
 }

@@ -54,7 +54,9 @@ namespace Mono.Upnp
         public Icon (int width, int height, int depth, string mimetype, byte[] data)
              : this (width, height, depth, mimetype)
         {
-            if (data == null) throw new ArgumentNullException ("data");
+            if (data == null) {
+                throw new ArgumentNullException ("data");
+            }
             
             this.data = data;
         }
@@ -62,14 +64,18 @@ namespace Mono.Upnp
         public Icon (int width, int height, int depth, string format, string filename)
             : this (width, height, depth, format)
         {
-            if (filename == null) throw new ArgumentNullException ("filename");
+            if (filename == null) {
+                throw new ArgumentNullException ("filename");
+            }
             
             this.filename = filename;
         }
         
         protected Icon (int width, int height, int depth, string mimetype)
         {
-            if (mimetype == null) throw new ArgumentNullException ("mimetype");
+            if (mimetype == null) {
+                throw new ArgumentNullException ("mimetype");
+            }
             
             Width = width;
             Height = height;
@@ -98,7 +104,9 @@ namespace Mono.Upnp
         
         protected internal virtual void Initialize (Root root, string iconUrlFragment)
         {
-            if (iconUrlFragment == null) throw new ArgumentNullException ("iconUrlFragment");
+            if (iconUrlFragment == null) {
+                throw new ArgumentNullException ("iconUrlFragment");
+            }
             
             Initialize (root);
             UrlFragment = iconUrlFragment;
@@ -107,14 +115,18 @@ namespace Mono.Upnp
         
         protected internal virtual void Start ()
         {
-            if (server == null) throw new InvalidOperationException ("The icon has not been initialized");
+            if (server == null) {
+                throw new InvalidOperationException ("The icon has not been initialized");
+            }
             
             server.Start ();
         }
         
         protected internal virtual void Stop ()
         {
-            if (server == null) throw new InvalidOperationException ("The icon has not been initialized");
+            if (server == null) {
+                throw new InvalidOperationException ("The icon has not been initialized");
+            }
             
             server.Stop ();
         }
@@ -153,23 +165,17 @@ namespace Mono.Upnp
 
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoDeserializeElement (this);
+            AutoDeserializeElement (this, context);
         }
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeObjectAndMembers (this);
+            AutoSerializeObjectAndMembers (this, context);
         }
         
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembersOnly (this, context);
         }
         
         public override string ToString ()

@@ -98,7 +98,9 @@ namespace Mono.Upnp.Internal
         
         void CheckReadOnly ()
         {
-            if (is_read_only) throw new NotSupportedException ("The collection is read-only.");
+            if (is_read_only) {
+                throw new NotSupportedException ("The collection is read-only.");
+            }
         }
     }
 }

@@ -54,7 +54,9 @@ namespace Mono.Upnp
         
         public Server (Root root, Uri url)
         {
-            if (root == null) throw new ArgumentNullException ("root");
+            if (root == null) {
+                throw new ArgumentNullException ("root");
+            }
             
             this.root = root;
             

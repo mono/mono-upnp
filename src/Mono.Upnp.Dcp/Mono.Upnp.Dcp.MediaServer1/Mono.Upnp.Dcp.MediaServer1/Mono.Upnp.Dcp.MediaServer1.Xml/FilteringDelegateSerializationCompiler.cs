@@ -1,10 +1,10 @@
 // 
-// DelegateDeserializationCompilerFactory.cs
+// FilteringDelegateSerializationCompiler.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Scott Peterson
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,15 +25,19 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 
-namespace Mono.Upnp.Xml.Compilation
+using Mono.Upnp.Xml;
+using Mono.Upnp.Xml.Compilation;
+
+namespace Mono.Upnp.Dcp.MediaServer1.Xml
 {
-    public class DelegateDeserializationCompilerFactory : DeserializationCompilerFactory
+    /*public class FilteringDelegateSerializationCompiler : DelegateSerializationCompiler<List<string>>
     {
-        public override DeserializationCompiler CreateDeserializationCompiler (XmlDeserializer xmlDeserializer, Type type)
+        public FilteringDelegateSerializationCompiler ()
         {
-            return new DelegateDeserializationCompiler (xmlDeserializer, type);
         }
-
-    }
+    }*/
 }
+

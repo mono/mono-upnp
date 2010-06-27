@@ -47,7 +47,9 @@ namespace Mono.Upnp.Xml
         
         protected virtual void Deserialize (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
             
             context.AutoDeserialize (this);
         }
@@ -58,6 +60,24 @@ namespace Mono.Upnp.Xml
         
         protected virtual void DeserializeElement (XmlDeserializationContext context)
         {
+        }
+
+        internal static void AutoDeserializeAttribute<T> (T @this, XmlDeserializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoDeserializeAttribute (@this);
+        }
+
+        internal static void AutoDeserializeElement<T> (T @this, XmlDeserializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoDeserializeElement (@this);
         }
     }
 }

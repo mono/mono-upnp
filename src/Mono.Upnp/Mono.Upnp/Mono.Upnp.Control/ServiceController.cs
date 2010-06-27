@@ -52,13 +52,18 @@ namespace Mono.Upnp.Control
         protected internal ServiceController (Deserializer deserializer, Service service)
             : base (deserializer)
         {
-            if (service == null) throw new ArgumentNullException ("service");
-            if (service.ControlUrl == null) throw new ArgumentException ("The service has no ControlUrl.", "service");
-            if (service.EventUrl == null) throw new ArgumentException ("The service has no EventUrl.", "service");
+            if (service == null) {
+                throw new ArgumentNullException ("service");
+            } else if (service.ControlUrl == null) {
+                throw new ArgumentException ("The service has no ControlUrl.", "service");
+            } else if (service.EventUrl == null) {
+                throw new ArgumentException ("The service has no EventUrl.", "service");
+            }
             
             actions = new CollectionMap<string, ServiceAction> ();
             state_variables = new CollectionMap<string, StateVariable> ();
-            control_client = new ControlClient (service.Type.ToString (), service.ControlUrl, deserializer.XmlDeserializer);
+            control_client = new ControlClient (
+                service.Type.ToString (), service.ControlUrl, deserializer.XmlDeserializer);
             event_client = new EventClient (state_variables, service.EventUrl);
         }
         
@@ -95,11 +100,17 @@ namespace Mono.Upnp.Control
         
         protected internal virtual void Initialize (XmlSerializer serializer, Service service)
         {
-            if (serializer == null) throw new ArgumentNullException ("serializer");
-            if (service == null) throw new ArgumentNullException ("service");
-            if (service.ScpdUrl == null) throw new ArgumentException ("The service has no ScpdUrl.", "service");
-            if (service.ControlUrl == null) throw new ArgumentException ("The service has no ControlUrl.", "service");
-            if (service.EventUrl == null) throw new ArgumentException ("The service has no EventUrl.", "service");
+            if (serializer == null) {
+                throw new ArgumentNullException ("serializer");
+            } else if (service == null) {
+                throw new ArgumentNullException ("service");
+            } else if (service.ScpdUrl == null) {
+                throw new ArgumentException ("The service has no ScpdUrl.", "service");
+            } else if (service.ControlUrl == null) {
+                throw new ArgumentException ("The service has no ControlUrl.", "service");
+            } else if (service.EventUrl == null) {
+                throw new ArgumentException ("The service has no EventUrl.", "service");
+            }
             
             scpd_server = new DataServer (serializer.GetBytes (this), @"text/xml; charset=""utf-8""", service.ScpdUrl);
             control_server = new ControlServer (Actions, service.Type.ToString (), service.ControlUrl, serializer);
@@ -112,7 +123,9 @@ namespace Mono.Upnp.Control
         
         protected internal virtual void Start ()
         {
-            if (scpd_server == null) throw new InvalidOperationException ("The service controller has not been initialized.");
+            if (scpd_server == null) {
+                throw new InvalidOperationException ("The service controller has not been initialized.");
+            }
             
             scpd_server.Start ();
             control_server.Start ();
@@ -121,18 +134,26 @@ namespace Mono.Upnp.Control
         
         protected internal virtual void Stop ()
         {
-            if (scpd_server == null) throw new InvalidOperationException ("The service controller has not been initialized.");
+            if (scpd_server == null) {
+                throw new InvalidOperationException ("The service controller has not been initialized.");
+            }
             
             scpd_server.Stop ();
             control_server.Stop ();
             event_server.Stop ();
         }
         
-        protected internal virtual IMap<string, string> Invoke (ServiceAction action, IDictionary<string, string> arguments, int retryAttempts)
+        protected internal virtual IMap<string, string> Invoke (ServiceAction action,
+                                                                IDictionary<string, string> arguments,
+                                                                int retryAttempts)
         {
             // TODO try dispose on timeout
             // TODO retry attempts
-            if (control_client == null) throw new InvalidOperationException ("The service controller was created to describe a local service and cannot be invoked across the network. Use the constructor which takes a Deserializer.");
+            if (control_client == null) {
+                throw new InvalidOperationException (
+                    "The service controller was created to describe a local service and cannot be invoked " +
+                    "across the network. Use the constructor which takes a Deserializer.");
+            }
             
             return control_client.Invoke (action.Name, arguments);
         }
@@ -191,23 +212,17 @@ namespace Mono.Upnp.Control
         
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoDeserializeElement (this);
+            AutoDeserializeElement (this, context);
         }
         
         protected override void SerializeSelfAndMembers (Mono.Upnp.Xml.XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeObjectAndMembers (this);
+            AutoSerializeObjectAndMembers (this, context);
         }
         
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembersOnly (this, context);
         }
     }
 }
