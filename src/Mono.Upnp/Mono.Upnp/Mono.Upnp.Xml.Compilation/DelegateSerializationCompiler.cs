@@ -219,8 +219,8 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        Serializer<TContext> CreateAttributeSerializer (PropertyInfo property,
-                                                        XmlAttributeAttribute attributeAttribute)
+        protected virtual Serializer<TContext> CreateAttributeSerializer (PropertyInfo property,
+                                                                          XmlAttributeAttribute attributeAttribute)
         {
             return CreateSerializer (
                 CreateAttributeSerializer (
@@ -253,7 +253,8 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        Serializer<TContext> CreateElementSerializer (PropertyInfo property, XmlElementAttribute elementAttribute)
+        protected virtual Serializer<TContext> CreateElementSerializer (PropertyInfo property,
+                                                                        XmlElementAttribute elementAttribute)
         {
             return CreateSerializer (
                 CreateElementSerializer (
@@ -281,9 +282,9 @@ namespace Mono.Upnp.Xml.Compilation
             };
         }
         
-        Serializer<TContext> CreateArraySerializer (PropertyInfo property,
-                                                    XmlArrayAttribute arrayAttribute,
-                                                    XmlArrayItemAttribute arrayItemAttribute)
+        protected virtual Serializer<TContext> CreateArraySerializer (PropertyInfo property,
+                                                                      XmlArrayAttribute arrayAttribute,
+                                                                      XmlArrayItemAttribute arrayItemAttribute)
         {
             return CreateSerializer (
                 CreateArraySerializer (
@@ -338,7 +339,8 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        Serializer<TContext> CreateArrayItemSerializer (Type type, XmlArrayItemAttribute arrayItemAttribute)
+        protected virtual Serializer<TContext> CreateArrayItemSerializer (Type type,
+                                                                          XmlArrayItemAttribute arrayItemAttribute)
         {
             if (arrayItemAttribute == null || string.IsNullOrEmpty (arrayItemAttribute.Name)) {
                 return GetCompilerForType (type).TypeSerializer;
@@ -355,8 +357,8 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        Serializer<TContext> CreateArrayItemSerializer (PropertyInfo property,
-                                                        XmlArrayItemAttribute arrayItemAttribute)
+        protected virtual Serializer<TContext> CreateArrayItemSerializer (PropertyInfo property,
+                                                                          XmlArrayItemAttribute arrayItemAttribute)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -401,7 +403,8 @@ namespace Mono.Upnp.Xml.Compilation
             };
         }
         
-        Serializer<TContext> CreateFlagSerializer (PropertyInfo property, XmlFlagAttribute flagAttribute)
+        protected virtual Serializer<TContext> CreateFlagSerializer (PropertyInfo property,
+                                                                     XmlFlagAttribute flagAttribute)
         {
             return CreateFlagSerializer (
                 property,

@@ -238,7 +238,7 @@ namespace Mono.Upnp.Xml
             {
                 if (options == null) {
                     Encoding = Helper.UTF8Unsigned;
-                    Context = default(TContext);
+                    Context = default (TContext);
                     XmlDeclarationType = 0;
                 } else {
                     Encoding = options.Encoding ?? Helper.UTF8Unsigned;

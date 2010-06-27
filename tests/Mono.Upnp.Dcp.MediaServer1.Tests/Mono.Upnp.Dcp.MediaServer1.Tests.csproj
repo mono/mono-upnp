@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="UpdateTextWriterTests.cs" />
     <Compile Include="UpdateXmlSerializerTests.cs" />
+    <Compile Include="FilteringXmlSerializerTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

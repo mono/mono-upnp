@@ -51,6 +51,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
             var type_auto_serializer = base.CreateTypeAutoSerializer (name, @namespace, prefix, namespaces);
             var member_serializer = MemberSerializer;
             return (obj, context) => {
+                if (context.Context == null) {
+                    throw new InvalidOperationException ("You must provide an UpdateContext to the serializer.");
+                }
                 var other_obj = context.Context.OtherValue;
                 if (other_obj != null) {
                     if (!Type.IsAssignableFrom (other_obj.GetType ())) {

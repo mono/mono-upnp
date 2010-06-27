@@ -33,11 +33,70 @@ using Mono.Upnp.Xml.Compilation;
 
 namespace Mono.Upnp.Dcp.MediaServer1.Xml
 {
-    /*public class FilteringDelegateSerializationCompiler : DelegateSerializationCompiler<List<string>>
+    public class FilteringDelegateSerializationCompiler : DelegateSerializationCompiler<FilteringContext>
     {
-        public FilteringDelegateSerializationCompiler ()
+        public FilteringDelegateSerializationCompiler (XmlSerializer<FilteringContext> xmlSerializer, Type type)
+            : base (xmlSerializer, type)
         {
         }
-    }*/
+
+        protected override Serializer<FilteringContext> CreateTypeAutoSerializer (string name,
+                                                                                  string @namespace,
+                                                                                  string prefix,
+                                                                                  IEnumerable<XmlNamespaceAttribute> namespaces)
+        {
+            var serializer = base.CreateTypeAutoSerializer (name, @namespace, prefix, namespaces);
+            return (obj, context) => {
+                if (context == null) {
+                    throw new InvalidOperationException ("You must provide a FilteringContext to the serializer.");
+                }
+                serializer (obj, context);
+            };
+        }
+
+        protected override Serializer<FilteringContext> CreateAttributeSerializer (PropertyInfo property,
+                                                                                   XmlAttributeAttribute attributeAttribute)
+        {
+            var serializer = base.CreateAttributeSerializer (property, attributeAttribute);
+            if (attributeAttribute.OmitIfNull) {
+                return CreateSerializer (attributeAttribute.Name, attributeAttribute.Namespace, serializer);
+            } else {
+                return serializer;
+            }
+        }
+
+        protected override Serializer<FilteringContext> CreateElementSerializer (PropertyInfo property,
+                                                                                 XmlElementAttribute elementAttribute)
+        {
+            var serializer = base.CreateElementSerializer (property, elementAttribute);
+            if (elementAttribute.OmitIfNull) {
+                return CreateSerializer (elementAttribute.Name, elementAttribute.Namespace, serializer);
+            } else {
+                return serializer;
+            }
+        }
+
+        Serializer<FilteringContext> CreateSerializer (string name,
+                                                       string @namespace,
+                                                       Serializer<FilteringContext> serializer)
+        {
+            return (obj, context) => {
+                string id;
+                if (string.IsNullOrEmpty (@namespace)) {
+                    id = name;
+                } else {
+                    var prefix = context.Writer.LookupPrefix (@namespace);
+                    if (string.IsNullOrEmpty (prefix)) {
+                        id = name;
+                    } else {
+                        id = string.Concat (prefix, ":", name);
+                    }
+                }
+                if (context.Context.Includes (id)) {
+                    serializer (obj, context);
+                }
+            };
+        }
+    }
 }
 
