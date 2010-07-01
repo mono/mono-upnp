@@ -3,7 +3,7 @@ Follow these simple guidelines when hacking on Mono.Upnp and you too will loose 
 C# Style Guidelines
 ===================
 
-  1. Indent with 4 spaces. Tabs are bad.
+  1. Indent with 4 spaces. Tabs are bad. Obviously.
 
   2. Leave room for the Holy Ghost; put a space before parenthesis, like so:
 
@@ -90,12 +90,12 @@ C# Style Guidelines
        throw new InvalidOperationExceltion (string.Format (
            "There is no action named {0} and the device {1}.", actionName, deviceName));
 
-     Overlong expressions in a statement declaration should break logically and indent four spaces. In these cases, 
-     Ms. Brace gets her own line, like so:
+     Overlong expressions in a statement declaration should break logically and indent to the opening parenthesis. 
+     In these cases, Ms. Brace gets her own line, like so:
 
-       if (parameter1 == null ||
-           parameter2 == null ||
-           parameter3 == null)
+       while (parameter1 == null ||
+              parameter2 == null ||
+              parameter3 == null)
        {
            ...
        }
