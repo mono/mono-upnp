@@ -1,46 +1,41 @@
-Please follow these guidelines when writing code for Mono.Upnp in order to maintain a consistant and clean codebase.
+Follow these simple guidelines when hacking on Mono.Upnp and you too will loose weight and find happiness!
 
-C# Coding Style Guidelines
-==========================
+C# Style Guidelines
+===================
 
-This style guide is based on the Mono Project coding guidelines [1]. All public APIs must conform to the Framework 
-Design Guidelines [2]. If you use MonoDevelop, the solution file will specify the proper code formatting rules.
+  1. Indent with 4 spaces. Tabs are bad.
 
-  1. Lines are indented with four spaces. DO NOT use tabs in C# source files.
-
-  2. Put a space before parenthesis IN ALL CASES, like so:
+  2. Leave room for the Holy Ghost; put a space before parenthesis, like so:
 
        this.ToString ();
 
-  2. Namespaces, classes, structs, and methods must have their opening brace on a new line, like so:
+  2. With namespaces, types, and methods, Ms. Brace gets her own line, like so:
   
        namespace Foo
-       {
+       {                              // This
            class Bar
-           {
+           {                          // Is
                public void Bat ()
-               {
+               {                      // Stylish
                }
            }
        }
 
-  3. Statement blocks (if, else, try, catch, &c.) must ALWAYS have an opeing brace on the same line, followed by the
-     first statement expression on its own line, and ending with a closing brace on its own line, like so:
+  3. Ms. Brace shares a line with statements, however. Now you try sharing:
 
        if (foo != null) {
            foo.Bar ();
        }
 
-     One exception is: else, else-if, catch, and do-while statements should begin on the same line as the preceding 
-     statement's closing brace, like so:
+     Statements such as else, else-if, catch, and do-while share a line with Ms. Closing Brace. Know what I mean?
 
-       if (foo != null) {
-           foo.Bar();
-       } else {
+       if (something) {
+           ...
+       } else {              // This is what I mean
            ...
        }
 
-     NEVER omit the braces from statement blocks, even if they contain only one expression.
+     Always use braces with statements. Always use braces with statements. Always use braces with statements.
   
   4. Properties look like this:
 
@@ -52,29 +47,51 @@ Design Guidelines [2]. If you use MonoDevelop, the solution file will specify th
        
        public string Bat {              // Multi-line accessor
            get {
-               if (bat == null) {
-                   bat = BuildBat ();
-               }
-               return bat;
+               /* Your
+                  Code
+                  Here */
            }
-      }
+       }
 
-  5. Lines should not exceed 120 columns. Overlong method and constructor definitions should break for EACH parameter
+  5. Private fileds and local variables look_like_this:
+
+       string all_lower_case_with_underscores = null;
+  
+     Method parameters lookLikeThis:
+  
+       public void Foo (string lowerCaseAndThenUpperCase)   // Camal casing
+       {
+       }
+
+     Everything else (namespaces, types, methods, properties, events, and non-private fields) LookLikeThis:
+
+       public class MyClass                               // Pascal casing
+       {
+           protected string NonPrivateField;              // Pascal casing
+           
+           void PrivateMethod ()                          // Pascal casing
+           {
+           }
+           
+           public string PublicProperty { get; set; }     // You get the idea
+       }
+
+  6. Lines should not exceed 120 columns. Overlong method and constructor definitions should break for EACH parameter
      and indent to the opening parenthesis, like so:
 
-       public void Foo (string parameter1,
-                        string parameter2,
-                        string parameter3)
+       public void CrazySuperLongMethodNameOhEmGeeThisThingIsPracticallyANovel (string parameter1,
+                                                                                string parameter2,
+                                                                                string parameter3)
        {
        }
 
      Overlong expressions should break at a logical location and indent 4 spaces, like so:
 
        throw new InvalidOperationExceltion (string.Format (
-           "There is no action named {0} and the device {1}", actionName, deviceName));
+           "There is no action named {0} and the device {1}.", actionName, deviceName));
 
      Overlong expressions in a statement declaration should break logically and indent four spaces. In these cases, 
-     the statement opening brace gets its own line, like so:
+     Ms. Brace gets her own line, like so:
 
        if (parameter1 == null ||
            parameter2 == null ||
@@ -83,25 +100,7 @@ Design Guidelines [2]. If you use MonoDevelop, the solution file will specify th
            ...
        }
 
-  6. Use the var keyword and array type-inference when possible.
+  7. Use the var keyword and array type-inference as much as you possible can!
 
-  7. Use NEITHER the "private" visibility modifier on members, NOR the "internal" visibility modifier on types; those
-     are the default visibility levels.
-
-  8. Private variable and field identifiers should be all lower-cased and underscored, like so:
-
-       xml_serializer_factory
-
-     Parameter identifiers should use begin lower-case and capitalize each following word (Pascal casing), like so:
-
-       xmlSerializerFactory
-     
-     All other identifiers (types, methods, properties, events, non-private fileds) should be camel-cased, like so:
-
-       XmlSerializerFactory
-
-     Under NO CIRCUMSTANCE should you capitalize all letters in an identifier.
-
-[1] http://www.mono-project.com/Coding_Guidelines
-[2] Highly recommended reading: http://www.amazon.com/gp/product/0321246756/ or view at:
-    http://msdn2.microsoft.com/en-us/library/ms229042.aspx
+  8. Use NEITHER the "private" visibility modifier on members, NOR the "internal" visibility modifier on types; those
+     are the default visibility levels. Github is paying for these bits, you know.
