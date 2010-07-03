@@ -24,16 +24,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 
 namespace Mono.Upnp.Dcp.MediaServer1.Xml
 {
     public class FilteringContext
     {
-        IList<string> properties;
+        ICollection<string> properties;
 
-        public FilteringContext (IList<string> properties)
+        public FilteringContext (ICollection<string> properties)
         {
             if (properties == null) {
                 properties = new string[0];
