@@ -59,7 +59,36 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
         {
             var serializer = base.CreateAttributeSerializer (property, attributeAttribute);
             if (attributeAttribute.OmitIfNull) {
-                return CreateSerializer (attributeAttribute.Name, attributeAttribute.Namespace, serializer);
+                var name = attributeAttribute.Name;
+                var @namespace = attributeAttribute.Namespace;
+                return (obj, context) => {
+                    string id;
+                    if (string.IsNullOrEmpty (@namespace)) {
+                        if (!context.Context.IsNested && Type == context.Context.Type) {
+                            id = string.Concat ("@", name);
+                        } else {
+                            id = string.Concat (context.Context.NestedPropertyName, "@", name);
+                        }
+                    } else {
+                        var prefix = context.Writer.LookupPrefix (@namespace);
+                        if (string.IsNullOrEmpty (prefix)) {
+                            if (!context.Context.IsNested && Type == context.Context.Type) {
+                                id = string.Concat ("@", name);
+                            } else {
+                                id = string.Concat (context.Context.NestedPropertyName, "@", name);
+                            }
+                        } else {
+                            if (!context.Context.IsNested && Type == context.Context.Type) {
+                                id = string.Concat ("@", prefix, ":", name);
+                            } else {
+                                id = string.Concat (context.Context.NestedPropertyName, "@", prefix, ":", name);
+                            }
+                        }
+                    }
+                    if (context.Context.IncludesAttribute (id)) {
+                        serializer (obj, context);
+                    }
+                };
             } else {
                 return serializer;
             }
@@ -70,32 +99,30 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
         {
             var serializer = base.CreateElementSerializer (property, elementAttribute);
             if (elementAttribute.OmitIfNull) {
-                return CreateSerializer (elementAttribute.Name, elementAttribute.Namespace, serializer);
+                var name = elementAttribute.Name;
+                var @namespace = elementAttribute.Namespace;
+                return (obj, context) => {
+                    string id;
+                    if (string.IsNullOrEmpty (@namespace)) {
+                        id = name;
+                    } else {
+                        var prefix = context.Writer.LookupPrefix (@namespace);
+                        if (string.IsNullOrEmpty (prefix)) {
+                            id = name;
+                        } else {
+                            id = string.Concat (prefix, ":", name);
+                        }
+                    }
+                    if (context.Context.IncludesElement (id)) {
+                        if (context.Context.Type == Type) {
+                            context = CreateContext (context.Writer, context.Context.GetNestedContext (id));
+                        }
+                        serializer (obj, context);
+                    }
+                };
             } else {
                 return serializer;
             }
-        }
-
-        Serializer<FilteringContext> CreateSerializer (string name,
-                                                       string @namespace,
-                                                       Serializer<FilteringContext> serializer)
-        {
-            return (obj, context) => {
-                string id;
-                if (string.IsNullOrEmpty (@namespace)) {
-                    id = name;
-                } else {
-                    var prefix = context.Writer.LookupPrefix (@namespace);
-                    if (string.IsNullOrEmpty (prefix)) {
-                        id = name;
-                    } else {
-                        id = string.Concat (prefix, ":", name);
-                    }
-                }
-                if (context.Context.Includes (id)) {
-                    serializer (obj, context);
-                }
-            };
         }
     }
 }

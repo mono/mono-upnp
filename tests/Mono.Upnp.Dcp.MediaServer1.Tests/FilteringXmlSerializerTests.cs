@@ -40,13 +40,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             new XmlSerializer<FilteringContext> (
                 (serializer, type) => new FilteringDelegateSerializationCompiler (serializer, type));
 
-        const string foo = "www.foo.org";
-        const string bar = "www.bar.org";
+
+        const string bar = "www.bar.org";       const string foo = "www.foo.org";
         const string bat = "www.bat.org";
 
         [XmlType ("data", foo)]
-        [XmlNamespace (bar, "bar")]
         [XmlNamespace (bat, "bat")]
+        [XmlNamespace (bar, "bar")]
         class Data
         {
             [XmlElement ("manditoryFooElement", foo)] public string ManditoryFooElement { get; set; }
@@ -61,14 +61,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             [XmlAttribute ("optionalAttribute", OmitIfNull = true)] public string OptionalAttribute { get; set; }
             [XmlAttribute ("optionalBarAttribute", bar, OmitIfNull = true)] public string OptionalBarAttribute { get; set; }
             [XmlAttribute ("optionalBatAttribute", bat, OmitIfNull = true)] public string OptionalBatAttribute { get; set; }
-
         }
 
-        static XmlSerializationOptions<FilteringContext> Options (params string[] filters)
+        static XmlSerializationOptions<FilteringContext> Options<T> (params string[] filters)
         {
             return new XmlSerializationOptions<FilteringContext> {
                 XmlDeclarationType = XmlDeclarationType.None,
-                Context = new FilteringContext (filters)
+                Context = new FilteringContext (typeof (T), filters)
             };
         }
 
@@ -84,7 +83,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                     "<bar:manditoryBarElement />" +
                     "<bat:manditoryBatElement />" +
                 "</data>",
-                xml_serializer.GetString (new Data (), Options ()));
+                xml_serializer.GetString (new Data (), Options<Data> ()));
         }
 
         static Data FullData {
@@ -118,7 +117,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                     "<bar:manditoryBarElement>Manditory Bar Element</bar:manditoryBarElement>" +
                     "<bat:manditoryBatElement>Manditory Bat Element</bat:manditoryBatElement>" +
                 "</data>",
-                xml_serializer.GetString (FullData, Options()));
+                xml_serializer.GetString (FullData, Options<Data> ()));
         }
 
         [Test]
@@ -133,7 +132,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                     "<bar:manditoryBarElement />" +
                     "<bat:manditoryBatElement />" +
                 "</data>",
-                xml_serializer.GetString (new Data (), Options ("*")));
+                xml_serializer.GetString (new Data (), Options<Data> ("*")));
         }
 
         [Test]
@@ -154,7 +153,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                     "<bar:optionalBarElement>Optional Bar Element</bar:optionalBarElement>" +
                     "<bat:optionalBatElement>Optional Bat Element</bat:optionalBatElement>" +
                 "</data>",
-                xml_serializer.GetString (FullData, Options("*")));
+                xml_serializer.GetString (FullData, Options<Data> ("*")));
         }
 
         [Test]
@@ -170,7 +169,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                     "<bat:manditoryBatElement>Manditory Bat Element</bat:manditoryBatElement>" +
                     "<optionalFooElement>Optional Foo Element</optionalFooElement>" +
                 "</data>",
-                xml_serializer.GetString (FullData, Options("optionalFooElement")));
+                xml_serializer.GetString (FullData, Options<Data> ("optionalFooElement")));
         }
 
         [Test]
@@ -186,7 +185,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                     "<bat:manditoryBatElement>Manditory Bat Element</bat:manditoryBatElement>" +
                     "<bar:optionalBarElement>Optional Bar Element</bar:optionalBarElement>" +
                 "</data>",
-                xml_serializer.GetString (FullData, Options("bar:optionalBarElement")));
+                xml_serializer.GetString (FullData, Options<Data> ("bar:optionalBarElement")));
         }
 
         [Test]
@@ -203,7 +202,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                     "<bar:optionalBarElement>Optional Bar Element</bar:optionalBarElement>" +
                     "<bat:optionalBatElement>Optional Bat Element</bat:optionalBatElement>" +
                 "</data>",
-                xml_serializer.GetString (FullData, Options("bar:optionalBarElement", "bat:optionalBatElement")));
+                xml_serializer.GetString (FullData, Options<Data> ("bar:optionalBarElement", "bat:optionalBatElement")));
         }
 
         [Test]
@@ -220,7 +219,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                     "<optionalFooElement>Optional Foo Element</optionalFooElement>" +
                     "<bar:optionalBarElement>Optional Bar Element</bar:optionalBarElement>" +
                 "</data>",
-                xml_serializer.GetString (FullData, Options("optionalFooElement", "bar:optionalBarElement")));
+                xml_serializer.GetString (FullData, Options<Data> ("optionalFooElement", "bar:optionalBarElement")));
         }
 
         [Test]
@@ -241,7 +240,160 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                     "<bar:optionalBarElement>Optional Bar Element</bar:optionalBarElement>" +
                     "<bat:optionalBatElement>Optional Bat Element</bat:optionalBatElement>" +
                 "</data>",
-                xml_serializer.GetString (FullData, Options("optionalFooElement", "*")));
+                xml_serializer.GetString (FullData, Options<Data> ("optionalFooElement", "*")));
+        }
+
+        [Test]
+        public void IncludeOptionalAttribute ()
+        {
+            Assert.AreEqual (
+                @"<data xmlns:bar=""www.bar.org"" xmlns:bat=""www.bat.org"" " +
+                @"manditoryAttribute=""Manditory Attribute"" " +
+                @"bar:manditoryBarAttribute=""Manditory Bar Attribute"" " +
+                @"bat:manditoryBatAttribute=""Manditory Bat Attribute"" " +
+                @"optionalAttribute=""Optional Attribute"" xmlns=""www.foo.org"">" +
+                    "<manditoryFooElement>Manditory Foo Element</manditoryFooElement>" +
+                    "<bar:manditoryBarElement>Manditory Bar Element</bar:manditoryBarElement>" +
+                    "<bat:manditoryBatElement>Manditory Bat Element</bat:manditoryBatElement>" +
+                "</data>",
+                xml_serializer.GetString (FullData, Options<Data> ("@optionalAttribute")));
+        }
+
+        [Test]
+        public void IncludeOptionalNamespacedAttribute ()
+        {
+            Assert.AreEqual (
+                @"<data xmlns:bar=""www.bar.org"" xmlns:bat=""www.bat.org"" " +
+                @"manditoryAttribute=""Manditory Attribute"" " +
+                @"bar:manditoryBarAttribute=""Manditory Bar Attribute"" " +
+                @"bat:manditoryBatAttribute=""Manditory Bat Attribute"" " +
+                @"bar:optionalBarAttribute=""Optional Bar Attribute"" xmlns=""www.foo.org"">" +
+                    "<manditoryFooElement>Manditory Foo Element</manditoryFooElement>" +
+                    "<bar:manditoryBarElement>Manditory Bar Element</bar:manditoryBarElement>" +
+                    "<bat:manditoryBatElement>Manditory Bat Element</bat:manditoryBatElement>" +
+                "</data>",
+                xml_serializer.GetString (FullData, Options<Data> ("@bar:optionalBarAttribute")));
+        }
+
+        [XmlType ("nestedData", foo)]
+        [XmlNamespace (bar, "bar")]
+        class NestedData
+        {
+            [XmlAttribute ("attribute", OmitIfNull = true)] public string Attribute { get; set; }
+            [XmlAttribute ("barAttribute", bar, OmitIfNull = true)] public string BarAttribute { get; set; }
+            [XmlElement ("nested", OmitIfNull = true)] public NestedData Nested { get; set; }
+            [XmlElement ("barNested", bar, OmitIfNull = true)] public NestedData BarNested { get; set; }
+        }
+
+        static NestedData FullNestedData {
+            get {
+                return new NestedData {
+                    Attribute = "Attribute",
+                    BarAttribute = "Bar Attribute",
+                    Nested = new NestedData {
+                        Attribute = "Nested Attribute",
+                        BarAttribute = "Nested Bar Attribute"
+                    },
+                    BarNested = new NestedData {
+                        Attribute = "Bar Nested Attribute",
+                        BarAttribute = "Bar Nested Bar Attribute"
+                    }
+                };
+            }
+        }
+
+        [Test]
+        public void NestedDataWithAnAttribute ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" " +
+                @"attribute=""Attribute"" xmlns=""www.foo.org"" />",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("@attribute")));
+        }
+
+        [Test]
+        public void NestedDataWithAttributeAndNamespacedAttribute ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" " +
+                @"attribute=""Attribute"" " +
+                @"bar:barAttribute=""Bar Attribute"" xmlns=""www.foo.org"" />",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("@attribute", "@bar:barAttribute")));
+        }
+
+        [Test]
+        public void NestedDataWithNoAttributes ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" xmlns=""www.foo.org""><nested /></nestedData>",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("nested")));
+        }
+
+        [Test]
+        public void NamespacedNestedDataWithNoAttributes ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" xmlns=""www.foo.org""><bar:barNested /></nestedData>",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("bar:barNested")));
+        }
+
+        [Test]
+        public void NestedDataWithAttribute ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" xmlns=""www.foo.org"">" +
+                    @"<nested attribute=""Nested Attribute"" />"+
+                "</nestedData>",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("nested", "nested@attribute")));
+        }
+
+        [Test]
+        public void NestedDataWithNamespacedAttribute ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" xmlns=""www.foo.org"">" +
+                    @"<nested bar:barAttribute=""Nested Bar Attribute"" />"+
+                "</nestedData>",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("nested", "nested@bar:barAttribute")));
+        }
+
+        [Test]
+        public void NamespacedNestedDataWithAttribute ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" xmlns=""www.foo.org"">" +
+                    @"<bar:barNested attribute=""Bar Nested Attribute"" />"+
+                "</nestedData>",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("bar:barNested", "bar:barNested@attribute")));
+        }
+
+        [Test]
+        public void NamespacedNestedDataWithNamespacedAttribute ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" xmlns=""www.foo.org"">" +
+                    @"<bar:barNested bar:barAttribute=""Bar Nested Bar Attribute"" />"+
+                "</nestedData>",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("bar:barNested", "bar:barNested@bar:barAttribute")));
+        }
+
+        [Test]
+        public void NestedAttributeButNoNestedData ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" xmlns=""www.foo.org"" />",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("nested@attribute")));
+        }
+
+        [Test]
+        public void EmptyNestedDataAndAnAttribute ()
+        {
+            Assert.AreEqual (
+                @"<nestedData xmlns:bar=""www.bar.org"" " +
+                @"attribute=""Attribute"" xmlns=""www.foo.org"">" +
+                    "<nested />" +
+                "</nestedData>",
+                xml_serializer.GetString (FullNestedData, Options<NestedData> ("@attribute", "nested")));
         }
     }
 }
