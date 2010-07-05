@@ -31,7 +31,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     // Refer to ContentDirectory1 Service Template 1.0.1, Section 2.5.5.1: Search Criteria String Syntax
     public abstract class QueryParser
     {
-        delegate QueryParser Consumer<T> (T value);
+        delegate TResult Func<T, TResult> (T argument);
+        delegate TResult Func<T1, T2, TResult> (T1 argument1, T2 argument2);
+
+        const int default_priority = 0;
+        const int disjunction_priority = 1;
+        const int conjunction_priority = 2;
 
         protected abstract QueryParser OnCharacter (char character);
 
@@ -74,11 +79,20 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class ExpressionParser : QueryParser
         {
-            protected readonly Query Expression;
+            readonly Query expression;
+            readonly Func<Query, Query> @operator;
+            readonly int priority;
 
             public ExpressionParser (Query expression)
+                : this (expression, default_priority, null)
             {
-                Expression = expression;
+            }
+
+            public ExpressionParser (Query expression, int priority, Func<Query, Query> @operator)
+            {
+                this.expression = expression;
+                this.@operator = @operator;
+                this.priority = priority;
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -86,31 +100,54 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 if (IsWhiteSpace (character)) {
                     return this;
                 } else if (character == 'a') {
-                    return new ConjunctionParser (Expression);
+                    return new ConjunctionParser (MakeOperator (conjunction_priority,
+                        (leftOperand, rightOperand) => visitor => visitor.VisitAnd (leftOperand, rightOperand)));
                 } else if (character == 'o') {
-                    return new DisjunctionParser (Expression);
+                    return new DisjunctionParser (MakeOperator (disjunction_priority,
+                        (leftOperand, rightOperand) => visitor => visitor.VisitOr (leftOperand, rightOperand)));
                 } else {
                     throw new QueryParsingException (string.Format ("Unexpected operator begining: {0}.", character));
                 }
             }
 
+            Func<Query, Query> MakeOperator (int priority, Func<Query, Query, Query> binaryOperator)
+            {
+                return (operand) => {
+                    if (@operator != null) {
+                        if (this.priority < priority) {
+                            return @operator(binaryOperator(expression, operand));
+                        } else {
+                            return binaryOperator(@operator(expression), operand);
+                        }
+                    } else {
+                        return binaryOperator (expression, operand);
+                    }
+                };
+            }
+
             protected override Query OnDone ()
             {
-                return Expression;
+                if (@operator != null) {
+                    return @operator (expression);
+                } else {
+                    return expression;
+                }
             }
         }
 
-        class ConjunctionParser : ExpressionParser
+        class ConjunctionParser : QueryParser
         {
+            readonly Func<Query, Query> @operator;
+
             const int a_state = 0;
             const int n_state = 1;
             const int d_state = 2;
 
             int state;
 
-            public ConjunctionParser (Query expression)
-                : base (expression)
+            public ConjunctionParser (Func<Query, Query> @operator)
             {
+                this.@operator = @operator;
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -149,8 +186,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                         return this;
                     } else {
                         return new PropertyParser (token => new RootPropertyOperatorParser (
-                            token, expression => new ExpressionParser (
-                                visitor => visitor.VisitAnd (Expression, expression)))).OnCharacter (character);
+                            token, expression => new ExpressionParser (expression, conjunction_priority, @operator))).OnCharacter (character);
                     }
                 }
             }
@@ -166,16 +202,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        class DisjunctionParser : ExpressionParser
+        class DisjunctionParser : QueryParser
         {
+            readonly Func<Query, Query> @operator;
+
             const int o_state = 0;
             const int r_state = 1;
 
             int state;
 
-            public DisjunctionParser (Query expression)
-                : base (expression)
+            public DisjunctionParser (Func<Query, Query> @operator)
             {
+                this.@operator = @operator;
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -204,8 +242,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                         return this;
                     } else {
                         return new PropertyParser (token => new RootPropertyOperatorParser (
-                            token, expression => new ExpressionParser (
-                                visitor => visitor.VisitOr (Expression, expression)))).OnCharacter (character);
+                            token, expression => new ExpressionParser (expression, disjunction_priority, @operator))).OnCharacter (character);
                     }
                 }
             }
@@ -223,9 +260,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         abstract class PropertyOperatorParser : QueryParser
         {
             protected readonly string Property;
-            protected readonly Consumer<Query> Consumer;
+            protected readonly Func<Query, QueryParser> Consumer;
 
-            protected PropertyOperatorParser (string property, Consumer<Query> consumer)
+            protected PropertyOperatorParser (string property, Func<Query, QueryParser> consumer)
             {
                 Property = property;
                 Consumer = consumer;
@@ -234,7 +271,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class RootPropertyOperatorParser : PropertyOperatorParser
         {
-            public RootPropertyOperatorParser (string property, Consumer<Query> consumer)
+            public RootPropertyOperatorParser (string property, Func<Query, QueryParser> consumer)
                 : base (property, consumer)
             {
             }
@@ -269,7 +306,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             protected bool Initialized;
 
-            protected TokenOperatorParser (string property, Consumer<Query> consumer)
+            protected TokenOperatorParser (string property, Func<Query, QueryParser> consumer)
                 : base (property, consumer)
             {
             }
@@ -310,7 +347,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             readonly string @operator;
             int position;
 
-            protected StringOperatorParser (string @operator, string property, Consumer<Query> consumer)
+            protected StringOperatorParser (string @operator, string property, Func<Query, QueryParser> consumer)
                 : base (property, consumer)
             {
                 this.@operator = @operator;
@@ -338,7 +375,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class ContainsParser : StringOperatorParser
         {
-            public ContainsParser (string property, Consumer<Query> consumer)
+            public ContainsParser (string property, Func<Query, QueryParser> consumer)
                 : base ("contains", property, consumer)
             {
             }
@@ -351,7 +388,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class ExistsParser : StringOperatorParser
         {
-            public ExistsParser (string property, Consumer<Query> consumer)
+            public ExistsParser (string property, Func<Query, QueryParser> consumer)
                 : base ("exists", property, consumer)
             {
             }
@@ -375,7 +412,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             protected bool HasEqualsSign;
 
-            protected EqualityOperatorParser (string property, Consumer<Query> consumer)
+            protected EqualityOperatorParser (string property, Func<Query, QueryParser> consumer)
                 : base (property, consumer)
             {
             }
@@ -393,7 +430,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class DerivedFromOrDoesNotContainParser : PropertyOperatorParser
         {
-            public DerivedFromOrDoesNotContainParser (string property, Consumer<Query> consumer)
+            public DerivedFromOrDoesNotContainParser (string property, Func<Query, QueryParser> consumer)
                 : base (property, consumer)
             {
             }
@@ -420,7 +457,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class DerivedFromParser : StringOperatorParser
         {
-            public DerivedFromParser (string property, Consumer<Query> consumer)
+            public DerivedFromParser (string property, Func<Query, QueryParser> consumer)
                 : base ("derivedFrom", property, consumer)
             {
             }
@@ -433,7 +470,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class DoesNotContainParser : StringOperatorParser
         {
-            public DoesNotContainParser (string property, Consumer<Query> consumer)
+            public DoesNotContainParser (string property, Func<Query, QueryParser> consumer)
                 : base ("doesNotContain", property, consumer)
             {
             }
@@ -446,7 +483,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class EqualityParser : TokenOperatorParser
         {
-            public EqualityParser (string property, Consumer<Query> consumer)
+            public EqualityParser (string property, Func<Query, QueryParser> consumer)
                 : base (property, consumer)
             {
             }
@@ -463,7 +500,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class InequalityParser : EqualityOperatorParser
         {
-            public InequalityParser (string property, Consumer<Query> consumer)
+            public InequalityParser (string property, Func<Query, QueryParser> consumer)
                 : base (property, consumer)
             {
             }
@@ -489,7 +526,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class LessThanParser : EqualityOperatorParser
         {
-            public LessThanParser (string property, Consumer<Query> consumer)
+            public LessThanParser (string property, Func<Query, QueryParser> consumer)
                 : base (property, consumer)
             {
             }
@@ -511,7 +548,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class GreaterThanParser : EqualityOperatorParser
         {
-            public GreaterThanParser (string property, Consumer<Query> consumer)
+            public GreaterThanParser (string property, Func<Query, QueryParser> consumer)
                 : base (property, consumer)
             {
             }
@@ -534,10 +571,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class PropertyParser : QueryParser
         {
-            readonly Consumer<string> consumer;
+            readonly Func<string, QueryParser> consumer;
             StringBuilder builder = new StringBuilder ();
 
-            public PropertyParser (Consumer<string> consumer)
+            public PropertyParser (Func<string, QueryParser> consumer)
             {
                 this.consumer = consumer;
             }
@@ -561,11 +598,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class StringParser : QueryParser
         {
-            readonly Consumer<string> consumer;
+            readonly Func<string, QueryParser> consumer;
             StringBuilder builder = new StringBuilder ();
             bool escaped;
 
-            public StringParser (Consumer<string> consumer)
+            public StringParser (Func<string, QueryParser> consumer)
             {
                 this.consumer = consumer;
             }
@@ -602,11 +639,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class BooleanParser : QueryParser
         {
-            readonly Consumer<bool> consumer;
+            readonly Func<bool, QueryParser> consumer;
             bool @true;
             int position;
 
-            public BooleanParser (Consumer<bool> consumer)
+            public BooleanParser (Func<bool, QueryParser> consumer)
             {
                 this.consumer = consumer;
             }

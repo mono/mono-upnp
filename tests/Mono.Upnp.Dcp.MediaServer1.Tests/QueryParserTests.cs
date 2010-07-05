@@ -215,6 +215,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
+        public void OperatorPriority ()
+        {
+            AssertEquality (
+                Disjoin (
+                    Disjoin (
+                        Conjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                        new Property ("name").Contains ("john")),
+                    Conjoin (new Property ("eyes") == "green", new Property ("age") >= "21")),
+                @"foo = ""bar"" and bat = ""baz"" or name contains ""john"" or eyes = ""green"" and age >= ""21""");
+        }
+
+        [Test]
         public void WhiteSpaceAroundOperator ()
         {
             var expected = new Property ("foo") == "bar";
