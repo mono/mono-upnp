@@ -207,7 +207,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = @"The identifier is not a part of an expression: foo=""bar"".")]
+            ExpectedMessage = "The property identifier is not a part of an expression: foo.")]
+        public void NoOperator ()
+        {
+            QueryParser.Parse ("foo");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = @"No operator is applied to the property identifier: foo.")]
+        public void NoOperatorAndTrailingWhiteSpace ()
+        {
+            QueryParser.Parse ("foo ");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = @"The property identifier is not a part of an expression: foo=""bar"".")]
         public void NoWhiteSpaceAroundOperator ()
         {
             QueryParser.Parse (@"foo=""bar""");

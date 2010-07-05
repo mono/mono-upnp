@@ -29,40 +29,15 @@ using System.Text;
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     // Refer to ContentDirectory1 Service Template 1.0.1, Section 2.5.5.1: Search Criteria String Syntax
-    public class QueryParser
+    public abstract class QueryParser
     {
-        Query last_expression;
+        delegate QueryParser Consumer<T> (T value);
 
-        QueryParser ()
-        {
-        }
+        protected abstract QueryParser OnCharacter (char character);
 
-        protected virtual QueryParser OnCharacter (char character)
-        {
-            if (IsWhiteSpace (character)) {
-                return this;
-            } else {
-                return new RootParser (token => {
-                    if (token == "and") {
-                        return null;
-                    } else if (token == "or") {
-                        return null;
-                    } else {
-                        return new RootExpressionParser (token, expression => {
-                            last_expression = expression;
-                            return this;
-                        });
-                    }
-                }).OnCharacter (character);
-            }
-        }
+        protected abstract Query OnDone ();
 
-        protected virtual Query OnDone ()
-        {
-            return last_expression;
-        }
-
-        protected bool IsWhiteSpace (char character)
+        protected static bool IsWhiteSpace (char character)
         {
             switch (character) {
             case ' ': return true;
@@ -75,7 +50,31 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        delegate QueryParser Consumer<T> (T value);
+        class RootQueryParser : QueryParser
+        {
+            Query expression;
+
+            public RootQueryParser ()
+            {
+            }
+
+            protected override QueryParser OnCharacter (char character)
+            {
+                if (IsWhiteSpace (character)) {
+                    return this;
+                } else {
+                    return new PropertyParser (token => new RootExpressionParser (token, expression => {
+                        this.expression = expression;
+                        return this;
+                    })).OnCharacter (character);
+                }
+            }
+
+            protected override Query OnDone ()
+            {
+                return expression;
+            }
+        }
 
         abstract class ExpressionParser : QueryParser
         {
@@ -113,6 +112,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 default: throw new QueryParsingException (string.Format (
                     "Unrecognized operator begining: {0}.", character));
                 }
+            }
+
+            protected override Query OnDone ()
+            {
+                throw new QueryParsingException (string.Format (
+                    "No operator is applied to the property identifier: {0}.", Property));
             }
         }
 
@@ -380,12 +385,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        class RootParser : QueryParser
+        class PropertyParser : QueryParser
         {
             readonly Consumer<string> consumer;
             StringBuilder builder = new StringBuilder ();
 
-            public RootParser (Consumer<string> consumer)
+            public PropertyParser (Consumer<string> consumer)
             {
                 this.consumer = consumer;
             }
@@ -403,7 +408,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected override Query OnDone ()
             {
                 throw new QueryParsingException (string.Format (
-                    @"The identifier is not a part of an expression: {0}.", builder.ToString ()));
+                    @"The property identifier is not a part of an expression: {0}.", builder.ToString ()));
             }
         }
 
@@ -524,7 +529,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         public static Query Parse (string query)
         {
-            var parser = new QueryParser ();
+            QueryParser parser = new RootQueryParser ();
             foreach (var character in query) {
                 parser = parser.OnCharacter (character);
             }
