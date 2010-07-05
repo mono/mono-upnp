@@ -51,6 +51,9 @@
     <Compile Include="UpdateTextWriterTests.cs" />
     <Compile Include="UpdateXmlSerializerTests.cs" />
     <Compile Include="FilteringXmlSerializerTests.cs" />
+    <Compile Include="QueryStringifier.cs" />
+    <Compile Include="Consumer.cs" />
+    <Compile Include="QueryParserTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

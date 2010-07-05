@@ -395,6 +395,42 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 "</nestedData>",
                 xml_serializer.GetString (FullNestedData, Options<NestedData> ("@attribute", "nested")));
         }
+
+        [XmlType ("container", foo)]
+        [XmlNamespace (bar, "bar")]
+        class Container<T>
+        {
+            [XmlElement ("content")] public T Content { get; set; }
+        }
+
+        [Test]
+        public void ContainedNestedData ()
+        {
+            Assert.AreEqual (
+                @"<container xmlns:bar=""www.bar.org"" xmlns=""www.foo.org"">" +
+                    @"<content attribute=""Attribute"">" +
+                        "<nested />" +
+                    "</content>" +
+                "</container>",
+                xml_serializer.GetString (
+                    new Container<NestedData> { Content = FullNestedData },
+                    Options<NestedData> ("@attribute", "nested")));
+        }
+
+        [Test]
+        public void ContainedWildCardNestedData ()
+        {
+            Assert.AreEqual (
+                @"<container xmlns:bar=""www.bar.org"" xmlns=""www.foo.org"">" +
+                    @"<content attribute=""Attribute"" bar:barAttribute=""Bar Attribute"">" +
+                        @"<nested attribute=""Nested Attribute"" bar:barAttribute=""Nested Bar Attribute"" />" +
+                        @"<bar:barNested attribute=""Bar Nested Attribute"" bar:barAttribute=""Bar Nested Bar Attribute"" />" +
+                    "</content>" +
+                "</container>",
+                xml_serializer.GetString (
+                    new Container<NestedData> { Content = FullNestedData },
+                    Options<NestedData> ("*")));
+        }
     }
 }
 
