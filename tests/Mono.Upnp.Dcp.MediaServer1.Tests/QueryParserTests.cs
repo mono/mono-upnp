@@ -91,7 +91,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         [Test]
         public void EqualityOperator ()
         {
-            AssertEquality (new Property ("foo") == "bar", @"foo == ""bar""");
+            AssertEquality (new Property ("foo") == "bar", @"foo = ""bar""");
         }
 
         [Test]
@@ -170,17 +170,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         public void WhiteSpaceAroundOperator ()
         {
             var expected = new Property ("foo") == "bar";
-            AssertEquality (expected, @" foo == ""bar""");
-            AssertEquality (expected, @"foo  == ""bar""");
-            AssertEquality (expected, @"foo ==  ""bar""");
-            AssertEquality (expected, @"foo == ""bar"" ");
-            AssertEquality (expected, @" foo  ==  ""bar"" ");
-        }
-
-        [Test, ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Incomplete operator: ==.")]
-        public void IncompleteEqualityOperator ()
-        {
-            QueryParser.Parse (@"foo = ""bar""");
+            AssertEquality (expected, @" foo = ""bar""");
+            AssertEquality (expected, @"foo  = ""bar""");
+            AssertEquality (expected, @"foo =  ""bar""");
+            AssertEquality (expected, @"foo = ""bar"" ");
+            AssertEquality (expected, @" foo  =  ""bar"" ");
         }
 
         [Test, ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Incomplete operator: !=.")]
@@ -191,18 +185,26 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = @"The property identifier is not a part of an expression: foo==""bar"".")]
+            ExpectedMessage = @"The property identifier is not a part of an expression: foo=""bar"".")]
         public void NoWhiteSpaceAroundOperator ()
         {
-            QueryParser.Parse (@"foo==""bar""");
+            QueryParser.Parse (@"foo=""bar""");
         }
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Whitespace is required around the operator: ==.")]
+            ExpectedMessage = "Whitespace is required around the operator: =.")]
         public void NoTrailingWhiteSpaceAroundOperator ()
         {
-            QueryParser.Parse (@"foo ==""bar""");
+            QueryParser.Parse (@"foo =""bar""");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Whitespace is required around the operator: =.")]
+        public void DoubleEqualityOperator ()
+        {
+            QueryParser.Parse (@"foo == ""bar""");
         }
 
         [Test]
@@ -239,10 +241,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Expecting double-quoted string operand with the operator: ==.")]
+            ExpectedMessage = "Expecting double-quoted string operand with the operator: =.")]
         public void UnquotedOperand ()
         {
-            QueryParser.Parse ("foo == bar");
+            QueryParser.Parse ("foo = bar");
         }
 
         [Test]
@@ -258,23 +260,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             ExpectedMessage = @"The double-quoted string is not terminated: ""bar"".")]
         public void UnterminatedDoubleQuotedString ()
         {
-            QueryParser.Parse (@"foo == ""bar");
+            QueryParser.Parse (@"foo = ""bar");
         }
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "There is no operand for the operator: ==.")]
+            ExpectedMessage = "There is no operand for the operator: =.")]
         public void MissingOperandWithNoSpace ()
         {
-            QueryParser.Parse ("foo ==");
+            QueryParser.Parse ("foo =");
         }
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "There is no operand for the operator: ==.")]
+            ExpectedMessage = "There is no operand for the operator: =.")]
         public void MissingOperandWithSpace ()
         {
-            QueryParser.Parse ("foo == ");
+            QueryParser.Parse ("foo = ");
         }
 
         [Test]

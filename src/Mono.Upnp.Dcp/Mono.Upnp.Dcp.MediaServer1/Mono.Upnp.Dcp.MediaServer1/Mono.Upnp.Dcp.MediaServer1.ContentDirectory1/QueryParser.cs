@@ -28,6 +28,7 @@ using System.Text;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
+    // Refer to ContentDirectory1 Service Template 1.0.1, Section 2.5.5.1: Search Criteria String Syntax
     public class QueryParser
     {
         Query last_expression;
@@ -227,24 +228,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        abstract class ManditoryEqualityOperatorParser : EqualityOperatorParser
-        {
-            protected ManditoryEqualityOperatorParser (string property, Consumer<Query> consumer)
-                : base (property, consumer)
-            {
-            }
-
-            protected override QueryParser OnCharacter (char character)
-            {
-                var parser = base.OnCharacter (character);
-                if (Initialized && !HasEqualsSign) {
-                    throw new QueryParsingException (string.Format ("Incomplete operator: {0}.", Operator));
-                }
-                return parser;
-            }
-        }
-
-        class EqualityParser : ManditoryEqualityOperatorParser
+        class EqualityParser : OperatorParser
         {
             public EqualityParser (string property, Consumer<Query> consumer)
                 : base (property, consumer)
@@ -257,15 +241,24 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
 
             protected override string Operator {
-                get { return "=="; }
+                get { return "="; }
             }
         }
 
-        class InequalityParser : ManditoryEqualityOperatorParser
+        class InequalityParser : EqualityOperatorParser
         {
             public InequalityParser (string property, Consumer<Query> consumer)
                 : base (property, consumer)
             {
+            }
+
+            protected override QueryParser OnCharacter (char character)
+            {
+                var parser = base.OnCharacter (character);
+                if (Initialized && !HasEqualsSign) {
+                    throw new QueryParsingException ("Incomplete operator: !=.");
+                }
+                return parser;
             }
 
             protected override QueryParser GetOperandParser ()
@@ -419,27 +412,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
             }
 
-            QueryParser Check (string expected, char character)
-            {
-                if (position == expected.Length) {
-                    if (IsWhiteSpace (character)) {
-                        return consumer (@true);
-                    } else {
-                        return Fail<QueryParser> ();
-                    }
-                } else if (expected[position] == character) {
-                    position++;
-                    return this;
-                } else {
-                    return Fail<QueryParser> ();
-                }
-            }
-
-            T Fail<T> ()
-            {
-                throw new QueryParsingException (@"Expecting either ""true"" or ""false"".");
-            }
-
             protected override Query OnDone ()
             {
                 if (position == 0) {
@@ -458,6 +430,29 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     }
                 }
             }
+
+            QueryParser Check (string expected, char character)
+            {
+                if (position == expected.Length) {
+                    if (IsWhiteSpace (character)) {
+                        return consumer (@true);
+                    } else if (character == ')' || character == '(') {
+                        return consumer (@true).OnCharacter (character);
+                    } else {
+                        return Fail<QueryParser> ();
+                    }
+                } else if (expected[position] == character) {
+                    position++;
+                    return this;
+                } else {
+                    return Fail<QueryParser> ();
+                }
+            }
+
+            T Fail<T> ()
+            {
+                throw new QueryParsingException (@"Expecting either ""true"" or ""false"".");
+            }
         }
 
         public static Query Parse (string query)
@@ -470,4 +465,3 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         }
     }
 }
-
