@@ -41,55 +41,65 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         public override void VisitEquals (string property, string value)
         {
-            VisitPropertyExpression (property, "==", value);
+            VisitPropertyOperator (property, "==", value);
         }
 
         public override void VisitDoesNotEqual (string property, string value)
         {
-            VisitPropertyExpression (property, "!=", value);
+            VisitPropertyOperator (property, "!=", value);
         }
 
         public override void VisitLessThan (string property, string value)
         {
-            VisitPropertyExpression (property, "<", value);
+            VisitPropertyOperator (property, "<", value);
         }
 
         public override void VisitLessThanOrEqualTo (string property, string value)
         {
-            VisitPropertyExpression (property, "<=", value);
+            VisitPropertyOperator (property, "<=", value);
         }
 
         public override void VisitGreaterThan (string property, string value)
         {
-            VisitPropertyExpression (property, ">", value);
+            VisitPropertyOperator (property, ">", value);
         }
 
         public override void VisitGreaterThanOrEqualTo (string property, string value)
         {
-            VisitPropertyExpression (property, ">=", value);
+            VisitPropertyOperator (property, ">=", value);
         }
 
         public override void VisitContains (string property, string value)
         {
-            VisitPropertyExpression (property, "contains", value);
+            VisitPropertyOperator (property, "contains", value);
         }
 
         public override void VisitDoesNotContain (string property, string value)
         {
-            VisitPropertyExpression (property, "doesNotContain", value);
+            VisitPropertyOperator (property, "doesNotContain", value);
         }
 
         public override void VisitDerivedFrom (string property, string value)
         {
-            VisitPropertyExpression (property, "derivedFrom", value);
+            VisitPropertyOperator (property, "derivedFrom", value);
         }
 
         public override void VisitExists (string property, bool value)
         {
-            VisitPropertyExpression (property, "exists", value ? "true" : "false");
+            VisitPropertyOperator (property, "exists", value ? "true" : "false");
         }
 
-        void VisitPropertyExpression (string property, string @operator, string value)
+        public override void VisitAnd (Query leftOperand, Query rightOperand)
+        {
+            VisitBinaryOperator (leftOperand, "and", rightOperand);
+        }
+
+        public override void VisitOr (Query leftOperand, Query rightOperand)
+        {
+            VisitBinaryOperator (leftOperand, "or", rightOperand);
+        }
+
+        void VisitPropertyOperator (string property, string @operator, string value)
         {
             builder.Append (property);
             builder.Append (' ');
@@ -97,6 +107,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             builder.Append (@" """);
             builder.Append (value);
             builder.Append ('"');
+        }
+
+        void VisitBinaryOperator (Query leftOperand, string @operator, Query rightOperand)
+        {
+            builder.Append ('(');
+            leftOperand (this);
+            builder.Append (' ');
+            builder.Append (@operator);
+            builder.Append (' ');
+            rightOperand (this);
+            builder.Append (')');
         }
     }
 }

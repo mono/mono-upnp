@@ -98,6 +98,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
         #pragma warning restore 0659
 
+        static Query Conjoin (Query leftOperand, Query rightOperand)
+        {
+            return visitor => visitor.VisitAnd (leftOperand, rightOperand);
+        }
+
+        static Query Disjoin (Query leftOperand, Query rightOperand)
+        {
+            return visitor => visitor.VisitOr (leftOperand, rightOperand);
+        }
+
         [Test]
         public void EqualityOperator ()
         {
@@ -189,6 +199,22 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
+        public void AndOperator ()
+        {
+            AssertEquality (
+                Conjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                @"foo = ""bar"" and bat = ""baz""");
+        }
+
+        [Test]
+        public void OrOperator ()
+        {
+            AssertEquality (
+                Disjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                @"foo = ""bar"" or bat = ""baz""");
+        }
+
+        [Test]
         public void WhiteSpaceAroundOperator ()
         {
             var expected = new Property ("foo") == "bar";
@@ -197,6 +223,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertEquality (expected, @"foo =  ""bar""");
             AssertEquality (expected, @"foo = ""bar"" ");
             AssertEquality (expected, @" foo  =  ""bar"" ");
+        }
+
+        [Test, ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The query is empty.")]
+        public void EmptyQuery ()
+        {
+            QueryParser.Parse ("");
         }
 
         [Test, ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Incomplete operator: !=.")]
@@ -287,8 +319,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Unrecognized operator begining: /.")]
-        public void UnrecognizedOperator ()
+            ExpectedMessage = "Unexpected operator begining: /.")]
+        public void UnexpectedOperator ()
         {
             QueryParser.Parse (@"foo / ""bar""");
         }
@@ -318,7 +350,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
-        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Unrecognized operator: contain.")]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Unexpected operator: contain.")]
         public void IncompleteContainsOperator ()
         {
             QueryParser.Parse (@"foo contain ""bar""");
@@ -390,7 +422,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Unrecognized operator begining: du.")]
+            ExpectedMessage = "Unexpected operator begining: du.")]
         public void NeitherDerivedFromNorDoesNotContain ()
         {
             QueryParser.Parse (@"foo dumbo ""bar""");
@@ -398,7 +430,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Unrecognized operator begining: d.")]
+            ExpectedMessage = "Unexpected operator begining: d.")]
         public void IllegallyShortDerivedFromOrDoesNotContain ()
         {
             QueryParser.Parse ("foo d");
@@ -406,10 +438,130 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Unrecognized operator: d.")]
+            ExpectedMessage = "Unexpected operator: d.")]
         public void IllegallyShortDerivedFromOrDoesNotContainWithWhiteSpace ()
         {
             QueryParser.Parse (@"foo d ""bar""");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator begining: az.")]
+        public void IllegalAndOperator1 ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" az");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator begining: anz.")]
+        public void IllegalAndOperator2 ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" anz");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator begining: andz.")]
+        public void IllegalAndOperator3 ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" andz");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator: a.")]
+        public void IllegallyShortAndOperator1 ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" a");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator: a.")]
+        public void IllegallyShortAndOperatorWithTrailingWhiteSpace1 ()
+        {
+            QueryParser.Parse ("foo = \"bar\" a\t");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator: an.")]
+        public void IllegallyShortAndOperator2 ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" an");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator: an.")]
+        public void IllegallyShortAndOperatorWithTrailingWhiteSpace2 ()
+        {
+            QueryParser.Parse ("foo = \"bar\" an\t");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Expecting an expression after the conjunction.")]
+        public void IncompleteConjuction ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" and");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Expecting an expression after the conjunction.")]
+        public void IncompleteConjuctionWithTrailingWhiteSpace ()
+        {
+            QueryParser.Parse ("foo = \"bar\" and \t\n");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator begining: oz.")]
+        public void IllegalOrOperator1 ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" oz");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator begining: orz.")]
+        public void IllegalOrOperator2 ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" orz");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator: o.")]
+        public void IllegallyShortOrOperator ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" o");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator: o.")]
+        public void IllegallyShortOrOperatorWithTrailingWhiteSpace ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" o ");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Expecting an expression after the disjunction.")]
+        public void IncompleteDisjunction ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" or");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Expecting an expression after the disjunction.")]
+        public void IncompleteDisjunctionWithTrailingWhiteSpace ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" or  ");
         }
 
         void AssertEquality (Query expectedQuery, string actualQuery)

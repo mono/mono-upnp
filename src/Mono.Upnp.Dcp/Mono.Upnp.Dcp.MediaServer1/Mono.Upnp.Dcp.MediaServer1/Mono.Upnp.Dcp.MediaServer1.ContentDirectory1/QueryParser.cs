@@ -52,8 +52,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class RootQueryParser : QueryParser
         {
-            Query expression;
-
             public RootQueryParser ()
             {
             }
@@ -63,34 +61,180 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 if (IsWhiteSpace (character)) {
                     return this;
                 } else {
-                    return new PropertyParser (token => new RootExpressionParser (token, expression => {
-                        this.expression = expression;
-                        return this;
-                    })).OnCharacter (character);
+                    return new PropertyParser (token => new RootPropertyOperatorParser (
+                        token, expression => new ExpressionParser (expression))).OnCharacter (character);
                 }
             }
 
             protected override Query OnDone ()
             {
-                return expression;
+                throw new QueryParsingException ("The query is empty.");
             }
         }
 
-        abstract class ExpressionParser : QueryParser
+        class ExpressionParser : QueryParser
+        {
+            protected readonly Query Expression;
+
+            public ExpressionParser (Query expression)
+            {
+                Expression = expression;
+            }
+
+            protected override QueryParser OnCharacter (char character)
+            {
+                if (IsWhiteSpace (character)) {
+                    return this;
+                } else if (character == 'a') {
+                    return new ConjunctionParser (Expression);
+                } else if (character == 'o') {
+                    return new DisjunctionParser (Expression);
+                } else {
+                    throw new QueryParsingException (string.Format ("Unexpected operator begining: {0}.", character));
+                }
+            }
+
+            protected override Query OnDone ()
+            {
+                return Expression;
+            }
+        }
+
+        class ConjunctionParser : ExpressionParser
+        {
+            const int a_state = 0;
+            const int n_state = 1;
+            const int d_state = 2;
+
+            int state;
+
+            public ConjunctionParser (Query expression)
+                : base (expression)
+            {
+            }
+
+            protected override QueryParser OnCharacter (char character)
+            {
+                switch (state) {
+                case a_state:
+                    if (character == 'n') {
+                        state++;
+                        return this;
+                    } else if (IsWhiteSpace (character)) {
+                        throw new QueryParsingException ("Unexpected operator: a.");
+                    } else {
+                        throw new QueryParsingException (string.Format (
+                            "Unexpected operator begining: a{0}.", character));
+                    }
+                case n_state:
+                    if (character == 'd') {
+                        state++;
+                        return this;
+                    } else if (IsWhiteSpace (character)) {
+                        throw new QueryParsingException ("Unexpected operator: an.");
+                    } else {
+                        throw new QueryParsingException (string.Format (
+                            "Unexpected operator begining: an{0}.", character));
+                    }
+                case d_state:
+                    if (IsWhiteSpace (character)) {
+                        state++;
+                        return this;
+                    } else {
+                        throw new QueryParsingException (string.Format (
+                            "Unexpected operator begining: and{0}.", character));
+                    }
+                default:
+                    if (IsWhiteSpace (character)) {
+                        return this;
+                    } else {
+                        return new PropertyParser (token => new RootPropertyOperatorParser (
+                            token, expression => new ExpressionParser (
+                                visitor => visitor.VisitAnd (Expression, expression)))).OnCharacter (character);
+                    }
+                }
+            }
+
+            protected override Query OnDone ()
+            {
+                if (state >= d_state) {
+                    throw new QueryParsingException ("Expecting an expression after the conjunction.");
+                } else {
+                    throw new QueryParsingException (string.Format (
+                        "Unexpected operator: {0}.", "and".Substring (0, state + 1)));
+                }
+            }
+        }
+
+        class DisjunctionParser : ExpressionParser
+        {
+            const int o_state = 0;
+            const int r_state = 1;
+
+            int state;
+
+            public DisjunctionParser (Query expression)
+                : base (expression)
+            {
+            }
+
+            protected override QueryParser OnCharacter (char character)
+            {
+                switch (state) {
+                case o_state:
+                    if (character == 'r') {
+                        state++;
+                        return this;
+                    } else if (IsWhiteSpace (character)) {
+                        throw new QueryParsingException ("Unexpected operator: o.");
+                    } else {
+                        throw new QueryParsingException (string.Format (
+                            "Unexpected operator begining: o{0}.", character));
+                    }
+                case r_state:
+                    if (IsWhiteSpace (character)) {
+                        state++;
+                        return this;
+                    } else {
+                        throw new QueryParsingException (string.Format (
+                            "Unexpected operator begining: or{0}.", character));
+                    }
+                default:
+                    if (IsWhiteSpace (character)) {
+                        return this;
+                    } else {
+                        return new PropertyParser (token => new RootPropertyOperatorParser (
+                            token, expression => new ExpressionParser (
+                                visitor => visitor.VisitOr (Expression, expression)))).OnCharacter (character);
+                    }
+                }
+            }
+
+            protected override Query OnDone ()
+            {
+                if (state >= r_state) {
+                    throw new QueryParsingException ("Expecting an expression after the disjunction.");
+                } else {
+                    throw new QueryParsingException ("Unexpected operator: o.");
+                }
+            }
+        }
+
+        abstract class PropertyOperatorParser : QueryParser
         {
             protected readonly string Property;
             protected readonly Consumer<Query> Consumer;
 
-            protected ExpressionParser (string property, Consumer<Query> consumer)
+            protected PropertyOperatorParser (string property, Consumer<Query> consumer)
             {
                 Property = property;
                 Consumer = consumer;
             }
         }
 
-        class RootExpressionParser : ExpressionParser
+        class RootPropertyOperatorParser : PropertyOperatorParser
         {
-            public RootExpressionParser (string property, Consumer<Query> consumer)
+            public RootPropertyOperatorParser (string property, Consumer<Query> consumer)
                 : base (property, consumer)
             {
             }
@@ -110,7 +254,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 case 'e': return new ExistsParser (Property, Consumer).OnCharacter ('e');
                 case 'd': return new DerivedFromOrDoesNotContainParser (Property, Consumer);
                 default: throw new QueryParsingException (string.Format (
-                    "Unrecognized operator begining: {0}.", character));
+                    "Unexpected operator begining: {0}.", character));
                 }
             }
 
@@ -121,11 +265,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        abstract class OperatorParser : ExpressionParser
+        abstract class TokenOperatorParser : PropertyOperatorParser
         {
             protected bool Initialized;
 
-            protected OperatorParser (string property, Consumer<Query> consumer)
+            protected TokenOperatorParser (string property, Consumer<Query> consumer)
                 : base (property, consumer)
             {
             }
@@ -161,7 +305,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        abstract class StringOperatorParser : OperatorParser
+        abstract class StringOperatorParser : TokenOperatorParser
         {
             readonly string @operator;
             int position;
@@ -178,7 +322,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     var parser = base.OnCharacter (character);
                     if (Initialized && position < @operator.Length) {
                         throw new QueryParsingException (string.Format (
-                            "Unrecognized operator: {0}.", @operator.Substring (0, position)));
+                            "Unexpected operator: {0}.", @operator.Substring (0, position)));
                     }
                     return parser;
                 } else {
@@ -227,7 +371,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        abstract class EqualityOperatorParser : OperatorParser
+        abstract class EqualityOperatorParser : TokenOperatorParser
         {
             protected bool HasEqualsSign;
 
@@ -247,7 +391,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        class DerivedFromOrDoesNotContainParser : ExpressionParser
+        class DerivedFromOrDoesNotContainParser : PropertyOperatorParser
         {
             public DerivedFromOrDoesNotContainParser (string property, Consumer<Query> consumer)
                 : base (property, consumer)
@@ -261,16 +405,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 } else  if (character == 'o') {
                     return new DoesNotContainParser (Property, Consumer).OnCharacter ('d').OnCharacter ('o');
                 } else if (IsWhiteSpace (character)) {
-                    throw new QueryParsingException ("Unrecognized operator: d.");
+                    throw new QueryParsingException ("Unexpected operator: d.");
                 } else {
                     throw new QueryParsingException (string.Format (
-                        "Unrecognized operator begining: d{0}.", character));
+                        "Unexpected operator begining: d{0}.", character));
                 }
             }
 
             protected override Query OnDone ()
             {
-                throw new QueryParsingException ("Unrecognized operator begining: d.");
+                throw new QueryParsingException ("Unexpected operator begining: d.");
             }
         }
 
@@ -300,7 +444,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        class EqualityParser : OperatorParser
+        class EqualityParser : TokenOperatorParser
         {
             public EqualityParser (string property, Consumer<Query> consumer)
                 : base (property, consumer)
@@ -431,7 +575,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     } else  if (character == '"') {
                         builder.Append ('"');
                     } else {
-                        throw new QueryParsingException ("Unrecognized escape sequence: \\" + character);
+                        throw new QueryParsingException ("Unexpected escape sequence: \\" + character);
                     }
                     escaped = false;
                     return this;
