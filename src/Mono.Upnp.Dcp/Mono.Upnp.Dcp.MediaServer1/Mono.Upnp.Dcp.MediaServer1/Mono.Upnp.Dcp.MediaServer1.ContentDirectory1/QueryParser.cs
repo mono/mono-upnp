@@ -42,10 +42,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             if (IsWhiteSpace (character)) {
                 return this;
             } else {
-                return new PropertyParser (property => new ExpressionParser (property, expression => {
-                    last_expression = expression;
-                    return this;
-                })).OnCharacter (character);
+                return new RootParser (token => {
+                    if (token == "and") {
+                        return null;
+                    } else if (token == "or") {
+                        return null;
+                    } else {
+                        return new RootExpressionParser (token, expression => {
+                            last_expression = expression;
+                            return this;
+                        });
+                    }
+                }).OnCharacter (character);
             }
         }
 
@@ -69,15 +77,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         delegate QueryParser Consumer<T> (T value);
 
-        class ExpressionParser : QueryParser
+        abstract class ExpressionParser : QueryParser
         {
-            readonly string property;
-            readonly Consumer<Query> consumer;
+            protected readonly string Property;
+            protected readonly Consumer<Query> Consumer;
 
-            public ExpressionParser (string property, Consumer<Query> consumer)
+            protected ExpressionParser (string property, Consumer<Query> consumer)
             {
-                this.property = property;
-                this.consumer = consumer;
+                Property = property;
+                Consumer = consumer;
+            }
+        }
+
+        class RootExpressionParser : ExpressionParser
+        {
+            public RootExpressionParser (string property, Consumer<Query> consumer)
+                : base (property, consumer)
+            {
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -87,28 +103,26 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
 
                 switch (character) {
-                case '=': return new EqualityParser (property, consumer);
-                case '!': return new InequalityParser (property, consumer);
-                case '<': return new LessThanParser (property, consumer);
-                case '>': return new GreaterThanParser (property, consumer);
-                case 'c': return new ContainsParser (property, consumer).OnCharacter ('c');
-                case 'e': return new ExistsParser (property, consumer).OnCharacter ('e');
+                case '=': return new EqualityParser (Property, Consumer);
+                case '!': return new InequalityParser (Property, Consumer);
+                case '<': return new LessThanParser (Property, Consumer);
+                case '>': return new GreaterThanParser (Property, Consumer);
+                case 'c': return new ContainsParser (Property, Consumer).OnCharacter ('c');
+                case 'e': return new ExistsParser (Property, Consumer).OnCharacter ('e');
+                case 'd': return new DerivedFromOrDoesNotContainParser (Property, Consumer);
                 default: throw new QueryParsingException (string.Format (
                     "Unrecognized operator begining: {0}.", character));
                 }
             }
         }
 
-        abstract class OperatorParser : QueryParser
+        abstract class OperatorParser : ExpressionParser
         {
-            protected readonly string Property;
-            protected readonly Consumer<Query> Consumer;
             protected bool Initialized;
 
             protected OperatorParser (string property, Consumer<Query> consumer)
+                : base (property, consumer)
             {
-                Property = property;
-                Consumer = consumer;
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -228,6 +242,59 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
+        class DerivedFromOrDoesNotContainParser : ExpressionParser
+        {
+            public DerivedFromOrDoesNotContainParser (string property, Consumer<Query> consumer)
+                : base (property, consumer)
+            {
+            }
+
+            protected override QueryParser OnCharacter (char character)
+            {
+                if (character == 'e') {
+                    return new DerivedFromParser (Property, Consumer).OnCharacter ('d').OnCharacter ('e');
+                } else  if (character == 'o') {
+                    return new DoesNotContainParser (Property, Consumer).OnCharacter ('d').OnCharacter ('o');
+                } else if (IsWhiteSpace (character)) {
+                    throw new QueryParsingException ("Unrecognized operator: d.");
+                } else {
+                    throw new QueryParsingException (string.Format (
+                        "Unrecognized operator begining: d{0}.", character));
+                }
+            }
+
+            protected override Query OnDone ()
+            {
+                throw new QueryParsingException ("Unrecognized operator begining: d.");
+            }
+        }
+
+        class DerivedFromParser : StringOperatorParser
+        {
+            public DerivedFromParser (string property, Consumer<Query> consumer)
+                : base ("derivedFrom", property, consumer)
+            {
+            }
+
+            protected override QueryParser GetOperandParser ()
+            {
+                return new StringParser (value => Consumer (visitor => visitor.VisitDerivedFrom (Property, value)));
+            }
+        }
+
+        class DoesNotContainParser : StringOperatorParser
+        {
+            public DoesNotContainParser (string property, Consumer<Query> consumer)
+                : base ("doesNotContain", property, consumer)
+            {
+            }
+
+            protected override QueryParser GetOperandParser ()
+            {
+                return new StringParser (value => Consumer (visitor => visitor.VisitDoesNotContain (Property, value)));
+            }
+        }
+
         class EqualityParser : OperatorParser
         {
             public EqualityParser (string property, Consumer<Query> consumer)
@@ -313,12 +380,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        class PropertyParser : QueryParser
+        class RootParser : QueryParser
         {
             readonly Consumer<string> consumer;
             StringBuilder builder = new StringBuilder ();
 
-            public PropertyParser (Consumer<string> consumer)
+            public RootParser (Consumer<string> consumer)
             {
                 this.consumer = consumer;
             }
@@ -336,7 +403,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected override Query OnDone ()
             {
                 throw new QueryParsingException (string.Format (
-                    @"The property identifier is not a part of an expression: {0}.", builder.ToString ()));
+                    @"The identifier is not a part of an expression: {0}.", builder.ToString ()));
             }
         }
 

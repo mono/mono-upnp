@@ -51,6 +51,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 return visitor => visitor.VisitContains (name, value);
             }
 
+            public Query DoesNotContain (string value)
+            {
+                return visitor => visitor.VisitDoesNotContain (name, value);
+            }
+
+            public Query DerivedFrom (string value)
+            {
+                return visitor => visitor.VisitDerivedFrom (name, value);
+            }
+
             public Query Exists (bool value)
             {
                 return visitor => visitor.VisitExists (name, value);
@@ -167,6 +177,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
+        public void DerivedFromOperator ()
+        {
+            AssertEquality (new Property ("foo").DerivedFrom ("object.item"), @"foo derivedFrom ""object.item""");
+        }
+
+        [Test]
+        public void DoesNotContainOperator ()
+        {
+            AssertEquality (new Property ("foo").DoesNotContain ("bar"), @"foo doesNotContain ""bar""");
+        }
+
+        [Test]
         public void WhiteSpaceAroundOperator ()
         {
             var expected = new Property ("foo") == "bar";
@@ -185,7 +207,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = @"The property identifier is not a part of an expression: foo=""bar"".")]
+            ExpectedMessage = @"The identifier is not a part of an expression: foo=""bar"".")]
         public void NoWhiteSpaceAroundOperator ()
         {
             QueryParser.Parse (@"foo=""bar""");
@@ -348,6 +370,30 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         public void IllegallyLongFalseLiteral ()
         {
             QueryParser.Parse ("foo exists falserize");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unrecognized operator begining: du.")]
+        public void NeitherDerivedFromNorDoesNotContain ()
+        {
+            QueryParser.Parse (@"foo dumbo ""bar""");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unrecognized operator begining: d.")]
+        public void IllegallyShortDerivedFromOrDoesNotContain ()
+        {
+            QueryParser.Parse ("foo d");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unrecognized operator: d.")]
+        public void IllegallyShortDerivedFromOrDoesNotContainWithWhiteSpace ()
+        {
+            QueryParser.Parse (@"foo d ""bar""");
         }
 
         void AssertEquality (Query expectedQuery, string actualQuery)

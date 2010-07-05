@@ -74,6 +74,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             VisitPropertyExpression (property, "contains", value);
         }
 
+        public override void VisitDoesNotContain (string property, string value)
+        {
+            VisitPropertyExpression (property, "doesNotContain", value);
+        }
+
+        public override void VisitDerivedFrom (string property, string value)
+        {
+            VisitPropertyExpression (property, "derivedFrom", value);
+        }
+
         public override void VisitExists (string property, bool value)
         {
             VisitPropertyExpression (property, "exists", value ? "true" : "false");
