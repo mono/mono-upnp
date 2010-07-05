@@ -497,7 +497,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected override QueryParser GetOperandParser ()
             {
                 if (HasEqualsSign) {
-                    return new StringParser (value => Consumer (visitor => visitor.VisitLessThanOrEqualTo (Property, value)));
+                    return new StringParser (
+                        value => Consumer (visitor => visitor.VisitLessThanOrEqualTo (Property, value)));
                 } else {
                     return new StringParser (value => Consumer (visitor => visitor.VisitLessThan (Property, value)));
                 }
@@ -518,9 +519,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected override QueryParser GetOperandParser ()
             {
                 if (HasEqualsSign) {
-                    return new StringParser (value => Consumer (visitor => visitor.VisitGreaterThanOrEqualTo (Property, value)));
+                    return new StringParser (
+                        value => Consumer (visitor => visitor.VisitGreaterThanOrEqualTo (Property, value)));
                 } else {
-                    return new StringParser (value => Consumer (visitor => visitor.VisitGreaterThan (Property, value)));
+                    return new StringParser (
+                        value => Consumer (visitor => visitor.VisitGreaterThan (Property, value)));
                 }
             }
 
