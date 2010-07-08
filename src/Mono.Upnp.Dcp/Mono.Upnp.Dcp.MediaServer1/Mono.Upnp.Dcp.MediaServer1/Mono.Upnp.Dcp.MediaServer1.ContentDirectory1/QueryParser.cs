@@ -200,24 +200,64 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        class ConjunctionParser : QueryParser
+        abstract class JunctionParser : QueryParser
         {
-            const int a_state = 0;
-            const int n_state = 1;
-            const int d_state = 2;
-
             readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
             readonly int priority;
             int parentheses;
-            int state;
 
-            public ConjunctionParser (int parentheses,
+            protected JunctionParser (int parentheses,
                                       int priority,
                                       Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
             {
                 this.parentheses = parentheses;
                 this.priority = priority;
                 this.previous_handler = previousHandler;
+            }
+
+            protected override QueryParser OnCharacter (char character)
+            {
+                if (IsWhiteSpace (character)) {
+                    return this;
+                } else if (character == '(') {
+                    parentheses++;
+                    return this;
+                } else if (character == ')') {
+                    return Fail<QueryParser> ();
+                } else {
+                    return new PropertyParser (token => new RootPropertyOperatorParser (
+                        token, expression => new JoinedExpressionParser (
+                            expression, parentheses, priority, previous_handler))).OnCharacter (character);
+                }
+            }
+
+            protected override Query OnDone ()
+            {
+                return Fail<Query> ();
+            }
+
+            T Fail<T> ()
+            {
+                throw new QueryParsingException (string.Format (
+                    "Expecting an expression after the {0}.", Junction));
+            }
+
+            protected abstract string Junction { get; }
+        }
+
+        class ConjunctionParser : JunctionParser
+        {
+            const int a_state = 0;
+            const int n_state = 1;
+            const int d_state = 2;
+
+            int state;
+
+            public ConjunctionParser (int parentheses,
+                                      int priority,
+                                      Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
+                : base (parentheses, priority, previousHandler)
+            {
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -252,18 +292,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                             "Unexpected operator begining: and{0}.", character));
                     }
                 default:
-                    if (IsWhiteSpace (character)) {
-                        return this;
-                    } else if (character == '(') {
-                        parentheses++;
-                        return this;
-                    } else if (character == ')') {
-                        throw new QueryParsingException ("Expecting an expression after the conjunction.");
-                    } else {
-                        return new PropertyParser (token => new RootPropertyOperatorParser (
-                            token, expression => new JoinedExpressionParser (
-                                expression, parentheses, priority, previous_handler))).OnCharacter (character);
-                    }
+                    return base.OnCharacter (character);
                 }
             }
 
@@ -273,28 +302,27 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     throw new QueryParsingException (string.Format (
                         "Unexpected operator: {0}.", "and".Substring (0, state + 1)));
                 } else {
-                    throw new QueryParsingException ("Expecting an expression after the conjunction.");
+                    return base.OnDone ();
                 }
+            }
+
+            protected override string Junction {
+                get { return "conjunction"; }
             }
         }
 
-        class DisjunctionParser : QueryParser
+        class DisjunctionParser : JunctionParser
         {
             const int o_state = 0;
             const int r_state = 1;
 
-            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
-            readonly int priority;
-            int parentheses;
             int state;
 
             public DisjunctionParser (int parentheses,
                                       int priority,
                                       Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
+                : base (parentheses, priority, previousHandler)
             {
-                this.parentheses = parentheses;
-                this.priority = priority;
-                this.@previous_handler = previousHandler;
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -319,18 +347,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                             "Unexpected operator begining: or{0}.", character));
                     }
                 default:
-                    if (IsWhiteSpace (character)) {
-                        return this;
-                    } else  if (character == '(') {
-                        parentheses++;
-                        return this;
-                    } else if (character == ')') {
-                        throw new QueryParsingException ("Expecting an expression after the disjunction.");
-                    } else {
-                        return new PropertyParser (token => new RootPropertyOperatorParser (
-                            token, expression => new JoinedExpressionParser (
-                                expression, parentheses, priority, previous_handler))).OnCharacter (character);
-                    }
+                    return base.OnCharacter (character);
                 }
             }
 
@@ -339,8 +356,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 if (state < r_state) {
                     throw new QueryParsingException ("Unexpected operator: o.");
                 } else {
-                    throw new QueryParsingException ("Expecting an expression after the disjunction.");
+                    return base.OnDone ();
                 }
+            }
+
+            protected override string Junction {
+                get { return "disjunction"; }
             }
         }
 
@@ -813,7 +834,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             foreach (var character in query) {
                 parser = parser.OnCharacter (character);
             }
-            
+
             return parser.OnDone ();
         }
     }
