@@ -44,9 +44,9 @@ namespace Mono.Upnp.Dcp.MSMediaServerRegistrar1
         
         [UpnpAction]
         public virtual void RegisterDevice ([UpnpArgument ("RegistrationRegMsg")]
-                                              [UpnpRelatedStateVariable (DataType = "bin.base64")] byte[] registrationRequestMessage,
-                                              [UpnpArgument ("RegistrationRespMsg")]
-                                              [UpnpRelatedStateVariable (DataType = "bin.base64")] out byte [] registrationResponseMessage)
+                                            [UpnpRelatedStateVariable (DataType = "bin.base64")] byte[] registrationRequestMessage,
+                                            [UpnpArgument ("RegistrationRespMsg")]
+                                            [UpnpRelatedStateVariable (DataType = "bin.base64")] out byte [] registrationResponseMessage)
         {
             registrationResponseMessage = RegisterDevice (registrationRequestMessage);
         }
