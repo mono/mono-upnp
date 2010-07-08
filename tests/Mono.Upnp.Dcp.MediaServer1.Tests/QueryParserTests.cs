@@ -227,6 +227,68 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
+        public void ParentheticalPriority1 ()
+        {
+            AssertEquality (
+                Disjoin (
+                    Conjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                    Conjoin (
+                        Disjoin (new Property ("name").Contains ("john"), new Property ("eyes") == "green"),
+                        new Property ("age") >= "21")),
+                @"foo = ""bar"" and bat = ""baz"" or (name contains ""john"" or eyes = ""green"") and age >= ""21""");
+        }
+
+        [Test]
+        public void ParentheticalPriority2 ()
+        {
+            AssertEquality (
+                Conjoin (
+                    Conjoin (
+                        new Property ("foo") == "bar",
+                        Disjoin (
+                            Disjoin (new Property ("bat") == "baz", new Property ("name").Contains ("john")),
+                            new Property ("eyes") == "green")),
+                    new Property ("age") >= "21"),
+                @"foo = ""bar"" and ((bat = ""baz"" or name contains ""john"") or eyes = ""green"") and age >= ""21""");
+        }
+
+        [Test]
+        public void ParentheticalPriority3 ()
+        {
+            AssertEquality (
+                Disjoin (
+                    Conjoin (
+                        new Property ("foo") == "bar",
+                        Disjoin (new Property ("bat") == "baz", new Property ("name").Contains ("john"))),
+                    Conjoin (new Property ("eyes") == "green", new Property ("age") >= "21")),
+                @"foo = ""bar"" and (bat = ""baz"" or name contains ""john"") or eyes = ""green"" and age >= ""21""");
+        }
+
+        [Test]
+        public void ParentheticalPriority4 ()
+        {
+            AssertEquality (
+                Conjoin (
+                    Conjoin (
+                        Disjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                        Disjoin (new Property ("name").Contains ("john"), new Property ("eyes") == "green")),
+                    new Property ("age") >= "21"),
+                @"(foo = ""bar"" or bat = ""baz"") and (name contains ""john"" or eyes = ""green"") and age >= ""21""");
+        }
+
+        [Test]
+        public void ParentheticalPriority5 ()
+        {
+            AssertEquality (
+                Conjoin (
+                    Disjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                    Conjoin (
+                        Disjoin (new Property ("name").Contains ("john"), new Property ("eyes") == "green"),
+                        new Property ("age") >= "21")),
+                @"(foo = ""bar"" or bat = ""baz"") and ((name contains ""john"" or eyes = ""green"") and age >= ""21"")");
+        }
+
+        [Test]
         public void WhiteSpaceAroundOperator ()
         {
             var expected = new Property ("foo") == "bar";
@@ -582,6 +644,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             var actual_builder = new StringBuilder ();
             expectedQuery (new QueryStringifier (expected_builder));
             QueryParser.Parse (actualQuery) (new QueryStringifier (actual_builder));
+            Console.WriteLine (actual_builder.ToString ());
             Assert.AreEqual (expected_builder.ToString (), actual_builder.ToString ());
         }
     }

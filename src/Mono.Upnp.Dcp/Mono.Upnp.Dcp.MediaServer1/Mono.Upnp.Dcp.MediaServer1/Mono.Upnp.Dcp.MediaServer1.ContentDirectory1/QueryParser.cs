@@ -33,10 +33,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     {
         delegate TResult Func<T, TResult> (T argument);
         delegate TResult Func<T1, T2, TResult> (T1 argument1, T2 argument2);
+        delegate TResult Func<T1, T2, T3, TResult> (T1 argument1, T2 argument2, T3 argument3);
 
-        const int default_priority = 0;
         const int disjunction_priority = 1;
         const int conjunction_priority = 2;
+        const int parenthetical_priority = 3;
 
         protected abstract QueryParser OnCharacter (char character);
 
@@ -57,6 +58,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class RootQueryParser : QueryParser
         {
+            int parentheses;
+
             public RootQueryParser ()
             {
             }
@@ -65,9 +68,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             {
                 if (IsWhiteSpace (character)) {
                     return this;
+                } else if (character == '(') {
+                    parentheses++;
+                    return this;
+                } else if (character == ')') {
+                    if (parentheses == 0) {
+                        throw new QueryParsingException ("The parentheses are unbalenced.");
+                    } else {
+                        throw new QueryParsingException ("Cannot have empty expressions.");
+                    }
                 } else {
                     return new PropertyParser (token => new RootPropertyOperatorParser (
-                        token, expression => new ExpressionParser (expression))).OnCharacter (character);
+                        token, expression => new ExpressionParser (expression, parentheses))).OnCharacter (character);
                 }
             }
 
@@ -79,65 +91,119 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class ExpressionParser : QueryParser
         {
-            readonly Query expression;
-            readonly Func<Query, Query> @operator;
-            readonly int priority;
+            protected readonly Query Expression;
+            protected int Parentheses;
 
-            public ExpressionParser (Query expression)
-                : this (expression, default_priority, null)
+            public ExpressionParser (Query expression, int parentheses)
             {
-            }
-
-            public ExpressionParser (Query expression, int priority, Func<Query, Query> @operator)
-            {
-                this.expression = expression;
-                this.@operator = @operator;
-                this.priority = priority;
+                Expression = expression;
+                Parentheses = parentheses;
             }
 
             protected override QueryParser OnCharacter (char character)
             {
                 if (IsWhiteSpace (character)) {
                     return this;
+                } else if (character == '(') {
+                    Parentheses++;
+                    return this;
+                } else if (character == ')') {
+                    Parentheses--;
+                    if (Parentheses < 0) {
+                        throw new QueryParsingException ("The parentheses are unbalenced.");
+                    } else {
+                        return this;
+                    }
                 } else if (character == 'a') {
-                    return new ConjunctionParser (MakeOperator (conjunction_priority,
+                    var priority = GetPriority (conjunction_priority);
+                    return new ConjunctionParser (Parentheses, priority, MakeHandler (priority,
                         (leftOperand, rightOperand) => visitor => visitor.VisitAnd (leftOperand, rightOperand)));
                 } else if (character == 'o') {
-                    return new DisjunctionParser (MakeOperator (disjunction_priority,
+                    var priority = GetPriority (disjunction_priority);
+                    return new DisjunctionParser (Parentheses, priority, MakeHandler (priority,
                         (leftOperand, rightOperand) => visitor => visitor.VisitOr (leftOperand, rightOperand)));
                 } else {
                     throw new QueryParsingException (string.Format ("Unexpected operator begining: {0}.", character));
                 }
             }
 
-            Func<Query, Query> MakeOperator (int priority, Func<Query, Query, Query> binaryOperator)
+            int GetPriority (int priority)
             {
-                return (operand) => {
-                    if (@operator != null) {
-                        if (this.priority < priority) {
-                            return @operator(binaryOperator(expression, operand));
-                        } else {
-                            return binaryOperator(@operator(expression), operand);
-                        }
+                if (Parentheses > 0) {
+                    return parenthetical_priority + Parentheses + priority;
+                } else {
+                    return priority;
+                }
+            }
+
+            protected virtual Func<int, Func<Query, Query>, Func<Query, Query>> MakeHandler (int priority,
+                                                                                             Func<Query, Query, Query> binaryOperator)
+            {
+                return (priorPriority, priorOperator) => {
+                    if (priorPriority < priority) {
+                        return priorOperand => priorOperator (binaryOperator (Expression, priorOperand));
                     } else {
-                        return binaryOperator (expression, operand);
+                        return priorOperand => binaryOperator (Expression, priorOperator (priorOperand));
                     }
                 };
             }
 
             protected override Query OnDone ()
             {
-                if (@operator != null) {
-                    return @operator (expression);
-                } else {
-                    return expression;
+                if (Parentheses > 0) {
+                    throw new QueryParsingException ("The parentheses are unbalenced.");
                 }
+                return Expression;
+            }
+        }
+
+        class JoinedExpressionParser : ExpressionParser
+        {
+            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
+            readonly int priority;
+
+            public JoinedExpressionParser (Query expression,
+                                           int parentheses,
+                                           int priority,
+                                           Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
+                : base (expression, parentheses)
+            {
+                this.previous_handler = previousHandler;
+                this.priority = priority;
+            }
+
+            protected override Func<int, Func<Query, Query>, Func<Query, Query>> MakeHandler (int priority,
+                                                                                              Func<Query, Query, Query> binaryOperator)
+            {
+                // Even I admit this is unreadable. But is a very slick operator priority algorithm.
+                if (this.priority < priority) {
+                    return (priorPriority, priorOperator) => {
+                        if (this.priority < priorPriority) {
+                            return priorOperand => previous_handler (this.priority, operand => operand) (
+                                priorOperator (binaryOperator (Expression, priorOperand)));
+                        } else {
+                            return priorOperand => previous_handler (
+                                priorPriority, operand => priorOperator (operand)) (
+                                binaryOperator (Expression, priorOperand));
+                        }
+                    };
+                } else {
+                    return (priorPriority, priorOperator) => priorOperand => priorOperator (previous_handler (
+                        priorPriority, operand => binaryOperator (operand, priorOperand)) (Expression));
+                }
+            }
+
+            protected override Query OnDone ()
+            {
+                return previous_handler (priority, operand => operand) (Expression);
             }
         }
 
         class ConjunctionParser : QueryParser
         {
-            readonly Func<Query, Query> @operator;
+            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
+            readonly int priority;
+            int parentheses;
 
             const int a_state = 0;
             const int n_state = 1;
@@ -145,9 +211,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             int state;
 
-            public ConjunctionParser (Func<Query, Query> @operator)
+            public ConjunctionParser (int parentheses,
+                                      int priority,
+                                      Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
             {
-                this.@operator = @operator;
+                this.parentheses = parentheses;
+                this.priority = priority;
+                this.previous_handler = previousHandler;
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -184,9 +254,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 default:
                     if (IsWhiteSpace (character)) {
                         return this;
+                    } else if (character == '(') {
+                        parentheses++;
+                        return this;
+                    } else if (character == ')') {
+                        throw new QueryParsingException ("Cannot have empty expressions.");
                     } else {
                         return new PropertyParser (token => new RootPropertyOperatorParser (
-                            token, expression => new ExpressionParser (expression, conjunction_priority, @operator))).OnCharacter (character);
+                            token, expression => new JoinedExpressionParser (
+                                expression, parentheses, priority, previous_handler))).OnCharacter (character);
                     }
                 }
             }
@@ -204,16 +280,22 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class DisjunctionParser : QueryParser
         {
-            readonly Func<Query, Query> @operator;
+            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
+            readonly int priority;
+            int parentheses;
 
             const int o_state = 0;
             const int r_state = 1;
 
             int state;
 
-            public DisjunctionParser (Func<Query, Query> @operator)
+            public DisjunctionParser (int parentheses,
+                                      int priority,
+                                      Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
             {
-                this.@operator = @operator;
+                this.parentheses = parentheses;
+                this.priority = priority;
+                this.@previous_handler = previousHandler;
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -240,9 +322,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 default:
                     if (IsWhiteSpace (character)) {
                         return this;
+                    } else  if (character == '(') {
+                        parentheses++;
+                        return this;
+                    } else if (character == ')') {
+                        throw new QueryParsingException ("Cannot have empty expressions.");
                     } else {
                         return new PropertyParser (token => new RootPropertyOperatorParser (
-                            token, expression => new ExpressionParser (expression, disjunction_priority, @operator))).OnCharacter (character);
+                            token, expression => new JoinedExpressionParser (
+                                expression, parentheses, priority, previous_handler))).OnCharacter (character);
                     }
                 }
             }
