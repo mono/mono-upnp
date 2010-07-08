@@ -73,9 +73,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     return this;
                 } else if (character == ')') {
                     if (parentheses == 0) {
-                        throw new QueryParsingException ("The parentheses are unbalenced.");
+                        throw new QueryParsingException ("The parentheses are unbalanced.");
                     } else {
-                        throw new QueryParsingException ("Cannot have empty expressions.");
+                        throw new QueryParsingException ("Empty expressions are not allowed.");
                     }
                 } else {
                     return new PropertyParser (token => new RootPropertyOperatorParser (
@@ -110,7 +110,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 } else if (character == ')') {
                     Parentheses--;
                     if (Parentheses < 0) {
-                        throw new QueryParsingException ("The parentheses are unbalenced.");
+                        throw new QueryParsingException ("The parentheses are unbalanced.");
                     } else {
                         return this;
                     }
@@ -151,7 +151,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected override Query OnDone ()
             {
                 if (Parentheses > 0) {
-                    throw new QueryParsingException ("The parentheses are unbalenced.");
+                    throw new QueryParsingException ("The parentheses are unbalanced.");
                 }
                 return Expression;
             }
@@ -258,7 +258,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                         parentheses++;
                         return this;
                     } else if (character == ')') {
-                        throw new QueryParsingException ("Cannot have empty expressions.");
+                        throw new QueryParsingException ("Expecting an expression after the conjunction.");
                     } else {
                         return new PropertyParser (token => new RootPropertyOperatorParser (
                             token, expression => new JoinedExpressionParser (
@@ -326,7 +326,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                         parentheses++;
                         return this;
                     } else if (character == ')') {
-                        throw new QueryParsingException ("Cannot have empty expressions.");
+                        throw new QueryParsingException ("Expecting an expression after the disjunction.");
                     } else {
                         return new PropertyParser (token => new RootPropertyOperatorParser (
                             token, expression => new JoinedExpressionParser (

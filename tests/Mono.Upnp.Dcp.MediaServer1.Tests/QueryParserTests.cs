@@ -638,6 +638,78 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             QueryParser.Parse (@"foo = ""bar"" or  ");
         }
 
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
+        public void UnbalancedOpeningParenthesis ()
+        {
+            QueryParser.Parse (")");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Empty expressions are not allowed.")]
+        public void OpeningEmptyParentheses ()
+        {
+            QueryParser.Parse ("()");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Empty expressions are not allowed.")]
+        public void ConjoinedEmptyParentheses ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" and ()");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Empty expressions are not allowed.")]
+        public void DisjoinedEmptyParentheses ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" or ()");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
+        public void UnbalencedEquasionStatement ()
+        {
+            QueryParser.Parse (@"foo = ""bar"")");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
+        public void UnbalencedExistsStatement ()
+        {
+            QueryParser.Parse (@"foo exists true )");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
+        public void UnbalencedConjunction ()
+        {
+            QueryParser.Parse (@"foo exists true and bar = ""bat"" )");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
+        public void UnbalencedDisjunction ()
+        {
+            QueryParser.Parse (@"foo exists true or bar = ""bat"" )");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Expecting an expression after the conjunction.")]
+        public void IllegalParenthesisWithConjunction ()
+        {
+            QueryParser.Parse (@"foo exists true and )");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Expecting an expression after the disjunction.")]
+        public void IllegalParenthesisWithDisjunction ()
+        {
+            QueryParser.Parse (@"foo exists true or )");
+        }
+
         void AssertEquality (Query expectedQuery, string actualQuery)
         {
             var expected_builder = new StringBuilder ();
