@@ -202,14 +202,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class ConjunctionParser : QueryParser
         {
-            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
-            readonly int priority;
-            int parentheses;
-
             const int a_state = 0;
             const int n_state = 1;
             const int d_state = 2;
 
+            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
+            readonly int priority;
+            int parentheses;
             int state;
 
             public ConjunctionParser (int parentheses,
@@ -281,13 +280,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class DisjunctionParser : QueryParser
         {
-            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
-            readonly int priority;
-            int parentheses;
-
             const int o_state = 0;
             const int r_state = 1;
 
+            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
+            readonly int priority;
+            int parentheses;
             int state;
 
             public DisjunctionParser (int parentheses,
@@ -431,6 +429,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         abstract class StringOperatorParser : TokenOperatorParser
         {
             readonly string @operator;
+
             int position;
 
             protected StringOperatorParser (string @operator, string property, Func<Query, QueryParser> consumer)
@@ -655,6 +654,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         class PropertyParser : QueryParser
         {
             readonly Func<string, QueryParser> consumer;
+
             StringBuilder builder = new StringBuilder ();
 
             public PropertyParser (Func<string, QueryParser> consumer)
@@ -683,6 +683,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             readonly string @operator;
             readonly Func<string, QueryParser> consumer;
+
             StringBuilder builder;
             bool escaped;
 
@@ -733,6 +734,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         class BooleanParser : QueryParser
         {
             readonly Func<bool, QueryParser> consumer;
+
             bool @true;
             int position;
 
@@ -807,9 +809,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public static Query Parse (string query)
         {
             QueryParser parser = new RootQueryParser ();
+
             foreach (var character in query) {
                 parser = parser.OnCharacter (character);
             }
+            
             return parser.OnDone ();
         }
     }
