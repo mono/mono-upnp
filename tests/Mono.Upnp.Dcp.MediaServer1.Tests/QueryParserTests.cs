@@ -653,14 +653,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
-        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Empty expressions are not allowed.")]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Expecting an expression after the conjunction.")]
         public void ConjoinedEmptyParentheses ()
         {
             QueryParser.Parse (@"foo = ""bar"" and ()");
         }
 
         [Test]
-        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Empty expressions are not allowed.")]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Expecting an expression after the disjunction.")]
         public void DisjoinedEmptyParentheses ()
         {
             QueryParser.Parse (@"foo = ""bar"" or ()");
