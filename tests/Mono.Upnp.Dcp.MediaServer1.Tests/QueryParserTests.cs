@@ -289,6 +289,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
+        public void WildCard ()
+        {
+            AssertEquality (visitor => visitor.VisitAllResults (), "*");
+        }
+
+        [Test]
+        public void WildCardWithWhiteSpace ()
+        {
+            AssertEquality (visitor => visitor.VisitAllResults (), " * ");
+        }
+
+        [Test]
         public void WhiteSpaceAroundOperator ()
         {
             var expected = new Property ("foo") == "bar";
@@ -710,6 +722,34 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         public void IllegalParenthesisWithDisjunction ()
         {
             QueryParser.Parse (@"foo exists true or )");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The wildcard must be used alone.")]
+        public void WildCardWithOpenParenthesis ()
+        {
+            QueryParser.Parse (@"* (foo exists true)");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
+        public void WildCardWithCloseParenthesis ()
+        {
+            QueryParser.Parse (@"* ) foo exists true)");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The wildcard must be used alone.")]
+        public void WildCardWithConjunction ()
+        {
+            QueryParser.Parse (@"* and foo exists true");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The wildcard must be used alone.")]
+        public void DoubleWildCards ()
+        {
+            QueryParser.Parse (@"* *");
         }
 
         void AssertEquality (Query expectedQuery, string actualQuery)

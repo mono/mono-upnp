@@ -53,6 +53,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class RootQueryParser : QueryParser
         {
+            const string wild_card_error_message = "The wildcard must be used alone.";
+
             int parentheses;
 
             public RootQueryParser ()
@@ -63,24 +65,43 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             {
                 if (IsWhiteSpace (character)) {
                     return this;
-                } else if (character == '(') {
-                    parentheses++;
-                    return this;
-                } else if (character == ')') {
-                    if (parentheses == 0) {
-                        throw new QueryParsingException ("The parentheses are unbalanced.");
+                } else if (character == '*') {
+                    if (parentheses == -1) {
+                        throw new QueryParsingException (wild_card_error_message);
                     } else {
+                        parentheses = -1;
+                        return this;
+                    }
+                } else if (character == '(') {
+                    if (parentheses == -1) {
+                        throw new QueryParsingException (wild_card_error_message);
+                    } else {
+                        parentheses++;
+                        return this;
+                    }
+                } else if (character == ')') {
+                    if (parentheses > 0) {
                         throw new QueryParsingException ("Empty expressions are not allowed.");
+                    } else {
+                        throw new QueryParsingException ("The parentheses are unbalanced.");
                     }
                 } else {
-                    return new PropertyParser (token => new RootPropertyOperatorParser (
-                        token, expression => new ExpressionParser (expression, parentheses))).OnCharacter (character);
+                    if (parentheses == -1) {
+                        throw new QueryParsingException (wild_card_error_message);
+                    } else {
+                        return new PropertyParser (token => new RootPropertyOperatorParser (token,
+                            expression => new ExpressionParser (expression, parentheses))).OnCharacter (character);
+                    }
                 }
             }
 
             protected override Query OnDone ()
             {
-                throw new QueryParsingException ("The query is empty.");
+                if (parentheses == -1) {
+                    return visitor => visitor.VisitAllResults ();
+                } else {
+                    throw new QueryParsingException ("The query is empty.");
+                }
             }
         }
 

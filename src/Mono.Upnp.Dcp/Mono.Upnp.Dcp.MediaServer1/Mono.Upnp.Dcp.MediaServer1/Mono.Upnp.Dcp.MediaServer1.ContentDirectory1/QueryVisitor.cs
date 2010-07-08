@@ -28,6 +28,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public class QueryVisitor
     {
+        public virtual void VisitAllResults ()
+        {
+        }
+
         public virtual void VisitEquals (string property, string value)
         {
             VisitPropertyExpression (property, value);
