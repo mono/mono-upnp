@@ -456,7 +456,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Whitespace is required around the operator: contains.")]
+            ExpectedMessage = "Unexpected operator begining: containe.")]
+        public void IncorrectContainsOperator ()
+        {
+            QueryParser.Parse (@"foo container ""bar""");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator begining: containsi.")]
         public void OverlongContainsOperator ()
         {
             QueryParser.Parse (@"foo containsing ""bar""");
@@ -516,6 +524,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         public void IllegallyLongFalseLiteral ()
         {
             QueryParser.Parse ("foo exists falserize");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "There is no operand for the operator: exists.")]
+        public void ExistsOperatorWithNoOperand ()
+        {
+            QueryParser.Parse ("foo exists ");
         }
 
         [Test]
@@ -693,10 +709,25 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
+        [ExpectedException (typeof (QueryParsingException),
+            ExpectedMessage = "Unexpected operator begining: n.")]
+        public void NeitherAndNorOr ()
+        {
+            QueryParser.Parse (@"foo = ""bar"" nor bat = ""baz""");
+        }
+
+        [Test]
         [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
-        public void UnbalancedEquasionStatement ()
+        public void BackHeavyUnbalancedEquasionStatement ()
         {
             QueryParser.Parse (@"foo = ""bar"")");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
+        public void FrontHeavyUnbalancedEquasionStatement ()
+        {
+            QueryParser.Parse (@"(foo = ""bar""");
         }
 
         [Test]

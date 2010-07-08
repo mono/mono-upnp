@@ -480,13 +480,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override QueryParser OnCharacter (char character)
             {
-                if (Initialized || position >= @operator.Length || character != @operator[position]) {
-                    var parser = base.OnCharacter (character);
-                    if (Initialized && position < @operator.Length) {
+                if (Initialized) {
+                    return base.OnCharacter (character);
+                } else if (position == @operator.Length) {
+                    if (IsWhiteSpace (character)) {
+                        return base.OnCharacter (character);
+                    } else {
+                        throw new QueryParsingException (string.Format (
+                            "Unexpected operator begining: {0}{1}.", @operator, character));
+                    }
+                } else if (character != @operator[position]) {
+                    if (IsWhiteSpace (character)) {
                         throw new QueryParsingException (string.Format (
                             "Unexpected operator: {0}.", @operator.Substring (0, position)));
+                    } else {
+                        throw new QueryParsingException (string.Format (
+                            "Unexpected operator begining: {0}{1}.", @operator.Substring (0, position), character));
                     }
-                    return parser;
                 } else {
                     position++;
                     return this;
@@ -803,9 +813,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override Query OnDone ()
             {
-                if (position == 0) {
-                    return Fail<Query> ();
-                } else if (@true) {
+                if (@true) {
                     if (position == "true".Length) {
                         return consumer (true).OnDone ();
                     } else {
