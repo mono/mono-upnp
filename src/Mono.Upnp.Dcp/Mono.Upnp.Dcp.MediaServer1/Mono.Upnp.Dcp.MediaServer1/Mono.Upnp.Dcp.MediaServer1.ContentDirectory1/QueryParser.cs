@@ -449,7 +449,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         abstract class StringOperatorParser : TokenOperatorParser
         {
             readonly string @operator;
-
             int position;
 
             protected StringOperatorParser (string @operator, string property, Func<Query, QueryParser> consumer)
@@ -674,7 +673,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         class PropertyParser : QueryParser
         {
             readonly Func<string, QueryParser> consumer;
-
             StringBuilder builder = new StringBuilder ();
 
             public PropertyParser (Func<string, QueryParser> consumer)
@@ -703,7 +701,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             readonly string @operator;
             readonly Func<string, QueryParser> consumer;
-
             StringBuilder builder;
             bool escaped;
 
@@ -754,7 +751,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         class BooleanParser : QueryParser
         {
             readonly Func<bool, QueryParser> consumer;
-
             bool @true;
             int position;
 
