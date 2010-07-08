@@ -199,6 +199,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
+        public void EscapedDoubleQuote ()
+        {
+            AssertEquality (new Property ("foo") == @"b""a""r", @"foo = ""b\""a\""r""");
+        }
+
+        [Test]
+        public void EscapedSlash ()
+        {
+            AssertEquality (new Property ("foo") == @"b\a\r", @"foo = ""b\\a\\r""");
+        }
+
+        [Test]
         public void AndOperator ()
         {
             AssertEquality (
@@ -750,6 +762,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         public void DoubleWildCards ()
         {
             QueryParser.Parse (@"* *");
+        }
+
+        [Test]
+        [ExpectedException (typeof (QueryParsingException), ExpectedMessage = @"Unexpected escape sequence: \t.")]
+        public void BadEscapeSequence ()
+        {
+            QueryParser.Parse (@"foo = ""\tbar""");
         }
 
         void AssertEquality (Query expectedQuery, string actualQuery)

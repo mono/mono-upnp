@@ -747,7 +747,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     } else  if (character == '"') {
                         builder.Append ('"');
                     } else {
-                        throw new QueryParsingException ("Unexpected escape sequence: \\" + character);
+                        throw new QueryParsingException (string.Format (
+                            "Unexpected escape sequence: \\{0}.", character));
                     }
                     escaped = false;
                     return this;
