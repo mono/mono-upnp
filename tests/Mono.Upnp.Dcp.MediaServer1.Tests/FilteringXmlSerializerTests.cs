@@ -40,8 +40,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             new XmlSerializer<FilteringContext> (
                 (serializer, type) => new FilteringDelegateSerializationCompiler (serializer, type));
 
-
-        const string bar = "www.bar.org";       const string foo = "www.foo.org";
+        const string foo = "www.foo.org";
+        const string bar = "www.bar.org";
         const string bat = "www.bat.org";
 
         [XmlType ("data", foo)]

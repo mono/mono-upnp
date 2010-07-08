@@ -36,7 +36,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
     [TestFixture]
     public class QueryParserTests
     {
-        #pragma warning disable 0659
+        #pragma warning disable 0660, 0661
         class Property
         {
             string name;
@@ -96,7 +96,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 return visitor => visitor.VisitGreaterThanOrEqualTo (property.name, value);
             }
         }
-        #pragma warning restore 0659
+        #pragma warning restore 0661, 0660
 
         static Query Conjoin (Query leftOperand, Query rightOperand)
         {
