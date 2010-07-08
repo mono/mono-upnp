@@ -35,10 +35,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         delegate TResult Func<T1, T2, TResult> (T1 argument1, T2 argument2);
         delegate TResult Func<T1, T2, T3, TResult> (T1 argument1, T2 argument2, T3 argument3);
 
-        const int disjunction_priority = 1;
-        const int conjunction_priority = 2;
-        const int parenthetical_priority = 3;
-
         protected abstract QueryParser OnCharacter (char character);
 
         protected abstract Query OnDone ();
@@ -91,6 +87,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class ExpressionParser : QueryParser
         {
+            const int disjunction_priority = 1;
+            const int conjunction_priority = 2;
+            const int parenthetical_priority = 3;
+
             protected readonly Query Expression;
             protected int Parentheses;
 
@@ -150,10 +150,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override Query OnDone ()
             {
-                if (Parentheses > 0) {
+                if (Parentheses == 0) {
+                    return Expression;
+                } else {
                     throw new QueryParsingException ("The parentheses are unbalanced.");
                 }
-                return Expression;
             }
         }
 
@@ -269,11 +270,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override Query OnDone ()
             {
-                if (state >= d_state) {
-                    throw new QueryParsingException ("Expecting an expression after the conjunction.");
-                } else {
+                if (state < d_state) {
                     throw new QueryParsingException (string.Format (
                         "Unexpected operator: {0}.", "and".Substring (0, state + 1)));
+                } else {
+                    throw new QueryParsingException ("Expecting an expression after the conjunction.");
                 }
             }
         }
@@ -337,10 +338,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override Query OnDone ()
             {
-                if (state >= r_state) {
-                    throw new QueryParsingException ("Expecting an expression after the disjunction.");
-                } else {
+                if (state < r_state) {
                     throw new QueryParsingException ("Unexpected operator: o.");
+                } else {
+                    throw new QueryParsingException ("Expecting an expression after the disjunction.");
                 }
             }
         }
@@ -402,13 +403,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected override QueryParser OnCharacter (char character)
             {
                 if (Initialized) {
-                    if (character == '"') {
-                        return GetOperandParser ();
-                    } else if (IsWhiteSpace (character)) {
+                    if (IsWhiteSpace (character)) {
                         return this;
                     } else {
-                        throw new QueryParsingException (string.Format (
-                            "Expecting double-quoted string operand with the operator: {0}.", Operator));
+                        return GetOperandParser ().OnCharacter (character);
                     }
                 } else if (IsWhiteSpace (character)) {
                     Initialized = true;
@@ -470,7 +468,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override QueryParser GetOperandParser ()
             {
-                return new StringParser (value => Consumer (visitor => visitor.VisitContains (Property, value)));
+                return new StringParser (Operator,
+                    value => Consumer (visitor => visitor.VisitContains (Property, value)));
             }
         }
 
@@ -479,15 +478,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             public ExistsParser (string property, Func<Query, QueryParser> consumer)
                 : base ("exists", property, consumer)
             {
-            }
-
-            protected override QueryParser OnCharacter (char character)
-            {
-                if (Initialized) {
-                    return GetOperandParser ().OnCharacter (character);
-                } else {
-                    return base.OnCharacter (character);
-                }
             }
 
             protected override QueryParser GetOperandParser ()
@@ -552,7 +542,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override QueryParser GetOperandParser ()
             {
-                return new StringParser (value => Consumer (visitor => visitor.VisitDerivedFrom (Property, value)));
+                return new StringParser (Operator,
+                    value => Consumer (visitor => visitor.VisitDerivedFrom (Property, value)));
             }
         }
 
@@ -565,7 +556,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override QueryParser GetOperandParser ()
             {
-                return new StringParser (value => Consumer (visitor => visitor.VisitDoesNotContain (Property, value)));
+                return new StringParser (Operator,
+                    value => Consumer (visitor => visitor.VisitDoesNotContain (Property, value)));
             }
         }
 
@@ -578,7 +570,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override QueryParser GetOperandParser ()
             {
-                return new StringParser (value => Consumer (visitor => visitor.VisitEquals (Property, value)));
+                return new StringParser (Operator,
+                    value => Consumer (visitor => visitor.VisitEquals (Property, value)));
             }
 
             protected override string Operator {
@@ -604,7 +597,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override QueryParser GetOperandParser ()
             {
-                return new StringParser (value => Consumer (visitor => visitor.VisitDoesNotEqual (Property, value)));
+                return new StringParser (Operator,
+                    value => Consumer (visitor => visitor.VisitDoesNotEqual (Property, value)));
             }
 
             protected override string Operator {
@@ -622,10 +616,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected override QueryParser GetOperandParser ()
             {
                 if (HasEqualsSign) {
-                    return new StringParser (
+                    return new StringParser (Operator,
                         value => Consumer (visitor => visitor.VisitLessThanOrEqualTo (Property, value)));
                 } else {
-                    return new StringParser (value => Consumer (visitor => visitor.VisitLessThan (Property, value)));
+                    return new StringParser (Operator,
+                        value => Consumer (visitor => visitor.VisitLessThan (Property, value)));
                 }
             }
 
@@ -644,10 +639,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected override QueryParser GetOperandParser ()
             {
                 if (HasEqualsSign) {
-                    return new StringParser (
+                    return new StringParser (Operator,
                         value => Consumer (visitor => visitor.VisitGreaterThanOrEqualTo (Property, value)));
                 } else {
-                    return new StringParser (
+                    return new StringParser (Operator,
                         value => Consumer (visitor => visitor.VisitGreaterThan (Property, value)));
                 }
             }
@@ -686,18 +681,28 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class StringParser : QueryParser
         {
+            readonly string @operator;
             readonly Func<string, QueryParser> consumer;
-            StringBuilder builder = new StringBuilder ();
+            StringBuilder builder;
             bool escaped;
 
-            public StringParser (Func<string, QueryParser> consumer)
+            public StringParser (string @operator, Func<string, QueryParser> consumer)
             {
+                this.@operator = @operator;
                 this.consumer = consumer;
             }
 
             protected override QueryParser OnCharacter (char character)
             {
-                if (escaped) {
+                if (builder == null) {
+                    if (character == '"') {
+                        builder = new StringBuilder ();
+                        return this;
+                    } else {
+                        throw new QueryParsingException (string.Format (
+                            "Expecting double-quoted string operand with the operator: {0}.", @operator));
+                    }
+                } else if (escaped) {
                     if (character == '\\') {
                         builder.Append ('\\');
                     } else  if (character == '"') {

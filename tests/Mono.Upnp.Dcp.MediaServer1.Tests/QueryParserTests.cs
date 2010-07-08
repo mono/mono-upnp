@@ -281,11 +281,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             AssertEquality (
                 Conjoin (
-                    Disjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                    Disjoin (new Property ("foo") == "bar", new Property ("bat").Exists (true)),
                     Conjoin (
-                        Disjoin (new Property ("name").Contains ("john"), new Property ("eyes") == "green"),
+                        Disjoin (new Property ("name").Contains ("john"), new Property ("eyes").Exists (false)),
                         new Property ("age") >= "21")),
-                @"(foo = ""bar"" or bat = ""baz"") and ((name contains ""john"" or eyes = ""green"") and age >= ""21"")");
+                @"(foo = ""bar"" or bat exists true) and ((name contains ""john"" or eyes exists false) and age >= ""21"")");
         }
 
         [Test]
@@ -670,28 +670,28 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
-        public void UnbalencedEquasionStatement ()
+        public void UnbalancedEquasionStatement ()
         {
             QueryParser.Parse (@"foo = ""bar"")");
         }
 
         [Test]
         [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
-        public void UnbalencedExistsStatement ()
+        public void UnbalancedExistsStatement ()
         {
             QueryParser.Parse (@"foo exists true )");
         }
 
         [Test]
         [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
-        public void UnbalencedConjunction ()
+        public void UnbalancedConjunction ()
         {
             QueryParser.Parse (@"foo exists true and bar = ""bat"" )");
         }
 
         [Test]
         [ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The parentheses are unbalanced.")]
-        public void UnbalencedDisjunction ()
+        public void UnbalancedDisjunction ()
         {
             QueryParser.Parse (@"foo exists true or bar = ""bat"" )");
         }
