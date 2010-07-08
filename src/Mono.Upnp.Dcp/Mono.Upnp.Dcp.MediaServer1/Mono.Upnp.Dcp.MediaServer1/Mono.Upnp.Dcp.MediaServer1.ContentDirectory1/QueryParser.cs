@@ -33,7 +33,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     {
         delegate TResult Func<T, TResult> (T argument);
         delegate TResult Func<T1, T2, TResult> (T1 argument1, T2 argument2);
-        delegate TResult Func<T1, T2, T3, TResult> (T1 argument1, T2 argument2, T3 argument3);
 
         protected abstract QueryParser OnCharacter (char character);
 
