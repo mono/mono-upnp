@@ -37,6 +37,26 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         {
         }
         
+        public AudioBroadcast (AudioBroadcastOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            this.UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var audio_broadcast_options = options as AudioBroadcastOptions;
+            if (audio_broadcast_options != null)
+            {
+                this.Region = audio_broadcast_options.Region;
+                this.RadioCallSign = audio_broadcast_options.RadioCallSign;
+                this.RadioStationId = audio_broadcast_options.RadioStationId;
+                this.RadioBand = audio_broadcast_options.RadioBand;    
+            }
+            
+            base.UpdateFromOptions (options);
+        }
+        
         [XmlElement ("region", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string Region { get; protected set; }
         

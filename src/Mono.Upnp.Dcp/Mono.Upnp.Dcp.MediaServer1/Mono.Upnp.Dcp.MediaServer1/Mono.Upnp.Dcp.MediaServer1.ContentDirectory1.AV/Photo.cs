@@ -33,11 +33,28 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class Photo : ImageItem
     {
-        readonly List<string> albums = new List<string> ();
+        List<string> albums = new List<string> ();
         
         protected Photo (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public Photo (PhotoOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var photo_options = options as PhotoOptions;
+            if (photo_options != null)
+            {
+                albums = new List<string> (photo_options.AlbumCollection);
+            }
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlArrayItem ("album", Schemas.UpnpSchema)]

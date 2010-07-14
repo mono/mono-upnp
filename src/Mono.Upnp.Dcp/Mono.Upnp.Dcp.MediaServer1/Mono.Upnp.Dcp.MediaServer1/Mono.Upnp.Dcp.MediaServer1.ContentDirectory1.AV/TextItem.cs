@@ -33,15 +33,44 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class TextItem : Item
     {
-        readonly List<PersonWithRole> authors = new List<PersonWithRole> ();
-        readonly List<string> publishers = new List<string> ();
-        readonly List<string> contributors = new List<string> ();
-        readonly List<Uri> relations = new List<Uri> ();
-        readonly List<string> rights = new List<string> ();
+        List<PersonWithRole> authors = new List<PersonWithRole> ();
+        List<string> publishers = new List<string> ();
+        List<string> contributors = new List<string> ();
+        List<Uri> relations = new List<Uri> ();
+        List<string> rights = new List<string> ();
         
         protected TextItem (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public TextItem (TextItemOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var text_item_options = options as TextItemOptions;
+            if (text_item_options != null)
+            {
+                Protection = text_item_options.Protection;
+                LongDescription = text_item_options.LongDescription;
+                Description = text_item_options.Description;
+                StorageMedium = text_item_options.StorageMedium;
+                Rating = text_item_options.Rating;
+                Date = text_item_options.Date;
+                Language = text_item_options.Language;
+                
+                authors = new List<PersonWithRole> (text_item_options.AuthorCollection);
+                publishers = new List<string> (text_item_options.PublisherCollection);
+                contributors = new List<string> (text_item_options.ContributorCollection);
+                relations = new List<Uri> (text_item_options.RelationCollection);
+                rights = new List<string> (text_item_options.RightsCollections);
+            }
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlArrayItemAttribute ("author", Schemas.UpnpSchema)]

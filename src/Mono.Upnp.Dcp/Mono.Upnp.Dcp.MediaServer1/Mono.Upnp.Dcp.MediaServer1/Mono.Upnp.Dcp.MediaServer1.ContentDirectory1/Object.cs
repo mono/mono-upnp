@@ -28,13 +28,15 @@ using System;
 using System.Collections.Generic;
 
 using Mono.Upnp.Xml;
+using System.Reflection;
+using System.Collections;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class Object : XmlAutomatable
     {
         readonly ContentDirectory content_directory;
-        readonly List<Resource> resources = new List<Resource> ();
+        List<Resource> resources = new List<Resource> ();
         bool is_restricted;
         string title;
         string creator;
@@ -49,6 +51,24 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             Id = contentDirectory.GetNewObjectId ();
             ParentId = parent == null ? "-1" : parent.Id;
             Class = new Class (ClassManager.GetClassNameFromType (GetType ()));
+        }
+        
+        public Object (ObjectOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            if (options == null) throw new ArgumentNullException ("options");
+            
+            UpdateFromOptions (options);
+        }
+        
+        public virtual void UpdateFromOptions (ObjectOptions options)
+        {
+            Title = options.Title;
+            creator = options.Creator;
+            WriteStatus = options.WriteStatus;
+            resources = new List<Resource> (options.ResourceCollection);
+            
+            //TODO: plug client-server sync logic somewhere hereabouts.
         }
         
         protected void OnUpdate ()

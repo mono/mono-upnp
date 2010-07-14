@@ -33,14 +33,36 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class MusicAlbum : Album
     {
-        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
-        readonly List<string> producers = new List<string> ();
-        readonly List<string> genres = new List<string> ();
-        readonly List<Uri> album_art_uris = new List<Uri> ();
+        List<PersonWithRole> artists = new List<PersonWithRole> ();
+        List<string> producers = new List<string> ();
+        List<string> genres = new List<string> ();
+        List<Uri> album_art_uris = new List<Uri> ();
         
         protected MusicAlbum (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public MusicAlbum (MusicAlbumOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var music_album_options = options as MusicAlbumOptions;
+            if (music_album_options != null)
+            {
+                Toc = music_album_options.Toc;
+                
+                artists = new List<PersonWithRole> (music_album_options.ArtistCollection);
+                producers = new List<string> (music_album_options.ProducerCollection);
+                genres = new List<string> (music_album_options.GenreCollection);
+                album_art_uris = new List<Uri> (music_album_options.AlbumArtUriCollection);
+            }
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]

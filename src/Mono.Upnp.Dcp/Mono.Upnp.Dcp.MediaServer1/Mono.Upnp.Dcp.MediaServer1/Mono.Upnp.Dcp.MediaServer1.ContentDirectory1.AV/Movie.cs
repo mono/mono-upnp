@@ -33,12 +33,34 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class Movie : VideoItem
     {
-        readonly List<DateTime> scheduled_start_times = new List<DateTime>();
-        readonly List<DateTime> scheduled_end_times = new List<DateTime>();
+        List<DateTime> scheduled_start_times = new List<DateTime> ();
+        List<DateTime> scheduled_end_times = new List<DateTime> ();
         
-        public Movie (ContentDirectory contentDirectory, Container parent)
+        protected Movie (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public Movie (MovieOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var movie_options = options as MovieOptions;
+            if (movie_options != null)
+            {
+                StorageMedium = movie_options.StorageMedium;
+                DvdRegionCode = movie_options.DvdRegionCode;
+                ChannelName = movie_options.ChannelName;
+                
+                scheduled_start_times = new List<DateTime> (movie_options.ScheduledStartTimeCollection);
+                scheduled_end_times = new List<DateTime> (movie_options.ScheduledEndTimeCollection);
+            }            
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]

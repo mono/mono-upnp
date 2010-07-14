@@ -33,12 +33,33 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class AudioBook : AudioItem
     {
-        readonly List<string> producers = new List<string> ();
-        readonly List<string> contributors = new List<string> ();
+        List<string> producers = new List<string> ();
+        List<string> contributors = new List<string> ();
         
         protected AudioBook (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public AudioBook (AudioBookOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            this.UpdateFromOptions(options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var audio_book_options = options as AudioBookOptions;
+            if (audio_book_options != null)
+            {
+                this.StorageMedium = audio_book_options.StorageMedium;
+                this.Date = audio_book_options.Date;
+                
+                producers = new List<string> (audio_book_options.ProducerCollection);
+                contributors = new List<string> (audio_book_options.ContributorCollection);
+            }
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]

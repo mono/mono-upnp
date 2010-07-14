@@ -33,12 +33,36 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class PlaylistItem : Item
     {
-        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
-        readonly List<string> genres = new List<string> ();
+        List<PersonWithRole> artists = new List<PersonWithRole> ();
+        List<string> genres = new List<string> ();
         
         protected PlaylistItem (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public PlaylistItem (PlaylistItemOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var playlist_item_options = options as PlaylistItemOptions;
+            if (playlist_item_options != null)
+            {
+                LongDescription = playlist_item_options.LongDescription;
+                Description = playlist_item_options.Description;
+                StorageMedium = playlist_item_options.StorageMedium;
+                Date = playlist_item_options.Date;
+                Language = playlist_item_options.Language;
+                
+                artists = new List<PersonWithRole> (playlist_item_options.ArtistCollection);
+                genres = new List<string> (playlist_item_options.GenreCollection);
+            }
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]
