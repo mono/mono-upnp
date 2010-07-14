@@ -169,7 +169,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 }
                 
                 var context = listener.EndGetContext (result);
-                GetFile (context.Response, context.Request.Url.Query);
+                var query = context.Request.Url.Query;
+                
+                if (query.StartsWith ("?id="))
+                {
+                    GetFile (context.Response, query);
+                } else if (query.StartsWith ("?art="))
+                {
+                    GetArtwork (context.Response, query);
+                } else
+                {
+                    context.Response.StatusCode = 404;
+                }
                 
                 listener.BeginGetContext (OnGotContext, null);
             }
@@ -190,6 +201,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                     return;
                 }
                 
+                Console.WriteLine ("Serving music for: {0}", object_cache[id].Path);
+                
                 if (id >= object_cache.Count) {
                     response.StatusCode = 404;
                     return;
@@ -199,6 +212,55 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                     using (var reader = System.IO.File.OpenRead (object_cache[id].Path)) {
                         response.ContentType = "audio/mpeg";
                         response.ContentLength64 = reader.Length;
+                        using (var stream = response.OutputStream) {
+                            using (var writer = new BinaryWriter (stream)) {
+                                var buffer = new byte[8192];
+                                int read;
+                                do {
+                                    read = reader.Read (buffer, 0, buffer.Length);
+                                    writer.Write (buffer, 0, read);
+                                } while (started && read > 0);
+                            }
+                        }
+                    }
+                } catch {
+                }
+            }
+        }
+        
+        void GetArtwork (HttpListenerResponse response, string query)
+        {
+            using (response) {
+                if (query.Length < 5) {
+                    response.StatusCode = 404;
+                    return;
+                }
+                
+                int id;
+                
+                if (!int.TryParse (query.Substring (4), out id)) {
+                    response.StatusCode = 404;
+                    return;
+                }
+                
+                Console.WriteLine ("Serving artwork for: {0}", object_cache[id].Path);
+                
+                if (id >= object_cache.Count) {
+                    response.StatusCode = 404;
+                    return;
+                }
+                
+                var picture = GetAlbumArt (object_cache[id].Path);
+                if (picture == null)
+                {
+                    response.StatusCode = 404;
+                    return;
+                }
+        
+                try {
+                    using (var reader = new BinaryReader (new MemoryStream (picture.Data.Data))) {
+                        response.ContentType = picture.MimeType;
+                        response.ContentLength64 = picture.Data.Data.Length;
                         using (var stream = response.OutputStream) {
                             using (var writer = new BinaryWriter (stream)) {
                                 var buffer = new byte[8192];
@@ -283,26 +345,66 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         {
             switch (Path.GetExtension (path)) {
             case ".mp3":
-                var music_track = new MusicTrack (this, parent) {
-                    Title = Path.GetFileNameWithoutExtension (path),
-                    IsRestricted = true
-                };
-                music_track.AddResource (new Resource (new ResourceSettings (
-                    new Uri (string.Format ("{0}object?id={1}", prefix, music_track.Id))) {
-                    ProtocolInfo = "http-get:*:audio/mpeg:*"
-                }));
-                return music_track;
+                return GetTrack(path, parent);
             case ".avi":
-                return new Movie (this, parent) {
-                    Title = Path.GetFileNameWithoutExtension (path),
-                    IsRestricted = true
-                };
+//                return new Movie (this, parent) {
+//                    Title = Path.GetFileNameWithoutExtension (path),
+//                    IsRestricted = true
+//                };
             default:
                 return new File (this, parent) {
                     Title = Path.GetFileNameWithoutExtension (path),
                     IsRestricted = true
                 };
             }
+        }
+        
+        private MusicTrack GetTrack(string path, Container parent)
+        {
+            var tags = TagLib.File.Create (path);
+            
+            var options = new MusicTrackOptions
+            {
+                Title = tags.Tag.Title,
+                OriginalTrackNumber = (int)tags.Tag.Track
+            };
+            
+            foreach (var artist in tags.Tag.Performers) {
+                options.ArtistCollection.Add (new PersonWithRole { Name = artist });
+            }
+            
+            options.AlbumCollection.Add (tags.Tag.Album);
+            
+            var track = new MusicTrack(options, this, parent);
+            var resourceSettings = new ResourceSettings
+                (new Uri (string.Format ("{0}object?id={1}", prefix, track.Id)))
+                {
+                    ProtocolInfo = "http-get:*:audio/mpeg:*",
+                    Size = (ulong)new FileInfo(path).Length,
+                    Duration = tags.Properties.Duration,
+                    Bitrate = (uint)tags.Properties.AudioBitrate,
+                    NrAudioChannels = (uint)tags.Properties.AudioChannels
+                };
+            track.AddResource (new Resource (resourceSettings));
+            
+            options = new MusicTrackOptions(track);
+            options.AlbumArtURI = new Uri (string.Format ("{0}object?art={1}", prefix, track.Id));
+            
+            track.UpdateFromOptions (options);
+            
+            return track;
+        }
+        
+        TagLib.IPicture GetAlbumArt (string path)
+        {
+            var tags = TagLib.File.Create (path);
+            
+            if (tags.Tag.Pictures.Length > 0)
+            {
+                return tags.Tag.Pictures [0];
+            }
+            
+            return null;
         }
         
         void CreateFolder (string path, StorageFolder parent)
