@@ -2,9 +2,9 @@
 // CollectionMap.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -98,7 +98,9 @@ namespace Mono.Upnp.Internal
         
         void CheckReadOnly ()
         {
-            if (is_read_only) throw new NotSupportedException ("The collection is read-only.");
+            if (is_read_only) {
+                throw new NotSupportedException ("The collection is read-only.");
+            }
         }
     }
 }

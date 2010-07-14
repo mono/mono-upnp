@@ -75,7 +75,7 @@ namespace Mono.Upnp.Tests
         {
             reader.ReadToFollowing ("scpd");
             return XmlDeserializer.Deserialize (reader, context => DeserializeServiceController (
-                new DummyService (new ServiceType ("urn:schemas-upnp-org:service:mono-upnp-test-service:1"), "testService1"), context));
+                new DummyService (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)), "testService1"), context));
         }
     }
 }

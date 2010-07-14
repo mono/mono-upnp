@@ -2,7 +2,7 @@
 // Protocol.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -39,6 +39,7 @@ namespace Mono.Upnp.Internal
         public const string SoapEnvelopeSchema = "http://schemas.xmlsoap.org/soap/envelope/";
         public const string SoapEncodingSchema = "http://schemas.xmlsoap.org/soap/encoding/";
         // TODO make this better
-        public readonly static string UserAgent = string.Format ("{0}/{1} UPnp/1.1 Mono.Upnp/1.0", Environment.OSVersion.Platform, Environment.OSVersion.Version);
+        public readonly static string UserAgent = string.Format (
+            "{0}/{1} UPnp/1.1 Mono.Upnp/1.0", Environment.OSVersion.Platform, Environment.OSVersion.Version);
     }
 }

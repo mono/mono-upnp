@@ -2,9 +2,9 @@
 // Root.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,9 @@ namespace Mono.Upnp
         protected internal Root (Deserializer deserializer, Uri url)
             : base (deserializer)
         {
-            if (url == null) throw new ArgumentNullException ("url");
+            if (url == null) {
+                throw new ArgumentNullException ("url");
+            }
             
             UrlBase = url;
         }
@@ -53,7 +55,12 @@ namespace Mono.Upnp
         {
         }
         
-        public Root (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, RootDeviceOptions options)
+        public Root (DeviceType type,
+                     string udn,
+                     string friendlyName,
+                     string manufacturer,
+                     string modelName,
+                     RootDeviceOptions options)
         {
             var embedded_devices = options != null ? options.EmbeddedDevices : null;
             RootDevice = new Device (type, udn, friendlyName, manufacturer, modelName, options, embedded_devices);
@@ -107,30 +114,22 @@ namespace Mono.Upnp
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoDeserializeAttribute (this);
+            AutoDeserializeAttribute (this, context);
         }
         
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoDeserializeElement (this);
+            AutoDeserializeElement (this, context);
         }
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeObjectAndMembers (this);
+            AutoSerializeObjectAndMembers (this, context);
         }
         
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembersOnly (this, context);
         }
     }
 }

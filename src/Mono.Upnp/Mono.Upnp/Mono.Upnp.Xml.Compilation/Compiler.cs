@@ -56,17 +56,5 @@ namespace Mono.Upnp.Xml.Compilation
                 }
             }
         }
-        
-        protected IEnumerable<MethodInfo> Methods {
-            get {
-                foreach (var method in type.GetMethods (BindingFlags.Instance | BindingFlags.Public)) {
-                    yield return method;
-                }
-                
-                foreach (var method in type.GetMethods (BindingFlags.Instance | BindingFlags.NonPublic)) {
-                    yield return method;
-                }
-            }
-        }
     }
 }

@@ -93,7 +93,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual int? OriginalTrackNumber { get; protected set; }
         
         [XmlArrayItem ("playlist", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> PlaylistCollections {
+        protected virtual ICollection<string> PlaylistCollection {
             get { return playlists; }
         }
         

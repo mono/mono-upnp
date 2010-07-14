@@ -34,7 +34,7 @@ namespace Mono.Upnp.Dcp.MediaServer1
 {
     public class MediaServer : IDisposable
     {
-        public static readonly DeviceType DeviceType = new DeviceType ("urn:schemas-upnp-org:device:MediaServer:1");
+        public static readonly DeviceType DeviceType = new DeviceType ("schemas-upnp-org", "MediaServer", new Version (1, 0));
         
         Server server;
         readonly ContentDirectory content_directory;

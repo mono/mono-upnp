@@ -2,7 +2,7 @@
 // ServiceAction.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -46,10 +46,12 @@ namespace Mono.Upnp.Control
         protected internal ServiceAction (Deserializer deserializer, ServiceController controller)
             : base (deserializer)
         {
-            if (controller == null) throw new ArgumentNullException ("controller");
+            if (controller == null) {
+                throw new ArgumentNullException ("controller");
+            }
 
             this.controller = controller;
-            arguments = new CollectionMap<string, Argument> ();
+            this.arguments = new CollectionMap<string, Argument> ();
         }
         
         public ServiceAction (string name, IEnumerable<Argument> arguments, ServiceActionExecutor executor)
@@ -60,7 +62,9 @@ namespace Mono.Upnp.Control
         
         protected ServiceAction (IEnumerable<Argument> arguments, ServiceActionExecutor executor)
         {
-            if (executor == null) throw new ArgumentNullException ("executor");
+            if (executor == null) {
+                throw new ArgumentNullException ("executor");
+            }
             
             this.arguments = Helper.MakeReadOnlyCopy<string, Argument> (arguments);
             this.executor = executor;
@@ -109,8 +113,11 @@ namespace Mono.Upnp.Control
         
         protected internal virtual IDictionary<string, string> Execute (IDictionary<string, string> arguments)
         {
-            if (executor == null) throw new InvalidOperationException (
-                "This ServiceAction was create for deserialization and cannot be executed locally. Use the Invoke method to invoke the action across the network.");
+            if (executor == null) {
+                throw new InvalidOperationException (
+                    "This ServiceAction was create for deserialization and cannot be executed locally. " +
+                    "Use the Invoke method to invoke the action across the network.");
+            }
             
             return executor (arguments);
         }
@@ -168,23 +175,17 @@ namespace Mono.Upnp.Control
         
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoDeserializeElement (this);
+            AutoDeserializeElement (this, context);
         }
 
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeObjectAndMembers (this);
+            AutoSerializeObjectAndMembers (this, context);
         }
 
         protected override void SerializeMembersOnly (Mono.Upnp.Xml.XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembersOnly (this, context);
         }
         
         string IMappable<string>.Map ()

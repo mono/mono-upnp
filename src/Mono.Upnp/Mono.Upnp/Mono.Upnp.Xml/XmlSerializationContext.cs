@@ -2,9 +2,9 @@
 // XmlSerializationContext.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,8 @@ namespace Mono.Upnp.Xml
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            serializer.AutoSerializeObjectAndMembers (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
+            serializer.AutoSerializeObjectAndMembers (obj,
+                new XmlSerializationContext<TContext> (serializer, Writer, context));
         }
         
         public override void AutoSerializeMembersOnly<TObject> (TObject obj)
@@ -90,7 +91,8 @@ namespace Mono.Upnp.Xml
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            serializer.AutoSerializeMembersOnly (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
+            serializer.AutoSerializeMembersOnly (obj,
+                new XmlSerializationContext<TContext> (serializer, Writer, context));
         }
         
         public override void Serialize<TObject> (TObject obj)

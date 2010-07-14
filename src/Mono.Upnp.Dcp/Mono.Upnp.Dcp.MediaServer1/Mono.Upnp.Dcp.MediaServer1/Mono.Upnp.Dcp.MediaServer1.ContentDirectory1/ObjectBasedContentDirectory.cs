@@ -77,9 +77,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         readonly XmlSerializer serializer = new XmlSerializer ();
         
-        protected override string Browse (string objectId, BrowseFlag browseFlag, string filter, int startIndex,
-                                          int requestCount, string sortCriteria, out int numberReturned,
-                                          out int totalMatches, out string updateId)
+        protected override string Browse (string objectId,
+                                          BrowseFlag browseFlag,
+                                          string filter,
+                                          int startIndex,
+                                          int requestCount,
+                                          string sortCriteria,
+                                          out int numberReturned,
+                                          out int totalMatches,
+                                          out string updateId)
         {
             updateId = "0";
             if (browseFlag == BrowseFlag.BrowseDirectChildren) {
@@ -103,8 +109,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
         
-        protected abstract IEnumerable<IXmlSerializable> GetChildren (string objectId, int startIndex, int requestCount,
-                                                                        string sortCriteria, out int totalMatches);
+        protected abstract IEnumerable<IXmlSerializable> GetChildren (string objectId,
+                                                                      int startIndex,
+                                                                      int requestCount,
+                                                                      string sortCriteria,
+                                                                      out int totalMatches);
         
         protected abstract IXmlSerializable GetObject (string objectId);
     }

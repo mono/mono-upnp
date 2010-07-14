@@ -1,10 +1,10 @@
 // 
-// DeserializerFactory.cs
+// DummyContentDirectory.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using Mono.Upnp.Xml;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
-namespace Mono.Upnp
+namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
-    public class DeserializerFactory
+    public class DummyContentDirectory : ContentDirectory
     {
-        public virtual Deserializer CreateDeserializer (XmlDeserializer xmlDeserializer)
+        protected override string SearchCapabilities {
+            get { return string.Empty; }
+        }
+     
+     
+        protected override string SortCapabilities {
+            get { return string.Empty; }
+        }
+     
+     
+        protected override string Browse (string objectId,
+                                          BrowseFlag browseFlag,
+                                          string filter,
+                                          int startIndex,
+                                          int requestCount,
+                                          string sortCriteria,
+                                          out int numberReturned,
+                                          out int totalMatches,
+                                          out string updateId)
         {
-            return new Deserializer (xmlDeserializer);
+            throw new System.NotImplementedException();
         }
     }
 }
+

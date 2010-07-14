@@ -2,9 +2,9 @@
 // Arguments.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,10 @@ namespace Mono.Upnp.Internal
         {
         }
         
-        public Arguments (string serviceType, string actionName, IDictionary<string, string> arguments, bool response)
+        public Arguments (string serviceType,
+                          string actionName,
+                          IDictionary<string, string> arguments,
+                          bool response)
         {
             ServiceType = serviceType;
             ActionName = actionName;

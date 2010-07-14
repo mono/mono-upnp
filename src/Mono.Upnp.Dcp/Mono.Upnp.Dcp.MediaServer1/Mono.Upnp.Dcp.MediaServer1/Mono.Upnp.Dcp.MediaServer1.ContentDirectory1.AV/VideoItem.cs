@@ -53,8 +53,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         
         public override void UpdateFromOptions (ObjectOptions options)
         {
-            base.UpdateFromOptions (options);
-            
             var video_item_options = options as VideoItemOptions;
             if (video_item_options != null)
             {
@@ -69,6 +67,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
                 publishers = new List<string> (video_item_options.PublisherCollection);
                 relations = new List<Uri> (video_item_options.RelationCollection);
             }
+
+            base.UpdateFromOptions (options);
         }
         
         [XmlArrayItemAttribute ("genre", Schemas.UpnpSchema)]

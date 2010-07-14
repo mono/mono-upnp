@@ -2,9 +2,9 @@
 // XmlDeserializer.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,17 +36,19 @@ namespace Mono.Upnp.Xml
     
     public sealed class XmlDeserializer
     {
-        readonly DeserializationCompilerFactory factory;
-        readonly Dictionary<Type, DeserializationCompiler> compilers = new Dictionary<Type, DeserializationCompiler> ();
+        readonly DeserializationCompilerProvider compiler_provider;
+        readonly Dictionary<Type, DeserializationCompiler> compilers =
+            new Dictionary<Type, DeserializationCompiler> ();
         
         public XmlDeserializer ()
             : this (null)
         {
         }
         
-        public XmlDeserializer (DeserializationCompilerFactory factory)
+        public XmlDeserializer (DeserializationCompilerProvider compilerProvider)
         {
-            this.factory = factory ?? new DelegateDeserializationCompilerFactory ();
+            this.compiler_provider = compilerProvider ?? ((xmlDeserializer, type) =>
+                new DelegateDeserializationCompiler (xmlDeserializer, type));
         }
         
         public T Deserialize<T> (XmlReader reader)
@@ -94,7 +96,7 @@ namespace Mono.Upnp.Xml
         {
             DeserializationCompiler compiler;
             if (!compilers.TryGetValue (type, out compiler)) {
-                compiler = factory.CreateDeserializationCompiler (this, type);
+                compiler = compiler_provider (this, type);
                 compilers[type] = compiler;
             }
             return compiler;

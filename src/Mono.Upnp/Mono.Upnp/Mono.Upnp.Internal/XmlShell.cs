@@ -2,9 +2,9 @@
 // XmlShell.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2010 Scott Peterson
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -78,7 +78,7 @@ namespace Mono.Upnp.Internal
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            throw new InvalidOperationException ("A XmlShell cannot be the root of a serialization operation.");
+            throw new InvalidOperationException ("An XmlShell cannot be the root of a serialization operation.");
         }
     }
 }

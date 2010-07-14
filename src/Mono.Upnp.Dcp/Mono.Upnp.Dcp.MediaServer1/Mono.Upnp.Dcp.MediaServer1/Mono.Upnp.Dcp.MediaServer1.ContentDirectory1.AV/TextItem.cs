@@ -67,7 +67,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
                 publishers = new List<string> (text_item_options.PublisherCollection);
                 contributors = new List<string> (text_item_options.ContributorCollection);
                 relations = new List<Uri> (text_item_options.RelationCollection);
-                rights = new List<string> (text_item_options.RightsCollections);
+                rights = new List<string> (text_item_options.RightsCollection);
             }
             
             base.UpdateFromOptions (options);
@@ -131,7 +131,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual string Language { get; protected set; }
         
         [XmlArrayItem ("rights", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> RightsCollections {
+        protected virtual ICollection<string> RightsCollection {
             get { return rights; }
         }
         

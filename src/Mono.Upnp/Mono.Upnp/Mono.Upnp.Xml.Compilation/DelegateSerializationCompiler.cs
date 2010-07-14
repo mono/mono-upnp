@@ -64,10 +64,14 @@ namespace Mono.Upnp.Xml.Compilation
                 prefix = type_attribute.Prefix;
             }
             
-            return CreateTypeAutoSerializer (name, @namespace, prefix, namespaces.Count == 0 ? null : namespaces.ToArray ());
+            return CreateTypeAutoSerializer (
+                name, @namespace, prefix, namespaces.Count == 0 ? null : namespaces.ToArray ());
         }
         
-        protected virtual Serializer<TContext> CreateTypeAutoSerializer (string name, string @namespace, string prefix, IEnumerable<XmlNamespaceAttribute> namespaces)
+        protected virtual Serializer<TContext> CreateTypeAutoSerializer (string name,
+                                                                         string @namespace,
+                                                                         string prefix,
+                                                                         IEnumerable<XmlNamespaceAttribute> namespaces)
         {
             var next = MemberSerializer;
             
@@ -116,7 +120,9 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        protected virtual void ProcessProperty (PropertyInfo property, ICollection<Serializer<TContext>> attributeSerializers, ICollection<Serializer<TContext>> elementSerializers)
+        protected virtual void ProcessProperty (PropertyInfo property,
+                                                ICollection<Serializer<TContext>> attributeSerializers,
+                                                ICollection<Serializer<TContext>> elementSerializers)
         {
             XmlAttributeAttribute attribute_attribute = null;
             XmlElementAttribute element_attribute = null;
@@ -173,21 +179,29 @@ namespace Mono.Upnp.Xml.Compilation
             }
             
             if (attribute_attribute != null) {
-                attributeSerializers.Add (CreateSerializer (property, CreateAttributeSerializer (property, attribute_attribute)));
+                attributeSerializers.Add (
+                    CreateSerializer (property, CreateAttributeSerializer (property, attribute_attribute)));
             } else if (element_attribute != null) {
-                elementSerializers.Add (CreateSerializer (property, CreateElementSerializer (property, element_attribute)));
+                elementSerializers.Add (
+                    CreateSerializer (property, CreateElementSerializer (property, element_attribute)));
             } else if (flag_attribute != null) {
-                elementSerializers.Add (CreateSerializer (property, CreateFlagSerializer (property, flag_attribute)));
+                elementSerializers.Add (
+                    CreateSerializer (property, CreateFlagSerializer (property, flag_attribute)));
             } else if (array_attribute != null) {
-                elementSerializers.Add (CreateSerializer (property, CreateArraySerializer (property, array_attribute, array_item_attribute)));
+                elementSerializers.Add (
+                    CreateSerializer (property,
+                        CreateArraySerializer (property, array_attribute, array_item_attribute)));
             } else if (array_item_attribute != null) {
-                elementSerializers.Add (CreateSerializer (property, CreateArrayItemSerializer (property, array_item_attribute)));
+                elementSerializers.Add (
+                    CreateSerializer (property, CreateArrayItemSerializer (property, array_item_attribute)));
             } else if (value_attribute != null) {
-                elementSerializers.Add (CreateSerializer (property, CreateValueSerializer (property)));
+                elementSerializers.Add (
+                    CreateSerializer (property, CreateValueSerializer (property)));
             }
         }
         
-        protected virtual Serializer<TContext> CreateSerializer (PropertyInfo property, Serializer<TContext> serializer)
+        protected virtual Serializer<TContext> CreateSerializer (PropertyInfo property,
+                                                                 Serializer<TContext> serializer)
         {
             return (obj, context) => serializer (property.GetValue (obj, null), context);
         }
@@ -205,7 +219,8 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        Serializer<TContext> CreateAttributeSerializer (PropertyInfo property, XmlAttributeAttribute attributeAttribute)
+        protected virtual Serializer<TContext> CreateAttributeSerializer (PropertyInfo property,
+                                                                          XmlAttributeAttribute attributeAttribute)
         {
             return CreateSerializer (
                 CreateAttributeSerializer (
@@ -216,7 +231,10 @@ namespace Mono.Upnp.Xml.Compilation
                 attributeAttribute.OmitIfNull);
         }
         
-        protected virtual Serializer<TContext> CreateAttributeSerializer (PropertyInfo property, string name, string @namespace, string prefix)
+        protected virtual Serializer<TContext> CreateAttributeSerializer (PropertyInfo property,
+                                                                          string name,
+                                                                          string @namespace,
+                                                                          string prefix)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -229,12 +247,14 @@ namespace Mono.Upnp.Xml.Compilation
                 };
             } else {
                 return (obj, context) => {
-                    context.Writer.WriteAttributeString (prefix, name, @namespace, obj != null ? obj.ToString () : string.Empty);
+                    context.Writer.WriteAttributeString (
+                        prefix, name, @namespace, obj != null ? obj.ToString () : string.Empty);
                 };
             }
         }
         
-        Serializer<TContext> CreateElementSerializer (PropertyInfo property, XmlElementAttribute elementAttribute)
+        protected virtual Serializer<TContext> CreateElementSerializer (PropertyInfo property,
+                                                                        XmlElementAttribute elementAttribute)
         {
             return CreateSerializer (
                 CreateElementSerializer (
@@ -245,7 +265,10 @@ namespace Mono.Upnp.Xml.Compilation
                 elementAttribute.OmitIfNull);
         }
         
-        protected virtual Serializer<TContext> CreateElementSerializer (PropertyInfo property, string name, string @namespace, string prefix)
+        protected virtual Serializer<TContext> CreateElementSerializer (PropertyInfo property,
+                                                                        string name,
+                                                                        string @namespace,
+                                                                        string prefix)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -259,7 +282,9 @@ namespace Mono.Upnp.Xml.Compilation
             };
         }
         
-        Serializer<TContext> CreateArraySerializer (PropertyInfo property, XmlArrayAttribute arrayAttribute, XmlArrayItemAttribute arrayItemAttribute)
+        protected virtual Serializer<TContext> CreateArraySerializer (PropertyInfo property,
+                                                                      XmlArrayAttribute arrayAttribute,
+                                                                      XmlArrayItemAttribute arrayItemAttribute)
         {
             return CreateSerializer (
                 CreateArraySerializer (
@@ -272,7 +297,12 @@ namespace Mono.Upnp.Xml.Compilation
                 arrayAttribute.OmitIfNull);
         }
         
-        protected virtual Serializer<TContext> CreateArraySerializer (PropertyInfo property, string name, string @namespace, string prefix, bool omitIfEmpty, XmlArrayItemAttribute arrayItemAttribute)
+        protected virtual Serializer<TContext> CreateArraySerializer (PropertyInfo property,
+                                                                      string name,
+                                                                      string @namespace,
+                                                                      string prefix,
+                                                                      bool omitIfEmpty,
+                                                                      XmlArrayItemAttribute arrayItemAttribute)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -309,7 +339,8 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        Serializer<TContext> CreateArrayItemSerializer (Type type, XmlArrayItemAttribute arrayItemAttribute)
+        protected virtual Serializer<TContext> CreateArrayItemSerializer (Type type,
+                                                                          XmlArrayItemAttribute arrayItemAttribute)
         {
             if (arrayItemAttribute == null || string.IsNullOrEmpty (arrayItemAttribute.Name)) {
                 return GetCompilerForType (type).TypeSerializer;
@@ -326,7 +357,8 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        Serializer<TContext> CreateArrayItemSerializer (PropertyInfo property, XmlArrayItemAttribute arrayItemAttribute)
+        protected virtual Serializer<TContext> CreateArrayItemSerializer (PropertyInfo property,
+                                                                          XmlArrayItemAttribute arrayItemAttribute)
         {
             if (!property.CanRead) {
                 // TODO throw
@@ -335,7 +367,8 @@ namespace Mono.Upnp.Xml.Compilation
             if (string.IsNullOrEmpty (arrayItemAttribute.Name)) {
                 return CreateArrayItemSerializer (property);
             } else {
-                return CreateArrayItemSerializer (property, arrayItemAttribute.Name, arrayItemAttribute.Namespace, arrayItemAttribute.Prefix);
+                return CreateArrayItemSerializer (
+                    property, arrayItemAttribute.Name, arrayItemAttribute.Namespace, arrayItemAttribute.Prefix);
             }
         }
         
@@ -352,7 +385,10 @@ namespace Mono.Upnp.Xml.Compilation
             };
         }
         
-        protected virtual Serializer<TContext> CreateArrayItemSerializer (PropertyInfo property, string name, string @namespace, string prefix)
+        protected virtual Serializer<TContext> CreateArrayItemSerializer (PropertyInfo property,
+                                                                          string name,
+                                                                          string @namespace,
+                                                                          string prefix)
         {
             var item_type = GetIEnumerable (property.PropertyType).GetGenericArguments ()[0];
             var serializer = GetCompilerForType (item_type).MemberSerializer;
@@ -367,7 +403,8 @@ namespace Mono.Upnp.Xml.Compilation
             };
         }
         
-        Serializer<TContext> CreateFlagSerializer (PropertyInfo property, XmlFlagAttribute flagAttribute)
+        protected virtual Serializer<TContext> CreateFlagSerializer (PropertyInfo property,
+                                                                     XmlFlagAttribute flagAttribute)
         {
             return CreateFlagSerializer (
                 property,
@@ -376,7 +413,10 @@ namespace Mono.Upnp.Xml.Compilation
                 flagAttribute.Prefix);
         }
         
-        protected virtual Serializer<TContext> CreateFlagSerializer (PropertyInfo property, string name, string @namespace, string prefix)
+        protected virtual Serializer<TContext> CreateFlagSerializer (PropertyInfo property,
+                                                                     string name,
+                                                                     string @namespace,
+                                                                     string prefix)
         {
             if (property.PropertyType != typeof (bool)) {
                 // TODO throw

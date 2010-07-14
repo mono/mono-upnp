@@ -2,9 +2,9 @@
 // XmlDeserializable.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,9 @@ namespace Mono.Upnp.Xml
         
         protected virtual void Deserialize (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
             
             context.AutoDeserialize (this);
         }
@@ -58,6 +60,24 @@ namespace Mono.Upnp.Xml
         
         protected virtual void DeserializeElement (XmlDeserializationContext context)
         {
+        }
+
+        internal static void AutoDeserializeAttribute<T> (T @this, XmlDeserializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoDeserializeAttribute (@this);
+        }
+
+        internal static void AutoDeserializeElement<T> (T @this, XmlDeserializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoDeserializeElement (@this);
         }
     }
 }

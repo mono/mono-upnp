@@ -29,6 +29,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 using Mono.Upnp.Xml.Compilation;
 
@@ -36,17 +37,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
 {
     public class UpdateXmlSerializer
     {
-        static readonly UTF8Encoding utf8 = new UTF8Encoding (false);
-        
         readonly XmlSerializer<UpdateContext> xml_serializer;
         
         public UpdateXmlSerializer ()
-            : this ((serializer, type) => new UpdateDelegateSerializationCompiler (serializer, type))
+            : this (null)
         {
         }
         
         public UpdateXmlSerializer (SerializationCompilerProvider<UpdateContext> compilerProvider)
         {
+            if (compilerProvider == null) {
+                compilerProvider = (serializer, type) => new UpdateDelegateSerializationCompiler (serializer, type);
+            }
+
             this.xml_serializer = new XmlSerializer<UpdateContext> (compilerProvider);
         }
         
@@ -61,7 +64,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
                 throw new ArgumentNullException ("stream");
             }
             
-            var encoding = options != null ? options.Encoding ?? utf8 : utf8;
+            var encoding = options != null ? options.Encoding ?? Helper.UTF8Unsigned : Helper.UTF8Unsigned;
             var update_writer = new UpdateTextWriter (new StreamWriter (stream, encoding));
             var context = new UpdateContext (obj2, stream, encoding);
             using (var xml_writer = XmlWriter.Create (update_writer, new XmlWriterSettings {

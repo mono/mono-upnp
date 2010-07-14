@@ -2,7 +2,7 @@
 // Server.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -54,7 +54,9 @@ namespace Mono.Upnp
         
         public Server (Root root, Uri url)
         {
-            if (root == null) throw new ArgumentNullException ("root");
+            if (root == null) {
+                throw new ArgumentNullException ("root");
+            }
             
             this.root = root;
             

@@ -48,10 +48,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
             var audio_broadcast_options = options as AudioBroadcastOptions;
             if (audio_broadcast_options != null)
             {
-                this.Region = audio_broadcast_options.Region;
-                this.RadioCallSign = audio_broadcast_options.RadioCallSign;
-                this.RadioStationId = audio_broadcast_options.RadioStationId;
-                this.RadioBand = audio_broadcast_options.RadioBand;    
+                Region = audio_broadcast_options.Region;
+                RadioCallSign = audio_broadcast_options.RadioCallSign;
+                RadioStationId = audio_broadcast_options.RadioStationId;
+                RadioBand = audio_broadcast_options.RadioBand;    
             }
             
             base.UpdateFromOptions (options);

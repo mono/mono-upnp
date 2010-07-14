@@ -2,7 +2,7 @@
 // DisposedEventArgs.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2009 S&S Black Ltd.
 //

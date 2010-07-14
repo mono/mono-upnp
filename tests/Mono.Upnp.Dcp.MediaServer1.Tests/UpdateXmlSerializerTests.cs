@@ -192,7 +192,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 new DataWithFlag { Foo = "foo", Bar = true },
                 new DataWithFlag { Foo = "bar", Bar = false });
         }
-        
+
+        #pragma warning disable 0659
         class NestedData
         {
             [XmlElement] public string Foo { get; set; }
@@ -204,6 +205,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 return data.Foo == Foo && data.Child.Equals (Child);
             }
         }
+        #pragma warning restore 0659
         
         [Test]
         public void NestedObjectChanged ()
@@ -212,7 +214,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 new NestedData { Child = new NestedData { Foo = "foo" } },
                 new NestedData { Child = new NestedData { Foo = "bar" } });
         }
-        
+
+        #pragma warning disable 0659
         class Item
         {
             readonly string foo;
@@ -232,6 +235,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 return foo;
             }
         }
+        #pragma warning restore 0659
         
         class ArrayItemData
         {
