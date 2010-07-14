@@ -2,7 +2,7 @@
 // StateVariable.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -37,7 +37,8 @@ namespace Mono.Upnp.Control
     [XmlType ("stateVariable")]
     public class StateVariable : XmlAutomatable, IMappable<string>
     {
-        readonly LinkedList<EventHandler<StateVariableChangedArgs<string>>> value_changed = new LinkedList<EventHandler<StateVariableChangedArgs<string>>> ();
+        readonly LinkedList<EventHandler<StateVariableChangedArgs<string>>> value_changed =
+            new LinkedList<EventHandler<StateVariableChangedArgs<string>>> ();
         ServiceController controller;
         IList<string> allowed_values;
         string value;
@@ -48,15 +49,20 @@ namespace Mono.Upnp.Control
 
         protected internal StateVariable (ServiceController serviceController)
         {
-            if (serviceController == null) throw new ArgumentNullException ("serviceController");
+            if (serviceController == null) {
+                throw new ArgumentNullException ("serviceController");
+            }
 
             this.controller = serviceController;
         }
         
         public StateVariable (string name, string dataType)
         {
-            if (name == null) throw new ArgumentNullException ("name");
-            if (dataType == null) throw new ArgumentNullException ("dataType");
+            if (name == null) {
+                throw new ArgumentNullException ("name");
+            } else if (dataType == null) {
+                throw new ArgumentNullException ("dataType");
+            }
             
             Name = name;
             DataType = dataType;
@@ -89,7 +95,10 @@ namespace Mono.Upnp.Control
         {
         }
         
-        public StateVariable (string name, string dataType, AllowedValueRange allowedValueRange, StateVariableOptions options)
+        public StateVariable (string name,
+                              string dataType,
+                              AllowedValueRange allowedValueRange,
+                              StateVariableOptions options)
             : this (name, dataType, options)
         {
             AllowedValueRange = allowedValueRange;
@@ -176,7 +185,9 @@ namespace Mono.Upnp.Control
         
         protected internal virtual void Initialize (ServiceController serviceController)
         {
-            if (serviceController == null) throw new ArgumentNullException ("serviceController");
+            if (serviceController == null) {
+                throw new ArgumentNullException ("serviceController");
+            }
             
             this.controller = serviceController;
         }
@@ -191,14 +202,14 @@ namespace Mono.Upnp.Control
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoDeserializeAttribute (this);
+            AutoDeserializeAttribute (this, context);
         }
         
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
             
             if (context.Reader.Name == "allowedValueList") {
                 allowed_values = new List<string> ();
@@ -208,16 +219,12 @@ namespace Mono.Upnp.Control
 
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeObjectAndMembers (this);
+            AutoSerializeObjectAndMembers (this, context);
         }
 
         protected override void SerializeMembersOnly (Mono.Upnp.Xml.XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembersOnly (this, context);
         }
         
         string IMappable<string>.Map ()

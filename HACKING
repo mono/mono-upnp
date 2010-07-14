@@ -1,0 +1,106 @@
+Follow these simple guidelines when hacking on Mono.Upnp and you too will loose weight and find happiness!
+
+C# Style Guidelines
+===================
+
+  1. Indent with 4 spaces. Tabs are bad. Obviously.
+
+  2. Leave room for the Holy Ghost; put a space before parenthesis, like so:
+
+       this.ToString ();
+
+  2. With namespaces, types, and methods, Ms. Brace gets her own line, like so:
+  
+       namespace Foo
+       {                              // This
+           class Bar
+           {                          // Is
+               public void Bat ()
+               {                      // Stylish
+               }
+           }
+       }
+
+  3. Ms. Brace shares a line with statements, however. Now you try sharing:
+
+       if (foo != null) {
+           foo.Bar ();
+       }
+
+     Statements such as else, else-if, catch, and do-while share a line with Ms. Closing Brace. Know what I mean?
+
+       if (something) {
+           ...
+       } else {              // This is what I mean
+           ...
+       }
+
+     Always use braces with statements. Always use braces with statements. Always use braces with statements.
+  
+  4. Properties look like this:
+
+       public string Foo { get; set; }  // Automatic property
+       
+       public string Bar {              // 1-line accessor
+           get { return "bar"; }
+       }
+       
+       public string Bat {              // Multi-line accessor
+           get {
+               /* Your
+                  Code
+                  Here */
+           }
+       }
+
+  5. Private fileds and local variables look_like_this:
+
+       string all_lower_case_with_underscores = null;
+  
+     Method parameters lookLikeThis:
+  
+       public void Foo (string lowerCaseAndThenUpperCase)   // Camal casing
+       {
+       }
+
+     Everything else (namespaces, types, methods, properties, events, and non-private fields) LookLikeThis:
+
+       public class MyClass                               // Pascal casing
+       {
+           protected string NonPrivateField;              // Pascal casing
+           
+           void PrivateMethod ()                          // Pascal casing
+           {
+           }
+           
+           public string PublicProperty { get; set; }     // You get the idea
+       }
+
+  6. Lines should not exceed 120 columns. Overlong method and constructor definitions should break for EACH parameter
+     and indent to the opening parenthesis, like so:
+
+       public void CrazySuperLongMethodNameOhEmGeeThisThingIsPracticallyANovel (string parameter1,
+                                                                                string parameter2,
+                                                                                string parameter3)
+       {
+       }
+
+     Overlong expressions should break at a logical location and indent 4 spaces, like so:
+
+       throw new InvalidOperationExceltion (string.Format (
+           "There is no action named {0} and the device {1}.", actionName, deviceName));
+
+     Overlong expressions in a statement declaration should break logically and indent to the opening parenthesis. 
+     In these cases, Ms. Brace gets her own line, like so:
+
+       while (parameter1 == null ||
+              parameter2 == null ||
+              parameter3 == null)
+       {
+           ...
+       }
+
+  7. Use the var keyword and array type-inference as much as you possible can!
+
+  8. Use NEITHER the "private" visibility modifier on members, NOR the "internal" visibility modifier on types; those
+     are the default visibility levels. Github is paying for these bits, you know.

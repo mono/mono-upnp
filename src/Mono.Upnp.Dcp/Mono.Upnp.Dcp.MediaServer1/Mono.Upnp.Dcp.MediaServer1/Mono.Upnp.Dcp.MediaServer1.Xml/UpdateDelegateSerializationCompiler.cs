@@ -43,15 +43,22 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
         {
         }
         
-        protected override Serializer<UpdateContext> CreateTypeAutoSerializer (string name, string @namespace, string prefix, IEnumerable<XmlNamespaceAttribute> namespaces)
+        protected override Serializer<UpdateContext> CreateTypeAutoSerializer (string name,
+                                                                               string @namespace,
+                                                                               string prefix,
+                                                                               IEnumerable<XmlNamespaceAttribute> namespaces)
         {
             var type_auto_serializer = base.CreateTypeAutoSerializer (name, @namespace, prefix, namespaces);
             var member_serializer = MemberSerializer;
             return (obj, context) => {
+                if (context.Context == null) {
+                    throw new InvalidOperationException ("You must provide an UpdateContext to the serializer.");
+                }
                 var other_obj = context.Context.OtherValue;
                 if (other_obj != null) {
                     if (!Type.IsAssignableFrom (other_obj.GetType ())) {
-                        throw new InvalidOperationException ("Two object must be serialize as a common compatable type for an update.");
+                        throw new InvalidOperationException (
+                            "Two object must be serialize as a common compatable type for an update.");
                     }
                     member_serializer (obj, context);
                 } else {
@@ -60,7 +67,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
             };
         }
         
-        protected override Serializer<UpdateContext> CreateSerializer (PropertyInfo property, Serializer<UpdateContext> serializer)
+        protected override Serializer<UpdateContext> CreateSerializer (PropertyInfo property,
+                                                                       Serializer<UpdateContext> serializer)
         {
             var serializerDelegate = base.CreateSerializer (property, serializer);
             if (property.GetCustomAttributes (typeof (XmlArrayItemAttribute), false).Length != 0) {
@@ -69,7 +77,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
             return (obj, context) => {
                 var other_obj = context.Context.OtherValue;
                 if (other_obj != null) {
-                    if (!object.Equals (property.GetValue (obj, empty_args), property.GetValue (other_obj, empty_args))) {
+                    if (!object.Equals (property.GetValue (obj, empty_args),
+                        property.GetValue (other_obj, empty_args)))
+                    {
                         context.Writer.Flush ();
                         context.Context.DelineateUpdate ();
                         serializerDelegate (obj, CreateContext (context.Writer, new UpdateContext ()));
@@ -84,11 +94,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
         {
             var item_type = GetIEnumerable (property.PropertyType).GetGenericArguments ()[0];
             var serializer = GetCompilerForType (item_type).TypeSerializer;
-            Serializer<UpdateContext> item_serializer = (obj, context) => serializer (obj, CreateContext (context.Writer, new UpdateContext ()));
+            Serializer<UpdateContext> item_serializer = (obj, context) =>
+                serializer (obj, CreateContext (context.Writer, new UpdateContext ()));
             return CreateArrayItemSerializer (property, item_serializer);
         }
         
-        protected override Serializer<UpdateContext> CreateArrayItemSerializer (PropertyInfo property, string name, string @namespace, string prefix)
+        protected override Serializer<UpdateContext> CreateArrayItemSerializer (PropertyInfo property,
+                                                                                string name,
+                                                                                string @namespace,
+                                                                                string prefix)
         {
             var item_type = GetIEnumerable (property.PropertyType).GetGenericArguments ()[0];
             var serializer = GetCompilerForType (item_type).MemberSerializer;
@@ -100,7 +114,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
             return CreateArrayItemSerializer (property, item_serializer);
         }
         
-        static Serializer<UpdateContext> CreateArrayItemSerializer (PropertyInfo property, Serializer<UpdateContext> serializer)
+        static Serializer<UpdateContext> CreateArrayItemSerializer (PropertyInfo property,
+                                                                    Serializer<UpdateContext> serializer)
         {
             return (obj, context) => {
                 var other_obj = context.Context.OtherValue;

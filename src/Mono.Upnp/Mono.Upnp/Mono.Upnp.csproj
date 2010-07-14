@@ -94,7 +94,6 @@
     <Compile Include="Mono.Upnp.Internal\ControlClient.cs" />
     <Compile Include="Mono.Upnp.Internal\TimeoutDispatcher.cs" />
     <Compile Include="Mono.Upnp\Deserializer.cs" />
-    <Compile Include="Mono.Upnp\DeserializerFactory.cs" />
     <Compile Include="Mono.Upnp\SpecVersion.cs" />
     <Compile Include="Mono.Upnp.Xml\DoNotDeserializeAttribute.cs" />
     <Compile Include="Mono.Upnp.Xml\DoNotSerializeAttribute.cs" />
@@ -124,8 +123,6 @@
     <Compile Include="Mono.Upnp.Xml.Compilation\DelegateDeserializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\Deserializer.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\ObjectDeserializer.cs" />
-    <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompilerFactory.cs" />
-    <Compile Include="Mono.Upnp.Xml.Compilation\DelegateDeserializationCompilerFactory.cs" />
     <Compile Include="Mono.Upnp.Control\StateVariableOptions.cs" />
     <Compile Include="Mono.Upnp\DeviceOptions.cs" />
     <Compile Include="Mono.Upnp\RootDeviceOptions.cs" />
@@ -137,6 +134,8 @@
     <Compile Include="Mono.Upnp.Internal\XmlShell.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompilerProvider.cs" />
     <Compile Include="Mono.Upnp.Control\UpnpServiceDefinitionException.cs" />
+    <Compile Include="Mono.Upnp\DeserializerProducer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompilerProvider.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

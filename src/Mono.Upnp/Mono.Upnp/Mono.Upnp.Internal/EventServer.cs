@@ -2,7 +2,7 @@
 // EventServer.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -138,7 +138,9 @@ namespace Mono.Upnp.Internal
             subscriber.Seq++;
             
             using (var stream = request.GetRequestStream ()) {
-                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings { Encoding = Helper.UTF8Unsigned })) {
+                using (var writer = XmlWriter.Create (stream,
+                    new XmlWriterSettings { Encoding = Helper.UTF8Unsigned }))
+                {
                     writer.WriteProcessingInstruction ("xml", @"version=""1.0""");
                     writer.WriteStartElement ("e", "propertyset", Protocol.EventSchema);
                     foreach (var state_variable in stateVariables) {
@@ -157,7 +159,8 @@ namespace Mono.Upnp.Internal
                     Interlocked.Exchange (ref subscriber.ConnectFailures, 0);
                     #pragma warning restore 0420
                 } catch (Exception e) {
-                    Log.Exception (string.Format ("There was a problem publishing updates to subscription {0}.", subscriber.Sid), e);
+                    Log.Exception (string.Format (
+                        "There was a problem publishing updates to subscription {0}.", subscriber.Sid), e);
                     #pragma warning disable 0420
                     Interlocked.Increment (ref subscriber.ConnectFailures);
                     #pragma warning restore 0420
@@ -165,7 +168,6 @@ namespace Mono.Upnp.Internal
                         lock (subscribers) {
                             if (subscribers.ContainsKey (subscriber.Sid)) {
                                 subscribers.Remove (subscriber.Sid);
-                                
                                 Log.Information (string.Format (
                                     "Subscription {0} failed multiple times and was removed.", subscriber.Sid));
                             }

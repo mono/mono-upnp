@@ -32,10 +32,12 @@ namespace Mono.Upnp.Dcp.MSMediaServerRegistrar1
 {
     public abstract class MSMediaServerRegistrar
     {
-        public static readonly ServiceType ServiceType = new ServiceType ("urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1");
+        public static readonly ServiceType ServiceType =
+            new ServiceType ("microsoft.com", "X_MS_MediaReceiverRegistrar", new Version (1, 0));
         
         [UpnpAction]
-        public virtual void IsAuthorized ([UpnpArgument ("DeviceId")] string deviceId, [UpnpArgument ("Result")] out long result)
+        public virtual void IsAuthorized ([UpnpArgument ("DeviceId")] string deviceId,
+                                          [UpnpArgument ("Result")] out long result)
         {
             result = IsAuthorized (deviceId);
         }
@@ -44,9 +46,9 @@ namespace Mono.Upnp.Dcp.MSMediaServerRegistrar1
         
         [UpnpAction]
         public virtual void RegisterDevice ([UpnpArgument ("RegistrationRegMsg")]
-                                              [UpnpRelatedStateVariable (DataType = "bin.base64")] byte[] registrationRequestMessage,
-                                              [UpnpArgument ("RegistrationRespMsg")]
-                                              [UpnpRelatedStateVariable (DataType = "bin.base64")] out byte [] registrationResponseMessage)
+                                            [UpnpRelatedStateVariable (DataType = "bin.base64")] byte[] registrationRequestMessage,
+                                            [UpnpArgument ("RegistrationRespMsg")]
+                                            [UpnpRelatedStateVariable (DataType = "bin.base64")] out byte [] registrationResponseMessage)
         {
             registrationResponseMessage = RegisterDevice (registrationRequestMessage);
         }
@@ -54,7 +56,8 @@ namespace Mono.Upnp.Dcp.MSMediaServerRegistrar1
         protected abstract byte[] RegisterDevice (byte[] registrationRequestMessage);
         
         [UpnpAction]
-        public virtual void IsValidated ([UpnpArgument ("DeviceId")] string deviceId, [UpnpArgument ("Result")] out long result)
+        public virtual void IsValidated ([UpnpArgument ("DeviceId")] string deviceId,
+                                         [UpnpArgument ("Result")] out long result)
         {
             result = IsAuthorized (deviceId);
         }

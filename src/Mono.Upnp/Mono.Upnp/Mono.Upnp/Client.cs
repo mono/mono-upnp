@@ -2,7 +2,7 @@
 // Client.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -49,25 +49,27 @@ namespace Mono.Upnp
             new Dictionary<string, Root> ();
 
         readonly Mono.Ssdp.Client client = new Mono.Ssdp.Client ();
-        DeserializerFactory deserializer_facotry;
+        DeserializerProducer deserializer_producer;
 
         public Client ()
             : this (null)
         {
         }
         
-        public Client (DeserializerFactory deserializerFactory)
+        public Client (DeserializerProducer deserializerProducer)
         {
-            DeserializerFactory = deserializerFactory ?? new DeserializerFactory ();
+            DeserializerProducer = deserializerProducer ?? (xmlDeserializer => new Deserializer (xmlDeserializer));
             client.ServiceAdded += ClientServiceAdded;
             client.ServiceRemoved += ClientServiceRemoved;
         }
         
-        public DeserializerFactory DeserializerFactory {
-            get { return deserializer_facotry; }
+        public DeserializerProducer DeserializerProducer {
+            get { return deserializer_producer; }
             set {
-                if (value == null) throw new ArgumentNullException ("value");
-                deserializer_facotry = value;
+                if (value == null) {
+                    throw new ArgumentNullException ("value");
+                }
+                deserializer_producer = value;
             }
         }
         
@@ -141,11 +143,11 @@ namespace Mono.Upnp
             var usn = colon == -1 ? args.Usn : args.Usn.Substring (0, colon);
 
             if (args.Usn.Contains (":device:")) {
-                var type = new DeviceType (args.Service.ServiceType);
+                var type = DeviceType.Parse (args.Service.ServiceType);
                 var device = new DeviceAnnouncement (this, type, usn, args.Service.Locations);
                 deviceHandler (device);
             } else if (args.Usn.Contains (":service:")) {
-                var type = new ServiceType (args.Service.ServiceType);
+                var type = ServiceType.Parse (args.Service.ServiceType);
                 var service = new ServiceAnnouncement (this, type, usn, args.Service.Locations);
                 serviceHandler (service);
             }
@@ -189,7 +191,9 @@ namespace Mono.Upnp
             return GetDescription<DeviceAnnouncement, Device> (announcement.Locations, announcement, GetDevice);
         }
         
-        TResult GetDescription<TAnnouncement, TResult> (IEnumerable<string> urls, TAnnouncement announcement, Func<TAnnouncement, Device, TResult> getter)
+        TResult GetDescription<TAnnouncement, TResult> (IEnumerable<string> urls,
+                                                        TAnnouncement announcement,
+                                                        Func<TAnnouncement, Device, TResult> getter)
             where TResult : class
         {
             foreach (var url in urls) {
@@ -205,7 +209,7 @@ namespace Mono.Upnp
                 
                 try {
                     var deserializer = Helper.Get<XmlDeserializer> (static_deserializer);
-                    var root = DeserializerFactory.CreateDeserializer (deserializer).DeserializeRoot (new Uri (url));
+                    var root = deserializer_producer (deserializer).DeserializeRoot (new Uri (url));
                     if (root == null) {
                         continue;
                     }

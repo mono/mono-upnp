@@ -2,7 +2,7 @@
 // Device.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2009 S&S Black Ltd.
 //
@@ -53,20 +53,38 @@ namespace Mono.Upnp
         {
         }
         
-        public Device (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, DeviceOptions options)
+        public Device (DeviceType type,
+                       string udn,
+                       string friendlyName,
+                       string manufacturer,
+                       string modelName,
+                       DeviceOptions options)
             : this (type, udn, friendlyName, manufacturer, modelName, options, null)
         {
         }
         
-        protected internal Device (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, DeviceOptions options, IEnumerable<Device> devices)
+        protected internal Device (DeviceType type,
+                                   string udn,
+                                   string friendlyName,
+                                   string manufacturer,
+                                   string modelName,
+                                   DeviceOptions options,
+                                   IEnumerable<Device> devices)
             : this (devices, GetServices (options), GetIcons (options))
         {
-            if (type == null) throw new ArgumentNullException ("type");
-            if (udn == null) throw new ArgumentNullException ("udn");
-            if (!udn.StartsWith ("uuid:")) throw new ArgumentException (@"The udn must begin with ""uuid:"".", "udn");
-            if (friendlyName == null) throw new ArgumentNullException ("friendlyName");
-            if (manufacturer == null) throw new ArgumentException ("manufacturer");
-            if (modelName == null) throw new ArgumentNullException ("modelName");
+            if (type == null) {
+                throw new ArgumentNullException ("type");
+            } else if (udn == null) {
+                throw new ArgumentNullException ("udn");
+            } else if (!udn.StartsWith ("uuid:")) {
+                throw new ArgumentException (@"The udn must begin with ""uuid:"".", "udn");
+            } else if (friendlyName == null) {
+                throw new ArgumentNullException ("friendlyName");
+            } else if (manufacturer == null) {
+                throw new ArgumentException ("manufacturer");
+            } else if (modelName == null) {
+                throw new ArgumentNullException ("modelName");
+            }
             
             Type = type;
             Udn = udn;
@@ -179,8 +197,12 @@ namespace Mono.Upnp
 
         protected internal virtual void Initialize (XmlSerializer serializer, Root root, string deviceUrlFragment)
         {
-            if (deviceUrlFragment == null) throw new ArgumentNullException ("deviceUrlFragment");
-            if (Deserializer != null) throw new InvalidOperationException ("The device was constructed for deserialization and cannot be initalized. Use one of the other constructors.");
+            if (deviceUrlFragment == null) {
+                throw new ArgumentNullException ("deviceUrlFragment");
+            } else if (Deserializer != null) {
+                throw new InvalidOperationException (
+                    "The device was constructed for deserialization and cannot be initalized. Use one of the other constructors.");
+            }
             
             for (var i = 0; i < devices.Count; i++) {
                 devices[i].Initialize (serializer, root, string.Concat (deviceUrlFragment, "/device/", i.ToString ()));
@@ -232,9 +254,11 @@ namespace Mono.Upnp
         
         protected virtual DeviceType DeserializeDeviceType (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
             
-            return new DeviceType (context.Reader.ReadElementContentAsString ());
+            return DeviceType.Parse (context.Reader.ReadElementContentAsString ());
         }
         
         Device IXmlDeserializer<Device>.Deserialize (XmlDeserializationContext context)
@@ -287,23 +311,17 @@ namespace Mono.Upnp
 
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoDeserializeElement (this);
+            AutoDeserializeElement (this, context);
         }
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeObjectAndMembers (this);
+            AutoSerializeObjectAndMembers (this, context);
         }
         
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
-            if (context == null) throw new ArgumentNullException ("context");
-            
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembersOnly (this, context);
         }
     }
 }

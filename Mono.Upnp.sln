@@ -33,6 +33,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MSMediaServerRegistrar1", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MSMediaServerRegistrar1\Mono.Upnp.Dcp.MSMediaServerRegistrar1.csproj", "{1203E9D4-B1F3-4838-8275-91782C8EC6E4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DEA343EA-6B89-4360-B169-F0474A32B259}"
+	ProjectSection(SolutionItems) = preProject
+		README = README
+		AUTHORS = AUTHORS
+		COPYING = COPYING
+		HACKING = HACKING
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,7 +137,7 @@ Global
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer.csproj
+		StartupItem = src\Mono.Upnp\Mono.Upnp.GtkClient\Mono.Upnp.GtkClient.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = Flat
@@ -141,9 +149,20 @@ Global
 		$3.inheritsSet = VisualStudio
 		$3.inheritsScope = text/plain
 		$0.TextStylePolicy = $4
-		$4.inheritsSet = null
+		$4.FileWidth = 120
+		$4.NoTabsAfterNonTabs = True
+		$4.RemoveTrailingWhitespace = True
+		$4.EolMarker = Unix
+		$4.inheritsSet = VisualStudio
+		$4.inheritsScope = text/plain
 		$4.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $5
+		$5.IfElseBraceForcement = AddBraces
+		$5.ForBraceForcement = AddBraces
+		$5.ForEachBraceForcement = AddBraces
+		$5.WhileBraceForcement = AddBraces
+		$5.UsingBraceForcement = AddBraces
+		$5.FixedBraceForcement = AddBraces
 		$5.inheritsSet = Mono
 		$5.inheritsScope = text/x-csharp
 		$5.scope = text/x-csharp

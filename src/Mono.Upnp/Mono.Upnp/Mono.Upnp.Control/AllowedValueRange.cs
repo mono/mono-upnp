@@ -2,7 +2,7 @@
 // AllowedValueRange.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -47,8 +47,11 @@ namespace Mono.Upnp.Control
         
         public AllowedValueRange (string minimum, string maximum, string step)
         {
-            if (minimum == null) throw new ArgumentNullException ("minimum");
-            if (maximum == null) throw new ArgumentNullException ("maximum");
+            if (minimum == null) {
+                throw new ArgumentNullException ("minimum");
+            } else if (maximum == null) {
+                throw new ArgumentNullException ("maximum");
+            }
             
             Minimum = minimum;
             Maximum = maximum;

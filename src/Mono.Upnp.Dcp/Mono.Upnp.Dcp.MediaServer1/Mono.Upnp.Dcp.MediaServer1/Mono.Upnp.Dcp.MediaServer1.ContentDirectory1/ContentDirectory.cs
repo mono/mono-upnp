@@ -61,7 +61,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         }
         
         public static readonly ServiceType ServiceType = new ServiceType (
-            "urn:schemas-upnp-org:service:ContentDirectory:1");
+            "schemas-upnp-org", "ContentDirectory", new Version (1, 0));
         
         [UpnpAction]
         public virtual void GetSearchCapabilities ([UpnpArgument ("SearchCaps")]

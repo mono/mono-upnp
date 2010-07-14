@@ -2,9 +2,9 @@
 // Description.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,9 @@ namespace Mono.Upnp
         
         internal Description (Deserializer deserializer)
         {
-            if (deserializer == null) throw new ArgumentNullException ("deserializer");
+            if (deserializer == null) {
+                throw new ArgumentNullException ("deserializer");
+            }
             
             this.deserializer = deserializer;
             Root = deserializer.Root;
@@ -94,7 +96,8 @@ namespace Mono.Upnp
             } else if (Uri.TryCreate (urlFragment, UriKind.Absolute, out url)) {
                 return url;
             } else {
-                throw new UpnpDeserializationException (string.Format(@"The URL fragment is not valid: ""{0}""", urlFragment));
+                throw new UpnpDeserializationException (
+                    string.Format(@"The URL fragment is not valid: ""{0}""", urlFragment));
             }
         }
     }

@@ -1,10 +1,10 @@
 // 
-// DelegateDeserializationCompilerFactory.cs
+// ObjectQueryTests.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +26,33 @@
 
 using System;
 
-namespace Mono.Upnp.Xml.Compilation
+using NUnit.Framework;
+
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
+using Mono.Upnp.Xml;
+
+namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
-    public class DelegateDeserializationCompilerFactory : DeserializationCompilerFactory
+    [TestFixture]
+    public class ObjectQueryTests
     {
-        public override DeserializationCompiler CreateDeserializationCompiler (XmlDeserializer xmlDeserializer, Type type)
+        class Data : DummyObject
         {
-            return new DelegateDeserializationCompiler (xmlDeserializer, type);
+            [XmlElement] public string Foo { get; set; }
         }
 
+        [Test]
+        public void Equality ()
+        {
+            var data = new Data { Foo = "bar" };
+            var match = false;
+            var visitor = new ObjectQueryVisitor (new ObjectQueryContext (typeof (Data)), data, result => match = result);
+            visitor.VisitEquals ("Foo", "bar");
+            Assert.IsTrue (match);
+            match = false;
+            visitor.VisitEquals ("Foo", "bat");
+            Assert.IsFalse (match);
+        }
     }
 }
+

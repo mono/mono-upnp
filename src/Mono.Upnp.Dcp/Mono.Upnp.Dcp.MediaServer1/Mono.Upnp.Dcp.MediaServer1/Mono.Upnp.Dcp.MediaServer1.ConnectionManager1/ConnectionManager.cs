@@ -32,7 +32,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
 {
     public abstract class ConnectionManager
     {
-        public static readonly ServiceType ServiceType = new ServiceType ("urn:schemas-upnp-org:service:ConnectionManager:1");
+        public static readonly ServiceType ServiceType = new ServiceType ("schemas-upnp-org", "ConnectionManager", new Version (1, 0));
         
         [UpnpAction]
         public virtual void GetProtocolInfo ([UpnpArgumentAttribute ("Source")]

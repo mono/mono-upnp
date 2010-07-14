@@ -2,9 +2,9 @@
 // Deserializer.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,9 @@ namespace Mono.Upnp
         
         public Deserializer (XmlDeserializer xmlDeserializer)
         {
-            if (xmlDeserializer == null) throw new ArgumentNullException ("xmlDeserializer");
+            if (xmlDeserializer == null) {
+                throw new ArgumentNullException ("xmlDeserializer");
+            }
             
             this.deserializer = xmlDeserializer;
         }
@@ -117,7 +119,8 @@ namespace Mono.Upnp
             return new Icon (this);
         }
         
-        public virtual ServiceAction DeserializeAction (ServiceController controller, XmlDeserializationContext context)
+        public virtual ServiceAction DeserializeAction (ServiceController controller,
+                                                        XmlDeserializationContext context)
         {
             var action = CreateAction (controller);
             Deserialize (action, context);
@@ -141,7 +144,8 @@ namespace Mono.Upnp
             return new Argument ();
         }
         
-        public virtual StateVariable DeserializeStateVariable (ServiceController controller, XmlDeserializationContext context)
+        public virtual StateVariable DeserializeStateVariable (ServiceController controller,
+                                                               XmlDeserializationContext context)
         {
             var state_variable = CreateStateVariable (controller);
             Deserialize (state_variable, context);
@@ -155,8 +159,11 @@ namespace Mono.Upnp
         
         public virtual ServiceController GetServiceController (Service service)
         {
-            if (service == null) throw new ArgumentNullException ("service");
-            if (service.ScpdUrl == null) throw new ArgumentException ("The service has no ScpdUrl", "service");
+            if (service == null) {
+                throw new ArgumentNullException ("service");
+            } else if (service.ScpdUrl == null) {
+                throw new ArgumentException ("The service has no ScpdUrl", "service");
+            }
             
             // TODO retry fallback
             var request = WebRequest.Create (service.ScpdUrl);

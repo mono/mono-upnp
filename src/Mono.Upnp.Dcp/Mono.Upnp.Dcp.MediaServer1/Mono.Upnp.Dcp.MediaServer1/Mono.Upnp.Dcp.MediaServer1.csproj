@@ -103,6 +103,17 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateContext.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateTextWriter.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateXmlSerializer.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\FilteringDelegateSerializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\FilteringContext.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\Helper.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\QueryVisitor.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Query.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\QueryParser.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\QueryParsingException.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectQueryVisitor.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\PropertyName.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectQueryContext.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectBasedQueryProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">

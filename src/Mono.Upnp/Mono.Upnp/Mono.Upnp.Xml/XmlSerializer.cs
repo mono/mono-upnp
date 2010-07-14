@@ -2,9 +2,9 @@
 // XmlSerializer.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -97,7 +97,8 @@ namespace Mono.Upnp.Xml
     public sealed class XmlSerializer<TContext>
     {
         readonly SerializationCompilerProvider<TContext> compiler_provider;
-        readonly Dictionary<Type, SerializationCompiler<TContext>> compilers = new Dictionary<Type, SerializationCompiler<TContext>> ();
+        readonly Dictionary<Type, SerializationCompiler<TContext>> compilers =
+            new Dictionary<Type, SerializationCompiler<TContext>> ();
         
         public XmlSerializer ()
             : this (null)
@@ -107,7 +108,8 @@ namespace Mono.Upnp.Xml
         public XmlSerializer (SerializationCompilerProvider<TContext> compilerProvider)
         {
             if (compilerProvider == null) {
-                compiler_provider = (serializer, type) => new DelegateSerializationCompiler<TContext> (serializer, type);
+                compiler_provider = (serializer, type) =>
+                    new DelegateSerializationCompiler<TContext> (serializer, type);
             } else {
                 compiler_provider = compilerProvider;
             }
@@ -185,7 +187,8 @@ namespace Mono.Upnp.Xml
                 writer.WriteProcessingInstruction ("xml", @"version=""1.0""");
                 break;
             case XmlDeclarationType.VersionAndEncoding:
-                writer.WriteProcessingInstruction ("xml", string.Format(@"version=""1.0"" encoding=""{0}""", options.Encoding.HeaderName));
+                writer.WriteProcessingInstruction ("xml", string.Format(
+                    @"version=""1.0"" encoding=""{0}""", options.Encoding.HeaderName));
                 break;
             }
         }
@@ -235,7 +238,7 @@ namespace Mono.Upnp.Xml
             {
                 if (options == null) {
                     Encoding = Helper.UTF8Unsigned;
-                    Context = default(TContext);
+                    Context = default (TContext);
                     XmlDeclarationType = 0;
                 } else {
                     Encoding = options.Encoding ?? Helper.UTF8Unsigned;

@@ -2,7 +2,7 @@
 // ServiceType.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -26,13 +26,23 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using System;
+
 namespace Mono.Upnp
 {
     public sealed class ServiceType : TypeInfo
     {
-        public ServiceType (string typeDescription)
-            : base (typeDescription, "service")
+        public ServiceType (string domainName, string type, Version version)
+            : base (domainName, type, version, "service")
         {
+        }
+
+        public static ServiceType Parse (string serviceType)
+        {
+            string domainName, type;
+            Version version;
+            Parse (serviceType, out domainName, out type, out version);
+            return new ServiceType (domainName, type, version);
         }
     }
 }

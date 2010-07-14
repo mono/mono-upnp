@@ -1,10 +1,10 @@
 // 
-// DeserializationCompilerFactory.cs
+// QueryParsingException.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,14 @@
 
 using System;
 
-namespace Mono.Upnp.Xml.Compilation
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public abstract class DeserializationCompilerFactory
+    public class QueryParsingException : Exception
     {
-        public abstract DeserializationCompiler CreateDeserializationCompiler (XmlDeserializer xmlDeserializer, Type type);
+        public QueryParsingException (string message)
+            : base (message)
+        {
+        }
     }
 }
+
