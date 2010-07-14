@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 
 using NUnit.Framework;
 
@@ -193,7 +194,93 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             test.OmitIfNullAttribute.Foo = "bar";
 
             Assert.IsTrue (context.PropertyExists ("OmitIfNullAttribute@Foo", test));
+            var equality = false;
+            context.VisitProperty<string> ("OmitIfNullAttribute@Foo", test, value => equality = value == "bar");
+            Assert.IsTrue (equality);
+        }
+
+        class ArrayItemTestClass
+        {
+            [XmlArrayItem] public IEnumerable<string> Foo { get; set; }
+        }
+
+        [Test]
+        public void ArrayItem ()
+        {
+            var context = new ObjectQueryContext (typeof (ArrayItemTestClass));
+            Assert.IsFalse (context.PropertyExists ("Foo", new ArrayItemTestClass ()));
+            Assert.IsFalse (context.PropertyExists ("Foo", new ArrayItemTestClass { Foo = new string[0] }));
+            var foos = new[] { "foo", "bar", "bat", "baz" };
+            var test = new ArrayItemTestClass { Foo = foos };
+            Assert.IsTrue (context.PropertyExists ("Foo", test));
+            var i = 0;
+            var inequality = false;
+            context.VisitProperty<string> ("Foo", test, value => inequality |= value != foos[i++]);
+            Assert.IsFalse (inequality);
+        }
+
+        class NamedArrayItemTestClass
+        {
+            [XmlArrayItem ("foo")] public IEnumerable<string> Foo { get; set; }
+        }
+
+        [Test]
+        public void NamedArrayItem ()
+        {
+            var context = new ObjectQueryContext (typeof (NamedArrayItemTestClass));
+            Assert.IsTrue (context.PropertyExists ("foo", new NamedArrayItemTestClass { Foo = new[] { "bar" } }));
+        }
+
+        class PrefixedArrayItemTestClass
+        {
+            [XmlArrayItem ("foo", bar, "bar")] public IEnumerable<string> Foo { get; set; }
+        }
+
+        [Test]
+        public void PrefixedArrayItem ()
+        {
+            var context = new ObjectQueryContext (typeof (PrefixedArrayItemTestClass));
+            Assert.IsTrue (context.PropertyExists ("bar:foo", new PrefixedArrayItemTestClass { Foo = new[] { "bar" } }));
+        }
+
+        class NestedArrayItemTestClass
+        {
+            [XmlElement] public IEnumerable<AttributeTestClass> Foo { get; set; }
+        }
+
+        [Test]
+        public void NestedArrayTestClass ()
+        {
+            var context = new ObjectQueryContext (typeof (NestedArrayItemTestClass));
+            var attributes = new[] { "foo", "bar", "bat", "baz" };
+            var foos = new[] {
+                new AttributeTestClass { Foo = "foo" },
+                new AttributeTestClass { Foo = "bar" },
+                new AttributeTestClass { Foo = "bat" },
+                new AttributeTestClass { Foo = "baz" }
+            };
+            var test = new NestedArrayItemTestClass { Foo = foos };
+            var i = 0;
+            var inequality = false;
+            context.VisitProperty<string>("Foo@Foo", test, value => inequality |= value != attributes[i++]);
+            Assert.IsFalse (inequality);
+        }
+
+        class ElementTestSubclass : ElementTestClass
+        {
+            [XmlElement] public string Bar { get; set; }
+        }
+
+        [Test]
+        public void SuperclassLookup ()
+        {
+            var superclass_context = new ObjectQueryContext (typeof (ElementTestClass));
+            var subclass_context = new ObjectQueryContext (typeof (ElementTestSubclass), superclass_context);
+            var test = new ElementTestSubclass ();
+            Assert.IsTrue (superclass_context.PropertyExists ("Foo", test));
+            Assert.IsFalse (superclass_context.PropertyExists ("Bar", test));
+            Assert.IsTrue (subclass_context.PropertyExists ("Foo", test));
+            Assert.IsTrue (subclass_context.PropertyExists ("Bar", test));
         }
     }
 }
-

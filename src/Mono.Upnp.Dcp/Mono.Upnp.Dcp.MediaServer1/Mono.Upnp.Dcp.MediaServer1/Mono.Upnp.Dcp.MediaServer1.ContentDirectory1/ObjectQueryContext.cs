@@ -237,7 +237,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             public override bool Exists (object @object)
             {
-                return ((IEnumerable)PropertyInfo.GetValue (@object, empty_args)).GetEnumerator ().MoveNext ();
+                var enumerable = (IEnumerable)PropertyInfo.GetValue (@object, empty_args);
+                return enumerable != null && enumerable.GetEnumerator ().MoveNext ();
             }
         }
     }

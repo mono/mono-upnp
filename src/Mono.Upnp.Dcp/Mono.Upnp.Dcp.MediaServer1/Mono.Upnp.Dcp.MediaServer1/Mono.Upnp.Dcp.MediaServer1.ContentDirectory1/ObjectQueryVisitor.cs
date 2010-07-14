@@ -81,9 +81,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             context.VisitProperty <object> (property, @object, v => {
                 if (v == null) {
-                    consumer (value == null);
-                } else {
-                    consumer (v.ToString ().Equals (value));
+                    if (value == null) {
+                        consumer (true);
+                    }
+                } else if (v.ToString ().Equals (value)) {
+                    consumer (true);
                 }
             });
         }
