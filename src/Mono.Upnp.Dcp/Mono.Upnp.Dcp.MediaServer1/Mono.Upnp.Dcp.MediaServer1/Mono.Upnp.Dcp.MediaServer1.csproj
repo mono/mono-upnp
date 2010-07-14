@@ -113,6 +113,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectQueryVisitor.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\PropertyName.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectQueryContext.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectBasedQueryProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">

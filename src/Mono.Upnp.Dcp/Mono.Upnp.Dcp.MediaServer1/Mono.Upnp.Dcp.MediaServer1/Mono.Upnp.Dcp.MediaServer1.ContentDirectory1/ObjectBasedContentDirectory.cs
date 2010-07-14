@@ -116,44 +116,5 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                                                       out int totalMatches);
         
         protected abstract IXmlSerializable GetObject (string objectId);
-
-        protected IEnumerable<Object> Query (Query query, IEnumerable<Object> objects)
-        {
-            if (query == null) {
-                throw new ArgumentNullException ("query");
-            } else if (objects == null) {
-                throw new ArgumentNullException ("objects");
-            }
-
-            foreach (var @object in objects) {
-                if (Matches (query, @object)) {
-                    yield return @object;
-                }
-            }
-        }
-
-        bool Matches (Query query, Object @object)
-        {
-            var match = false;
-            query (new ObjectQueryVisitor (GetQueryContext (@object.GetType ()), @object, result => match = result));
-            return match;
-        }
-
-        ObjectQueryContext GetQueryContext (Type type)
-        {
-            if (type == null) {
-                return null;
-            }
-
-            ObjectQueryContext context;
-            if (!queryContexts.TryGetValue (type, out context)) {
-                context = new ObjectQueryContext (type, GetQueryContext (type.BaseType));
-                queryContexts[type] = context;
-            }
-
-            return context;
-        }
-
-        Dictionary<Type, ObjectQueryContext> queryContexts = new Dictionary<Type, ObjectQueryContext>();
     }
 }

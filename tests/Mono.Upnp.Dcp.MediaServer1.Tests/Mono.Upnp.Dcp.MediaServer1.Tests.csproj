@@ -57,6 +57,9 @@
     <Compile Include="Consumer.cs" />
     <Compile Include="QueryParserTests.cs" />
     <Compile Include="ObjectQueryContextTests.cs" />
+    <Compile Include="ObjectQueryTests.cs" />
+    <Compile Include="DummyObject.cs" />
+    <Compile Include="DummyContentDirectory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
