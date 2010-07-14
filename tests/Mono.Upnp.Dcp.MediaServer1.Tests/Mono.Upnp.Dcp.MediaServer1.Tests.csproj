@@ -56,6 +56,7 @@
     <Compile Include="QueryStringifier.cs" />
     <Compile Include="Consumer.cs" />
     <Compile Include="QueryParserTests.cs" />
+    <Compile Include="ObjectQueryContextTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

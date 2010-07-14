@@ -808,7 +808,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             var actual_builder = new StringBuilder ();
             expectedQuery (new QueryStringifier (expected_builder));
             QueryParser.Parse (actualQuery) (new QueryStringifier (actual_builder));
-            Console.WriteLine (actual_builder.ToString ());
             Assert.AreEqual (expected_builder.ToString (), actual_builder.ToString ());
         }
     }

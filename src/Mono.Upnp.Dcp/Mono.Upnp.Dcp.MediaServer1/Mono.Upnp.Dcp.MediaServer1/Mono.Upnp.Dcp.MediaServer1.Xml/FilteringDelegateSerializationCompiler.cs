@@ -62,29 +62,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
                 var name = attributeAttribute.Name;
                 var @namespace = attributeAttribute.Namespace;
                 return (obj, context) => {
-                    string id;
+                    string prefix;
                     if (string.IsNullOrEmpty (@namespace)) {
-                        if (!context.Context.IsNested && Type == context.Context.Type) {
-                            id = string.Concat ("@", name);
-                        } else {
-                            id = string.Concat (context.Context.NestedPropertyName, "@", name);
-                        }
+                        prefix = null;
                     } else {
-                        var prefix = context.Writer.LookupPrefix (@namespace);
-                        if (string.IsNullOrEmpty (prefix)) {
-                            if (!context.Context.IsNested && Type == context.Context.Type) {
-                                id = string.Concat ("@", name);
-                            } else {
-                                id = string.Concat (context.Context.NestedPropertyName, "@", name);
-                            }
-                        } else {
-                            if (!context.Context.IsNested && Type == context.Context.Type) {
-                                id = string.Concat ("@", prefix, ":", name);
-                            } else {
-                                id = string.Concat (context.Context.NestedPropertyName, "@", prefix, ":", name);
-                            }
-                        }
+                        prefix = context.Writer.LookupPrefix (@namespace);
                     }
+                    var id = PropertyName.CreateForAttribute (name, prefix, context.Context.NestedPropertyName);
                     if (context.Context.IncludesAttribute (id)) {
                         serializer (obj, context);
                     }
@@ -102,17 +86,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
                 var name = elementAttribute.Name;
                 var @namespace = elementAttribute.Namespace;
                 return (obj, context) => {
-                    string id;
+                    string prefix;
                     if (string.IsNullOrEmpty (@namespace)) {
-                        id = name;
+                        prefix = null;
                     } else {
-                        var prefix = context.Writer.LookupPrefix (@namespace);
-                        if (string.IsNullOrEmpty (prefix)) {
-                            id = name;
-                        } else {
-                            id = string.Concat (prefix, ":", name);
-                        }
+                        prefix = context.Writer.LookupPrefix (@namespace);
                     }
+                    var id = PropertyName.CreateForElement (name, prefix);
                     if (context.Context.IncludesElement (id)) {
                         if (context.Context.Type == Type) {
                             context = CreateContext (context.Writer, context.Context.GetNestedContext (id));

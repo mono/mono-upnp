@@ -1,10 +1,10 @@
 // 
-// Compiler.cs
+// PropertyName.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Thomas
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,36 +25,29 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 
-namespace Mono.Upnp.Xml.Compilation
+namespace Mono.Upnp.Dcp.MediaServer1.Xml
 {
-    public class Compiler
+    public class PropertyName
     {
-        readonly Type type;
-        
-        internal Compiler (Type type)
+        public static string CreateForAttribute (string name, string prefix, string nestedName)
         {
-            if (type == null) throw new ArgumentNullException ("type");
-            
-            this.type = type;
+            if (string.IsNullOrEmpty (prefix)) {
+                return string.Concat (nestedName, "@", name);
+            } else {
+                return string.Concat (nestedName, "@", prefix, ":", name);
+            }
         }
-        
-        protected Type Type {
-            get { return type; }
-        }
-        
-        protected IEnumerable<PropertyInfo> Properties {
-            get {
-                foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public)) {
-                    yield return property;
-                }
-                
-                foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.NonPublic)) {
-                    yield return property;
-                }
+
+        public static string CreateForElement (string name, string prefix)
+        {
+            if (string.IsNullOrEmpty (prefix)) {
+                return name;
+            } else {
+                return string.Concat (prefix, ":", name);
             }
         }
     }
 }
+

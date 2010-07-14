@@ -45,8 +45,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         const string bat = "www.bat.org";
 
         [XmlType ("data", foo)]
-        [XmlNamespace (bat, "bat")]
         [XmlNamespace (bar, "bar")]
+        [XmlNamespace (bat, "bat")]
         class Data
         {
             [XmlElement ("manditoryFooElement", foo)] public string ManditoryFooElement { get; set; }
