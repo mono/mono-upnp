@@ -78,7 +78,7 @@ namespace Mono.Upnp.Internal
         
         protected override void SerializeSelfAndMembers (XmlSerializationContext context)
         {
-            throw new InvalidOperationException ("A XmlShell cannot be the root of a serialization operation.");
+            throw new InvalidOperationException ("An XmlShell cannot be the root of a serialization operation.");
         }
     }
 }
