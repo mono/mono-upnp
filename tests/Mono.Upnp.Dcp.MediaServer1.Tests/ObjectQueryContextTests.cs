@@ -281,6 +281,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsFalse (superclass_context.PropertyExists ("Bar", test));
             Assert.IsTrue (subclass_context.PropertyExists ("Foo", test));
             Assert.IsTrue (subclass_context.PropertyExists ("Bar", test));
+            Assert.IsFalse (new ObjectQueryContext (typeof (ElementTestSubclass)).PropertyExists ("Foo", test));
         }
     }
 }
