@@ -204,25 +204,29 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             if (model.GetIterFromString (out iter, args.Path))
             {
                 var tag_id = (uint)model.GetValue (iter, 0);
-                ToggleTag (tag_id);
+                var is_active = selected_tags.Contains (tag_id);
+                ToggleTag (tag_id, is_active);
 
                 selected_tags_changed = true;
             }
         }
 
-        void ToggleTag (uint tag_id)
+        void ToggleTag (uint tag_id, bool isActive)
         {
             var tag = tag_store.Get (tag_id);
             if (tag != null) {
-                if (selected_tags.Contains (tag_id)) {
-                    selected_tags.Remove (tag_id);
+                if (isActive) {
+                    if (selected_tags.Contains (tag_id)) {
+                        selected_tags.Remove (tag_id);
+                    }
                 } else {
-                    selected_tags.Add (tag_id);
-                }
+                    if (!selected_tags.Contains (tag_id)) {
+                        selected_tags.Add (tag_id);
+                    }            }
 
                 if (tag is Category) {
                     foreach (var child in (tag as Category).Children) {
-                        ToggleTag (child.Id);
+                        ToggleTag (child.Id, isActive);
                     }
                 }
             }
