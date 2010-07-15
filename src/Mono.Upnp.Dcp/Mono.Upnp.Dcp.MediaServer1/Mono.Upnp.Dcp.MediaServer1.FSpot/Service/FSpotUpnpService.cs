@@ -31,7 +31,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 {
     public class FSpotUpnpService : IService
     {
-        internal static Guid ServiceGuid = new Guid ("c0a64f08-c1e6-4c42-82e7-d6870e1c3c67");
+        internal static Guid ServiceGuid = new Guid ();
         MediaServer media_server;
         GConf.Client client;
 
