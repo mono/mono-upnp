@@ -359,12 +359,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
         }
         
-        private MusicTrack GetTrack(string path, Container parent)
+        MusicTrack GetTrack(string path, Container parent)
         {
             var tags = TagLib.File.Create (path);
             
-            var options = new MusicTrackOptions
-            {
+            var options = new MusicTrackOptions {
                 Title = tags.Tag.Title,
                 OriginalTrackNumber = (int)tags.Tag.Track
             };
