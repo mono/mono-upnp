@@ -37,6 +37,7 @@ using FSpot.Query;
 using FSpotPhoto = FSpot.Photo;
 using UpnpPhoto = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av.Photo;
 using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
+using System.Collections;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 {
@@ -47,13 +48,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
         string prefix = GeneratePrefix ();
         Db db = App.Instance.Database;
 
-        Dictionary <uint, UpnpPhoto> photos_cache;
-        Dictionary <uint, Container> tags_cache;
+        Dictionary<uint, UpnpPhoto> photos_cache;
+        Dictionary<uint, Container> tags_cache;
+
+        List<uint> shared_tags;
+        bool share_all_tags = true;
 
         public FSpotContentDirectory ()
         {
             photos_cache = new Dictionary<uint, UpnpPhoto> ();
             tags_cache = new Dictionary<uint, Container> ();
+
+            LoadSharedTags ();
 
             PrepareRoot ();
 
@@ -61,12 +67,41 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             listener.Prefixes.Add (prefix);
         }
 
+        void LoadSharedTags ()
+        {
+            shared_tags = new List<uint> ();
+
+            var client = new GConf.Client ();
+
+            try {
+                share_all_tags = (bool)client.Get (GConfConstants.SHARE_ALL_CATEGORIES_KEY);
+                var list = client.Get (GConfConstants.SHARED_CATEGORIES_KEY);
+                if (list != null) {
+                    foreach (var item in (IEnumerable)list) {
+                        shared_tags.Add (Convert.ToUInt32 (item));
+                    }
+                }
+            } catch (GConf.NoSuchKeyException) {
+            }
+        }
+
         void PrepareRoot ()
         {
+            var child_count = 0;
+            if (!share_all_tags) {
+                foreach (var tag in db.Tags.RootCategory.Children) {
+                    if (shared_tags.Contains (tag.Id)) {
+                        child_count++;
+                    }
+                }
+            } else {
+                child_count = db.Tags.RootCategory.Children.Count;
+            }
+
             var root = new StorageFolder (this) {
                 IsRestricted = true,
                 Title = "F-Spot RootCategory",
-                ChildCount = db.Tags.RootCategory.Children.Count
+                ChildCount = child_count
             };
 
             tags_cache.Add (db.Tags.RootCategory.Id, root);
@@ -197,23 +232,28 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
                 var tag = db.Tags.Get (tag_key_value.Key);
                 if (tag != null) {
                     var results = db.Photos.Query (new TagTerm (tag));
-                    totalMatches = results.Count ();;
-
-                    var photos = results.Skip (startIndex).Take (requestCount);
+                    totalMatches = results.Count ();
 
                     var upnp_result = new List<UpnpObject> ();
 
                     var category = tag as Category;
                     if (category != null) {
-                        totalMatches += category.Children.Count;
                         foreach (var child_tag in category.Children) {
+                            if (!share_all_tags && !shared_tags.Contains (child_tag.Id)) {
+                                continue;
+                            }
                             upnp_result.Add (GetContainer (child_tag, tag_key_value.Value));
+                            totalMatches++;
                         }
                     }
+
+                    var photos = results.Skip (startIndex).Take (requestCount - totalMatches);
 
                     foreach (var photo in photos) {
                         upnp_result.Add (GetPhoto (photo, tag_key_value.Value));
                     }
+
+                    Console.WriteLine (upnp_result.Count);
 
                     return upnp_result.Cast <IXmlSerializable> ();
                 }

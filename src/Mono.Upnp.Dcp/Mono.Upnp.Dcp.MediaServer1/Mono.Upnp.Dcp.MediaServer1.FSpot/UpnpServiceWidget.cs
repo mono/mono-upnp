@@ -32,9 +32,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 {
     public partial class UpnpServiceWidget : ScrolledWindow
     {
+        GConf.Client gconf_client;
         TreeStore model;
         Client client;
         Dictionary <string, TreeIter> devices = new Dictionary<string, TreeIter> ();
+
+        bool client_running = false;
 
         public UpnpServiceWidget ()
         {
@@ -51,15 +54,48 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 
             treeview1.AppendColumn (col);
 
-            GenerateTree();
+            gconf_client = new GConf.Client ();
+            gconf_client.AddNotify (GConfConstants.GCONF_APP_PATH, OnGConfNotify);
+
+            try {
+                if ((bool)gconf_client.Get (GConfConstants.LOOK_FOR_LIBRARIES_KEY)) {
+                    StartClient ();
+                }
+            } catch (GConf.NoSuchKeyException) {
+                
+            }
         }
 
-        private void GenerateTree ()
+        void OnGConfNotify (object sender, GConf.NotifyEventArgs args)
+        {
+            if (args.Key == GConfConstants.LOOK_FOR_LIBRARIES_KEY) {
+                if ((bool)args.Value && !client_running) {
+                    StartClient ();
+                } else if (!(bool)args.Value && client_running) {
+                    StopClient ();
+                }
+            }
+        }
+
+        void StartClient ()
         {
             client = new Client ();
             client.DeviceAdded += OnDeviceAdded;
             client.DeviceRemoved += OnDeviceRemoved;
             client.BrowseAll ();
+
+            client_running = true;
+        }
+
+        void StopClient ()
+        {
+            model.Clear ();
+
+            client.DeviceAdded -= OnDeviceAdded;
+            client.DeviceRemoved -= OnDeviceRemoved;
+            client.Dispose ();
+
+            client_running = false;
         }
 
         void OnDeviceRemoved (object sender, DeviceEventArgs e)
@@ -84,7 +120,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 
         public override void Dispose ()
         {
-            // client.Stop (); ?
+            StopClient ();
 
             base.Dispose ();
         }

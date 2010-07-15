@@ -58,6 +58,9 @@
     <Reference Include="gnome-vfs-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Package>gnome-vfs-sharp-2.0</Package>
     </Reference>
+    <Reference Include="gconf-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gconf-sharp-2.0</Package>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -70,6 +73,10 @@
     <Compile Include="Service\FSpotContentDirectory.cs" />
     <Compile Include="Service\MimeTypeHelper.cs" />
     <Compile Include="Service\FSpotUpnpService.cs" />
+    <Compile Include="MenuCommand\SharingConfig.cs" />
+    <Compile Include="MenuCommand\SharingConfigDialog.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.Dcp.MediaServer1.FSpot.SharingConfigDialog.cs" />
+    <Compile Include="GConfConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">
@@ -94,5 +101,6 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Service\" />
+    <Folder Include="MenuCommand\" />
   </ItemGroup>
 </Project>

@@ -33,10 +33,51 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
     {
         internal static Guid ServiceGuid = new Guid ("c0a64f08-c1e6-4c42-82e7-d6870e1c3c67");
         MediaServer media_server;
+        GConf.Client client;
+
+        internal static FSpotUpnpService Instance { get; private set; }
+
+        internal bool IsRunning { get; private set; }
+
+        public FSpotUpnpService ()
+        {
+            Instance = this;
+            client = new GConf.Client ();
+            client.AddNotify (GConfConstants.GCONF_APP_PATH, OnGConfNotify);
+        }
+
+        void OnGConfNotify (object sender, GConf.NotifyEventArgs args)
+        {
+            switch (args.Key) {
+                case GConfConstants.SHARED_CATEGORIES_KEY:
+                case GConfConstants.SHARE_ALL_CATEGORIES_KEY:
+                    if (IsRunning) {
+                        Restart ();
+                    }
+                    break;
+                case GConfConstants.SHARE_LIBRARY_KEY:
+                    if ((bool)args.Value && !IsRunning) {
+                        Start ();
+                    } else if (!(bool)args.Value && IsRunning) {
+                        Stop ();
+                    }
+                    break;
+            default:
+            break;
+            }
+        }
 
         #region IService implementation
         public bool Start ()
         {
+            try {
+                if (!(bool)client.Get (GConfConstants.SHARE_LIBRARY_KEY)) {
+                    return false;
+                }
+            } catch (GConf.NoSuchKeyException) {
+                return false;
+            }
+
             var udn = "uuid:" + ServiceGuid.ToString ();
 
             var friendly_name = string.Format ("{0} | F-Spot Photo Sharing", Environment.UserName);
@@ -72,18 +113,34 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
                 );
                 
                 media_server.Start ();
+
+                IsRunning = true;
+
                 return true;
             } catch (Exception ex) {
                 Console.WriteLine ("Error loading F-Spot UPnP add-in: {0}", ex.Message);
                 return false;
             }
         }
-        
+
+        public void Restart ()
+        {
+            if (IsRunning) {
+                Stop ();
+            }
+
+            Start ();
+        }
         
         public bool Stop ()
         {
-            media_server.Stop ();
-            media_server.Dispose ();
+            if (media_server != null) {
+                media_server.Stop ();
+                media_server.Dispose ();
+            }
+
+            IsRunning = false;
+
             return true;
         }
         
