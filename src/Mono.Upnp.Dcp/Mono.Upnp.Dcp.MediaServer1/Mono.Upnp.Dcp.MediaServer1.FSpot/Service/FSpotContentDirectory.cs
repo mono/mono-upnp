@@ -253,8 +253,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
                         upnp_result.Add (GetPhoto (photo, tag_key_value.Value));
                     }
 
-                    Console.WriteLine (upnp_result.Count);
-
                     return upnp_result.Cast <IXmlSerializable> ();
                 }
             }

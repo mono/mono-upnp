@@ -51,9 +51,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             switch (args.Key) {
                 case GConfConstants.SHARED_CATEGORIES_KEY:
                 case GConfConstants.SHARE_ALL_CATEGORIES_KEY:
-                    if (IsRunning) {
-                        Restart ();
-                    }
+                    Restart ();
                     break;
                 case GConfConstants.SHARE_LIBRARY_KEY:
                     if ((bool)args.Value && !IsRunning) {
