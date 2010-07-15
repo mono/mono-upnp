@@ -1,0 +1,11 @@
+<Addin namespace="FSpot">
+        <Dependencies>
+                <Addin id="Core" version="0.7"/>
+        </Dependencies>
+        <Extension path = "/FSpot/Services">
+                <Service class="Mono.Upnp.Dcp.MediaServer1.FSpot.FSpotUpnpService"/>
+        </Extension>
+        <Extension path = "/FSpot/Sidebar">
+                <SidebarPage sidebar_page_type="Mono.Upnp.Dcp.MediaServer1.FSpot.FSpotUpnpSidebarPage"/>
+        </Extension>
+</Addin>
