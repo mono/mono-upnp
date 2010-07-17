@@ -38,6 +38,7 @@ using FSpotPhoto = FSpot.Photo;
 using UpnpPhoto = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av.Photo;
 using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 using System.Collections;
+using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 {
@@ -273,7 +274,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
                 upnp_photo = new UpnpPhoto (photo_options, this, parent);
 
                 var resource_settings = new ResourceSettings (new Uri (string.Format ("{0}object?id={1}", prefix, upnp_photo.Id))) {
-                    ProtocolInfo = string.Format ("http-get:*:{0}:*", MimeTypeHelper.GetMimeType(photo.DefaultVersion.Uri))
+                    ProtocolInfo = new ProtocolInfo (Protocols.HttpGet, MimeTypeHelper.GetMimeType(photo.DefaultVersion.Uri))
                 };
                 upnp_photo.AddResource (new Resource (resource_settings));
 
