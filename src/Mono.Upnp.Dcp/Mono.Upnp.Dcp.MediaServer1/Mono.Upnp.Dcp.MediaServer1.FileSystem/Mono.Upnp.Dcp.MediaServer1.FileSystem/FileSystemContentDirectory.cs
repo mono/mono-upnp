@@ -35,6 +35,7 @@ using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
 using Mono.Upnp.Xml;
 
 using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
+using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
@@ -378,7 +379,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             var resourceSettings = new ResourceSettings
                 (new Uri (string.Format ("{0}object?id={1}", prefix, track.Id)))
                 {
-                    ProtocolInfo = "http-get:*:audio/mpeg:*",
+                    ProtocolInfo = new ProtocolInfo (Protocols.HttpGet, "audio/mpeg"),
                     Size = (ulong)new FileInfo(path).Length,
                     Duration = tags.Properties.Duration,
                     Bitrate = (uint)tags.Properties.AudioBitrate,

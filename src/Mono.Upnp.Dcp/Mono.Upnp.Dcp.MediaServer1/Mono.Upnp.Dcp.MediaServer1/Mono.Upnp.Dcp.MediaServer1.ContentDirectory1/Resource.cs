@@ -27,6 +27,7 @@
 using System;
 
 using Mono.Upnp.Xml;
+using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
@@ -84,7 +85,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public virtual uint? ColorDepth { get; protected set; }
 
         [XmlAttribute ("protocolInfo", OmitIfNull = true)]
-        public virtual string ProtocolInfo { get; protected set; }
+        public virtual ProtocolInfo ProtocolInfo { get; protected set; }
 
         [XmlAttribute ("protection", OmitIfNull = true)]
         public virtual string Protection { get; protected set; }
