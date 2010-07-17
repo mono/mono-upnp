@@ -53,7 +53,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
         Dictionary<uint, Container> tags_cache;
 
         List<uint> shared_tags;
-        bool share_all_tags = true;
+        bool share_all_tags = GConfHelper.ShareAllCategories;
 
         public FSpotContentDirectory ()
         {

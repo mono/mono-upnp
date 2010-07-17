@@ -102,7 +102,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             GConfHelper.LookForLibraries = lookForSharedLibrariesCheckbox.Active;
             GConfHelper.ShareLibrary = shareMyLibraryCheckbox.Active;
             GConfHelper.LibraryName = libraryNameTextBox.Text;
-            GConfHelper.ShareAllCategories = !shareSelectedCategoriesRadioButton.Active;
+            GConfHelper.ShareAllCategories = shareEntireLibraryRadioButton.Active;
             GConfHelper.SharedCategories = selected_tags;
 
             GConfHelper.Client.SuggestSync ();
@@ -113,7 +113,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             lookForSharedLibrariesCheckbox.Active = GConfHelper.LookForLibraries;
             shareMyLibraryCheckbox.Active = GConfHelper.ShareLibrary;
             libraryNameTextBox.Text = GConfHelper.LibraryName;
-            shareSelectedCategoriesRadioButton.Active = !GConfHelper.ShareAllCategories;
+            shareEntireLibraryRadioButton.Active = GConfHelper.ShareAllCategories;
             selected_tags = new List<uint> (GConfHelper.SharedCategories);
         }
 
@@ -184,7 +184,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             model.GetValue (iter, 0, ref value);
             var tag_id = (uint) value;
 
-            (renderer as CellRendererToggle).Active = selected_tags.Contains (tag_id);
+            var is_active = selected_tags.Contains (tag_id);
+
+            var toggle_renderer = renderer as CellRendererToggle;
+            toggle_renderer.Active = is_active;
         }
 
         void CellRendererToggle_Toggled (object o, ToggledArgs args)
@@ -193,27 +196,29 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             if (model.GetIterFromString (out iter, args.Path))
             {
                 var tag_id = (uint)model.GetValue (iter, 0);
-                var is_active = selected_tags.Contains (tag_id);
-                ToggleTag (tag_id, is_active);
+                ToggleTag (tag_id);
             }
         }
 
-        void ToggleTag (uint tag_id, bool isActive)
+        void ToggleTag (uint tag_id)
         {
             var tag = tag_store.Get (tag_id);
             if (tag != null) {
-                if (isActive) {
-                    if (selected_tags.Contains (tag_id)) {
-                        selected_tags.Remove (tag_id);
+                if (selected_tags.Contains (tag_id)) {
+                    selected_tags.Remove (tag_id);
+                    if (tag is Category) {
+                        foreach (var child in (tag as Category).Children) {
+                            if (selected_tags.Contains (child.Id)) {
+                                selected_tags.Remove (child.Id);
+                            }
+                        }
                     }
                 } else {
                     if (!selected_tags.Contains (tag_id)) {
                         selected_tags.Add (tag_id);
-                    }            }
-
-                if (tag is Category) {
-                    foreach (var child in (tag as Category).Children) {
-                        ToggleTag (child.Id, isActive);
+                        if (!selected_tags.Contains (tag.Category.Id)) {
+                            selected_tags.Add (tag.Category.Id);
+                        }
                     }
                 }
             }
