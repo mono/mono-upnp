@@ -30,7 +30,7 @@
       </widget>
     </child>
   </widget>
-  <widget class="Gtk.Dialog" id="Mono.Upnp.Dcp.MediaServer1.FSpot.SharingConfigDialog" design-size="356 429">
+  <widget class="Gtk.Dialog" id="Mono.Upnp.Dcp.MediaServer1.FSpot.SharingConfigDialog" design-size="358 472">
     <property name="MemberName" />
     <property name="Title" translatable="yes">UPnP Photo Sharing Preferences</property>
     <property name="Icon">stock:gtk-preferences Menu</property>
@@ -86,39 +86,6 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="Gtk.RadioButton" id="shareEntireLibraryRadioButton">
-                        <property name="MemberName" />
-                        <property name="Sensitive">False</property>
-                        <property name="CanFocus">True</property>
-                        <property name="Label" translatable="yes">Share entire library</property>
-                        <property name="DrawIndicator">True</property>
-                        <property name="HasLabel">True</property>
-                        <property name="UseUnderline">True</property>
-                        <property name="Group">shareLibraryGroup</property>
-                      </widget>
-                      <packing>
-                        <property name="X">32</property>
-                        <property name="Y">71</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="Gtk.RadioButton" id="shareSelectedCategoriesRadioButton">
-                        <property name="MemberName" />
-                        <property name="Sensitive">False</property>
-                        <property name="CanFocus">True</property>
-                        <property name="Label" translatable="yes">Share selected categories:</property>
-                        <property name="DrawIndicator">True</property>
-                        <property name="HasLabel">True</property>
-                        <property name="UseUnderline">True</property>
-                        <property name="Group">shareLibraryGroup</property>
-                        <signal name="Toggled" handler="OnShareSelectedCategoriesRadioButtonToggled" />
-                      </widget>
-                      <packing>
-                        <property name="X">32</property>
-                        <property name="Y">97</property>
-                      </packing>
-                    </child>
-                    <child>
                       <placeholder />
                     </child>
                     <child>
@@ -139,7 +106,65 @@
                       </widget>
                       <packing>
                         <property name="X">35</property>
-                        <property name="Y">124</property>
+                        <property name="Y">154</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Gtk.RadioButton" id="shareSelectedCategoriesRadioButton">
+                        <property name="MemberName" />
+                        <property name="Sensitive">False</property>
+                        <property name="CanFocus">True</property>
+                        <property name="Label" translatable="yes">Share selected categories:</property>
+                        <property name="DrawIndicator">True</property>
+                        <property name="HasLabel">True</property>
+                        <property name="UseUnderline">True</property>
+                        <property name="Group">shareLibraryGroup</property>
+                        <signal name="Toggled" handler="OnShareSelectedCategoriesRadioButtonToggled" />
+                      </widget>
+                      <packing>
+                        <property name="X">35</property>
+                        <property name="Y">119</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Gtk.Label" id="libraryNameLabel">
+                        <property name="MemberName" />
+                        <property name="Sensitive">False</property>
+                        <property name="LabelProp" translatable="yes">Library name:</property>
+                      </widget>
+                      <packing>
+                        <property name="X">38</property>
+                        <property name="Y">71</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Gtk.Entry" id="libraryNameTextBox">
+                        <property name="MemberName" />
+                        <property name="WidthRequest">177</property>
+                        <property name="Sensitive">False</property>
+                        <property name="CanFocus">True</property>
+                        <property name="IsEditable">True</property>
+                        <property name="InvisibleChar">●</property>
+                      </widget>
+                      <packing>
+                        <property name="X">132</property>
+                        <property name="Y">66</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="Gtk.RadioButton" id="shareEntireLibraryRadioButton">
+                        <property name="MemberName" />
+                        <property name="Sensitive">False</property>
+                        <property name="CanFocus">True</property>
+                        <property name="Label" translatable="yes">Share entire library</property>
+                        <property name="DrawIndicator">True</property>
+                        <property name="HasLabel">True</property>
+                        <property name="UseUnderline">True</property>
+                        <property name="Group">shareLibraryGroup</property>
+                      </widget>
+                      <packing>
+                        <property name="X">35</property>
+                        <property name="Y">94</property>
                       </packing>
                     </child>
                   </widget>

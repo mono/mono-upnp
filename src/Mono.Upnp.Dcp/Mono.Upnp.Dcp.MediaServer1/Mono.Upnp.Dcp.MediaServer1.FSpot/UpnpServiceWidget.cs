@@ -32,7 +32,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 {
     public partial class UpnpServiceWidget : ScrolledWindow
     {
-        GConf.Client gconf_client;
         TreeStore model;
         Client client;
         Dictionary <string, TreeIter> devices = new Dictionary<string, TreeIter> ();
@@ -54,21 +53,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 
             treeview1.AppendColumn (col);
 
-            gconf_client = new GConf.Client ();
-            gconf_client.AddNotify (GConfConstants.GCONF_APP_PATH, OnGConfNotify);
+            GConfHelper.Client.AddNotify (GConfHelper.GCONF_APP_PATH, OnGConfNotify);
 
-            try {
-                if ((bool)gconf_client.Get (GConfConstants.LOOK_FOR_LIBRARIES_KEY)) {
-                    StartClient ();
-                }
-            } catch (GConf.NoSuchKeyException) {
-                
+            if (GConfHelper.LookForLibraries) {
+                StartClient ();
             }
         }
 
         void OnGConfNotify (object sender, GConf.NotifyEventArgs args)
         {
-            if (args.Key == GConfConstants.LOOK_FOR_LIBRARIES_KEY) {
+            if (args.Key == GConfHelper.LOOK_FOR_LIBRARIES_KEY) {
                 if ((bool)args.Value && !client_running) {
                     StartClient ();
                 } else if (!(bool)args.Value && client_running) {

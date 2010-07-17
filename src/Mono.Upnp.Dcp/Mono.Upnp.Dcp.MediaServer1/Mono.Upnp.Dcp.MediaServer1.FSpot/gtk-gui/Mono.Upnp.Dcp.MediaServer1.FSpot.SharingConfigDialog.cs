@@ -12,13 +12,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 
 		private global::Gtk.CheckButton shareMyLibraryCheckbox;
 
-		private global::Gtk.RadioButton shareEntireLibraryRadioButton;
-
-		private global::Gtk.RadioButton shareSelectedCategoriesRadioButton;
-
 		private global::Gtk.ScrolledWindow GtkScrolledWindow1;
 
 		private global::Gtk.TreeView categoriesTreeView;
+
+		private global::Gtk.RadioButton shareSelectedCategoriesRadioButton;
+
+		private global::Gtk.Label libraryNameLabel;
+
+		private global::Gtk.Entry libraryNameTextBox;
+
+		private global::Gtk.RadioButton shareEntireLibraryRadioButton;
 
 		private global::Gtk.Button buttonCancel;
 
@@ -72,30 +76,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 			w4.X = 13;
 			w4.Y = 43;
 			// Container child fixed2.Gtk.Fixed+FixedChild
-			this.shareEntireLibraryRadioButton = new global::Gtk.RadioButton (global::Mono.Unix.Catalog.GetString ("Share entire library"));
-			this.shareEntireLibraryRadioButton.Sensitive = false;
-			this.shareEntireLibraryRadioButton.CanFocus = true;
-			this.shareEntireLibraryRadioButton.Name = "shareEntireLibraryRadioButton";
-			this.shareEntireLibraryRadioButton.DrawIndicator = true;
-			this.shareEntireLibraryRadioButton.UseUnderline = true;
-			this.shareEntireLibraryRadioButton.Group = new global::GLib.SList (global::System.IntPtr.Zero);
-			this.fixed2.Add (this.shareEntireLibraryRadioButton);
-			global::Gtk.Fixed.FixedChild w5 = ((global::Gtk.Fixed.FixedChild)(this.fixed2[this.shareEntireLibraryRadioButton]));
-			w5.X = 32;
-			w5.Y = 71;
-			// Container child fixed2.Gtk.Fixed+FixedChild
-			this.shareSelectedCategoriesRadioButton = new global::Gtk.RadioButton (global::Mono.Unix.Catalog.GetString ("Share selected categories:"));
-			this.shareSelectedCategoriesRadioButton.Sensitive = false;
-			this.shareSelectedCategoriesRadioButton.CanFocus = true;
-			this.shareSelectedCategoriesRadioButton.Name = "shareSelectedCategoriesRadioButton";
-			this.shareSelectedCategoriesRadioButton.DrawIndicator = true;
-			this.shareSelectedCategoriesRadioButton.UseUnderline = true;
-			this.shareSelectedCategoriesRadioButton.Group = this.shareEntireLibraryRadioButton.Group;
-			this.fixed2.Add (this.shareSelectedCategoriesRadioButton);
-			global::Gtk.Fixed.FixedChild w6 = ((global::Gtk.Fixed.FixedChild)(this.fixed2[this.shareSelectedCategoriesRadioButton]));
-			w6.X = 32;
-			w6.Y = 97;
-			// Container child fixed2.Gtk.Fixed+FixedChild
 			this.GtkScrolledWindow1 = new global::Gtk.ScrolledWindow ();
 			this.GtkScrolledWindow1.Name = "GtkScrolledWindow1";
 			this.GtkScrolledWindow1.ShadowType = ((global::Gtk.ShadowType)(1));
@@ -109,20 +89,65 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 			this.categoriesTreeView.HeadersVisible = false;
 			this.GtkScrolledWindow1.Add (this.categoriesTreeView);
 			this.fixed2.Add (this.GtkScrolledWindow1);
-			global::Gtk.Fixed.FixedChild w8 = ((global::Gtk.Fixed.FixedChild)(this.fixed2[this.GtkScrolledWindow1]));
-			w8.X = 35;
-			w8.Y = 124;
+			global::Gtk.Fixed.FixedChild w6 = ((global::Gtk.Fixed.FixedChild)(this.fixed2[this.GtkScrolledWindow1]));
+			w6.X = 35;
+			w6.Y = 154;
+			// Container child fixed2.Gtk.Fixed+FixedChild
+			this.shareSelectedCategoriesRadioButton = new global::Gtk.RadioButton (global::Mono.Unix.Catalog.GetString ("Share selected categories:"));
+			this.shareSelectedCategoriesRadioButton.Sensitive = false;
+			this.shareSelectedCategoriesRadioButton.CanFocus = true;
+			this.shareSelectedCategoriesRadioButton.Name = "shareSelectedCategoriesRadioButton";
+			this.shareSelectedCategoriesRadioButton.DrawIndicator = true;
+			this.shareSelectedCategoriesRadioButton.UseUnderline = true;
+			this.shareSelectedCategoriesRadioButton.Group = new global::GLib.SList (global::System.IntPtr.Zero);
+			this.fixed2.Add (this.shareSelectedCategoriesRadioButton);
+			global::Gtk.Fixed.FixedChild w7 = ((global::Gtk.Fixed.FixedChild)(this.fixed2[this.shareSelectedCategoriesRadioButton]));
+			w7.X = 35;
+			w7.Y = 119;
+			// Container child fixed2.Gtk.Fixed+FixedChild
+			this.libraryNameLabel = new global::Gtk.Label ();
+			this.libraryNameLabel.Sensitive = false;
+			this.libraryNameLabel.Name = "libraryNameLabel";
+			this.libraryNameLabel.LabelProp = global::Mono.Unix.Catalog.GetString ("Library name:");
+			this.fixed2.Add (this.libraryNameLabel);
+			global::Gtk.Fixed.FixedChild w8 = ((global::Gtk.Fixed.FixedChild)(this.fixed2[this.libraryNameLabel]));
+			w8.X = 38;
+			w8.Y = 71;
+			// Container child fixed2.Gtk.Fixed+FixedChild
+			this.libraryNameTextBox = new global::Gtk.Entry ();
+			this.libraryNameTextBox.WidthRequest = 177;
+			this.libraryNameTextBox.Sensitive = false;
+			this.libraryNameTextBox.CanFocus = true;
+			this.libraryNameTextBox.Name = "libraryNameTextBox";
+			this.libraryNameTextBox.IsEditable = true;
+			this.libraryNameTextBox.InvisibleChar = '●';
+			this.fixed2.Add (this.libraryNameTextBox);
+			global::Gtk.Fixed.FixedChild w9 = ((global::Gtk.Fixed.FixedChild)(this.fixed2[this.libraryNameTextBox]));
+			w9.X = 132;
+			w9.Y = 66;
+			// Container child fixed2.Gtk.Fixed+FixedChild
+			this.shareEntireLibraryRadioButton = new global::Gtk.RadioButton (global::Mono.Unix.Catalog.GetString ("Share entire library"));
+			this.shareEntireLibraryRadioButton.Sensitive = false;
+			this.shareEntireLibraryRadioButton.CanFocus = true;
+			this.shareEntireLibraryRadioButton.Name = "shareEntireLibraryRadioButton";
+			this.shareEntireLibraryRadioButton.DrawIndicator = true;
+			this.shareEntireLibraryRadioButton.UseUnderline = true;
+			this.shareEntireLibraryRadioButton.Group = this.shareSelectedCategoriesRadioButton.Group;
+			this.fixed2.Add (this.shareEntireLibraryRadioButton);
+			global::Gtk.Fixed.FixedChild w10 = ((global::Gtk.Fixed.FixedChild)(this.fixed2[this.shareEntireLibraryRadioButton]));
+			w10.X = 35;
+			w10.Y = 94;
 			w2.Add (this.fixed2);
 			this.GtkScrolledWindow.Add (w2);
 			w1.Add (this.GtkScrolledWindow);
-			global::Gtk.Box.BoxChild w11 = ((global::Gtk.Box.BoxChild)(w1[this.GtkScrolledWindow]));
-			w11.Position = 0;
+			global::Gtk.Box.BoxChild w13 = ((global::Gtk.Box.BoxChild)(w1[this.GtkScrolledWindow]));
+			w13.Position = 0;
 			// Internal child Mono.Upnp.Dcp.MediaServer1.FSpot.SharingConfigDialog.ActionArea
-			global::Gtk.HButtonBox w12 = this.ActionArea;
-			w12.Name = "dialog1_ActionArea";
-			w12.Spacing = 10;
-			w12.BorderWidth = ((uint)(5));
-			w12.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
+			global::Gtk.HButtonBox w14 = this.ActionArea;
+			w14.Name = "dialog1_ActionArea";
+			w14.Spacing = 10;
+			w14.BorderWidth = ((uint)(5));
+			w14.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonCancel = new global::Gtk.Button ();
 			this.buttonCancel.CanDefault = true;
@@ -132,9 +157,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 			this.buttonCancel.UseUnderline = true;
 			this.buttonCancel.Label = "gtk-cancel";
 			this.AddActionWidget (this.buttonCancel, -6);
-			global::Gtk.ButtonBox.ButtonBoxChild w13 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w12[this.buttonCancel]));
-			w13.Expand = false;
-			w13.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w15 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w14[this.buttonCancel]));
+			w15.Expand = false;
+			w15.Fill = false;
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
 			this.buttonOk = new global::Gtk.Button ();
 			this.buttonOk.CanDefault = true;
@@ -144,15 +169,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 			this.buttonOk.UseUnderline = true;
 			this.buttonOk.Label = "gtk-save";
 			this.AddActionWidget (this.buttonOk, 0);
-			global::Gtk.ButtonBox.ButtonBoxChild w14 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w12[this.buttonOk]));
-			w14.Position = 1;
-			w14.Expand = false;
-			w14.Fill = false;
+			global::Gtk.ButtonBox.ButtonBoxChild w16 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w14[this.buttonOk]));
+			w16.Position = 1;
+			w16.Expand = false;
+			w16.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 356;
-			this.DefaultHeight = 429;
+			this.DefaultWidth = 358;
+			this.DefaultHeight = 472;
 			this.Show ();
 			this.shareMyLibraryCheckbox.Toggled += new global::System.EventHandler (this.OnShareMyLibraryCheckboxToggled);
 			this.shareSelectedCategoriesRadioButton.Toggled += new global::System.EventHandler (this.OnShareSelectedCategoriesRadioButtonToggled);

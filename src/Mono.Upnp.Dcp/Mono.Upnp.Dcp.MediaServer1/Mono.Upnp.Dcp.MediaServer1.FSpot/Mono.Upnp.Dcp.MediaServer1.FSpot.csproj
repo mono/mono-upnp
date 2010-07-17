@@ -76,7 +76,7 @@
     <Compile Include="MenuCommand\SharingConfig.cs" />
     <Compile Include="MenuCommand\SharingConfigDialog.cs" />
     <Compile Include="gtk-gui\Mono.Upnp.Dcp.MediaServer1.FSpot.SharingConfigDialog.cs" />
-    <Compile Include="GConfConstants.cs" />
+    <Compile Include="GConfHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">

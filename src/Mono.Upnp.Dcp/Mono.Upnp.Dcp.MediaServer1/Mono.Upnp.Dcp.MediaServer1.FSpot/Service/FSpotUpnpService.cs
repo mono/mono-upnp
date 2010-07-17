@@ -33,7 +33,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
     {
         internal static Guid ServiceGuid = new Guid ();
         MediaServer media_server;
-        GConf.Client client;
 
         internal static FSpotUpnpService Instance { get; private set; }
 
@@ -42,18 +41,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
         public FSpotUpnpService ()
         {
             Instance = this;
-            client = new GConf.Client ();
-            client.AddNotify (GConfConstants.GCONF_APP_PATH, OnGConfNotify);
+            GConfHelper.Client.AddNotify (GConfHelper.GCONF_APP_PATH, OnGConfNotify);
         }
 
         void OnGConfNotify (object sender, GConf.NotifyEventArgs args)
         {
             switch (args.Key) {
-                case GConfConstants.SHARED_CATEGORIES_KEY:
-                case GConfConstants.SHARE_ALL_CATEGORIES_KEY:
+                case GConfHelper.SHARED_CATEGORIES_KEY:
+                case GConfHelper.SHARE_ALL_CATEGORIES_KEY:
+                case GConfHelper.LIBRARY_NAME_KEY:
                     Restart ();
                     break;
-                case GConfConstants.SHARE_LIBRARY_KEY:
+                case GConfHelper.SHARE_LIBRARY_KEY:
                     if ((bool)args.Value && !IsRunning) {
                         Start ();
                     } else if (!(bool)args.Value && IsRunning) {
@@ -68,17 +67,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
         #region IService implementation
         public bool Start ()
         {
-            try {
-                if (!(bool)client.Get (GConfConstants.SHARE_LIBRARY_KEY)) {
-                    return false;
-                }
-            } catch (GConf.NoSuchKeyException) {
+            if (!GConfHelper.ShareLibrary) {
                 return false;
             }
 
             var udn = "uuid:" + ServiceGuid.ToString ();
 
-            var friendly_name = string.Format ("{0} | F-Spot Photo Sharing", Environment.UserName);
+            var friendly_name = GConfHelper.LibraryName;
             var manufacturer = "Mono Project";
             var model_name = "Mono.Upnp.Dcp.MediaServer1.FSpot";
             var manufacturer_url = new Uri ("http://www.mono-project.org/");

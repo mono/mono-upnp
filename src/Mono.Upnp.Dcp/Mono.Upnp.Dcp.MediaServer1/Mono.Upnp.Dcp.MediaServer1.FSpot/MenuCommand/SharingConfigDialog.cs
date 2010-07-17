@@ -35,9 +35,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 {
     public partial class SharingConfigDialog : Dialog
     {
-        GConf.Client client = new GConf.Client();
         private List<uint> selected_tags = new List<uint> ();
-        bool selected_tags_changed = false;
         TreeStore model = new TreeStore (typeof(uint), typeof(string));
         TagStore tag_store = App.Instance.Database.Tags;
         Pixbuf empty_pixbuf = new Pixbuf (Colorspace.Rgb, true, 8, 1, 1);
@@ -74,12 +72,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
         protected virtual void OnShareMyLibraryCheckboxToggled (object sender, System.EventArgs e)
         {
             if (shareMyLibraryCheckbox.Active) {
+                libraryNameLabel.Sensitive = true;
+                libraryNameTextBox.Sensitive = true;
                 shareEntireLibraryRadioButton.Sensitive = true;
                 shareSelectedCategoriesRadioButton.Sensitive = true;
                 if (shareSelectedCategoriesRadioButton.Active) {
                     categoriesTreeView.Sensitive = true;
                 }
             } else {
+                libraryNameLabel.Sensitive = false;
+                libraryNameTextBox.Sensitive = false;
                 shareEntireLibraryRadioButton.Sensitive = false;
                 shareSelectedCategoriesRadioButton.Sensitive = false;
                 categoriesTreeView.Sensitive = false;
@@ -97,35 +99,22 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 
         protected virtual void OnButtonOkClicked (object sender, System.EventArgs e)
         {
-            client.Set (GConfConstants.LOOK_FOR_LIBRARIES_KEY, lookForSharedLibrariesCheckbox.Active);
-            client.Set (GConfConstants.SHARE_LIBRARY_KEY, shareMyLibraryCheckbox.Active);
-            client.Set (GConfConstants.SHARE_ALL_CATEGORIES_KEY, shareEntireLibraryRadioButton.Active);
+            GConfHelper.LookForLibraries = lookForSharedLibrariesCheckbox.Active;
+            GConfHelper.ShareLibrary = shareMyLibraryCheckbox.Active;
+            GConfHelper.LibraryName = libraryNameTextBox.Text;
+            GConfHelper.ShareAllCategories = !shareSelectedCategoriesRadioButton.Active;
+            GConfHelper.SharedCategories = selected_tags;
 
-            var list = new List<int> ();
-            foreach (var tag_id in selected_tags) {
-                list.Add (unchecked((int)tag_id));
-            }
-
-            client.Set (GConfConstants.SHARED_CATEGORIES_KEY, list.ToArray ());
-
-            client.SuggestSync ();
+            GConfHelper.Client.SuggestSync ();
         }
 
         void LoadPreferences ()
         {
-            try {
-                lookForSharedLibrariesCheckbox.Active = (bool)client.Get (GConfConstants.LOOK_FOR_LIBRARIES_KEY);
-                shareMyLibraryCheckbox.Active = (bool)client.Get (GConfConstants.SHARE_LIBRARY_KEY);
-                shareSelectedCategoriesRadioButton.Active = !(bool)client.Get (GConfConstants.SHARE_ALL_CATEGORIES_KEY);
-                var list = client.Get (GConfConstants.SHARED_CATEGORIES_KEY);
-                if (list != null) {
-                    foreach (var item in (IEnumerable)list)
-                    {
-                        selected_tags.Add (Convert.ToUInt32 (item));
-                    }
-                }
-            } catch (GConf.NoSuchKeyException) {
-            }
+            lookForSharedLibrariesCheckbox.Active = GConfHelper.LookForLibraries;
+            shareMyLibraryCheckbox.Active = GConfHelper.ShareLibrary;
+            libraryNameTextBox.Text = GConfHelper.LibraryName;
+            shareSelectedCategoriesRadioButton.Active = !GConfHelper.ShareAllCategories;
+            selected_tags = new List<uint> (GConfHelper.SharedCategories);
         }
 
         void Update ()
@@ -206,8 +195,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
                 var tag_id = (uint)model.GetValue (iter, 0);
                 var is_active = selected_tags.Contains (tag_id);
                 ToggleTag (tag_id, is_active);
-
-                selected_tags_changed = true;
             }
         }
 

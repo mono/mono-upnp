@@ -60,30 +60,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             photos_cache = new Dictionary<uint, UpnpPhoto> ();
             tags_cache = new Dictionary<uint, Container> ();
 
-            LoadSharedTags ();
+            shared_tags = new List<uint> (GConfHelper.SharedCategories);
 
             PrepareRoot ();
 
             listener = new HttpListener { IgnoreWriteExceptions = true };
             listener.Prefixes.Add (prefix);
-        }
-
-        void LoadSharedTags ()
-        {
-            shared_tags = new List<uint> ();
-
-            var client = new GConf.Client ();
-
-            try {
-                share_all_tags = (bool)client.Get (GConfConstants.SHARE_ALL_CATEGORIES_KEY);
-                var list = client.Get (GConfConstants.SHARED_CATEGORIES_KEY);
-                if (list != null) {
-                    foreach (var item in (IEnumerable)list) {
-                        shared_tags.Add (Convert.ToUInt32 (item));
-                    }
-                }
-            } catch (GConf.NoSuchKeyException) {
-            }
         }
 
         void PrepareRoot ()
