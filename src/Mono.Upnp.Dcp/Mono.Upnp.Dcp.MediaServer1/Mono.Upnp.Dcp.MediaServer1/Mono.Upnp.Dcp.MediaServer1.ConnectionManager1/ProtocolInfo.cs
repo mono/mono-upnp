@@ -30,7 +30,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
     {
         public ProtocolInfo (string protocol)
         {
-            if (string.IsNullOrEmpty (protocol)) {
+            if (string.IsNullOrEmpty (protocol) || protocol == "*") {
                 throw new ArgumentException ("Protocol must be defined.", "protocol");
             }
             this.Protocol = protocol;
@@ -64,6 +64,33 @@ namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
             var additional_info = string.IsNullOrEmpty (AdditionalInfo) ? "*" : AdditionalInfo;
 
             return string.Format ("{0}:{1}:{2}:{3}", Protocol, network, content_format, additional_info);
+        }
+
+        public static implicit operator string(ProtocolInfo protocolInfo)
+        {
+            return protocolInfo.ToString ();
+        }
+
+        public static implicit operator ProtocolInfo(string textValue)
+        {
+            var tokens = textValue.Split (':');
+            if (tokens.Length != 4) {
+                throw new ArgumentException ("textValue");
+            }
+
+            var result = new ProtocolInfo (tokens [0]);
+
+            if (!string.IsNullOrEmpty (tokens [1]) && tokens [1] != "*") {
+                result.Network = tokens [1];
+            }
+            if (!string.IsNullOrEmpty (tokens [2]) && tokens [2] != "*") {
+                result.ContentFormat = tokens [2];
+            }
+            if (!string.IsNullOrEmpty (tokens [3]) && tokens [3] != "*") {
+                result.AdditionalInfo = tokens [3];
+            }
+
+            return result;
         }
     }
 
