@@ -27,12 +27,13 @@ using System;
 using FSpot.Widgets;
 using Gtk;
 using FSpot.Extensions;
+using Mono.Unix;
 namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 {
     public class FSpotUpnpSidebarPage : SidebarPage
     {
         public FSpotUpnpSidebarPage ()
-            : base (new UpnpServiceWidget(), "UPnP", "gtk-network")
+            : base (new UpnpServiceWidget(), Catalog.GetString ("UPnP Shares"), "gtk-network")
         {
             (SidebarWidget as UpnpServiceWidget).Page = this;
         }

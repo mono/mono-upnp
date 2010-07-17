@@ -76,7 +76,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             client = new Client ();
             client.DeviceAdded += OnDeviceAdded;
             client.DeviceRemoved += OnDeviceRemoved;
-            client.BrowseAll ();
+            try {
+                client.BrowseAll ();
+            } catch (Exception ex) {
+                Console.WriteLine ("Error starting Mono.Upnp service browser: {0}", ex.Message);
+                return;
+            }
 
             client_running = true;
         }

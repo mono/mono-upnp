@@ -111,7 +111,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 
                 return true;
             } catch (Exception ex) {
-                Console.WriteLine ("Error loading F-Spot UPnP add-in: {0}", ex.Message);
+                Console.WriteLine ("Error starting Mono.Upnp server: {0}", ex.Message);
                 return false;
             }
         }
