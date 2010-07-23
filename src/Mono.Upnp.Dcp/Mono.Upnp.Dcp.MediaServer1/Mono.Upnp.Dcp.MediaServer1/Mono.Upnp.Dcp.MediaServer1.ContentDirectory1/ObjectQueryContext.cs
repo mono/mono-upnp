@@ -181,9 +181,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             {
                 this.PropertyInfo = propertyInfo;
                 var property_type = propertyInfo.PropertyType;
-                if (property_type.IsGenericType && property_type.GetGenericTypeDefinition () == typeof (Nullable<>)) {
-                    property_type = property_type.GetGenericArguments ()[0];
+                var ienumerable = property_type.GetInterface ("IEnumerable`1");
+                if (ienumerable != null) {
+                    property_type = ienumerable.GetGenericArguments ()[0];
+                } else {
+                    var generic_type = property_type.GetGenericTypeDefinition ();
+                    if (generic_type == typeof (Nullable<>) || generic_type == typeof (IEnumerable<>)) {
+                        property_type = property_type.GetGenericArguments ()[0];
+                    }
                 }
+
                 if (typeof (IComparable).IsAssignableFrom (property_type)) {
                     this.ParseMethod = property_type.GetMethod (
                         "Parse", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof (string) }, null);

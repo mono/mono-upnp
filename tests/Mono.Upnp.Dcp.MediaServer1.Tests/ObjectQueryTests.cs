@@ -37,9 +37,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
     [TestFixture]
     public class ObjectQueryTests : QueryTests
     {
-        readonly Property text = new Property ("Text");
-        readonly Property number = new Property ("Number");
-        readonly Property nullable_number = new Property ("NullableNumber");
+        static readonly Property text = new Property ("Text");
+        static readonly Property number = new Property ("Number");
+        static readonly Property nullable_number = new Property ("NullableNumber");
+//        static readonly Property text_attribute = new Property ("@Text");
+//        static readonly Property number_attribute = new Property ("@Number");
+//        static readonly Property nullable_number_attribute = new Property ("@NullableNumber");
 
         class Data : DummyObject
         {
@@ -187,18 +190,57 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         class ArrayItemData : DummyObject
         {
             [XmlArrayItem] public IEnumerable<string> Text { get; set; }
+            [XmlArrayItem] public IEnumerable<int> Number { get; set; }
         }
 
         [Test]
-        public void ArrayItemDataTest ()
+        public void ArrayItems ()
         {
-            var data = new ArrayItemData { Text = new[] { "one", "two", "three" } };
+            var data = new ArrayItemData {
+                Text = new[] { "one", "two", "three" },
+                Number = new[] { 1, 2, 3 }
+            };
             Assert.IsTrue (Matches (data, text == "two"));
             Assert.IsTrue (Matches (data, text.Contains ("ee")));
+            Assert.IsTrue (Matches (data, text.Contains ("t")));
             Assert.IsTrue (Matches (data, text.Exists (true)));
             Assert.IsFalse (Matches (data, text.Exists (false)));
             Assert.IsTrue (Matches (new ArrayItemData (), text.Exists (false)));
             Assert.IsFalse (Matches (new ArrayItemData (), text.Exists (true)));
+            Assert.IsTrue (Matches (data, number < "4"));
+            Assert.IsTrue (Matches (data, number < "3"));
+            Assert.IsTrue (Matches (data, number < "2"));
+            Assert.IsFalse (Matches (data, number < "1"));
+        }
+
+        class ListArrayItemData : DummyObject
+        {
+            [XmlArrayItem] public List<int> Number { get; set; }
+        }
+
+        [Test]
+        public void ListArrayItems ()
+        {
+            var data = new ListArrayItemData { Number = new List<int> { 1, 2, 3 } };
+            Assert.IsTrue (Matches (data, number <= "4"));
+            Assert.IsTrue (Matches (data, number <= "3"));
+            Assert.IsTrue (Matches (data, number <= "2"));
+            Assert.IsTrue (Matches (data, number <= "1"));
+            Assert.IsFalse (Matches (data, number <= "0"));
+        }
+
+        class AttributeData : DummyObject
+        {
+            [XmlAttribute] public string Text { get; set; }
+            [XmlAttribute] public int Number { get; set; }
+            [XmlAttribute] public int? NullableNumber { get; set; }
+        }
+
+        [Test]
+        public void Attributes ()
+        {
+            //var data = new AttributeData { Text = "foo", Number = 42, NullableNumber = 13 };
+            //Assert.IsTrue (
         }
 
         static bool Matches (Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object @object, Query query)
@@ -208,7 +250,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 if (match) {
                     Assert.Fail ("Multiple matches for a single input.");
                 }
-                match = result == @object;
+                match = true;
             }));
             return match;
         }

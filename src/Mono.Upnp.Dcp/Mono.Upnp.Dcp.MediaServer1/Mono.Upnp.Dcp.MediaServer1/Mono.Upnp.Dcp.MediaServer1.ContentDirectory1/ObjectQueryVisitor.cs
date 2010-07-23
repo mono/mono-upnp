@@ -34,7 +34,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     {
         readonly ObjectQueryContext context;
         readonly Object @object;
-        readonly Action<Object> consumer;
+        Action<Object> consumer;
 
         public ObjectQueryVisitor (ObjectQueryContext context, Object @object, Action<Object> consumer)
         {
@@ -50,9 +50,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             this.consumer = consumer;
         }
 
+        void Yield ()
+        {
+            if (consumer != null) {
+                consumer (@object);
+                consumer = null;
+            }
+        }
+
         public override void VisitAllResults ()
         {
-            consumer (@object);
+            Yield ();
         }
 
         public override void VisitAnd (Query leftOperand, Query rightOperand)
@@ -67,14 +75,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             if (leftResult == null) {
                 rightOperand (this);
             } else {
-                consumer (leftResult);
+                Yield ();
             }
         }
 
         public override void VisitExists (string property, bool value)
         {
             if (context.PropertyExists (property, @object) == value) {
-                consumer (@object);
+                Yield ();
             }
         }
 
@@ -83,10 +91,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             context.VisitProperty (property, @object, val => {
                 if (val == null) {
                     if (value == null) {
-                        consumer (@object);
+                        Yield ();
                     }
                 } else if (val.ToString ().Equals (value)) {
-                    consumer (@object);
+                    Yield ();
                 }
             });
         }
@@ -96,10 +104,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             context.VisitProperty (property, @object, val => {
                 if (val == null) {
                     if (value != null) {
-                        consumer (@object);
+                        Yield ();
                     }
                 } else if (!val.ToString ().Equals (value)) {
-                    consumer (@object);
+                    Yield ();
                 }
             });
         }
@@ -108,7 +116,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             context.CompareProperty (property, @object, value, val => {
                 if (val < 0) {
-                    consumer (@object);
+                    Yield ();
                 }
             });
         }
@@ -117,7 +125,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             context.CompareProperty (property, @object, value, val => {
                 if (val <= 0) {
-                    consumer (@object);
+                    Yield ();
                 }
             });
         }
@@ -126,7 +134,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             context.CompareProperty (property, @object, value, val => {
                 if (val > 0) {
-                    consumer (@object);
+                    Yield ();
                 }
             });
         }
@@ -135,7 +143,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             context.CompareProperty (property, @object, value, val => {
                 if (val >= 0) {
-                    consumer (@object);
+                    Yield ();
                 }
             });
         }
@@ -144,7 +152,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             context.VisitProperty (property, @object, val => {
                 if (val != null && val.ToString ().Contains (value)) {
-                    consumer (@object);
+                    Yield ();
                 }
             });
         }
@@ -153,7 +161,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             context.VisitProperty (property, @object, val => {
                 if (val == null || !val.ToString ().Contains (value)) {
-                    consumer (@object);
+                    Yield ();
                 }
             });
         }

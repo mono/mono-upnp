@@ -36,11 +36,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
     [TestFixture]
     public class QueryParserTests : QueryTests
     {
-        readonly Property foo = new Property ("foo");
-        readonly Property bat = new Property ("bat");
-        readonly Property name = new Property ("name");
-        readonly Property eyes = new Property ("eyes");
-        readonly Property age = new Property ("age");
+        static readonly Property foo = new Property ("foo");
+        static readonly Property bat = new Property ("bat");
+        static readonly Property name = new Property ("name");
+        static readonly Property eyes = new Property ("eyes");
+        static readonly Property age = new Property ("age");
 
         [Test]
         public void EqualityOperator ()
