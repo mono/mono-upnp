@@ -34,9 +34,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     {
         readonly ObjectQueryContext context;
         readonly Object @object;
-        readonly Action<bool> consumer;
+        readonly Action<Object> consumer;
 
-        public ObjectQueryVisitor (ObjectQueryContext context, Object @object, Action<bool> consumer)
+        public ObjectQueryVisitor (ObjectQueryContext context, Object @object, Action<Object> consumer)
         {
             if (context == null) {
                 throw new ArgumentNullException ("context");
@@ -52,58 +52,110 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         public override void VisitAllResults ()
         {
-            consumer (true);
+            consumer (@object);
         }
 
         public override void VisitAnd (Query leftOperand, Query rightOperand)
         {
-            Visit (leftOperand, leftResult => {
-                if (leftResult) {
-                    Visit (rightOperand, rightResult => consumer (rightResult));
-                } else {
-                    consumer (false);
-                }
-            });
+            leftOperand (new ObjectQueryVisitor (context, @object, result => rightOperand (this)));
         }
 
         public override void VisitOr (Query leftOperand, Query rightOperand)
         {
-            Visit (leftOperand, leftResult => {
-                if (leftResult) {
-                    consumer (true);
-                } else {
-                    Visit (rightOperand, rightResult => consumer (rightResult));
-                }
-            });
+            Object leftResult = null;
+            leftOperand (new ObjectQueryVisitor (context, @object, result => leftResult = result));
+            if (leftResult == null) {
+                rightOperand (this);
+            } else {
+                consumer (leftResult);
+            }
+        }
+
+        public override void VisitExists (string property, bool value)
+        {
+            if (context.PropertyExists (property, @object) == value) {
+                consumer (@object);
+            }
         }
 
         public override void VisitEquals (string property, string value)
         {
-            context.VisitProperty <object> (property, @object, v => {
-                if (v == null) {
+            context.VisitProperty (property, @object, val => {
+                if (val == null) {
                     if (value == null) {
-                        consumer (true);
+                        consumer (@object);
                     }
-                } else if (v.ToString ().Equals (value)) {
-                    consumer (true);
+                } else if (val.ToString ().Equals (value)) {
+                    consumer (@object);
                 }
             });
         }
 
         public override void VisitDoesNotEqual (string property, string value)
         {
-            //VisitPropertyExpression<object> (property, val => consumer (!val.Equals (value)));
+            context.VisitProperty (property, @object, val => {
+                if (val == null) {
+                    if (value != null) {
+                        consumer (@object);
+                    }
+                } else if (!val.ToString ().Equals (value)) {
+                    consumer (@object);
+                }
+            });
+        }
+
+        public override void VisitLessThan (string property, string value)
+        {
+            context.CompareProperty (property, @object, value, val => {
+                if (val < 0) {
+                    consumer (@object);
+                }
+            });
+        }
+
+        public override void VisitLessThanOrEqualTo (string property, string value)
+        {
+            context.CompareProperty (property, @object, value, val => {
+                if (val <= 0) {
+                    consumer (@object);
+                }
+            });
+        }
+
+        public override void VisitGreaterThan (string property, string value)
+        {
+            context.CompareProperty (property, @object, value, val => {
+                if (val > 0) {
+                    consumer (@object);
+                }
+            });
+        }
+
+        public override void VisitGreaterThanOrEqualTo (string property, string value)
+        {
+            context.CompareProperty (property, @object, value, val => {
+                if (val >= 0) {
+                    consumer (@object);
+                }
+            });
         }
 
         public override void VisitContains (string property, string value)
         {
-            //VisitPropertyExpression<string> (property, val => consumer (val.Contains (value)));
+            context.VisitProperty (property, @object, val => {
+                if (val != null && val.ToString ().Contains (value)) {
+                    consumer (@object);
+                }
+            });
         }
 
-        void Visit (Query query, Action<bool> consumer)
+        public override void VisitDoesNotContain (string property, string value)
         {
-            query (new ObjectQueryVisitor (context, @object, consumer));
+            context.VisitProperty (property, @object, val => {
+                if (val == null || !val.ToString ().Contains (value)) {
+                    consumer (@object);
+                }
+            });
         }
     }
 }
-

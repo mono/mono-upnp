@@ -55,11 +55,11 @@ C# Style Guidelines
 
   5. Private fileds and local variables look_like_this:
 
-       string all_lower_case_with_underscores = null;
+       string all_lower_case_with_underscores = null;      // Snake casing
   
      Method parameters lookLikeThis:
   
-       public void Foo (string lowerCaseAndThenUpperCase)   // Camal casing
+       public void Foo (string lowerCaseAndThenUpperCase)  // Camal casing
        {
        }
 

@@ -53,10 +53,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (context.PropertyExists ("Foo", foo));
             Assert.IsFalse (context.PropertyExists ("Bar", foo));
             var equality = false;
-            context.VisitProperty<string> ("Foo", foo, value => equality = value == "bar");
+            context.VisitProperty ("Foo", foo, value => equality = value.Equals ("bar"));
             Assert.IsTrue (equality);
             equality = false;
-            context.VisitProperty<string> ("Foo", new ElementTestClass (), value => equality = value == null);
+            context.VisitProperty ("Foo", new ElementTestClass (), value => equality = value == null);
             Assert.IsTrue (equality);
         }
 
@@ -111,10 +111,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (context.PropertyExists ("@Foo", foo));
             Assert.IsFalse (context.PropertyExists ("@Bar", foo));
             var equality = false;
-            context.VisitProperty<string> ("@Foo", foo, value => equality = value == "bar");
+            context.VisitProperty ("@Foo", foo, value => equality = value.Equals ("bar"));
             Assert.IsTrue (equality);
             equality = false;
-            context.VisitProperty<string> ("@Foo", new AttributeTestClass (), value => equality = value == null);
+            context.VisitProperty ("@Foo", new AttributeTestClass (), value => equality = value == null);
             Assert.IsTrue (equality);
         }
 
@@ -195,7 +195,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
             Assert.IsTrue (context.PropertyExists ("OmitIfNullAttribute@Foo", test));
             var equality = false;
-            context.VisitProperty<string> ("OmitIfNullAttribute@Foo", test, value => equality = value == "bar");
+            context.VisitProperty ("OmitIfNullAttribute@Foo", test, value => equality = value.Equals ("bar"));
             Assert.IsTrue (equality);
         }
 
@@ -215,7 +215,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (context.PropertyExists ("Foo", test));
             var i = 0;
             var inequality = false;
-            context.VisitProperty<string> ("Foo", test, value => inequality |= value != foos[i++]);
+            context.VisitProperty ("Foo", test, value => inequality |= !value.Equals (foos[i++]));
             Assert.IsFalse (inequality);
         }
 
@@ -262,7 +262,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             var test = new NestedArrayItemTestClass { Foo = foos };
             var i = 0;
             var inequality = false;
-            context.VisitProperty<string>("Foo@Foo", test, value => inequality |= value != attributes[i++]);
+            context.VisitProperty ("Foo@Foo", test, value => inequality |= !value.Equals (attributes[i++]));
             Assert.IsFalse (inequality);
         }
 
@@ -282,6 +282,32 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (subclass_context.PropertyExists ("Foo", test));
             Assert.IsTrue (subclass_context.PropertyExists ("Bar", test));
             Assert.IsFalse (new ObjectQueryContext (typeof (ElementTestSubclass)).PropertyExists ("Foo", test));
+        }
+
+        class NullableElementTestClass
+        {
+            [XmlElement (OmitIfNull = true)] public int? Foo { get; set; }
+        }
+
+        [Test]
+        public void NullableElement ()
+        {
+            var context = new ObjectQueryContext (typeof (NullableElementTestClass));
+            Assert.IsTrue (context.PropertyExists ("Foo", new NullableElementTestClass { Foo = 42 }));
+            Assert.IsFalse (context.PropertyExists ("Foo", new NullableElementTestClass ()));
+        }
+
+        class NullableAttributeTestClass
+        {
+            [XmlAttribute (OmitIfNull = true)] public int? Foo { get; set; }
+        }
+
+        [Test]
+        public void NullableAttribute ()
+        {
+            var context = new ObjectQueryContext (typeof (NullableAttributeTestClass));
+            Assert.IsTrue (context.PropertyExists ("@Foo", new NullableAttributeTestClass { Foo = 42 }));
+            Assert.IsFalse (context.PropertyExists ("@Foo", new NullableAttributeTestClass ()));
         }
     }
 }

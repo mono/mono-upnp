@@ -60,6 +60,8 @@
     <Compile Include="ObjectQueryTests.cs" />
     <Compile Include="DummyObject.cs" />
     <Compile Include="DummyContentDirectory.cs" />
+    <Compile Include="Property.cs" />
+    <Compile Include="QueryTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

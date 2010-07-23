@@ -52,6 +52,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
 
             this.parentContext = parentContext;
+
             foreach (var property_info in GetProperties (type, BindingFlags.DeclaredOnly)) {
                 foreach (var attribute in property_info.GetCustomAttributes (false)) {
                     if (ProcessElementAttribute (property_info, attribute as XmlElementAttribute)) {
@@ -121,13 +122,30 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        public void VisitProperty<T> (string property, object @object, Action<T> consumer)
+        public void VisitProperty (string property, object @object, Action<object> consumer)
         {
             PropertyVisitor property_visitor;
             if (properties.TryGetValue (property, out property_visitor)) {
-                property_visitor.Visit (@object, value => consumer ((T)value));
+                property_visitor.Visit (@object, value => consumer (value));
             } else if (parentContext != null) {
                 parentContext.VisitProperty (property, @object, consumer);
+            }
+        }
+
+        public void CompareProperty (string property, object @object, string value, Action<int> consumer)
+        {
+            PropertyVisitor property_visitor;
+            if (properties.TryGetValue (property, out property_visitor)) {
+                property_visitor.Visit (@object, val => {
+                    if (property_visitor.ParseMethod != null) {
+                        var parsed_value = property_visitor.ParseMethod.Invoke (null, new[] { value });
+                        consumer (((IComparable)val).CompareTo (parsed_value));
+                    } else {
+                        // TODO throw?
+                    }
+                });
+            } else if (parentContext != null) {
+                parentContext.CompareProperty (property, @object, value, consumer);
             }
         }
 
@@ -157,10 +175,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         abstract class PropertyVisitor
         {
             public readonly PropertyInfo PropertyInfo;
+            public readonly MethodInfo ParseMethod;
 
             protected PropertyVisitor (PropertyInfo propertyInfo)
             {
                 this.PropertyInfo = propertyInfo;
+                var property_type = propertyInfo.PropertyType;
+                if (property_type.IsGenericType && property_type.GetGenericTypeDefinition () == typeof (Nullable<>)) {
+                    property_type = property_type.GetGenericArguments ()[0];
+                }
+                if (typeof (IComparable).IsAssignableFrom (property_type)) {
+                    this.ParseMethod = property_type.GetMethod (
+                        "Parse", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof (string) }, null);
+                }
             }
 
             public abstract void Visit (object @object, Action<object> consumer);

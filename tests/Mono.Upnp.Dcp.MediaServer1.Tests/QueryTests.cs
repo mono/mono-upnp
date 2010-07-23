@@ -1,5 +1,5 @@
 // 
-// ObjectBasedQueryProvider.cs
+// QueryTests.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -24,41 +24,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
-using System.Collections.Generic;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
+namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
-    public class ObjectBasedQueryProvider
+    public class QueryTests
     {
-        Dictionary<Type, ObjectQueryContext> queryContexts = new Dictionary<Type, ObjectQueryContext>();
-
-        public void Query (Query query, IEnumerable<Object> objects, Action<Object> consumer)
+        protected static Query Conjoin (Query leftOperand, Query rightOperand)
         {
-            if (query == null) {
-                throw new ArgumentNullException ("query");
-            } else if (objects == null) {
-                throw new ArgumentNullException ("objects");
-            }
-
-            foreach (var @object in objects) {
-                query (new ObjectQueryVisitor (GetQueryContext (@object.GetType ()), @object, consumer));
-            }
+            return visitor => visitor.VisitAnd (leftOperand, rightOperand);
         }
 
-        ObjectQueryContext GetQueryContext (Type type)
+        protected static Query Disjoin (Query leftOperand, Query rightOperand)
         {
-            if (type == null) {
-                return null;
-            }
-
-            ObjectQueryContext context;
-            if (!queryContexts.TryGetValue (type, out context)) {
-                context = new ObjectQueryContext (type, GetQueryContext (type.BaseType));
-                queryContexts[type] = context;
-            }
-
-            return context;
+            return visitor => visitor.VisitOr (leftOperand, rightOperand);
         }
     }
 }

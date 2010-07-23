@@ -41,7 +41,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         public override void VisitEquals (string property, string value)
         {
-            VisitPropertyOperator (property, "==", value);
+            VisitPropertyOperator (property, "=", value);
         }
 
         public override void VisitDoesNotEqual (string property, string value)

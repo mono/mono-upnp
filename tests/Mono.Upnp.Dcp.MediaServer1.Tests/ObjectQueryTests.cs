@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 
 using NUnit.Framework;
 
@@ -34,24 +35,182 @@ using Mono.Upnp.Xml;
 namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
     [TestFixture]
-    public class ObjectQueryTests
+    public class ObjectQueryTests : QueryTests
     {
+        readonly Property text = new Property ("Text");
+        readonly Property number = new Property ("Number");
+        readonly Property nullable_number = new Property ("NullableNumber");
+
         class Data : DummyObject
         {
-            [XmlElement] public string Foo { get; set; }
+            [XmlElement] public string Text { get; set; }
+            [XmlElement] public int Number { get; set; }
+            [XmlElement] public int? NullableNumber { get; set; }
+        }
+
+        Data FullData {
+            get { return new Data { Text = "bar", Number = 42, NullableNumber = 13 }; }
         }
 
         [Test]
         public void Equality ()
         {
-            var data = new Data { Foo = "bar" };
+            Assert.IsTrue (Matches (FullData, text == "bar"));
+            Assert.IsFalse (Matches (FullData, text == null));
+            Assert.IsFalse (Matches (FullData, text == "bat"));
+            Assert.IsTrue (Matches (new Data (), text == null));
+            Assert.IsTrue (Matches (FullData, number == "42"));
+            Assert.IsFalse (Matches (FullData, number == "13"));
+            Assert.IsTrue (Matches (FullData, nullable_number == "13"));
+            Assert.IsTrue (Matches (new Data (), nullable_number == null));
+            Assert.IsFalse (Matches (FullData, nullable_number == null));
+        }
+
+        [Test]
+        public void Inequality ()
+        {
+            Assert.IsTrue (Matches (FullData, text != "bat"));
+            Assert.IsTrue (Matches (FullData, text != null));
+            Assert.IsFalse (Matches (FullData, text != "bar"));
+            Assert.IsFalse (Matches (new Data (), text != null));
+            Assert.IsTrue (Matches (FullData, number != "13"));
+            Assert.IsFalse (Matches (FullData, number != "42"));
+            Assert.IsFalse (Matches (new Data (), nullable_number != null));
+            Assert.IsTrue (Matches (FullData, nullable_number != null));
+        }
+
+        [Test]
+        public void LessThan ()
+        {
+            Assert.IsTrue (Matches (FullData, number < "43"));
+            Assert.IsFalse (Matches (FullData, number < "42"));
+            Assert.IsTrue (Matches (FullData, nullable_number < "14"));
+            Assert.IsFalse (Matches (FullData, nullable_number < "13"));
+        }
+
+        [Test]
+        public void LessThanOrEqualTo ()
+        {
+            Assert.IsTrue (Matches (FullData, number <= "43"));
+            Assert.IsTrue (Matches (FullData, number <= "42"));
+            Assert.IsFalse (Matches (FullData, number <= "41"));
+            Assert.IsTrue (Matches (FullData, nullable_number <= "14"));
+            Assert.IsTrue (Matches (FullData, nullable_number <= "13"));
+            Assert.IsFalse (Matches (FullData, nullable_number <= "12"));
+        }
+
+        [Test]
+        public void GreaterThan ()
+        {
+            Assert.IsTrue (Matches (FullData, number > "41"));
+            Assert.IsFalse (Matches (FullData, number > "42"));
+            Assert.IsTrue (Matches (FullData, nullable_number > "12"));
+            Assert.IsFalse (Matches (FullData, nullable_number > "13"));
+        }
+
+        [Test]
+        public void GreaterThanOrEqualTo ()
+        {
+            Assert.IsTrue (Matches (FullData, number >= "41"));
+            Assert.IsTrue (Matches (FullData, number >= "42"));
+            Assert.IsFalse (Matches (FullData, number >= "43"));
+            Assert.IsTrue (Matches (FullData, nullable_number >= "12"));
+            Assert.IsTrue (Matches (FullData, nullable_number >= "13"));
+            Assert.IsFalse (Matches (FullData, nullable_number >= "14"));
+        }
+
+        [Test]
+        public void Contains ()
+        {
+            Assert.IsTrue (Matches (FullData, text.Contains ("bar")));
+            Assert.IsTrue (Matches (FullData, text.Contains ("ba")));
+            Assert.IsTrue (Matches (FullData, text.Contains ("ar")));
+            Assert.IsFalse (Matches (FullData, text.Contains ("bart")));
+            Assert.IsFalse (Matches (FullData, text.Contains ("bb")));
+            Assert.IsFalse (Matches (new Data (), text.Contains ("bb")));
+        }
+
+        [Test]
+        public void DoesNotContain ()
+        {
+            Assert.IsFalse (Matches (FullData, text.DoesNotContain ("bar")));
+            Assert.IsFalse (Matches (FullData, text.DoesNotContain ("ba")));
+            Assert.IsFalse (Matches (FullData, text.DoesNotContain ("ar")));
+            Assert.IsTrue (Matches (FullData, text.DoesNotContain ("bart")));
+            Assert.IsTrue (Matches (FullData, text.DoesNotContain ("bb")));
+            Assert.IsTrue (Matches (new Data (), text.DoesNotContain ("bb")));
+        }
+
+        [Test]
+        public void Conjoin ()
+        {
+            Assert.IsTrue (Matches (FullData, Conjoin (text == "bar", number == "42")));
+            Assert.IsTrue (Matches (
+                FullData, Conjoin (Conjoin (text == "bar", number == "42"), nullable_number <= "13")));
+            Assert.IsFalse (Matches (FullData, Conjoin (text == "bar", number < "42")));
+            Assert.IsFalse (Matches (FullData, Conjoin (text == "bart", number == "42")));
+        }
+
+        [Test]
+        public void Disjoin ()
+        {
+            Assert.IsTrue (Matches (FullData, Disjoin (text == "bar", number == "42")));
+            Assert.IsTrue (Matches (FullData, Disjoin (text == "bar", number < "42")));
+            Assert.IsTrue (Matches (FullData, Disjoin (text == "bart", number == "42")));
+            Assert.IsTrue (Matches (
+                FullData, Disjoin (Disjoin (text == "bart", number == "42"), nullable_number == "13")));
+            Assert.IsTrue (Matches (
+                FullData, Disjoin (Disjoin (text == "bart", number != "42"), nullable_number == "13")));
+            Assert.IsFalse (Matches (FullData, Disjoin (text == "bart", number < "42")));
+        }
+
+        class OmitIfNullData : DummyObject
+        {
+            [XmlElement (OmitIfNull = true)] public string Text { get; set; }
+            [XmlElement (OmitIfNull = true)] public int? Number { get; set; }
+        }
+
+        [Test]
+        public void Exists ()
+        {
+            var data = new OmitIfNullData { Text = "foo", Number = 42 };
+            Assert.IsTrue (Matches (data, text.Exists (true)));
+            Assert.IsFalse (Matches (data, text.Exists (false)));
+            Assert.IsTrue (Matches (data, number.Exists (true)));
+            Assert.IsFalse (Matches (data, number.Exists (false)));
+            Assert.IsFalse (Matches (new OmitIfNullData (), text.Exists (true)));
+            Assert.IsTrue (Matches (new OmitIfNullData (), text.Exists (false)));
+            Assert.IsFalse (Matches (new OmitIfNullData (), number.Exists (true)));
+            Assert.IsTrue (Matches (new OmitIfNullData (), number.Exists (false)));
+        }
+
+        class ArrayItemData : DummyObject
+        {
+            [XmlArrayItem] public IEnumerable<string> Text { get; set; }
+        }
+
+        [Test]
+        public void ArrayItemDataTest ()
+        {
+            var data = new ArrayItemData { Text = new[] { "one", "two", "three" } };
+            Assert.IsTrue (Matches (data, text == "two"));
+            Assert.IsTrue (Matches (data, text.Contains ("ee")));
+            Assert.IsTrue (Matches (data, text.Exists (true)));
+            Assert.IsFalse (Matches (data, text.Exists (false)));
+            Assert.IsTrue (Matches (new ArrayItemData (), text.Exists (false)));
+            Assert.IsFalse (Matches (new ArrayItemData (), text.Exists (true)));
+        }
+
+        static bool Matches (Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object @object, Query query)
+        {
             var match = false;
-            var visitor = new ObjectQueryVisitor (new ObjectQueryContext (typeof (Data)), data, result => match = result);
-            visitor.VisitEquals ("Foo", "bar");
-            Assert.IsTrue (match);
-            match = false;
-            visitor.VisitEquals ("Foo", "bat");
-            Assert.IsFalse (match);
+            query (new ObjectQueryVisitor (new ObjectQueryContext (@object.GetType ()), @object, result => {
+                if (match) {
+                    Assert.Fail ("Multiple matches for a single input.");
+                }
+                match = result == @object;
+            }));
+            return match;
         }
     }
 }

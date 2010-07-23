@@ -34,187 +34,121 @@ using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
     [TestFixture]
-    public class QueryParserTests
+    public class QueryParserTests : QueryTests
     {
-        #pragma warning disable 0660, 0661
-        class Property
-        {
-            string name;
-
-            public Property (string name)
-            {
-                this.name = name;
-            }
-
-            public Query Contains (string value)
-            {
-                return visitor => visitor.VisitContains (name, value);
-            }
-
-            public Query DoesNotContain (string value)
-            {
-                return visitor => visitor.VisitDoesNotContain (name, value);
-            }
-
-            public Query DerivedFrom (string value)
-            {
-                return visitor => visitor.VisitDerivedFrom (name, value);
-            }
-
-            public Query Exists (bool value)
-            {
-                return visitor => visitor.VisitExists (name, value);
-            }
-
-            public static Query operator ==(Property property, string value)
-            {
-                return visitor => visitor.VisitEquals (property.name, value);
-            }
-
-            public static Query operator !=(Property property, string value)
-            {
-                return visitor => visitor.VisitDoesNotEqual (property.name, value);
-            }
-
-            public static Query operator <(Property property, string value)
-            {
-                return visitor => visitor.VisitLessThan (property.name, value);
-            }
-
-            public static Query operator <=(Property property, string value)
-            {
-                return visitor => visitor.VisitLessThanOrEqualTo (property.name, value);
-            }
-
-            public static Query operator >(Property property, string value)
-            {
-                return visitor => visitor.VisitGreaterThan (property.name, value);
-            }
-
-            public static Query operator >=(Property property, string value)
-            {
-                return visitor => visitor.VisitGreaterThanOrEqualTo (property.name, value);
-            }
-        }
-        #pragma warning restore 0661, 0660
-
-        static Query Conjoin (Query leftOperand, Query rightOperand)
-        {
-            return visitor => visitor.VisitAnd (leftOperand, rightOperand);
-        }
-
-        static Query Disjoin (Query leftOperand, Query rightOperand)
-        {
-            return visitor => visitor.VisitOr (leftOperand, rightOperand);
-        }
+        readonly Property foo = new Property ("foo");
+        readonly Property bat = new Property ("bat");
+        readonly Property name = new Property ("name");
+        readonly Property eyes = new Property ("eyes");
+        readonly Property age = new Property ("age");
 
         [Test]
         public void EqualityOperator ()
         {
-            AssertEquality (new Property ("foo") == "bar", @"foo = ""bar""");
+            AssertEquality (foo == "bar", @"foo = ""bar""");
         }
 
         [Test]
         public void InequalityOperator ()
         {
-            AssertEquality (new Property ("foo") != "bar", @"foo != ""bar""");
+            AssertEquality (foo != "bar", @"foo != ""bar""");
         }
 
         [Test]
         public void LessThanOperator ()
         {
-            AssertEquality (new Property ("foo") < "5", @"foo < ""5""");
+            AssertEquality (foo < "5", @"foo < ""5""");
         }
 
         [Test]
         public void LessThanOrEqualOperator ()
         {
-            AssertEquality (new Property ("foo") <= "5", @"foo <= ""5""");
+            AssertEquality (foo <= "5", @"foo <= ""5""");
         }
 
         [Test]
         public void GreaterThanOperator ()
         {
-            AssertEquality (new Property ("foo") > "5", @"foo > ""5""");
+            AssertEquality (foo > "5", @"foo > ""5""");
         }
 
         [Test]
         public void GreaterThanOrEqualOperator ()
         {
-            AssertEquality (new Property ("foo") >= "5", @"foo >= ""5""");
+            AssertEquality (foo >= "5", @"foo >= ""5""");
         }
 
         [Test]
         public void ContainsOperator ()
         {
-            AssertEquality (new Property ("foo").Contains ("bar"), @"foo contains ""bar""");
+            AssertEquality (foo.Contains ("bar"), @"foo contains ""bar""");
         }
 
         [Test]
         public void ExistsTrue ()
         {
-            AssertEquality (new Property ("foo").Exists (true), "foo exists true");
+            AssertEquality (foo.Exists (true), "foo exists true");
         }
 
         [Test]
         public void ExistsFalse ()
         {
-            AssertEquality (new Property ("foo").Exists (false), "foo exists false");
+            AssertEquality (foo.Exists (false), "foo exists false");
         }
 
         [Test]
         public void ExistsTrueWithTrailingWhiteSpace ()
         {
-            AssertEquality (new Property ("foo").Exists (true), "foo exists true ");
+            AssertEquality (foo.Exists (true), "foo exists true ");
         }
 
         [Test]
         public void ExistsFalseWithTrailingWhiteSpace ()
         {
-            AssertEquality (new Property ("foo").Exists (false), "foo exists false ");
+            AssertEquality (foo.Exists (false), "foo exists false ");
         }
 
         [Test]
         public void ExistsTrueWithLeadingWhiteSpace ()
         {
-            AssertEquality (new Property ("foo").Exists (true), "foo exists \t\rtrue");
+            AssertEquality (foo.Exists (true), "foo exists \t\rtrue");
         }
 
         [Test]
         public void ExistsFalseWithLeadingWhiteSpace ()
         {
-            AssertEquality (new Property ("foo").Exists (false), "foo exists \t\rfalse");
+            AssertEquality (foo.Exists (false), "foo exists \t\rfalse");
         }
 
         [Test]
         public void DerivedFromOperator ()
         {
-            AssertEquality (new Property ("foo").DerivedFrom ("object.item"), @"foo derivedFrom ""object.item""");
+            AssertEquality (foo.DerivedFrom ("object.item"), @"foo derivedFrom ""object.item""");
         }
 
         [Test]
         public void DoesNotContainOperator ()
         {
-            AssertEquality (new Property ("foo").DoesNotContain ("bar"), @"foo doesNotContain ""bar""");
+            AssertEquality (foo.DoesNotContain ("bar"), @"foo doesNotContain ""bar""");
         }
 
         [Test]
         public void EscapedDoubleQuote ()
         {
-            AssertEquality (new Property ("foo") == @"b""a""r", @"foo = ""b\""a\""r""");
+            AssertEquality (foo == @"b""a""r", @"foo = ""b\""a\""r""");
         }
 
         [Test]
         public void EscapedSlash ()
         {
-            AssertEquality (new Property ("foo") == @"b\a\r", @"foo = ""b\\a\\r""");
+            AssertEquality (foo == @"b\a\r", @"foo = ""b\\a\\r""");
         }
 
         [Test]
         public void AndOperator ()
         {
             AssertEquality (
-                Conjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                Conjoin (foo == "bar", bat == "baz"),
                 @"foo = ""bar"" and bat = ""baz""");
         }
 
@@ -222,7 +156,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         public void OrOperator ()
         {
             AssertEquality (
-                Disjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                Disjoin (foo == "bar", bat == "baz"),
                 @"foo = ""bar"" or bat = ""baz""");
         }
 
@@ -232,9 +166,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertEquality (
                 Disjoin (
                     Disjoin (
-                        Conjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
-                        new Property ("name").Contains ("john")),
-                    Conjoin (new Property ("eyes") == "green", new Property ("age") >= "21")),
+                        Conjoin (foo == "bar", bat == "baz"),
+                        name.Contains ("john")),
+                    Conjoin (eyes == "green", age >= "21")),
                 @"foo = ""bar"" and bat = ""baz"" or name contains ""john"" or eyes = ""green"" and age >= ""21""");
         }
 
@@ -243,10 +177,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             AssertEquality (
                 Disjoin (
-                    Conjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
+                    Conjoin (foo == "bar", bat == "baz"),
                     Conjoin (
-                        Disjoin (new Property ("name").Contains ("john"), new Property ("eyes") == "green"),
-                        new Property ("age") >= "21")),
+                        Disjoin (name.Contains ("john"), eyes == "green"),
+                        age >= "21")),
                 @"foo = ""bar"" and bat = ""baz"" or (name contains ""john"" or eyes = ""green"") and age >= ""21""");
         }
 
@@ -256,11 +190,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertEquality (
                 Conjoin (
                     Conjoin (
-                        new Property ("foo") == "bar",
+                        foo == "bar",
                         Disjoin (
-                            Disjoin (new Property ("bat") == "baz", new Property ("name").Contains ("john")),
-                            new Property ("eyes") == "green")),
-                    new Property ("age") >= "21"),
+                            Disjoin (bat == "baz", name.Contains ("john")),
+                            eyes == "green")),
+                    age >= "21"),
                 @"foo = ""bar"" and ((bat = ""baz"" or name contains ""john"") or eyes = ""green"") and age >= ""21""");
         }
 
@@ -270,9 +204,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertEquality (
                 Disjoin (
                     Conjoin (
-                        new Property ("foo") == "bar",
-                        Disjoin (new Property ("bat") == "baz", new Property ("name").Contains ("john"))),
-                    Conjoin (new Property ("eyes") == "green", new Property ("age") >= "21")),
+                        foo == "bar",
+                        Disjoin (bat == "baz", name.Contains ("john"))),
+                    Conjoin (eyes == "green", age >= "21")),
                 @"foo = ""bar"" and (bat = ""baz"" or name contains ""john"") or eyes = ""green"" and age >= ""21""");
         }
 
@@ -282,9 +216,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertEquality (
                 Conjoin (
                     Conjoin (
-                        Disjoin (new Property ("foo") == "bar", new Property ("bat") == "baz"),
-                        Disjoin (new Property ("name").Contains ("john"), new Property ("eyes") == "green")),
-                    new Property ("age") >= "21"),
+                        Disjoin (foo == "bar", bat == "baz"),
+                        Disjoin (name.Contains ("john"), eyes == "green")),
+                    age >= "21"),
                 @"(foo = ""bar"" or bat = ""baz"") and (name contains ""john"" or eyes = ""green"") and age >= ""21""");
         }
 
@@ -293,10 +227,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             AssertEquality (
                 Conjoin (
-                    Disjoin (new Property ("foo") == "bar", new Property ("bat").Exists (true)),
+                    Disjoin (foo == "bar", bat.Exists (true)),
                     Conjoin (
-                        Disjoin (new Property ("name").Contains ("john"), new Property ("eyes").Exists (false)),
-                        new Property ("age") >= "21")),
+                        Disjoin (name.Contains ("john"), eyes.Exists (false)),
+                        age >= "21")),
                 @"(foo = ""bar"" or bat exists true) and ((name contains ""john"" or eyes exists false) and age >= ""21"")");
         }
 
@@ -315,7 +249,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         [Test]
         public void WhiteSpaceAroundOperator ()
         {
-            var expected = new Property ("foo") == "bar";
+            var expected = foo == "bar";
             AssertEquality (expected, @" foo = ""bar""");
             AssertEquality (expected, @"foo  = ""bar""");
             AssertEquality (expected, @"foo =  ""bar""");
