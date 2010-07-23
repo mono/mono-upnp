@@ -33,15 +33,43 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class MusicTrack : AudioItem
     {
-        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
-        readonly List<string> contributors = new List<string> ();
-        readonly List<string> albums = new List<string>();
-        readonly List<string> playlists = new List<string> ();
+        List<PersonWithRole> artists = new List<PersonWithRole> ();
+        List<string> contributors = new List<string> ();
+        List<string> albums = new List<string> ();
+        List<string> playlists = new List<string> ();
         
-        public MusicTrack (ContentDirectory contentDirectory, Container parent)
+        protected MusicTrack (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
         }
+        
+        public MusicTrack (MusicTrackOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var music_track_options = options as MusicTrackOptions;
+            if (music_track_options != null)
+            {
+                AlbumArtURI = music_track_options.AlbumArtURI;
+                Date = music_track_options.Date;
+                OriginalTrackNumber = music_track_options.OriginalTrackNumber;
+                StorageMedium = music_track_options.StorageMedium;
+                
+                artists = new List<PersonWithRole> (music_track_options.ArtistCollection);
+                albums = new List<string> (music_track_options.AlbumCollection);
+                playlists = new List<string> (music_track_options.PlaylistCollection);
+                contributors = new List<string> (music_track_options.ContributorCollection);
+            }
+            
+            base.UpdateFromOptions (options);
+        }
+        
+        [XmlElement ("albumArtURI", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual Uri AlbumArtURI { get; protected set; }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]
         protected virtual ICollection<PersonWithRole> ArtistCollection {
@@ -65,7 +93,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual int? OriginalTrackNumber { get; protected set; }
         
         [XmlArrayItem ("playlist", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> PlaylistCollections {
+        protected virtual ICollection<string> PlaylistCollection {
             get { return playlists; }
         }
         

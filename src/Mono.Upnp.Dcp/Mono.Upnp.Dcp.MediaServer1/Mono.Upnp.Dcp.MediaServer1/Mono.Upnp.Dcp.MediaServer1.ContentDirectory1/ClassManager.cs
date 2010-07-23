@@ -41,7 +41,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         static ClassManager ()
         {
             types = new Dictionary<string, Type> ();
-            names = new Dictionary<Type, string>();
+            names = new Dictionary<Type, string> ();
             RegisterType<Object> ();
             RegisterType<Item> ();
             RegisterType<Container> ();

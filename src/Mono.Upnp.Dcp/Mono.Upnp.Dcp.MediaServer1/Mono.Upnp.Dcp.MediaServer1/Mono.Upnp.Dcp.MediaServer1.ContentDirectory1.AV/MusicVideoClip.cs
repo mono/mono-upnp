@@ -33,15 +33,39 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class MusicVideoClip : VideoItem
     {
-        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
-        readonly List<string> contributors = new List<string> ();
-        readonly List<string> albums = new List<string> ();
-        readonly List<DateTime> scheduled_start_times = new List<DateTime> ();
-        readonly List<DateTime> scheduled_end_times = new List<DateTime> ();
+        List<PersonWithRole> artists = new List<PersonWithRole> ();
+        List<string> contributors = new List<string> ();
+        List<string> albums = new List<string> ();
+        List<DateTime> scheduled_start_times = new List<DateTime> ();
+        List<DateTime> scheduled_end_times = new List<DateTime> ();
         
         protected MusicVideoClip (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public MusicVideoClip (MusicVideoClipOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var music_video_clip_options = options as MusicVideoClipOptions;
+            if (music_video_clip_options != null)
+            {
+                Date = music_video_clip_options.Date;
+                StorageMedium = music_video_clip_options.StorageMedium;
+                
+                artists = new List<PersonWithRole> (music_video_clip_options.ArtistCollection);
+                albums = new List<string> (music_video_clip_options.AlbumCollection);
+                scheduled_start_times = new List<DateTime> (music_video_clip_options.ScheduledStartTimeCollection);
+                scheduled_end_times = new List<DateTime> (music_video_clip_options.ScheduledEndTimeCollection);
+                contributors = new List<string> (music_video_clip_options.ContributorCollection);
+            }
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]

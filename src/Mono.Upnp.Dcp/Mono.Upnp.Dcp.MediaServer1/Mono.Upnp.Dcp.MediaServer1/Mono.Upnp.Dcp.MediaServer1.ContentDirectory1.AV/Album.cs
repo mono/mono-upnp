@@ -33,14 +33,39 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class Album : Container
     {
-        readonly List<string> publishers = new List<string> ();
-        readonly List<string> contributors = new List<string> ();
-        readonly List<Uri> relations = new List<Uri> ();
-        readonly List<string> rights = new List<string> ();
+        List<string> publishers = new List<string> ();
+        List<string> contributors = new List<string> ();
+        List<Uri> relations = new List<Uri> ();
+        List<string> rights = new List<string> ();
         
         protected Album (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public Album (AlbumOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        { 
+            var album_options = options as AlbumOptions;
+            if (album_options != null)
+            {
+                StorageMedium = album_options.StorageMedium;
+                LongDescription = album_options.LongDescription;
+                Description = album_options.Description;
+                Date = album_options.Date;
+                
+                publishers = new List<string> (album_options.PublisherCollection);
+                contributors = new List<string> (album_options.ContributorCollection);
+                relations = new List<Uri> (album_options.RelationCollection);
+                rights = new List<string> (album_options.RightsCollections);
+            }
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]

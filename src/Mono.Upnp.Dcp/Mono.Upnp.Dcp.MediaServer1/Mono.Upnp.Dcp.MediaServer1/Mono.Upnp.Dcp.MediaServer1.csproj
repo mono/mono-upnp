@@ -103,6 +103,28 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateContext.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateTextWriter.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateXmlSerializer.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\AlbumOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\AudioBookOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\AudioBroadcastOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\AudioItemOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\GenreOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\ImageItemOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\MovieOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\MovieGenreOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\MusicAlbumOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\MusicArtistOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\MusicGenreOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\MusicTrackOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\MusicVideoClipOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\PersonOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\PhotoOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\PhotoAlbumOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\PlaylistContainerOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\PlaylistItemOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\TextItemOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\VideoBroadcastOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\VideoItemOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Options\ObjectOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\FilteringDelegateSerializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\FilteringContext.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\Helper.cs" />
@@ -114,6 +136,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\PropertyName.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectQueryContext.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectBasedQueryProvider.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ProtocolInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
@@ -126,5 +149,7 @@
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Internal\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Xml\" />
+    <Folder Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\Options\" />
+    <Folder Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Options\" />
   </ItemGroup>
 </Project>

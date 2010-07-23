@@ -33,16 +33,42 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class VideoItem : Item
     {
-        readonly List<PersonWithRole> actors = new List<PersonWithRole> ();
-        readonly List<string> producers = new List<string> ();
-        readonly List<string> directors = new List<string> ();
-        readonly List<string> publishers = new List<string> ();
-        readonly List<string> genres = new List<string> ();
-        readonly List<Uri> relations = new List<Uri>();
+        List<PersonWithRole> actors = new List<PersonWithRole> ();
+        List<string> producers = new List<string> ();
+        List<string> directors = new List<string> ();
+        List<string> publishers = new List<string> ();
+        List<string> genres = new List<string> ();
+        List<Uri> relations = new List<Uri> ();
         
         protected VideoItem (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public VideoItem (VideoItemOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var video_item_options = options as VideoItemOptions;
+            if (video_item_options != null)
+            {
+                Description = video_item_options.Description;
+                LongDescription = video_item_options.LongDescription;
+                Rating = video_item_options.Rating;
+                Language = video_item_options.Language;
+                
+                actors = new List<PersonWithRole> (video_item_options.ActorCollection);
+                directors = new List<string> (video_item_options.DirectorCollection);
+                producers = new List<string> (video_item_options.ProducerCollection);
+                publishers = new List<string> (video_item_options.PublisherCollection);
+                relations = new List<Uri> (video_item_options.RelationCollection);
+            }
+
+            base.UpdateFromOptions (options);
         }
         
         [XmlArrayItemAttribute ("genre", Schemas.UpnpSchema)]

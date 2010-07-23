@@ -37,6 +37,25 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         {
         }
         
+        public VideoBroadcast (VideoBroadcastOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var video_broadcast_options = options as VideoBroadcastOptions;
+            if (video_broadcast_options != null)
+            {
+                Icon = video_broadcast_options.Icon;
+                Region = video_broadcast_options.Region;
+                ChannelNr = video_broadcast_options.ChannelNr;
+            }
+            
+            base.UpdateFromOptions (options);
+        }
+        
         [XmlElement ("icon", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual Uri Icon { get; protected set; }
         

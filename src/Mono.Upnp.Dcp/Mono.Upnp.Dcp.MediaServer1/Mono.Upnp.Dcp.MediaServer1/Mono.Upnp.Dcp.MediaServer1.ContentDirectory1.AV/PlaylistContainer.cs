@@ -33,15 +33,36 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class PlaylistContainer : Container
     {
-        readonly List<PersonWithRole> artists = new List<PersonWithRole> ();
-        readonly List<string> producers = new List<string> ();
-        readonly List<string> contributors = new List<string> ();
-        readonly List<string> genres = new List<string> ();
-        readonly List<string> rights = new List<string> ();
+        List<PersonWithRole> artists = new List<PersonWithRole> ();
+        List<string> producers = new List<string> ();
+        List<string> contributors = new List<string> ();
+        List<string> genres = new List<string> ();
+        List<string> rights = new List<string> ();
         
         protected PlaylistContainer (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var playlist_container_options = options as PlaylistContainerOptions;
+            if (playlist_container_options != null)
+            {
+                LongDescription = playlist_container_options.LongDescription;
+                Description = playlist_container_options.Description;
+                Date = playlist_container_options.Date;
+                StorageMedium = playlist_container_options.StorageMedium;
+                Language = playlist_container_options.Language;
+                
+                artists = new List<PersonWithRole> (playlist_container_options.ArtistCollection);
+                producers = new List<string> (playlist_container_options.ProducerCollection);
+                contributors = new List<string> (playlist_container_options.ContributorCollection);
+                genres = new List<string> (playlist_container_options.GenreCollection);
+                rights = new List<string> (playlist_container_options.RightsCollection);
+            }
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]

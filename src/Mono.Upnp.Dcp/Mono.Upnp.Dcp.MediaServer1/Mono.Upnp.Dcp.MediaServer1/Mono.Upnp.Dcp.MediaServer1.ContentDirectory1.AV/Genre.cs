@@ -37,6 +37,24 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         {
         }
         
+        public Genre (GenreOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {            
+            var genre_options = options as GenreOptions;
+            if (genre_options != null)
+            {
+                Description = genre_options.Description;
+                LongDescription = genre_options.LongDescription;
+            }
+            
+            base.UpdateFromOptions (options);
+        }
+        
         [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string LongDescription { get; protected set; }
         

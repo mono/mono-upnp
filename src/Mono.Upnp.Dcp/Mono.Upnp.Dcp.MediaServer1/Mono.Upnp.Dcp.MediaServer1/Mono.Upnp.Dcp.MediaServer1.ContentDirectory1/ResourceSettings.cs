@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
@@ -59,7 +60,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         public uint? ColorDepth { get; set; }
 
-        public string ProtocolInfo { get; set; }
+        public ProtocolInfo ProtocolInfo { get; set; }
         
         public string Protection { get; set; }
 

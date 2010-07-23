@@ -33,12 +33,36 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 {
     public class ImageItem : Item
     {
-        readonly List<string> publishers = new List<string> ();
-        readonly List<string> rights = new List<string> ();
+        List<string> publishers = new List<string> ();
+        List<string> rights = new List<string> ();
         
         protected ImageItem (ContentDirectory contentDirectory, Container parent)
             : base (contentDirectory, parent)
         {
+        }
+        
+        public ImageItem (ImageItemOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var image_item_options = options as ImageItemOptions;
+            if (image_item_options != null)
+            {
+                Description = image_item_options.Description;
+                LongDescription = image_item_options.LongDescription;
+                StorageMedium = image_item_options.StorageMedium;
+                Rating = image_item_options.Rating;
+                Date = image_item_options.Date;
+                
+                publishers = new List<string> (image_item_options.PublisherCollection);
+                rights = new List<string> (image_item_options.RightsCollection);
+            }
+            
+            base.UpdateFromOptions (options);
         }
         
         [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]

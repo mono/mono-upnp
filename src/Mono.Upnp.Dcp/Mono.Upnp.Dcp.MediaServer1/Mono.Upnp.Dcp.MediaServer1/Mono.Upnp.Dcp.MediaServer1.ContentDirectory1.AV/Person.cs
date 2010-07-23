@@ -37,6 +37,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         {
         }
         
+        public Person (PersonOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
+        
+        public override void UpdateFromOptions (ObjectOptions options)
+        {
+            var person_options = options as PersonOptions;
+            if (person_options != null)
+            {
+                Language = person_options.Language;
+            }
+            
+            base.UpdateFromOptions (options);
+        }
+        
         [XmlElement ("language", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Language { get; protected set; }
     

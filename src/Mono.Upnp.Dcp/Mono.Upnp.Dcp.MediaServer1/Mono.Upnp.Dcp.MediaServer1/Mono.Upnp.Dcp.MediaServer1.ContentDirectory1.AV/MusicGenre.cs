@@ -32,5 +32,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
             : base (contentDirectory, parent)
         {
         }
+        
+        public MusicGenre (MusicGenreOptions options, ContentDirectory contentDirectory, Container parent)
+            : this (contentDirectory, parent)
+        {
+            UpdateFromOptions (options);
+        }
     }
 }
