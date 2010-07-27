@@ -48,7 +48,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             var @object = new Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object ("-1", options);
             Assert.AreEqual ("-1", @object.Id);
             AssertObject (@object, options);
-            AssertObjectOptions (@object.GetOptions (), @object);
+            AssertObject (@object, @object.GetOptions ());
         }
 
         static void AssertObject (Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object @object, ObjectOptions options)
@@ -61,24 +61,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (@object.Resources.IsReadOnly);
         }
 
-        static void AssertObjectOptions (ObjectOptions options,
-                                         Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object @object)
-        {
-            Assert.AreEqual (@object.Title, options.Title);
-            Assert.AreEqual (@object.Creator, options.Creator);
-            Assert.AreEqual (@object.WriteStatus, options.WriteStatus);
-            Assert.AreEqual (@object.IsRestricted, options.IsRestricted);
-            Assert.IsNotNull (options.Resources);
-        }
-
         [Test]
         public void ItemInstantiation ()
         {
-            var item = new Item ("-1", new ItemOptions {
+            var options = new ItemOptions {
+                Title = "foo",
                 RefId = "1"
-            });
+            };
+            var item = new Item ("-1", options);
             AssertItem (item, options);
-            AssertItemOptions (item.GetOptions (), item);
+            AssertItem (item, item.GetOptions ());
         }
 
         static void AssertItem (Item item, ItemOptions options)
@@ -87,10 +79,28 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.AreEqual (options.RefId, item.RefId);
         }
 
-        static void AssertItemOptions (ItemOptions options, Item item)
+        [Test]
+        public void ContainerInstantiation ()
         {
-            AssertObjectOptions (options, item);
-            Assert.AreEqual (item.RefId, options.RefId);
+            var options = new ContainerOptions {
+                Title = "foo",
+                ChildCount = 42,
+                IsSearchable = true
+            };
+            var container = new Container ("-1", options);
+            AssertContainer (container, options);
+            AssertContainer (container, container.GetOptions ());
+        }
+
+        static void AssertContainer (Container container, ContainerOptions options)
+        {
+            AssertObject (container, options);
+            Assert.AreEqual (options.ChildCount, container.ChildCount);
+            Assert.AreEqual (options.IsSearchable, container.IsSearchable);
+            Assert.IsNotNull (container.SearchClasses);
+            Assert.IsTrue (container.SearchClasses.IsReadOnly);
+            Assert.IsNotNull (container.CreateClasses);
+            Assert.IsTrue (container.CreateClasses.IsReadOnly);
         }
     }
 }
