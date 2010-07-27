@@ -26,74 +26,68 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class PlaylistContainer : Container
     {
-        List<PersonWithRole> artists = new List<PersonWithRole> ();
-        List<string> producers = new List<string> ();
-        List<string> contributors = new List<string> ();
-        List<string> genres = new List<string> ();
-        List<string> rights = new List<string> ();
-        
-        protected PlaylistContainer (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected PlaylistContainer ()
         {
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        public PlaylistContainer (string id, PlaylistContainerOptions options)
+            : base (id, options)
         {
-            var playlist_container_options = options as PlaylistContainerOptions;
-            if (playlist_container_options != null)
-            {
-                LongDescription = playlist_container_options.LongDescription;
-                Description = playlist_container_options.Description;
-                Date = playlist_container_options.Date;
-                StorageMedium = playlist_container_options.StorageMedium;
-                Language = playlist_container_options.Language;
-                
-                artists = new List<PersonWithRole> (playlist_container_options.ArtistCollection);
-                producers = new List<string> (playlist_container_options.ProducerCollection);
-                contributors = new List<string> (playlist_container_options.ContributorCollection);
-                genres = new List<string> (playlist_container_options.GenreCollection);
-                rights = new List<string> (playlist_container_options.RightsCollection);
-            }
-            
-            base.UpdateFromOptions (options);
+            LongDescription = options.LongDescription;
+            Description = options.Description;
+            Date = options.Date;
+            StorageMedium = options.StorageMedium;
+            Language = options.Language;
+            Artists = Helper.MakeReadOnlyCopy (options.Artists);
+            Producers = Helper.MakeReadOnlyCopy (options.Producers);
+            Contributors = Helper.MakeReadOnlyCopy (options.Contributors);
+            Genres = Helper.MakeReadOnlyCopy (options.Genres);
+            Rights = Helper.MakeReadOnlyCopy (options.Rights);
+        }
+
+        protected void CopyToOptions (PlaylistContainerOptions options)
+        {
+            base.CopyToOptions (options);
+
+            options.LongDescription = LongDescription;
+            options.Description = Description;
+            options.Date = Date;
+            options.StorageMedium = StorageMedium;
+            options.Language = Language;
+            options.Artists = new List<PersonWithRole> (Artists);
+            options.Producers = new List<string> (Producers);
+            options.Contributors = new List<string> (Contributors);
+            options.Genres = new List<string> (Genres);
+            options.Rights = new List<string> (Rights);
+        }
+
+        public new PlaylistContainerOptions GetOptions ()
+        {
+            var options = new PlaylistContainerOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]
-        protected virtual ICollection<PersonWithRole> ArtistCollection {
-            get { return artists; }
-        }
-        
-        public IEnumerable<PersonWithRole> Artists {
-            get { return artists; }
-        }
+        public virtual IList<PersonWithRole> Artists { get; private set; }
         
         [XmlArrayItem ("genre", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> GenreCollection {
-            get { return genres; }
-        }
-        
-        public IEnumerable<string> Genres {
-            get { return genres; }
-        }
+        public virtual IList<string> Genres { get; private set; }
         
         [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string LongDescription { get; protected set; }
         
         [XmlArrayItem ("producer", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> ProducerCollection {
-            get { return producers; }
-        }
-        
-        public IEnumerable<string> Producers {
-            get { return producers; }
-        }
+        public virtual IList<string> Producers { get; private set; }
         
         [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string StorageMedium { get; protected set; }
@@ -102,13 +96,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual string Description { get; protected set; }
         
         [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> ContributorCollection {
-            get { return contributors; }
-        }
-        
-        public IEnumerable<string> Contributors {
-            get { return contributors; }
-        }
+        public virtual IList<string> Contributors { get; private set; }
         
         [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Date { get; protected set; }
@@ -117,12 +105,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual string Language { get; protected set; }
         
         [XmlArrayItem ("rights", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> RightsCollection {
-            get { return rights; }
-        }
-        
-        public IEnumerable<string> Rights {
-            get { return rights; }
+        public virtual IList<string> Rights { get; private set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Artists = new ReadOnlyCollection<PersonWithRole> (Artists);
+            Producers = new ReadOnlyCollection<string> (Producers);
+            Contributors = new ReadOnlyCollection<string> (Contributors);
+            Genres = new ReadOnlyCollection<string> (Genres);
+            Rights = new ReadOnlyCollection<string> (Rights);
         }
     
         protected override void DeserializeElement (XmlDeserializationContext context)

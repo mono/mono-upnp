@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {

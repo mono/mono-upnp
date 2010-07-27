@@ -1,5 +1,5 @@
 // 
-// GenreOptions.cs
+// ObjectOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,35 +23,36 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+using System.Collections.Generic;
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class GenreOptions : ObjectOptions
+    public class ObjectOptions
     {
-        public GenreOptions ()
+        IEnumerable<Resource> resources;
+
+        public IEnumerable<Resource> Resources {
+            get { return GetEnumerable (resources); }
+            set { resources = value; }
+        }
+
+        public string Title { get; set; }
+
+        public string Creator { get; set; }
+
+        public WriteStatus? WriteStatus { get; set; }
+
+        public bool IsRestricted { get; set; }
+
+        internal static IEnumerable<T> GetEnumerable<T> (IEnumerable<T> enumerable)
         {
+            return enumerable ?? GetEmptyEnumerable<T> ();
         }
 
-        public GenreOptions (Genre genre)
+        static IEnumerable<T> GetEmptyEnumerable<T> ()
         {
-            GetOptionsFrom (genre);
+            yield break;
         }
-
-        protected override void GetOptionsFrom (Object obj)
-        {            
-            var genre = obj as Genre;
-            if (genre != null)
-            {
-                Description = genre.Description;
-                LongDescription = genre.LongDescription;
-            }
-            
-            base.GetOptionsFrom (obj);
-        }
-
-        public virtual string LongDescription { get; set; }
-
-        public virtual string Description { get; set; }
     }
 }
-

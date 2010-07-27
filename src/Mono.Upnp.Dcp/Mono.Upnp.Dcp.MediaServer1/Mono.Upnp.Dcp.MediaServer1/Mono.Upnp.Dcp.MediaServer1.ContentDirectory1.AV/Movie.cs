@@ -26,41 +26,47 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class Movie : VideoItem
     {
-        List<DateTime> scheduled_start_times = new List<DateTime> ();
-        List<DateTime> scheduled_end_times = new List<DateTime> ();
-        
-        protected Movie (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected Movie ()
         {
+            ScheduledStartTimes = new List<DateTime> ();
+            ScheduledEndTimes = new List<DateTime> ();
         }
         
-        public Movie (MovieOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public Movie (string id, MovieOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            StorageMedium = options.StorageMedium;
+            DvdRegionCode = options.DvdRegionCode;
+            ChannelName = options.ChannelName;
+            ScheduledStartTimes = Helper.MakeReadOnlyCopy (options.ScheduledStartTimes);
+            ScheduledEndTimes = Helper.MakeReadOnlyCopy (options.ScheduledEndTimes);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (MovieOptions options)
         {
-            var movie_options = options as MovieOptions;
-            if (movie_options != null)
-            {
-                StorageMedium = movie_options.StorageMedium;
-                DvdRegionCode = movie_options.DvdRegionCode;
-                ChannelName = movie_options.ChannelName;
-                
-                scheduled_start_times = new List<DateTime> (movie_options.ScheduledStartTimeCollection);
-                scheduled_end_times = new List<DateTime> (movie_options.ScheduledEndTimeCollection);
-            }            
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.StorageMedium = StorageMedium;
+            options.DvdRegionCode = DvdRegionCode;
+            options.ChannelName = ChannelName;
+            options.ScheduledStartTimes = new List<DateTime> (ScheduledStartTimes);
+            options.ScheduledEndTimes = new List<DateTime> (ScheduledEndTimes);
+        }
+
+        public new MovieOptions GetOptions ()
+        {
+            var options = new MovieOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
@@ -73,21 +79,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual string ChannelName { get; protected set; }
         
         [XmlArrayItem ("scheduledStartTime", Schemas.UpnpSchema)]
-        protected virtual ICollection<DateTime> ScheduledStartTimeCollection {
-            get { return scheduled_start_times; }
-        }
-        
-        public IEnumerable<DateTime> ScheduledStartTimes {
-            get { return scheduled_start_times; }
-        }
+        public virtual IList<DateTime> ScheduledStartTimes { get; private set; }
         
         [XmlArrayItem ("scheduledEndTime", Schemas.UpnpSchema)]
-        protected virtual ICollection<DateTime> ScheduledEndTimeCollection {
-            get { return scheduled_end_times; }
-        }
-        
-        public IEnumerable<DateTime> ScheduledEndTimes {
-            get { return scheduled_end_times; }
+        public virtual IList<DateTime> ScheduledEndTimes { get; private set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            ScheduledStartTimes = new ReadOnlyCollection<DateTime> (ScheduledStartTimes);
+            ScheduledEndTimes = new ReadOnlyCollection<DateTime> (ScheduledEndTimes);
         }
     
         protected override void DeserializeElement (XmlDeserializationContext context)

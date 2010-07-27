@@ -1,10 +1,10 @@
 // 
-// MusicGenre.cs
+// MusicArtistOptions.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Yavor Georgiev <fealebenpae@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Yavor Georgiev
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class MusicGenre : Genre
+    public class MusicArtistOptions : PersonOptions
     {
-        protected MusicGenre ()
-        {
+        IEnumerable<string> genres;
+
+        public IEnumerable<string> Genres {
+            get { return GetEnumerable (genres); }
+            set { genres = value; }
         }
-        
-        public MusicGenre (string id, GenreOptions options)
-            : base (id, options)
-        {
-        }
+
+        public Uri ArtistDiscographyUri { get; set; }
     }
 }

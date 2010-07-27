@@ -1,5 +1,5 @@
 // 
-// VideoBroadcastOptions.cs
+// PhotoOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,38 +23,18 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+using System.Collections.Generic;
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class VideoBroadcastOptions : VideoItemOptions
+    public class PhotoOptions : ImageItemOptions
     {
-        public VideoBroadcastOptions ()
-        {
+        IEnumerable<string> albums;
+
+        public IEnumerable<string> Albums {
+            get { return GetEnumerable (albums); }
+            set { albums = value; }
         }
-
-        public VideoBroadcastOptions (VideoBroadcast videoBroadcast)
-        {
-            GetOptionsFrom (videoBroadcast);
-        }
-
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var video_broadcast = obj as VideoBroadcast;
-            if (video_broadcast != null)
-            {
-                Icon = video_broadcast.Icon;
-                Region = video_broadcast.Region;
-                ChannelNr = video_broadcast.ChannelNr;
-            }
-            
-            base.GetOptionsFrom (obj);
-        }
-
-        public virtual Uri Icon { get;  set; }
-
-        public virtual string Region { get; set; }
-
-        public virtual int? ChannelNr { get; set; }
     }
 }
-

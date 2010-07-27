@@ -26,61 +26,68 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class TextItem : Item
     {
-        List<PersonWithRole> authors = new List<PersonWithRole> ();
-        List<string> publishers = new List<string> ();
-        List<string> contributors = new List<string> ();
-        List<Uri> relations = new List<Uri> ();
-        List<string> rights = new List<string> ();
-        
-        protected TextItem (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected TextItem ()
         {
+            Authors = new List<PersonWithRole> ();
+            Publishers = new List<string> ();
+            Contributors = new List<string> ();
+            Relations = new List<Uri> ();
+            Rights = new List<string> ();
         }
         
-        public TextItem (TextItemOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public TextItem (string id, TextItemOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            Protection = options.Protection;
+            LongDescription = options.LongDescription;
+            Description = options.Description;
+            StorageMedium = options.StorageMedium;
+            Rating = options.Rating;
+            Date = options.Protection;
+            Language = options.Language;
+            Authors = Helper.MakeReadOnlyCopy (options.Authors);
+            Publishers = Helper.MakeReadOnlyCopy (options.Publishers);
+            Contributors = Helper.MakeReadOnlyCopy (options.Contributors);
+            Relations = Helper.MakeReadOnlyCopy (options.Relations);
+            Rights = Helper.MakeReadOnlyCopy (options.Rights);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (TextItemOptions options)
         {
-            var text_item_options = options as TextItemOptions;
-            if (text_item_options != null)
-            {
-                Protection = text_item_options.Protection;
-                LongDescription = text_item_options.LongDescription;
-                Description = text_item_options.Description;
-                StorageMedium = text_item_options.StorageMedium;
-                Rating = text_item_options.Rating;
-                Date = text_item_options.Date;
-                Language = text_item_options.Language;
-                
-                authors = new List<PersonWithRole> (text_item_options.AuthorCollection);
-                publishers = new List<string> (text_item_options.PublisherCollection);
-                contributors = new List<string> (text_item_options.ContributorCollection);
-                relations = new List<Uri> (text_item_options.RelationCollection);
-                rights = new List<string> (text_item_options.RightsCollection);
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.Protection = Protection;
+            options.LongDescription = LongDescription;
+            options.Description = Description;
+            options.StorageMedium = StorageMedium;
+            options.Rating = Rating;
+            options.Date = Date;
+            options.Language = Language;
+            options.Authors = new List<PersonWithRole> (Authors);
+            options.Publishers = new List<string> (Publishers);
+            options.Contributors = new List<string> (Contributors);
+            options.Relations = new List<Uri> (Relations);
+            options.Rights = new List<string> (Rights);
+        }
+
+        public new TextItemOptions GetOptions ()
+        {
+            var options = new TextItemOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlArrayItemAttribute ("author", Schemas.UpnpSchema)]
-        protected virtual ICollection<PersonWithRole> AuthorCollection {
-            get { return authors; }
-        }
-        
-        public IEnumerable<PersonWithRole> Authors {
-            get { return authors; }
-        }
+        public virtual IList<PersonWithRole> Authors { get; private set; }
         
         [XmlElement ("protection", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string Protection { get; protected set; }
@@ -98,45 +105,32 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual string Description { get; protected set; }
         
         [XmlArrayItem ("publisher", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> PublisherCollection {
-            get { return publishers; }
-        }
-        
-        public IEnumerable<string> Publishers {
-            get { return publishers; }
-        }
+        public virtual IList<string> Publishers { get; private set; }
         
         [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> ContributorCollection {
-            get { return contributors; }
-        }
-        
-        public IEnumerable<string> Contributors {
-            get { return contributors; }
-        }
+        public virtual IList<string> Contributors { get; private set; }
         
         [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Date { get; protected set; }
         
         [XmlArrayItem ("relation", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<Uri> RelationCollection {
-            get { return relations; }
-        }
-        
-        public IEnumerable<Uri> Relations {
-            get { return relations; }
-        }
+        public virtual IList<Uri> Relations { get; private set; }
         
         [XmlElement ("language", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Language { get; protected set; }
         
         [XmlArrayItem ("rights", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> RightsCollection {
-            get { return rights; }
-        }
-        
-        public IEnumerable<string> Rights {
-            get { return rights; }
+        public virtual IList<string> Rights { get; private set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Authors = new ReadOnlyCollection<PersonWithRole> (Authors);
+            Publishers = new ReadOnlyCollection<string> (Publishers);
+            Contributors = new ReadOnlyCollection<string> (Contributors);
+            Relations = new ReadOnlyCollection<Uri> (Relations);
+            Rights = new ReadOnlyCollection<string> (Rights);
         }
     
         protected override void DeserializeElement (XmlDeserializationContext context)

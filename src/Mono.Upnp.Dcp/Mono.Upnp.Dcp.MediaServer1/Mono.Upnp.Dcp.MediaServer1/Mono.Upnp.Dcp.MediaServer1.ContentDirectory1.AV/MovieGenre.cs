@@ -24,19 +24,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class MovieGenre : Genre
     {
-        protected MovieGenre (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected MovieGenre ()
         {
         }
         
-        public MovieGenre (MovieGenreOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public MovieGenre (string id, GenreOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
         }
     }
 }

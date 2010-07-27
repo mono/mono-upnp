@@ -31,7 +31,7 @@ using System.Net;
 using System.Net.Sockets;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
-using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 using Mono.Upnp.Xml;
 
 using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
@@ -85,16 +85,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         readonly string prefix = GeneratePrefix ();
         volatile bool started;
         HttpListener listener;
+        int id;
         
         public FileSystemContentDirectory (string path)
         {
             if (path == null) throw new ArgumentNullException ("path");
             
-            var root = new StorageFolder (this) {
+            var root = new StorageFolder ((id++).ToString (), new StorageFolderOptions {
                 IsRestricted = true,
                 Title = "root",
                 ChildCount = 1
-            };
+            });
             object_cache.Add (new ObjectInfo (root, null));
             object_hierarchy.Add ("0", new Range (1, 2));
             CreateFolder (path, root);
@@ -177,7 +178,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                     GetFile (context.Response, query);
                 } else if (query.StartsWith ("?art="))
                 {
-                    GetArtwork (context.Response, query);
+                    //GetArtwork (context.Response, query);
                 } else
                 {
                     context.Response.StatusCode = 404;
@@ -229,7 +230,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
         }
         
-        void GetArtwork (HttpListenerResponse response, string query)
+        /*void GetArtwork (HttpListenerResponse response, string query)
         {
             using (response) {
                 if (query.Length < 5) {
@@ -276,7 +277,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 } catch {
                 }
             }
-        }
+        }*/
         
         void CheckDisposed ()
         {
@@ -353,16 +354,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 //                    IsRestricted = true
 //                };
             default:
-                return new File (this, parent) {
+                return new File ((id++).ToString (), new ItemOptions {
                     Title = Path.GetFileNameWithoutExtension (path),
                     IsRestricted = true
-                };
+                });
             }
         }
         
         MusicTrack GetTrack(string path, Container parent)
         {
-            var tags = TagLib.File.Create (path);
+            /*var tags = TagLib.File.Create (path);
             
             var options = new MusicTrackOptions {
                 Title = tags.Tag.Title,
@@ -392,10 +393,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             
             track.UpdateFromOptions (options);
             
-            return track;
+            return track;*/
+            return null;
         }
         
-        TagLib.IPicture GetAlbumArt (string path)
+        /*TagLib.IPicture GetAlbumArt (string path)
         {
             var tags = TagLib.File.Create (path);
             
@@ -405,7 +407,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
             
             return null;
-        }
+        }*/
         
         void CreateFolder (string path, StorageFolder parent)
         {
@@ -420,11 +422,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 seperator += 1;
                 name = name.Substring (seperator, name.Length - seperator);
             }
-            var folder = new StorageFolder (this, parent) {
+            var folder = new StorageFolder ((id++).ToString (), new StorageFolderOptions {
                 Title = name,
                 ChildCount = directories.Length + files.Length,
                 IsRestricted = true
-            };
+            });
             object_cache.Add (new ObjectInfo (folder, path));
             folder_cache[folder.Id] = new FolderInfo (folder, directories, files);
         }

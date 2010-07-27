@@ -1,5 +1,5 @@
 // 
-// PhotoOptions.cs
+// AudioBookOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,34 +23,28 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
+
 using System.Collections.Generic;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class PhotoOptions : ImageItemOptions
+    public class AudioBookOptions : AudioItemOptions
     {
-        public PhotoOptions ()
-        {
-            AlbumCollection = new List<string> ();
+        IEnumerable<string> producers;
+        IEnumerable<string> contributors;
+
+        public IEnumerable<string> Producers {
+            get { return GetEnumerable (producers); }
+            set { producers = value; }
         }
 
-        public PhotoOptions (Photo photo)
-        {
-            GetOptionsFrom (photo);
+        public IEnumerable<string> Contributors {
+            get { return GetEnumerable (contributors); }
+            set { contributors = value; }
         }
 
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var photo = obj as Photo;
-            if (photo != null)
-            {
-                AlbumCollection = new List<string> (photo.Albums);
-            }
-            
-            base.GetOptionsFrom (obj);
-        }
+        public string StorageMedium { get; set; }
 
-        public virtual List<string> AlbumCollection { get; set; }
+        public string Date { get; set; }
     }
 }
-

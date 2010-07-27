@@ -26,65 +26,66 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class AudioBook : AudioItem
     {
-        List<string> producers = new List<string> ();
-        List<string> contributors = new List<string> ();
-        
-        protected AudioBook (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected AudioBook ()
         {
+            Producers = new List<string> ();
+            Contributors = new List<string> ();
         }
         
-        public AudioBook (AudioBookOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public AudioBook (string id, AudioBookOptions options)
+            : base (id, options)
         {
-            this.UpdateFromOptions(options);
+            StorageMedium = options.StorageMedium;
+            Date = options.Date;
+            Producers = Helper.MakeReadOnlyCopy (options.Producers);
+            Contributors = Helper.MakeReadOnlyCopy (options.Contributors);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (AudioBookOptions options)
         {
-            var audio_book_options = options as AudioBookOptions;
-            if (audio_book_options != null)
-            {
-                this.StorageMedium = audio_book_options.StorageMedium;
-                this.Date = audio_book_options.Date;
-                
-                producers = new List<string> (audio_book_options.ProducerCollection);
-                contributors = new List<string> (audio_book_options.ContributorCollection);
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.StorageMedium = StorageMedium;
+            options.Date = Date;
+            options.Producers = new List<string> (Producers);
+            options.Contributors = new List<string> (Contributors);
+        }
+
+        public new AudioBookOptions GetOptions ()
+        {
+            var options = new AudioBookOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string StorageMedium { get; protected set; }
         
         [XmlArrayItem ("producer", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> ProducerCollection {
-            get { return producers; }
-        }
-        
-        public IEnumerable<string> Producers {
-            get { return producers; }
-        }
+        public virtual IList<string> Producers { get; private set; }
         
         [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> ContributorCollection {
-            get { return contributors; }
-        }
-        
-        public IEnumerable<string> Contributors {
-            get { return contributors; }
-        }
+        public virtual IList<string> Contributors { get; private set; }
         
         [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Date { get; protected set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Producers = new ReadOnlyCollection<string> (Producers);
+            Contributors = new ReadOnlyCollection<string> (Contributors);
+        }
     
         protected override void DeserializeElement (XmlDeserializationContext context)
         {

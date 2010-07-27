@@ -46,9 +46,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         }
         
         [XmlAttribute ("name", OmitIfNull = true)]
-        public string FriendlyClassName { get; private set; }
+        public virtual string FriendlyClassName { get; protected set; }
         
         [XmlValue]
-        public string FullClassName { get; private set; }
+        public virtual string FullClassName { get; protected set; }
     }
 }

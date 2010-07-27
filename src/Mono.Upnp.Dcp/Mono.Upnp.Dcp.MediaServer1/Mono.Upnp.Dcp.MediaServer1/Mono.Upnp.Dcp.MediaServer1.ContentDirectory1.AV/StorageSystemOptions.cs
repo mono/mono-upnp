@@ -1,10 +1,10 @@
 // 
-// MusicGenreOptions.cs
+// StorageSystemOptions.cs
 //  
 // Author:
-//       Yavor Georgiev <fealebenpae@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2010 Yavor Georgiev
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
-{
-    public class MusicGenreOptions : GenreOptions
-    {
-        public MusicGenreOptions ()
-        {
-        }
 
-        public MusicGenreOptions (MusicGenre musicGenre)
-        {
-            GetOptionsFrom (musicGenre);
-        }
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
+{
+    public class StorageSystemOptions : StorageVolumeOptions
+    {
+        public long StorageMaxPartition { get; set; }
     }
 }
-

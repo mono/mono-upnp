@@ -26,44 +26,41 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class Photo : ImageItem
     {
-        List<string> albums = new List<string> ();
-        
-        protected Photo (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected Photo ()
         {
+            Albums = new List<string> ();
         }
         
-        public Photo (PhotoOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public Photo (string id, PhotoOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            Albums = Helper.MakeReadOnlyCopy (options.Albums);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (PhotoOptions options)
         {
-            var photo_options = options as PhotoOptions;
-            if (photo_options != null)
-            {
-                albums = new List<string> (photo_options.AlbumCollection);
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.Albums = new List<string> (Albums);
         }
         
         [XmlArrayItem ("album", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> AlbumCollection {
-            get { return albums; }
-        }
-        
-        public IEnumerable<string> Albums {
-            get { return albums; }
+        public virtual IList<string> Albums { get; private set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Albums = new ReadOnlyCollection<string> (Albums);
         }
     
         protected override void DeserializeElement (XmlDeserializationContext context)

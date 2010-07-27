@@ -28,30 +28,32 @@ using System;
 
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class Person : Container
     {
-        protected Person (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected Person ()
         {
         }
         
-        public Person (PersonOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public Person (string id, PersonOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            Language = options.Language;
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (PersonOptions options)
         {
-            var person_options = options as PersonOptions;
-            if (person_options != null)
-            {
-                Language = person_options.Language;
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.Language = Language;
+        }
+
+        public new PersonOptions GetOptions ()
+        {
+            var options = new PersonOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("language", Schemas.DublinCoreSchema, OmitIfNull = true)]

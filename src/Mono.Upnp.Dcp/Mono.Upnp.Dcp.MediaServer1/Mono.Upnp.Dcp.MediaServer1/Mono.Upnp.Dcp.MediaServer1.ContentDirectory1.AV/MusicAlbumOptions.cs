@@ -23,50 +23,39 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using System.Collections.Generic;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class MusicAlbumOptions : AlbumOptions
     {
-        public MusicAlbumOptions ()
-        {
-            ArtistCollection = new List<PersonWithRole> ();
-            ProducerCollection = new List<string> ();
-            GenreCollection = new List<string> ();
-            AlbumArtUriCollection = new List<Uri> ();
+        IEnumerable<PersonWithRole> artists;
+        IEnumerable<string> genres;
+        IEnumerable<string> producers;
+        IEnumerable<Uri> album_art_uris;
+
+        public IEnumerable<PersonWithRole> Artists {
+            get { return GetEnumerable (artists); }
+            set { artists = value; }
         }
 
-        public MusicAlbumOptions (MusicAlbum musicAlbum)
-        {
-            GetOptionsFrom (musicAlbum);
+        public IEnumerable<string> Genres {
+            get { return GetEnumerable (genres); }
+            set { genres = value; }
         }
 
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var music_album = obj as MusicAlbum;
-            if (music_album != null)
-            {
-                Toc = music_album.Toc;
-
-                ArtistCollection = new List<PersonWithRole> (music_album.Artists);
-                ProducerCollection = new List<string> (music_album.Producers);
-                GenreCollection = new List<string> (music_album.Genres);
-                AlbumArtUriCollection = new List<Uri> (music_album.AlbumArtUris);
-            }
-            
-            base.GetOptionsFrom (obj);
+        public IEnumerable<string> Producers {
+            get { return GetEnumerable (producers); }
+            set { producers = value; }
         }
 
-        public virtual List<PersonWithRole> ArtistCollection { get; set; }
-
-        public virtual List<string> GenreCollection { get; set; }
-
-        public virtual List<string> ProducerCollection { get; set; }
-
-        public virtual List<Uri> AlbumArtUriCollection { get; set; }
+        public IEnumerable<Uri> AlbumArtUris {
+            get { return GetEnumerable (album_art_uris); }
+            set { album_art_uris = value; }
+        }
 
         public virtual string Toc { get; set; }
     }
 }
-

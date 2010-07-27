@@ -23,43 +23,20 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class AudioBroadcastOptions : AudioItemOptions
     {
-        public AudioBroadcastOptions ()
-        {
-        }
+        public string Region { get; set; }
 
-        public AudioBroadcastOptions (AudioBroadcast audioBroadcast)
-        {
-            GetOptionsFrom (audioBroadcast);
-        }
+        public string RadioCallSign { get; set; }
 
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var audio_broadcast = obj as AudioBroadcast;
-            if (audio_broadcast != null)
-            {
-                Region = audio_broadcast.Region;
-                RadioCallSign = audio_broadcast.RadioCallSign;
-                RadioStationId = audio_broadcast.RadioStationId;
-                RadioBand = audio_broadcast.RadioBand;
-            }
+        public string RadioStationId { get; set; }
 
-            base.GetOptionsFrom (obj);
-        }
+        public string RadioBand { get; set; }
 
-        public virtual string Region { get; set; }
-
-        public virtual string RadioCallSign { get; set; }
-
-        public virtual string RadioStationId { get; set; }
-
-        public virtual string RadioBand { get; set; }
-
-        public virtual int? ChannelNr { get; set; }
+        public int? ChannelNr { get; set; }
     }
 }
 

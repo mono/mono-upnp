@@ -1,5 +1,5 @@
 // 
-// PlaylistItemOptions.cs
+// PlaylistContainerOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,44 +23,43 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
+
 using System.Collections.Generic;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class PlaylistItemOptions : ObjectOptions
+    public class PlaylistContainerOptions : ContainerOptions
     {
-        public PlaylistItemOptions ()
-        {
-            ArtistCollection = new List<PersonWithRole> ();
-            GenreCollection = new List<string> ();
+        IEnumerable<PersonWithRole> artists;
+        IEnumerable<string> genres;
+        IEnumerable<string> producers;
+        IEnumerable<string> contributors;
+        IEnumerable<string> rights;
+
+        public IEnumerable<PersonWithRole> Artists {
+            get { return GetEnumerable (artists); }
+            set { artists = value; }
         }
 
-        public PlaylistItemOptions (PlaylistItem playlistItem)
-        {
-            GetOptionsFrom (playlistItem);
+        public IEnumerable<string> Genres {
+            get { return GetEnumerable (genres); }
+            set { genres = value; }
         }
 
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var playlist_item = obj as PlaylistItem;
-            if (playlist_item != null)
-            {
-                LongDescription = playlist_item.LongDescription;
-                Description = playlist_item.Description;
-                StorageMedium = playlist_item.StorageMedium;
-                Date = playlist_item.Date;
-                Language = playlist_item.Language;
-
-                ArtistCollection = new List<PersonWithRole> (playlist_item.Artists);
-                GenreCollection = new List<string> (playlist_item.Genres);
-            }
-            
-            base.GetOptionsFrom (obj);
+        public IEnumerable<string> Producers {
+            get { return GetEnumerable (producers); }
+            set { producers = value; }
         }
 
-        public virtual List<PersonWithRole> ArtistCollection { get; set; }
+        public IEnumerable<string> Contributors {
+            get { return GetEnumerable (contributors); }
+            set { contributors = value; }
+        }
 
-        public virtual List<string> GenreCollection { get; set; }
+        public IEnumerable<string> Rights {
+            get { return GetEnumerable (rights); }
+            set { rights = value; }
+        }
 
         public virtual string LongDescription { get; set; }
 
@@ -73,4 +72,3 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual string Language { get; set; }
     }
 }
-

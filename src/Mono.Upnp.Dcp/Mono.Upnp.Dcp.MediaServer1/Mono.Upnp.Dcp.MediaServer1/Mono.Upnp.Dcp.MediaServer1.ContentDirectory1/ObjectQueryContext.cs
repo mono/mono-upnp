@@ -184,7 +184,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 var ienumerable = property_type.GetInterface ("IEnumerable`1");
                 if (ienumerable != null) {
                     property_type = ienumerable.GetGenericArguments ()[0];
-                } else {
+                } else if (property_type.IsGenericType) {
                     var generic_type = property_type.GetGenericTypeDefinition ();
                     if (generic_type == typeof (Nullable<>) || generic_type == typeof (IEnumerable<>)) {
                         property_type = property_type.GetGenericArguments ()[0];

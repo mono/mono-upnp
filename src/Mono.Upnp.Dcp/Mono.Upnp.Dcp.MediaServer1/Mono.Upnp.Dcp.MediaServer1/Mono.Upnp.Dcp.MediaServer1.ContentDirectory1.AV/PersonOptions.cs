@@ -1,10 +1,10 @@
 // 
-// MusicGenre.cs
+// PersonOptions.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Yavor Georgiev <fealebenpae@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Yavor Georgiev
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,15 +26,8 @@
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class MusicGenre : Genre
+    public class PersonOptions : ContainerOptions
     {
-        protected MusicGenre ()
-        {
-        }
-        
-        public MusicGenre (string id, GenreOptions options)
-            : base (id, options)
-        {
-        }
+        public string Language { get; set; }
     }
 }

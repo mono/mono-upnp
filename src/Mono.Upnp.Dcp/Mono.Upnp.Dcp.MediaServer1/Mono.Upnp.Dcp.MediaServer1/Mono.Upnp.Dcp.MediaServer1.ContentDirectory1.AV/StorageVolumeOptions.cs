@@ -1,10 +1,10 @@
 // 
-// MusicArtistOptions.cs
+// StorageVolumeOptions.cs
 //  
 // Author:
-//       Yavor Georgiev <fealebenpae@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2010 Yavor Georgiev
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,38 +23,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-using System.Collections.Generic;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class MusicArtistOptions : PersonOptions
+    public class StorageVolumeOptions : StorageFolderOptions
     {
-        public MusicArtistOptions ()
-        {
-            GenreCollection = new List<string> ();
-        }
+        public long StorageTotal { get; set; }
 
-        public MusicArtistOptions (MusicArtist musicArtist)
-        {
-            GetOptionsFrom (musicArtist);
-        }
+        public long StorageFree { get; set; }
 
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var music_artist = obj as MusicArtist;
-            if (music_artist != null)
-            {
-                ArtistDiscographyUri = music_artist.ArtistDiscographyUri;
-
-                GenreCollection = new List<string> (music_artist.Genres);
-            }
-
-            base.GetOptionsFrom (obj);
-        }
-
-        public virtual List<string> GenreCollection { get; set; }
-
-        public virtual Uri ArtistDiscographyUri { get; set; }
+        public string StorageMedium { get; set; }
     }
 }
-

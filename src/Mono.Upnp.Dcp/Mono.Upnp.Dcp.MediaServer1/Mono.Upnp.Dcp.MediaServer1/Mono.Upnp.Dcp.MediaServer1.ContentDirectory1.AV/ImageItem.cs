@@ -26,43 +26,44 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class ImageItem : Item
     {
-        List<string> publishers = new List<string> ();
-        List<string> rights = new List<string> ();
-        
-        protected ImageItem (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected ImageItem ()
         {
+            Publishers = new List<string> ();
+            Rights = new List<string> ();
         }
         
-        public ImageItem (ImageItemOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public ImageItem (string id, ImageItemOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            LongDescription = options.LongDescription;
+            StorageMedium = options.StorageMedium;
+            Rating = options.Rating;
+            Description = options.Description;
+            Date = options.Date;
+            Publishers = Helper.MakeReadOnlyCopy (options.Publishers);
+            Rights = Helper.MakeReadOnlyCopy (options.Rights);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (ImageItemOptions options)
         {
-            var image_item_options = options as ImageItemOptions;
-            if (image_item_options != null)
-            {
-                Description = image_item_options.Description;
-                LongDescription = image_item_options.LongDescription;
-                StorageMedium = image_item_options.StorageMedium;
-                Rating = image_item_options.Rating;
-                Date = image_item_options.Date;
-                
-                publishers = new List<string> (image_item_options.PublisherCollection);
-                rights = new List<string> (image_item_options.RightsCollection);
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.LongDescription = LongDescription;
+            options.StorageMedium = StorageMedium;
+            options.Rating = Rating;
+            options.Description = Description;
+            options.Date = Date;
+            options.Publishers = new List<string> (Publishers);
+            options.Rights = new List<string> (Rights);
         }
         
         [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]
@@ -78,24 +79,20 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual string Description { get; protected set; }
         
         [XmlArrayItem ("publisher", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> PublisherCollection {
-            get { return publishers; }
-        }
-        
-        public IEnumerable<string> Publishers {
-            get { return publishers; }
-        }
+        public virtual IList<string> Publishers { get; private set; }
         
         [XmlElement ("date", Schemas.DublinCoreSchema)]
         public virtual string Date { get; protected set; }
         
         [XmlArrayItem ("rights", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> RightsCollection {
-            get { return rights; }
-        }
-        
-        public IEnumerable<string> Rights {
-            get { return rights; }
+        public virtual IList<string> Rights { get; private set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Publishers = new ReadOnlyCollection<string> (Publishers);
+            Rights = new ReadOnlyCollection<string> (Rights);
         }
     
         protected override void DeserializeElement (XmlDeserializationContext context)

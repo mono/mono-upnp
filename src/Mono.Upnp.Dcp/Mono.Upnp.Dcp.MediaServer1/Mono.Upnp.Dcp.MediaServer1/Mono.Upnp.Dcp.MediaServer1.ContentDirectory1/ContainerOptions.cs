@@ -1,10 +1,10 @@
-// 
-// PersonOptions.cs
+//
+// ContainerOptions.cs
 //  
 // Author:
-//       Yavor Georgiev <fealebenpae@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2010 Yavor Georgiev
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,32 +23,28 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+using System.Collections.Generic;
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class PersonOptions : ObjectOptions
+    public class ContainerOptions : ObjectOptions
     {
-        public PersonOptions ()
-        {
+        IEnumerable<ClassReference> search_classes;
+        IEnumerable<ClassReference> create_classes;
+
+        public IEnumerable<ClassReference> SearchClasses {
+            get { return GetEnumerable (search_classes); }
+            set { search_classes = value; }
         }
 
-        public PersonOptions (Person person)
-        {
-            GetOptionsFrom (person);
+        public IEnumerable<ClassReference> CreateClasses {
+            get { return GetEnumerable (create_classes); }
+            set { create_classes = value; }
         }
 
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var person = obj as Person;
-            if (person != null)
-            {
-                Language = person.Language;
-            }
-            
-            base.GetOptionsFrom (obj);
-        }
+        public int? ChildCount { get; set; }
 
-        public virtual string Language { get; set; }
+        public bool IsSearchable { get; set; }
     }
 }
-

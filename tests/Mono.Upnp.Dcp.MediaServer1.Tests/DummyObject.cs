@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.Tests
@@ -31,7 +32,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
     public class DummyObject : Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object
     {
         public DummyObject ()
-            : base (new DummyContentDirectory (), null)
+            : base ("-1", new ObjectOptions ())
         {
         }
 

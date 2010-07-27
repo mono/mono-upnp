@@ -26,50 +26,54 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class MusicArtist : Person
     {
-        List<string> genres = new List<string> ();
-        
-        protected MusicArtist (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected MusicArtist ()
         {
+            Genres = new List<string> ();
         }
         
-        public MusicArtist (MusicArtistOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public MusicArtist (string id, MusicArtistOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            ArtistDiscographyUri = options.ArtistDiscographyUri;
+            Genres = Helper.MakeReadOnlyCopy (options.Genres);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (MusicArtistOptions options)
         {
-            var music_artist_options = options as MusicArtistOptions;
-            if (music_artist_options != null)
-            {
-                ArtistDiscographyUri = music_artist_options.ArtistDiscographyUri;
-                
-                genres = new List<string> (music_artist_options.GenreCollection);
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.ArtistDiscographyUri = ArtistDiscographyUri;
+            options.Genres = new List<string> (Genres);
+        }
+
+        public new MusicArtistOptions GetOptions ()
+        {
+            var options = new MusicArtistOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlArrayItem ("genre", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> GenreCollection {
-            get { return genres; }
-        }
-        
-        public IEnumerable<string> Genres {
-            get { return genres; }
-        }
+        public virtual IList<string> Genres { get; private set; }
         
         [XmlElement ("artistDiscographyURI", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual Uri ArtistDiscographyUri { get; protected set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Genres = new ReadOnlyCollection<string> (Genres);
+        }
     
         protected override void DeserializeElement (XmlDeserializationContext context)
         {

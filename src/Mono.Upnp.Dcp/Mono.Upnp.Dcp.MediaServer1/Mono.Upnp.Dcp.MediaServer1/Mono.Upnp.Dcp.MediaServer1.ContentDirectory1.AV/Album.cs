@@ -26,46 +26,55 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class Album : Container
     {
-        List<string> publishers = new List<string> ();
-        List<string> contributors = new List<string> ();
-        List<Uri> relations = new List<Uri> ();
-        List<string> rights = new List<string> ();
-        
-        protected Album (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected Album ()
         {
+            Publishers = new List<string> ();
+            Contributors = new List<string> ();
+            Relations = new List<Uri> ();
+            Rights = new List<string> ();
         }
         
-        public Album (AlbumOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public Album (string id, AlbumOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            StorageMedium = options.StorageMedium;
+            LongDescription = options.LongDescription;
+            Description = options.Description;
+            Date = options.Date;
+            Publishers = Helper.MakeReadOnlyCopy (options.Publishers);
+            Contributors = Helper.MakeReadOnlyCopy (options.Contributors);
+            Relations = Helper.MakeReadOnlyCopy (options.Relations);
+            Rights = Helper.MakeReadOnlyCopy (options.Rights);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
-        { 
-            var album_options = options as AlbumOptions;
-            if (album_options != null)
-            {
-                StorageMedium = album_options.StorageMedium;
-                LongDescription = album_options.LongDescription;
-                Description = album_options.Description;
-                Date = album_options.Date;
-                
-                publishers = new List<string> (album_options.PublisherCollection);
-                contributors = new List<string> (album_options.ContributorCollection);
-                relations = new List<Uri> (album_options.RelationCollection);
-                rights = new List<string> (album_options.RightsCollections);
-            }
-            
-            base.UpdateFromOptions (options);
+
+        protected void CopyToOptions (AlbumOptions options)
+        {
+            base.CopyToOptions (options);
+
+            options.StorageMedium = StorageMedium;
+            options.LongDescription = LongDescription;
+            options.Description = Description;
+            options.Date = Date;
+            options.Publishers = new List<string> (Publishers);
+            options.Contributors = new List<string> (Contributors);
+            options.Relations = new List<Uri> (Relations);
+            options.Rights = new List<string> (Rights);
+        }
+
+        public new AlbumOptions GetOptions ()
+        {
+            var options = new AlbumOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
@@ -78,46 +87,32 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         public virtual string Description { get; protected set; }
         
         [XmlArrayItem ("publisher", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> PublisherCollection {
-            get { return publishers; }
-        }
-        
-        public IEnumerable<string> Publishers {
-            get { return publishers; }
-        }
+        public virtual IList<string> Publishers { get; private set; }
         
         [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> ContributorCollection {
-            get { return contributors; }
-        }
-        
-        public IEnumerable<string> Contributors {
-            get { return contributors; }
-        }
+        public virtual IList<string> Contributors { get; private set; }
         
         [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Date { get; protected set; }
         
         [XmlArrayItem ("relation", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<Uri> RelationCollection {
-            get { return relations; }
-        }
-        
-        public IEnumerable<Uri> Relations {
-            get { return relations; }
-        }
+        public virtual IList<Uri> Relations { get; private set; }
         
         [XmlArrayItem ("rights", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> RightsCollections {
-            get { return rights; }
-        }
+        public virtual IList<string> Rights { get; private set; }
         
-        public IEnumerable<string> Rights {
-            get { return rights; }
-        }
-        
-        // TODO what the hell about this?!?!?!
+        // TODO What about this?
         //public Uri LyricsUri { get; private set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Publishers = new ReadOnlyCollection<string> (Publishers);
+            Contributors = new ReadOnlyCollection<string> (Contributors);
+            Relations = new ReadOnlyCollection<Uri> (Relations);
+            Rights = new ReadOnlyCollection<string> (Rights);
+        }
     
         protected override void DeserializeElement (XmlDeserializationContext context)
         {

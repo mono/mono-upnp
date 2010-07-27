@@ -28,32 +28,36 @@ using System;
 
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class VideoBroadcast : VideoItem
     {
-        protected VideoBroadcast (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected VideoBroadcast ()
         {
         }
         
-        public VideoBroadcast (VideoBroadcastOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public VideoBroadcast (string id, VideoBroadcastOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            Icon = options.Icon;
+            Region = options.Region;
+            ChannelNr = options.ChannelNr;
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (VideoBroadcastOptions options)
         {
-            var video_broadcast_options = options as VideoBroadcastOptions;
-            if (video_broadcast_options != null)
-            {
-                Icon = video_broadcast_options.Icon;
-                Region = video_broadcast_options.Region;
-                ChannelNr = video_broadcast_options.ChannelNr;
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.Icon = Icon;
+            options.Region = Region;
+            options.ChannelNr = ChannelNr;
+        }
+
+        public new VideoBroadcastOptions GetOptions ()
+        {
+            var options = new VideoBroadcastOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("icon", Schemas.UpnpSchema, OmitIfNull = true)]

@@ -28,18 +28,40 @@ using System;
 
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class StorageSystem : Container
     {
-        public StorageSystem (ContentDirectory contentDirectory)
-            : this (contentDirectory, null)
+        protected StorageSystem ()
         {
         }
         
-        public StorageSystem (ContentDirectory contentDirectory, StorageSystem parent)
-            : base (contentDirectory, parent)
+        public StorageSystem (string id, StorageSystemOptions options)
+            : base (id, options)
         {
+            StorageTotal = options.StorageTotal;
+            StorageUsed = options.StorageUsed;
+            StorageFree = options.StorageFree;
+            StorageMaxPartition = options.StorageMaxPartition;
+            StorageMedium = options.StorageMedium;
+        }
+
+        protected void CopyToOptions (StorageSystemOptions options)
+        {
+            base.CopyToOptions (options);
+
+            options.StorageTotal = StorageTotal;
+            options.StorageUsed = StorageUsed;
+            options.StorageFree = StorageFree;
+            options.StorageMaxPartition = StorageMaxPartition;
+            options.StorageMedium = StorageMedium;
+        }
+
+        public new StorageSystemOptions GetOptions ()
+        {
+            var option = new StorageSystemOptions ();
+            CopyToOptions (option);
+            return option;
         }
         
         [XmlElement ("storageTotal", Schemas.UpnpSchema)]

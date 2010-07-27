@@ -26,62 +26,56 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class PlaylistItem : Item
     {
-        List<PersonWithRole> artists = new List<PersonWithRole> ();
-        List<string> genres = new List<string> ();
-        
-        protected PlaylistItem (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected PlaylistItem ()
         {
         }
         
-        public PlaylistItem (PlaylistItemOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public PlaylistItem (string id, PlaylistItemOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            LongDescription = options.LongDescription;
+            StorageMedium = options.StorageMedium;
+            Description = options.Description;
+            Date = options.Date;
+            Language = options.Language;
+            Artists = Helper.MakeReadOnlyCopy (options.Artists);
+            Genres = Helper.MakeReadOnlyCopy (options.Genres);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (PlaylistItemOptions options)
         {
-            var playlist_item_options = options as PlaylistItemOptions;
-            if (playlist_item_options != null)
-            {
-                LongDescription = playlist_item_options.LongDescription;
-                Description = playlist_item_options.Description;
-                StorageMedium = playlist_item_options.StorageMedium;
-                Date = playlist_item_options.Date;
-                Language = playlist_item_options.Language;
-                
-                artists = new List<PersonWithRole> (playlist_item_options.ArtistCollection);
-                genres = new List<string> (playlist_item_options.GenreCollection);
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.LongDescription = LongDescription;
+            options.StorageMedium = StorageMedium;
+            options.Description = Description;
+            options.Date = Date;
+            options.Language = Language;
+            options.Artists = new List<PersonWithRole> (Artists);
+            options.Genres = new List<string> (Genres);
+        }
+
+        public new PlaylistItemOptions GetOptions ()
+        {
+            var options = new PlaylistItemOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]
-        protected virtual ICollection<PersonWithRole> ArtistCollection {
-            get { return artists; }
-        }
-        
-        public IEnumerable<PersonWithRole> Artists {
-            get { return artists; }
-        }
+        public virtual IList<PersonWithRole> Artists { get; private set; }
         
         [XmlArrayItem ("genre", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> GenreCollection {
-            get { return genres; }
-        }
-        
-        public IEnumerable<string> Genres {
-            get { return genres; }
-        }
+        public virtual IList<string> Genres { get; private set; }
         
         [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string LongDescription { get; protected set; }
@@ -97,6 +91,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
         
         [XmlElement ("language", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Language { get; protected set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Artists = new ReadOnlyCollection<PersonWithRole> (Artists);
+            Genres = new ReadOnlyCollection<string> (Genres);
+        }
     
         protected override void DeserializeElement (XmlDeserializationContext context)
         {

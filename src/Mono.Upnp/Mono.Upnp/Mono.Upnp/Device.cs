@@ -44,10 +44,6 @@ namespace Mono.Upnp
         IXmlDeserializer<Service>,
         IXmlDeserializer<Icon>
     {
-        IList<Device> devices;
-        IList<Service> services;
-        IList<Icon> icons;
-        
         public Device (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName)
             : this (type, udn, friendlyName, manufacturer, modelName, null)
         {
@@ -104,63 +100,37 @@ namespace Mono.Upnp
         
         protected internal Device (IEnumerable<Device> devices, IEnumerable<Service> services, IEnumerable<Icon> icons)
         {
-            this.devices = Helper.MakeReadOnlyCopy (devices);
-            this.services = Helper.MakeReadOnlyCopy (services);
-            this.icons = Helper.MakeReadOnlyCopy (icons);
+            Devices = Helper.MakeReadOnlyCopy (devices);
+            Services = Helper.MakeReadOnlyCopy (services);
+            Icons = Helper.MakeReadOnlyCopy (icons);
         }
         
         protected internal Device (Deserializer deserializer)
             : base (deserializer)
         {
-            devices = new List<Device> ();
-            services = new List<Service> ();
-            icons = new List<Icon> ();
+            Devices = new List<Device> ();
+            Services = new List<Service> ();
+            Icons = new List<Icon> ();
         }
         
         static IEnumerable<Service> GetServices (DeviceOptions options)
         {
-            if (options != null) {
-                return options.Services;
-            } else {
-                return null;
-            }
+            return options == null ? null : options.Services;
         }
         
         static IEnumerable<Icon> GetIcons (DeviceOptions options)
         {
-            if (options != null) {
-                return options.Icons;
-            } else {
-                return null;
-            }
+            return options == null ? null : options.Icons;
         }
         
         [XmlArray ("iconList", OmitIfEmpty = true)]
-        protected virtual ICollection<Icon> IconCollection {
-            get { return icons; }
-        }
-        
-        public IEnumerable<Icon> Icons {
-            get { return icons; }
-        }
+        public virtual IList<Icon> Icons { get; private set; }
         
         [XmlArray ("serviceList", OmitIfEmpty = true)]
-        protected virtual ICollection<Service> ServiceCollection {
-            get { return services; }
-        }
-        
-        public IEnumerable<Service> Services {
-            get { return services; }
-        }
+        public virtual IList<Service> Services { get; private set; }
         
         [XmlArray ("deviceList", OmitIfEmpty = true)]
-        protected virtual ICollection<Device> DeviceCollection {
-            get { return devices; }
-        }
-        
-        public IEnumerable<Device> Devices {
-            get { return devices; }
-        }
+        public virtual IList<Device> Devices { get; private set; }
         
         [XmlElement ("deviceType")]
         public virtual DeviceType Type { get; protected set; }
@@ -201,48 +171,50 @@ namespace Mono.Upnp
                 throw new ArgumentNullException ("deviceUrlFragment");
             } else if (Deserializer != null) {
                 throw new InvalidOperationException (
-                    "The device was constructed for deserialization and cannot be initalized. Use one of the other constructors.");
+                    "The device was constructed for deserialization and cannot be initalized." +
+                    "Use one of the other constructors.");
             }
             
-            for (var i = 0; i < devices.Count; i++) {
-                devices[i].Initialize (serializer, root, string.Concat (deviceUrlFragment, "/device/", i.ToString ()));
+            for (var i = 0; i < Devices.Count; i++) {
+                Devices[i].Initialize (serializer, root, string.Concat (deviceUrlFragment, "/device/", i.ToString ()));
             }
             
-            for (var i = 0; i < services.Count; i++) {
-                services[i].Initialize (serializer, root, string.Concat (deviceUrlFragment, "/service/", i.ToString ()));
+            for (var i = 0; i < Services.Count; i++) {
+                Services[i].Initialize (serializer, root, string.Concat (
+                    deviceUrlFragment, "/service/", i.ToString ()));
             }
             
-            for (var i = 0; i < icons.Count; i++) {
-                icons[i].Initialize (root, string.Concat (deviceUrlFragment, "/icon/", i.ToString (), "/"));
+            for (var i = 0; i < Icons.Count; i++) {
+                Icons[i].Initialize (root, string.Concat (deviceUrlFragment, "/icon/", i.ToString (), "/"));
             }
         }
 
         protected internal virtual void Start ()
         {
-            foreach (var device in devices) {
+            foreach (var device in Devices) {
                 device.Start ();
             }
             
-            foreach (var service in services) {
+            foreach (var service in Services) {
                 service.Start ();
             }
             
-            foreach (var icon in icons) {
+            foreach (var icon in Icons) {
                 icon.Start ();
             }
         }
 
         protected internal virtual void Stop ()
         {
-            foreach (var device in devices) {
+            foreach (var device in Devices) {
                 device.Stop ();
             }
             
-            foreach (var service in services) {
+            foreach (var service in Services) {
                 service.Stop ();
             }
             
-            foreach (var icon in icons) {
+            foreach (var icon in Icons) {
                 icon.Stop ();
             }
         }
@@ -294,9 +266,9 @@ namespace Mono.Upnp
         void IXmlDeserializable.Deserialize (XmlDeserializationContext context)
         {
             Deserialize (context);
-            devices = new ReadOnlyCollection<Device> (devices);
-            services = new ReadOnlyCollection<Service> (services);
-            icons = new ReadOnlyCollection<Icon> (icons);
+            Devices = new ReadOnlyCollection<Device> (Devices);
+            Services = new ReadOnlyCollection<Service> (Services);
+            Icons = new ReadOnlyCollection<Icon> (Icons);
         }
         
         void IXmlDeserializable.DeserializeAttribute (XmlDeserializationContext context)

@@ -38,10 +38,9 @@ namespace Mono.Upnp.Control
     public class ServiceAction : Description, IMappable<string>, IXmlDeserializer<Argument>
     {
         readonly static IDictionary<string, string> emptyArguments = new EmptyDictionary ();
-        
         readonly ServiceController controller;
-        readonly CollectionMap<string, Argument> arguments;
         readonly ServiceActionExecutor executor;
+        CollectionMap<string, Argument> arguments;
 
         protected internal ServiceAction (Deserializer deserializer, ServiceController controller)
             : base (deserializer)
@@ -74,11 +73,7 @@ namespace Mono.Upnp.Control
         public virtual string Name { get; protected set; }
         
         [XmlArray ("argumentList")]
-        protected virtual ICollection<Argument> ArgumentList {
-            get { return arguments; }
-        }
-        
-        public IMap<string, Argument> Arguments {
+        public virtual IMap<string, Argument> Arguments {
             get { return arguments; }
         }
         
@@ -125,7 +120,8 @@ namespace Mono.Upnp.Control
         void VerifyArguments (IDictionary<string, string> arguments)
         {
             foreach (var pair in arguments) {
-                if (!Arguments.ContainsKey (pair.Key) || Arguments[pair.Key].Direction != ArgumentDirection.In) {
+                if (!this.arguments.ContainsKey (pair.Key)
+                    || this.arguments[pair.Key].Direction != ArgumentDirection.In) {
                     throw new ArgumentException ("This action does not have an in argument called {0}.", pair.Key);
                 }
                 //VerifyArgumentValue (Arguments[pair.Key], pair.Value);

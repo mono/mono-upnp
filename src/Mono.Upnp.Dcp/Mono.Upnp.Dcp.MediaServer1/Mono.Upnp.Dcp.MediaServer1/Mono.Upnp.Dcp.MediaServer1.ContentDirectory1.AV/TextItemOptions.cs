@@ -1,5 +1,5 @@
 // 
-// ImageItemOptions.cs
+// TextItemOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,40 +23,46 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using System.Collections.Generic;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class ImageItemOptions : ObjectOptions
+    public class TextItemOptions : ItemOptions
     {
-        public ImageItemOptions ()
-        {
-            PublisherCollection = new List<string> ();
-            RightsCollection = new List<string> ();
+        IEnumerable<PersonWithRole> authors;
+        IEnumerable<string> publishers;
+        IEnumerable<string> contributors;
+        IEnumerable<Uri> relations;
+        IEnumerable<string> rights;
+
+        public IEnumerable<PersonWithRole> Authors {
+            get { return GetEnumerable (authors); }
+            set { authors = value; }
         }
 
-        public ImageItemOptions (ImageItem imageItem)
-        {
-            GetOptionsFrom (imageItem);
+        public IEnumerable<string> Publishers {
+            get { return GetEnumerable (publishers); }
+            set { publishers = value; }
         }
 
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var image_item = obj as ImageItem;
-            if (image_item != null)
-            {
-                Description = image_item.Description;
-                LongDescription = image_item.LongDescription;
-                StorageMedium = image_item.StorageMedium;
-                Rating = image_item.Rating;
-                Date = image_item.Date;
-
-                PublisherCollection = new List<string> (image_item.Publishers);
-                RightsCollection = new List<string> (image_item.Rights);
-            }
-            
-            base.GetOptionsFrom (obj);
+        public IEnumerable<string> Contributors {
+            get { return GetEnumerable (contributors); }
+            set { contributors = value; }
         }
+
+        public IEnumerable<Uri> Relations {
+            get { return GetEnumerable (relations); }
+            set { relations = value; }
+        }
+
+        public IEnumerable<string> Rights {
+            get { return GetEnumerable (rights); }
+            set { rights = value; }
+        }
+
+        public virtual string Protection { get; set; }
 
         public virtual string LongDescription { get; set; }
 
@@ -66,11 +72,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
 
         public virtual string Description { get; set; }
 
-        public virtual List<string> PublisherCollection { get; set; }
-
         public virtual string Date { get; set; }
 
-        public virtual List<string> RightsCollection { get; set; }
+        public virtual string Language { get; set; }
     }
 }
-

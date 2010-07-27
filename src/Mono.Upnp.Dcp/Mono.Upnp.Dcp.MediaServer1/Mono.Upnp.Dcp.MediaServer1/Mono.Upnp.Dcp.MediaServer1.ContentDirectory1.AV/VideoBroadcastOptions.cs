@@ -1,5 +1,5 @@
 // 
-// AudioBookOptions.cs
+// VideoBroadcastOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,45 +23,17 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
-using System.Collections.Generic;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class AudioBookOptions : ObjectOptions
+    public class VideoBroadcastOptions : VideoItemOptions
     {
-        public AudioBookOptions ()
-        {
-            ProducerCollection = new List<string> ();
-            ContributorCollection = new List<string> ();
-        }
+        public Uri Icon { get;  set; }
 
-        public AudioBookOptions (AudioBook audioBook)
-        {
-            GetOptionsFrom (audioBook);
-        }
+        public string Region { get; set; }
 
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var audio_book = obj as AudioBook;
-            if (audio_book != null)
-            {
-                this.StorageMedium = audio_book.StorageMedium;
-                this.Date = audio_book.Date;
-
-                ProducerCollection = new List<string> (audio_book.Producers);
-                ContributorCollection = new List<string> (audio_book.Contributors);
-            }
-
-            base.GetOptionsFrom (obj);
-        }
-
-        public virtual string StorageMedium { get; set; }
-
-        public virtual List<string> ProducerCollection { get; set; }
-
-        public virtual List<string> ContributorCollection { get; set; }
-
-        public virtual string Date { get; set; }
+        public int? ChannelNr { get; set; }
     }
 }
-

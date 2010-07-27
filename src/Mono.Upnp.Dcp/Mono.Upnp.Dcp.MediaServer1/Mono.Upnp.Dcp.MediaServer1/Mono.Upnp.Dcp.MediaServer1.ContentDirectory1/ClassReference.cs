@@ -34,7 +34,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     public class ClassReference : Class, IComparable<ClassReference>
     {
         [XmlAttribute ("includeDerived")]
-        public bool IncludeDerived { get; private set; }
+        public virtual bool IncludeDerived { get; protected set; }
         
         int IComparable<ClassReference>.CompareTo (ClassReference classReference)
         {

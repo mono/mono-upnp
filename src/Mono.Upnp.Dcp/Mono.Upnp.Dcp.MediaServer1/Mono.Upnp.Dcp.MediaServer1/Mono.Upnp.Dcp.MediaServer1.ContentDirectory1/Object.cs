@@ -26,61 +26,67 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
-using System.Reflection;
-using System.Collections;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public abstract class Object : XmlAutomatable
+    public class Object : XmlAutomatable
     {
-        readonly ContentDirectory content_directory;
-        List<Resource> resources = new List<Resource> ();
-        bool is_restricted;
-        string title;
-        string creator;
-        Class @class;
-        WriteStatus? write_status;
-        
-        protected Object (ContentDirectory contentDirectory, Container parent)
+        protected Object ()
         {
-            if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
-            
-            content_directory = contentDirectory;
-            Id = contentDirectory.GetNewObjectId ();
-            ParentId = parent == null ? "-1" : parent.Id;
-            Class = new Class (ClassManager.GetClassNameFromType (GetType ()));
+            Resources = new List<Resource> ();
         }
         
-        public Object (ObjectOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public Object (string id, ObjectOptions options)
         {
-            if (options == null) throw new ArgumentNullException ("options");
-            
-            UpdateFromOptions (options);
-        }
-        
-        public virtual void UpdateFromOptions (ObjectOptions options)
-        {
+            if (id == null) {
+                throw new ArgumentNullException ("id");
+            } else if (options == null) {
+                throw new ArgumentNullException ("options");
+            }
+
+            Id = id;
             Title = options.Title;
-            creator = options.Creator;
+            Creator = options.Creator;
             WriteStatus = options.WriteStatus;
-            resources = new List<Resource> (options.ResourceCollection);
-            
-            //TODO: plug client-server sync logic somewhere hereabouts.
+            IsRestricted = options.IsRestricted;
+            Resources = Helper.MakeReadOnlyCopy (options.Resources);
         }
-        
-        protected void OnUpdate ()
+
+        protected void CopyToOptions (ObjectOptions options)
         {
-            content_directory.OnSystemUpdate ();
+            if (options == null) {
+                throw new ArgumentNullException ("options");
+            }
+
+            options.Title = Title;
+            options.Creator = Creator;
+            options.WriteStatus = WriteStatus;
+            options.IsRestricted = IsRestricted;
+            options.Resources = new List<Resource> (Resources);
+        }
+
+        public ObjectOptions GetOptions ()
+        {
+            var options = new ObjectOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("class", Schemas.UpnpSchema)]
-        public virtual Class Class {
-            get { return @class; }
-            set { @class = value; }
-        }
+        public virtual Class Class { get; protected set; }
+        
+        [XmlElement ("title", Schemas.DublinCoreSchema)]
+        public virtual string Title { get; protected set; }
+        
+        [XmlElement ("creator", Schemas.DublinCoreSchema, OmitIfNull = true)]
+        public virtual string Creator { get; protected set; }
+        
+        [XmlElement ("writeStatus", Schemas.UpnpSchema, OmitIfNull = true)]
+        public virtual WriteStatus? WriteStatus { get; protected set; }
 
         [XmlAttribute ("id")]
         public virtual string Id { get; protected set; }
@@ -89,78 +95,26 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public virtual string ParentId { get; protected set; }
         
         [XmlAttribute ("restricted")]
-        protected virtual string IsRestrictedValue {
+        protected virtual string Restricted {
             get { return IsRestricted ? "true" : "false"; }
             set { IsRestricted = value == "true"; }
         }
         
-        public bool IsRestricted {
-            get { return is_restricted; }
-            set { is_restricted = value; }
-        }
+        public bool IsRestricted { get; protected set; }
         
         [XmlArrayItem]
-        protected virtual ICollection<Resource> ResourceCollection {
-            get { return resources; }
-        }
-        
-        public IEnumerable<Resource> Resources {
-            get { return resources; }
-        }
-        
-        [XmlElement ("title", Schemas.DublinCoreSchema)]
-        public virtual string Title {
-            get { return title; }
-            set { title = value; }
-        }
-        
-        [XmlElement ("creator", Schemas.DublinCoreSchema, OmitIfNull = true)]
-        public virtual string Creator {
-            get { return creator; }
-            set { creator = value; }
-        }
-        
-        [XmlElement ("writeStatus", Schemas.UpnpSchema, OmitIfNull = true)]
-        public virtual WriteStatus? WriteStatus {
-            get { return write_status; }
-            set { write_status = value; }
-        }
-        
-        internal Deserializer Deserializer { get; private set; }
-        
-        internal uint ParentUpdateId { get; set; }
-        
-        public void AddResource (Resource resource)
-        {
-            resources.Add (resource);
-        }
-        
-        public bool RemoveResource (Resource resource)
-        {
-            return resources.Remove (resource);
-        }
-        
-//        public Container GetParent ()
-//        {
-//            return ParentId == "-1" ? null : ContentDirectory.GetObject<Container> (ParentId);
-//        }
-//        
-//        public bool CanDestroy {
-//            get { return !IsRestricted && ContentDirectory.Controller.CanDestroyObject; }
-//        }
-//        
-//        public void Destroy ()
-//        {
-//            ContentDirectory.Controller.DestroyObject (Id);
-//        }
-//        
-//        public bool IsOutOfDate {
-//            get { return ContentDirectory.CheckIfObjectIsOutOfDate (this); }
-//        }
+        public virtual IList<Resource> Resources { get; private set; }
         
         public override string ToString ()
         {
             return string.Format("{0} ({1})", Id, Class.FullClassName);
+        }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Resources = new ReadOnlyCollection<Resource> (Resources);
         }
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)
@@ -171,6 +125,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
             context.AutoDeserializeElement (this);
+        }
+        
+        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        {
+            context.AutoSerializeObjectAndMembers (this);
+        }
+        
+        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        {
+            context.AutoSerializeMembersOnly (this);
         }
     }
 }

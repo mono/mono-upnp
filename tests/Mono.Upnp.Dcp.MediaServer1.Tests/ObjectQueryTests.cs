@@ -40,9 +40,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         static readonly Property text = new Property ("Text");
         static readonly Property number = new Property ("Number");
         static readonly Property nullable_number = new Property ("NullableNumber");
-//        static readonly Property text_attribute = new Property ("@Text");
-//        static readonly Property number_attribute = new Property ("@Number");
-//        static readonly Property nullable_number_attribute = new Property ("@NullableNumber");
+        static readonly Property text_attribute = new Property ("@Text");
+        static readonly Property number_attribute = new Property ("@Number");
+        static readonly Property nullable_number_attribute = new Property ("@NullableNumber");
+        static readonly Property nested_text_attribute = new Property ("Data@Text");
+        static readonly Property nested_number_attribute = new Property ("Data@Number");
+        static readonly Property nested_nullable_number_attribute = new Property ("Data@NullableNumber");
 
         class Data : DummyObject
         {
@@ -185,6 +188,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (Matches (new OmitIfNullData (), text.Exists (false)));
             Assert.IsFalse (Matches (new OmitIfNullData (), number.Exists (true)));
             Assert.IsTrue (Matches (new OmitIfNullData (), number.Exists (false)));
+            Assert.IsFalse (Matches (data, text_attribute.Exists (true)));
+            Assert.IsTrue (Matches (data, text_attribute.Exists (false)));
         }
 
         class ArrayItemData : DummyObject
@@ -239,8 +244,60 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         [Test]
         public void Attributes ()
         {
-            //var data = new AttributeData { Text = "foo", Number = 42, NullableNumber = 13 };
-            //Assert.IsTrue (
+            var data = new AttributeData { Text = "foo", Number = 42, NullableNumber = 13 };
+            Assert.IsTrue (Matches (data, text_attribute == "foo"));
+            Assert.IsTrue (Matches (data, number_attribute == "42"));
+            Assert.IsTrue (Matches (data, nullable_number_attribute == "13"));
+            Assert.IsFalse (Matches (data, text_attribute.Contains ("bar")));
+            Assert.IsFalse (Matches (data, number_attribute < "42"));
+            Assert.IsFalse (Matches (data, nullable_number_attribute >= "14"));
+        }
+
+        class OmitIfNullAttributeData : DummyObject
+        {
+            [XmlAttribute (OmitIfNull = true)] public string Text { get; set; }
+            [XmlAttribute] public int Number { get; set; }
+            [XmlAttribute (OmitIfNull = true)] public int? NullableNumber { get; set; }
+        }
+
+        [Test]
+        public void AttributeExists ()
+        {
+            var data = new OmitIfNullAttributeData { Text = "foo", Number = 42, NullableNumber = 13 };
+            Assert.IsTrue (Matches (data, text_attribute.Exists (true)));
+            Assert.IsFalse (Matches (data, text_attribute.Exists (false)));
+            Assert.IsTrue (Matches (data, number_attribute.Exists (true)));
+            Assert.IsFalse (Matches (data, number_attribute.Exists (false)));
+            Assert.IsTrue (Matches (data, nullable_number_attribute.Exists (true)));
+            Assert.IsFalse (Matches (data, nullable_number_attribute.Exists (false)));
+            data = new OmitIfNullAttributeData ();
+            Assert.IsFalse (Matches (data, text_attribute.Exists (true)));
+            Assert.IsTrue (Matches (data, text_attribute.Exists (false)));
+            Assert.IsTrue (Matches (data, number_attribute.Exists (true)));
+            Assert.IsFalse (Matches (data, number_attribute.Exists (false)));
+            Assert.IsFalse (Matches (data, nullable_number_attribute.Exists (true)));
+            Assert.IsTrue (Matches (data, nullable_number_attribute.Exists (false)));
+            Assert.IsFalse (Matches (data, text.Exists (true)));
+            Assert.IsTrue (Matches (data, text.Exists (false)));
+        }
+
+        class NestedAttributeData : DummyObject
+        {
+            [XmlElement] public AttributeData Data { get; set; }
+        }
+
+        [Test]
+        public void NestedAttributes ()
+        {
+            var data = new NestedAttributeData {
+                Data = new AttributeData { Text = "foo", Number = 42, NullableNumber = 13 }
+            };
+            Assert.IsTrue (Matches (data, nested_text_attribute == "foo"));
+            Assert.IsTrue (Matches (data, nested_number_attribute == "42"));
+            Assert.IsTrue (Matches (data, nested_nullable_number_attribute == "13"));
+            Assert.IsFalse (Matches (data, nested_text_attribute.Exists (false)));
+            Assert.IsFalse (Matches (data, nested_number_attribute > "42"));
+            Assert.IsFalse (Matches (data, nested_nullable_number_attribute != "13"));
         }
 
         static bool Matches (Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object @object, Query query)

@@ -28,28 +28,32 @@ using System;
 
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class StorageFolder : Container
     {
-        public StorageFolder (ContentDirectory contentDirectory)
-            : base (contentDirectory, null)
+        protected StorageFolder ()
         {
         }
         
-        public StorageFolder (ContentDirectory contentDirectory, StorageSystem parent)
-            : base (contentDirectory, parent)
+        public StorageFolder (string id, StorageFolderOptions options)
+            : base (id, options)
         {
+            StorageUsed = options.StorageUsed;
         }
-        
-        public StorageFolder (ContentDirectory contentDirectory, StorageVolume parent)
-            : base (contentDirectory, parent)
+
+        protected void CopyToOptions (StorageFolderOptions options)
         {
+            base.CopyToOptions (options);
+
+            options.StorageUsed = StorageUsed;
         }
-        
-        public StorageFolder (ContentDirectory contentDirectory, StorageFolder parent)
-            : base (contentDirectory, parent)
+
+        public new StorageFolderOptions GetOptions ()
         {
+            var options = new StorageFolderOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("storageUsed", Schemas.UpnpSchema)]

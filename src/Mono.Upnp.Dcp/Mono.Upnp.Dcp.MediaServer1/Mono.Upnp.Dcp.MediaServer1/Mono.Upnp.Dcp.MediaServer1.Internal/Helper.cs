@@ -24,6 +24,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace Mono.Upnp.Dcp.MediaServer1.Internal
@@ -31,6 +33,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.Internal
     static class Helper
     {
         public readonly static Encoding UTF8Unsigned = new UTF8Encoding (false);
+
+        public static IList<T> MakeReadOnlyCopy<T> (IEnumerable<T> items)
+        {
+            var list = items as IList<T>;
+            if (list == null) {
+                list = new List<T> (items);
+            }
+            return new ReadOnlyCollection<T> (list);
+        }
     }
 }
 

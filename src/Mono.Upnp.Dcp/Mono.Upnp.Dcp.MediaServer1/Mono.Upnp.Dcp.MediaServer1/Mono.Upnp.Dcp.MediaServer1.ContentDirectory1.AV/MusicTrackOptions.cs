@@ -1,5 +1,5 @@
 // 
-// MovieOptions.cs
+// MusicTrackOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,48 +23,46 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using System.Collections.Generic;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class MovieOptions : VideoItemOptions
+    public class MusicTrackOptions : AudioItemOptions
     {
-        public MovieOptions ()
-        {
-            ScheduledStartTimeCollection = new List<DateTime> ();
-            ScheduledEndTimeCollection = new List<DateTime> ();
+        IEnumerable<PersonWithRole> artists;
+        IEnumerable<string> albums;
+        IEnumerable<string> playlists;
+        IEnumerable<string> contributors;
+
+        public IEnumerable<PersonWithRole> Artists {
+            get { return GetEnumerable (artists); }
+            set { artists = value; }
         }
 
-        public MovieOptions (Movie movie)
-        {
-            GetOptionsFrom (movie);
+        public IEnumerable<string> Albums {
+            get { return GetEnumerable (albums); }
+            set { albums = value; }
         }
 
-        protected override void GetOptionsFrom (Object obj)
-        {
-            var movie = obj as Movie;
-            if (movie != null)
-            {
-                StorageMedium = movie.StorageMedium;
-                DvdRegionCode = movie.DvdRegionCode;
-                ChannelName = movie.ChannelName;
-
-                ScheduledStartTimeCollection = new List<DateTime> (movie.ScheduledStartTimes);
-                ScheduledEndTimeCollection = new List<DateTime> (movie.ScheduledEndTimes);
-            }            
-            
-            base.GetOptionsFrom (obj);
+        public IEnumerable<string> Playlists {
+            get { return GetEnumerable (playlists); }
+            set { playlists = value; }
         }
+
+        public IEnumerable<string> Contributors {
+            get { return contributors; }
+            set { contributors = value; }
+        }
+
+        public virtual Uri AlbumArtURI { get; set; }
+
+        public virtual int? OriginalTrackNumber { get;  set; }
 
         public virtual string StorageMedium { get; set; }
 
-        public virtual int? DvdRegionCode { get; set; }
-
-        public virtual string ChannelName { get; set; }
-
-        public virtual List<DateTime> ScheduledStartTimeCollection { get; set; }
-
-        public virtual List<DateTime> ScheduledEndTimeCollection { get; set; }
+        public virtual string Date { get; set; }
     }
 }
 

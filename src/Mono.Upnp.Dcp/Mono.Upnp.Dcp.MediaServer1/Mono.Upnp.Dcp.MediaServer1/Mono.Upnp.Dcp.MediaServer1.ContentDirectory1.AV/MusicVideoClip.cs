@@ -26,98 +26,87 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class MusicVideoClip : VideoItem
     {
-        List<PersonWithRole> artists = new List<PersonWithRole> ();
-        List<string> contributors = new List<string> ();
-        List<string> albums = new List<string> ();
-        List<DateTime> scheduled_start_times = new List<DateTime> ();
-        List<DateTime> scheduled_end_times = new List<DateTime> ();
-        
-        protected MusicVideoClip (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected MusicVideoClip ()
         {
+            Artists = new List<PersonWithRole> ();
+            Albums = new List<string> ();
+            ScheduledStartTimes = new List<DateTime> ();
+            ScheduledEndTimes = new List<DateTime> ();
+            Contributors = new List<string> ();
         }
         
-        public MusicVideoClip (MusicVideoClipOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public MusicVideoClip (string id, MusicVideoClipOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            Date = options.Date;
+            StorageMedium = options.StorageMedium;
+            Artists = Helper.MakeReadOnlyCopy (options.Artists);
+            Albums = Helper.MakeReadOnlyCopy (options.Albums);
+            ScheduledStartTimes = Helper.MakeReadOnlyCopy (options.ScheduledStartTimes);
+            ScheduledEndTimes = Helper.MakeReadOnlyCopy (options.ScheduledEndTimes);
+            Contributors = Helper.MakeReadOnlyCopy (options.Contributors);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (MusicVideoClipOptions options)
         {
-            var music_video_clip_options = options as MusicVideoClipOptions;
-            if (music_video_clip_options != null)
-            {
-                Date = music_video_clip_options.Date;
-                StorageMedium = music_video_clip_options.StorageMedium;
-                
-                artists = new List<PersonWithRole> (music_video_clip_options.ArtistCollection);
-                albums = new List<string> (music_video_clip_options.AlbumCollection);
-                scheduled_start_times = new List<DateTime> (music_video_clip_options.ScheduledStartTimeCollection);
-                scheduled_end_times = new List<DateTime> (music_video_clip_options.ScheduledEndTimeCollection);
-                contributors = new List<string> (music_video_clip_options.ContributorCollection);
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.Date = Date;
+            options.StorageMedium = StorageMedium;
+            options.Artists = new List<PersonWithRole> (Artists);
+            options.Albums = new List<string> (Albums);
+            options.ScheduledStartTimes = new List<DateTime> (ScheduledStartTimes);
+            options.ScheduledEndTimes = new List<DateTime> (ScheduledEndTimes);
+            options.Contributors = new List<string> (Contributors);
+        }
+
+        public new MusicVideoClipOptions GetOptions ()
+        {
+            var options = new MusicVideoClipOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]
-        protected virtual ICollection<PersonWithRole> ArtistCollection {
-            get { return artists; }
-        }
-        
-        public IEnumerable<PersonWithRole> Artists {
-            get { return artists; }
-        }
+        public virtual IList<PersonWithRole> Artists { get; private set; }
         
         [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string StorageMedium { get; protected set; }
         
         [XmlArrayItem ("album", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> AlbumCollection {
-            get { return albums; }
-        }
-        
-        public IEnumerable<string> Albums {
-            get { return albums; }
-        }
+        public virtual IList<string> Albums { get; private set; }
         
         [XmlArrayItem ("scheduledStartTime", Schemas.UpnpSchema)]
-        protected virtual ICollection<DateTime> ScheduledStartTimeCollection {
-            get { return scheduled_start_times; }
-        }
-        
-        public IEnumerable<DateTime> ScheduledStartTimes {
-            get { return scheduled_end_times; }
-        }
+        public virtual IList<DateTime> ScheduledStartTimes { get; private set; }
         
         [XmlArrayItem ("scheduledEndTime", Schemas.UpnpSchema)]
-        protected virtual ICollection<DateTime> ScheduledEndTimeCollection {
-            get { return scheduled_end_times; }
-        }
-        
-        public IEnumerable<DateTime> ScheduledEndTimes {
-            get { return scheduled_end_times; }
-        }
+        public virtual IList<DateTime> ScheduledEndTimes { get; private set; }
         
         [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> ContributorCollection {
-            get { return contributors; }
-        }
-        
-        public IEnumerable<string> Contributors {
-            get { return contributors; }
-        }
+        public virtual IList<string> Contributors { get; private set; }
         
         [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Date { get; protected set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Artists = new ReadOnlyCollection<PersonWithRole> (Artists);
+            Albums = new ReadOnlyCollection<string> (Albums);
+            ScheduledStartTimes = new ReadOnlyCollection<DateTime> (ScheduledStartTimes);
+            ScheduledEndTimes = new ReadOnlyCollection<DateTime> (ScheduledEndTimes);
+            Contributors = new ReadOnlyCollection<string> (Contributors);
+        }
     
         protected override void DeserializeElement (XmlDeserializationContext context)
         {

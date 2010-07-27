@@ -1,5 +1,5 @@
 // 
-// PhotoAlbumOptions.cs
+// ImageItemOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,19 +23,35 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+
+using System.Collections.Generic;
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class PhotoAlbumOptions : AlbumOptions
+    public class ImageItemOptions : ItemOptions
     {
-        public PhotoAlbumOptions ()
-        {
+        IEnumerable<string> publishers;
+        IEnumerable<string> rights;
+
+        public IEnumerable<string> Publishers {
+            get { return GetEnumerable (publishers); }
+            set { publishers = value; }
         }
 
-        public PhotoAlbumOptions (PhotoAlbum photoAlbum)
-        {
-            GetOptionsFrom (photoAlbum);
+        public IEnumerable<string> Rights {
+            get { return GetEnumerable (rights); }
+            set { rights = value; }
         }
+
+        public virtual string LongDescription { get; set; }
+
+        public virtual string StorageMedium { get; set; }
+
+        public virtual string Rating { get; set; }
+
+        public virtual string Description { get; set; }
+
+        public virtual string Date { get; set; }
     }
 }
 

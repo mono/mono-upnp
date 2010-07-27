@@ -1,5 +1,5 @@
 // 
-// MovieGenreOptions.cs
+// GenreOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,19 +23,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
-{
-    public class MovieGenreOptions : GenreOptions
-    {
-        public MovieGenreOptions ()
-        {
-        }
 
-        public MovieGenreOptions (MovieGenre movieGenre)
-        {
-            GetOptionsFrom (movieGenre);
-        }
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
+{
+    public class GenreOptions : ContainerOptions
+    {
+        public string LongDescription { get; set; }
+
+        public string Description { get; set; }
     }
 }
-

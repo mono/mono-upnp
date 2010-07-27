@@ -28,33 +28,40 @@ using System;
 
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class AudioBroadcast  : AudioItem
     {
-        protected AudioBroadcast (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected AudioBroadcast ()
         {
         }
         
-        public AudioBroadcast (AudioBroadcastOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public AudioBroadcast (string id, AudioBroadcastOptions options)
+            : base (id, options)
         {
-            this.UpdateFromOptions (options);
+            Region = options.Region;
+            RadioCallSign = options.RadioCallSign;
+            RadioStationId = options.RadioStationId;
+            RadioBand = options.RadioBand;
+            ChannelNr = options.ChannelNr;
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (AudioBroadcastOptions options)
         {
-            var audio_broadcast_options = options as AudioBroadcastOptions;
-            if (audio_broadcast_options != null)
-            {
-                Region = audio_broadcast_options.Region;
-                RadioCallSign = audio_broadcast_options.RadioCallSign;
-                RadioStationId = audio_broadcast_options.RadioStationId;
-                RadioBand = audio_broadcast_options.RadioBand;    
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.Region = Region;
+            options.RadioCallSign = RadioCallSign;
+            options.RadioStationId = RadioStationId;
+            options.RadioBand = RadioBand;
+            options.ChannelNr = ChannelNr;
+        }
+
+        public new AudioBroadcastOptions GetOptions ()
+        {
+            var options = new AudioBroadcastOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("region", Schemas.UpnpSchema, OmitIfNull = true)]

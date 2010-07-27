@@ -41,13 +41,13 @@ namespace Mono.Upnp.Control
         IXmlDeserializer<ServiceAction>,
         IXmlDeserializer<StateVariable>
     {
-        readonly CollectionMap<string, ServiceAction> actions;
-        readonly CollectionMap<string, StateVariable> state_variables;
         DataServer scpd_server;
         ControlServer control_server;
         ControlClient control_client;
         EventServer event_server;
         EventClient event_client;
+        CollectionMap<string, ServiceAction> actions;
+        CollectionMap<string, StateVariable> state_variables;
 
         protected internal ServiceController (Deserializer deserializer, Service service)
             : base (deserializer)
@@ -84,16 +84,16 @@ namespace Mono.Upnp.Control
         protected virtual ICollection<ServiceAction> ActionCollection {
             get { return actions; }
         }
-        
+
         public IMap<string, ServiceAction> Actions {
             get { return actions; }
         }
         
         [XmlArray ("serviceStateTable")]
-        protected ICollection<StateVariable> StateVariablesCollection {
+        protected virtual ICollection<StateVariable> StateVariableCollection {
             get { return state_variables; }
         }
-        
+
         public IMap<string, StateVariable> StateVariables {
             get { return state_variables; }
         }
@@ -113,8 +113,8 @@ namespace Mono.Upnp.Control
             }
             
             scpd_server = new DataServer (serializer.GetBytes (this), @"text/xml; charset=""utf-8""", service.ScpdUrl);
-            control_server = new ControlServer (Actions, service.Type.ToString (), service.ControlUrl, serializer);
-            event_server = new EventServer (StateVariables.Values, service.EventUrl);
+            control_server = new ControlServer (actions, service.Type.ToString (), service.ControlUrl, serializer);
+            event_server = new EventServer (state_variables.Values, service.EventUrl);
             
             foreach (var state_variable in state_variables.Values) {
                 state_variable.Initialize (this);

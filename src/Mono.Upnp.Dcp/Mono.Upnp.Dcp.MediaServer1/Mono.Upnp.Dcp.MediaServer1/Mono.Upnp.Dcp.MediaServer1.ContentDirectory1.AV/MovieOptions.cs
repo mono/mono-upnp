@@ -1,5 +1,5 @@
 // 
-// ObjectOptions.cs
+// MovieOptions.cs
 //  
 // Author:
 //       Yavor Georgiev <fealebenpae@gmail.com>
@@ -23,39 +23,31 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
 using System.Collections.Generic;
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
+
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public class ObjectOptions
+    public class MovieOptions : VideoItemOptions
     {
-        public ObjectOptions ()
-        {
-            ResourceCollection = new List<Resource> ();
+        IEnumerable<DateTime> scheduled_start_times;
+        IEnumerable<DateTime> scheduled_end_times;
+
+        public IEnumerable<DateTime> ScheduledStartTimes {
+            get { return GetEnumerable (scheduled_start_times); }
+            set { scheduled_start_times = value; }
         }
 
-        public ObjectOptions (Object obj)
-        {
-            GetOptionsFrom (obj);
+        public IEnumerable<DateTime> ScheduledEndTimes {
+            get { return GetEnumerable (scheduled_end_times); }
+            set { scheduled_end_times = value; }
         }
 
-        protected virtual void GetOptionsFrom (Object obj)
-        {
-            Title = obj.Title;
-            Creator = obj.Creator;
-            WriteStatus = obj.WriteStatus;
+        public string StorageMedium { get; set; }
 
-            ResourceCollection = new List<Resource> (obj.Resources);
-        }
+        public int? DvdRegionCode { get; set; }
 
-        public virtual List<Resource> ResourceCollection { get; set; }
-
-        public virtual string Title { get; set; }
-
-        public virtual string Creator { get; set; }
-
-        public virtual WriteStatus? WriteStatus { get; set; }
+        public string ChannelName { get; set; }
     }
 }
-
-

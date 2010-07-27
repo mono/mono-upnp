@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -51,19 +52,11 @@ namespace Mono.Upnp.Internal
         
         public static IList<T> MakeReadOnlyCopy<T> (IEnumerable<T> items)
         {
-            var array = items as T[];
-            if (items == null) {
-                array = new T[0];
+            var list = items as IList<T>;
+            if (list == null) {
+                list = new List<T> (items);
             }
-            if (array != null) {
-                return Array.AsReadOnly (array);
-            } else {
-                var list = items as List<T>;
-                if (list == null) {
-                    list = new List<T> (items);
-                }
-                return Array.AsReadOnly (list.ToArray ());
-            }
+            return new ReadOnlyCollection<T> (list);
         }
         
         public static CollectionMap<TKey, TValue> MakeReadOnlyCopy<TKey, TValue> (IEnumerable<TValue> items)

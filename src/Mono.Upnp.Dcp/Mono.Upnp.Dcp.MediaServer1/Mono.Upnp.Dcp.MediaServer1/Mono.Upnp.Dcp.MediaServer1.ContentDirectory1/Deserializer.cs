@@ -120,7 +120,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 //@object.Deserialize (this, reader);
             }
             if (container_update_ids.ContainsKey (@object.ParentId)) {
-                @object.ParentUpdateId = container_update_ids[@object.ParentId];
+                //@object.ParentUpdateId = container_update_ids[@object.ParentId];
             }
             
             object_cache[filter][@object.Id] = new WeakReference (@object);
@@ -139,8 +139,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         internal bool CheckIfObjectIsOutOfDate (Object @object)
         {
-            return container_update_ids.ContainsKey (@object.ParentId) &&
-                container_update_ids[@object.ParentId] != @object.ParentUpdateId;
+            return false;
+            //return container_update_ids.ContainsKey (@object.ParentId) &&
+            //    container_update_ids[@object.ParentId] != @object.ParentUpdateId;
         }
         
         internal T GetObject<T> (string id) where T : Object
@@ -160,8 +161,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public static T GetUpdatedObject<T> (T @object) where T : Object
         {
             if (@object == null) throw new ArgumentNullException ("object");
-            
-            return @object.Deserializer.GetObject<T> (@object.Id);
+
+            return default (T);
+            //return @object.Deserializer.GetObject<T> (@object.Id);
         }
     }
 }

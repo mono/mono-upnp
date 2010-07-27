@@ -28,31 +28,34 @@ using System;
 
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class Genre : Container
     {
-        protected Genre (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected Genre ()
         {
         }
         
-        public Genre (GenreOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public Genre (string id, GenreOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            Description = options.Description;
+            LongDescription = options.LongDescription;
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
-        {            
-            var genre_options = options as GenreOptions;
-            if (genre_options != null)
-            {
-                Description = genre_options.Description;
-                LongDescription = genre_options.LongDescription;
-            }
-            
-            base.UpdateFromOptions (options);
+
+        protected void CopyToOptions (GenreOptions options)
+        {
+            base.CopyToOptions (options);
+
+            options.Description = Description;
+            options.LongDescription = LongDescription;
+        }
+
+        public new GenreOptions GetOptions ()
+        {
+            var options = new GenreOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]

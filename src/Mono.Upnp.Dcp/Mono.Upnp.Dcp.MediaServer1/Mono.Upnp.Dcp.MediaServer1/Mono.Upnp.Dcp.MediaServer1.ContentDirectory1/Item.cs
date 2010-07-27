@@ -33,24 +33,34 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     [XmlType ("item", Schemas.DidlLiteSchema)]
     public class Item : Object
     {
-        protected Item (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected Item ()
         {
-            if (parent == null) throw new ArgumentNullException ("parent");
+        }
+
+        public Item (string id, ItemOptions options)
+            : base (id, options)
+        {
+            RefId = options.RefId;
+        }
+
+        protected void CopyToOptions (ItemOptions options)
+        {
+            base.CopyToOptions (options);
+
+            options.RefId = RefId;
+        }
+
+        public new ItemOptions GetOptions ()
+        {
+            var options = new ItemOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlAttribute ("refID", Schemas.DidlLiteSchema, OmitIfNull = true)]
         public virtual string RefId { get; protected set; }
         
         public bool IsReference { get { return RefId != null; } }
-        
-        public Item GetReferedObject ()
-        {
-            if (RefId == null) throw new InvalidOperationException (
-                "Cannot get refered object because the item is not a reference.");
-            
-            return Deserializer.GetObject<Item> (RefId);
-        }
         
         protected override void DeserializeAttribute (XmlDeserializationContext context)
         {

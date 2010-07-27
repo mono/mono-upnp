@@ -26,115 +26,103 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class VideoItem : Item
     {
-        List<PersonWithRole> actors = new List<PersonWithRole> ();
-        List<string> producers = new List<string> ();
-        List<string> directors = new List<string> ();
-        List<string> publishers = new List<string> ();
-        List<string> genres = new List<string> ();
-        List<Uri> relations = new List<Uri> ();
-        
-        protected VideoItem (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected VideoItem ()
         {
+            Genres = new List<string> ();
+            Actors = new List<PersonWithRole> ();
+            Directors = new List<string> ();
+            Producers = new List<string> ();
+            Publishers = new List<string> ();
+            Relations = new List<Uri> ();
         }
         
-        public VideoItem (VideoItemOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public VideoItem (string id, VideoItemOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            Description = options.Description;
+            LongDescription = options.LongDescription;
+            Rating = options.Rating;
+            Language = options.Language;
+            Genres = Helper.MakeReadOnlyCopy (options.Genres);
+            Actors = Helper.MakeReadOnlyCopy (options.Actors);
+            Directors = Helper.MakeReadOnlyCopy (options.Directors);
+            Producers = Helper.MakeReadOnlyCopy (options.Producers);
+            Publishers = Helper.MakeReadOnlyCopy (options.Publishers);
+            Relations = Helper.MakeReadOnlyCopy (options.Relations);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
-        {
-            var video_item_options = options as VideoItemOptions;
-            if (video_item_options != null)
-            {
-                Description = video_item_options.Description;
-                LongDescription = video_item_options.LongDescription;
-                Rating = video_item_options.Rating;
-                Language = video_item_options.Language;
-                
-                actors = new List<PersonWithRole> (video_item_options.ActorCollection);
-                directors = new List<string> (video_item_options.DirectorCollection);
-                producers = new List<string> (video_item_options.ProducerCollection);
-                publishers = new List<string> (video_item_options.PublisherCollection);
-                relations = new List<Uri> (video_item_options.RelationCollection);
-            }
 
-            base.UpdateFromOptions (options);
+        protected void CopyToOptions (VideoItemOptions options)
+        {
+            base.CopyToOptions (options);
+
+            options.Description = Description;
+            options.LongDescription = LongDescription;
+            options.Rating = Rating;
+            options.Language = Language;
+            options.Genres = new List<string> (Genres);
+            options.Actors = new List<PersonWithRole> (Actors);
+            options.Directors = new List<string> (Directors);
+            options.Producers = new List<string> (Producers);
+            options.Publishers = new List<string> (Publishers);
+            options.Relations = new List<Uri> (Relations);
+        }
+
+        public new VideoItemOptions GetOptions ()
+        {
+            var options = new VideoItemOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlArrayItemAttribute ("genre", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> GenreCollection {
-            get { return genres; }
-        }
-        
-        public IEnumerable<string> Genres {
-            get { return genres; }
-        }
+        public virtual IList<string> Genres { get; private set; }
         
         [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string LongDescription { get; protected set; }
         
         [XmlArrayItem ("producer", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> ProducerCollection {
-            get { return producers; }
-        }
-        
-        public IEnumerable<string> Producers {
-            get { return producers; }
-        }
+        public virtual IList<string> Producers { get; private set; }
         
         [XmlElement ("rating", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string Rating { get; protected set; }
         
         [XmlArrayItem ("actor", Schemas.UpnpSchema)]
-        protected virtual ICollection<PersonWithRole> ActorCollection {
-            get { return actors; }
-        }
-        
-        public IEnumerable<PersonWithRole> Actors {
-            get { return actors; }
-        }
+        public virtual IList<PersonWithRole> Actors { get; private set; }
         
         [XmlArrayItem ("director", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> DirectorCollection {
-            get { return directors; }
-        }
-        
-        public IEnumerable<string> Directors {
-            get { return directors; }
-        }
+        public virtual IList<string> Directors { get; private set; }
         
         [XmlElement ("description", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Description { get; protected set; }
         
         [XmlArrayItem ("publisher", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> PublisherCollection {
-            get { return publishers; }
-        }
-        
-        public IEnumerable<string> Publishers {
-            get { return publishers; }
-        }
+        public virtual IList<string> Publishers { get; private set; }
         
         [XmlElement ("language", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Language { get; protected set; }
         
         [XmlArrayItem ("relation", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<Uri> RelationCollection {
-            get { return relations; }
-        }
-        
-        public IEnumerable<Uri> Relations {
-            get { return relations; }
+        public virtual IList<Uri> Relations { get; private set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Genres = new ReadOnlyCollection<string> (Genres);
+            Actors = new ReadOnlyCollection<PersonWithRole> (Actors);
+            Directors = new ReadOnlyCollection<string> (Directors);
+            Producers = new ReadOnlyCollection<string> (Producers);
+            Publishers = new ReadOnlyCollection<string> (Publishers);
+            Relations = new ReadOnlyCollection<Uri> (Relations);
         }
     
         protected override void DeserializeElement (XmlDeserializationContext context)

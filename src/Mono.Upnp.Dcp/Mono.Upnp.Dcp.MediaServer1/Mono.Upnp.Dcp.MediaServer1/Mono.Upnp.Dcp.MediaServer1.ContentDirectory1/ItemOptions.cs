@@ -1,10 +1,10 @@
 // 
-// MusicGenre.cs
+// ItemOptions.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,17 +24,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class MusicGenre : Genre
+    public class ItemOptions : ObjectOptions
     {
-        protected MusicGenre ()
-        {
-        }
-        
-        public MusicGenre (string id, GenreOptions options)
-            : base (id, options)
-        {
-        }
+        public string RefId { get; set; }
     }
 }

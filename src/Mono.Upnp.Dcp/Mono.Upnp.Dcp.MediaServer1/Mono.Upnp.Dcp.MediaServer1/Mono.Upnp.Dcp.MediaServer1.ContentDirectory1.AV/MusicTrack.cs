@@ -26,98 +26,93 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 using Mono.Upnp.Xml;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class MusicTrack : AudioItem
     {
-        List<PersonWithRole> artists = new List<PersonWithRole> ();
-        List<string> contributors = new List<string> ();
-        List<string> albums = new List<string> ();
-        List<string> playlists = new List<string> ();
-        
-        protected MusicTrack (ContentDirectory contentDirectory, Container parent)
-            : base (contentDirectory, parent)
+        protected MusicTrack ()
         {
+            Artists = new List<PersonWithRole> ();
+            Albums = new List<string> ();
+            Playlists = new List<string> ();
+            Contributors = new List<string> ();
         }
         
-        public MusicTrack (MusicTrackOptions options, ContentDirectory contentDirectory, Container parent)
-            : this (contentDirectory, parent)
+        public MusicTrack (string id, MusicTrackOptions options)
+            : base (id, options)
         {
-            UpdateFromOptions (options);
+            AlbumArtURI = options.AlbumArtURI;
+            Date = options.Date;
+            OriginalTrackNumber = options.OriginalTrackNumber;
+            StorageMedium = options.StorageMedium;
+            Artists = Helper.MakeReadOnlyCopy (options.Artists);
+            Albums = Helper.MakeReadOnlyCopy (options.Albums);
+            Playlists = Helper.MakeReadOnlyCopy (options.Playlists);
+            Contributors = Helper.MakeReadOnlyCopy (options.Contributors);
         }
-        
-        public override void UpdateFromOptions (ObjectOptions options)
+
+        protected void CopyToOptions (MusicTrackOptions options)
         {
-            var music_track_options = options as MusicTrackOptions;
-            if (music_track_options != null)
-            {
-                AlbumArtURI = music_track_options.AlbumArtURI;
-                Date = music_track_options.Date;
-                OriginalTrackNumber = music_track_options.OriginalTrackNumber;
-                StorageMedium = music_track_options.StorageMedium;
-                
-                artists = new List<PersonWithRole> (music_track_options.ArtistCollection);
-                albums = new List<string> (music_track_options.AlbumCollection);
-                playlists = new List<string> (music_track_options.PlaylistCollection);
-                contributors = new List<string> (music_track_options.ContributorCollection);
-            }
-            
-            base.UpdateFromOptions (options);
+            base.CopyToOptions (options);
+
+            options.AlbumArtURI = AlbumArtURI;
+            options.Date = Date;
+            options.OriginalTrackNumber = OriginalTrackNumber;
+            options.StorageMedium = StorageMedium;
+            options.Artists = new List<PersonWithRole> (Artists);
+            options.Albums = new List<string> (Albums);
+            options.Playlists = new List<string> (Playlists);
+            options.Contributors = new List<string> (Contributors);
+        }
+
+        public new MusicTrackOptions GetOptions ()
+        {
+            var options = new MusicTrackOptions ();
+            CopyToOptions (options);
+            return options;
         }
         
         [XmlElement ("albumArtURI", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual Uri AlbumArtURI { get; protected set; }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]
-        protected virtual ICollection<PersonWithRole> ArtistCollection {
-            get { return artists; }
-        }
-        
-        public IEnumerable<PersonWithRole> Artists {
-            get { return artists; }
-        }
+        public virtual IList<PersonWithRole> Artists { get; private set; }
         
         [XmlArrayItem ("album", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> AlbumCollection {
-            get { return albums; }
-        }
-        
-        public IEnumerable<string> Albums {
-            get { return albums; }
-        }
+        public virtual IList<string> Albums { get; private set; }
         
         [XmlElement ("orginalTrackElement", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual int? OriginalTrackNumber { get; protected set; }
         
         [XmlArrayItem ("playlist", Schemas.UpnpSchema)]
-        protected virtual ICollection<string> PlaylistCollection {
-            get { return playlists; }
-        }
-        
-        public IEnumerable<string> Playlists {
-            get { return playlists; }
-        }
+        public virtual IList<string> Playlists { get; private set; }
         
         [XmlElement ("storageMedium", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string StorageMedium { get; protected set; }
         
         [XmlArrayItem ("contributor", Schemas.DublinCoreSchema)]
-        protected virtual ICollection<string> ContributorCollection {
-            get { return contributors; }
-        }
-        
-        public IEnumerable<string> Contributors {
-            get { return contributors; }
-        }
+        public virtual IList<string> Contributors { get; private set; }
         
         [XmlElement ("date", Schemas.DublinCoreSchema, OmitIfNull = true)]
         public virtual string Date { get; protected set; }
         
         // TODO what is the deal with this?!?!?!
         //public Uri LyricsUri { get; private set; }
+
+        protected override void Deserialize (XmlDeserializationContext context)
+        {
+            base.Deserialize (context);
+
+            Artists = new ReadOnlyCollection<PersonWithRole> (Artists);
+            Albums = new ReadOnlyCollection<string> (Albums);
+            Playlists = new ReadOnlyCollection<string> (Playlists);
+            Contributors = new ReadOnlyCollection<string> (Contributors);
+        }
     
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
