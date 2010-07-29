@@ -1,5 +1,5 @@
 // 
-// ResourceSettings.cs
+// ResourceOptions.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -30,21 +30,8 @@ using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class ResourceSettings
+    public class ResourceOptions
     {
-        readonly Uri uri;
-        
-        public ResourceSettings (Uri uri)
-        {
-            if (uri == null) throw new ArgumentNullException ("uri");
-            
-            this.uri = uri;
-        }
-        
-        public Uri Uri {
-            get { return uri; }
-        }
-        
         public ulong? Size { get; set; }
         
         public TimeSpan? Duration { get; set; }

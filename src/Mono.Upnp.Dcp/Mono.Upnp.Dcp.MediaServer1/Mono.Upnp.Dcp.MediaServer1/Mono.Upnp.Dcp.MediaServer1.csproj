@@ -63,7 +63,6 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Schemas.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\SearchResults.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\WriteStatus.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ResourceSettings.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectBasedContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\MediaServer.cs" />
@@ -139,6 +138,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContainerOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ItemOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ResourceOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
@@ -151,6 +151,5 @@
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Internal\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Xml\" />
-    <Folder Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Options\" />
   </ItemGroup>
 </Project>

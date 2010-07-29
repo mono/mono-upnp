@@ -38,24 +38,53 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
         }
         
-        public Resource (ResourceSettings settings)
+        public Resource (Uri uri, ResourceOptions options)
         {
-            if (settings == null) throw new ArgumentNullException ("settings");
+            if (uri == null) {
+                throw new ArgumentNullException ("uri");
+            } else if (options == null) {
+                throw new ArgumentNullException ("options");
+            }
             
-            this.Uri = settings.Uri;
-            this.Size = settings.Size;
-            this.Duration = settings.Duration;
-            this.Bitrate = settings.Bitrate;
-            this.SampleFrequency = settings.SampleFrequency;
-            this.BitsPerSample = settings.BitsPerSample;
-            this.NrAudioChannels = settings.NrAudioChannels;
-            this.Resolution = settings.Resolution;
-            this.ColorDepth = settings.ColorDepth;
-            this.ProtocolInfo = settings.ProtocolInfo;
-            this.Protection = settings.Protection;
-            this.ImportUri = settings.ImportUri;
+            Uri = uri;
+            Size = options.Size;
+            Duration = options.Duration;
+            Bitrate = options.Bitrate;
+            SampleFrequency = options.SampleFrequency;
+            BitsPerSample = options.BitsPerSample;
+            NrAudioChannels = options.NrAudioChannels;
+            Resolution = options.Resolution;
+            ColorDepth = options.ColorDepth;
+            ProtocolInfo = options.ProtocolInfo;
+            Protection = options.Protection;
+            ImportUri = options.ImportUri;
         }
-        
+
+        protected void CopyToOptions (ResourceOptions options)
+        {
+            if (options == null) {
+                throw new ArgumentNullException ("options");
+            }
+
+            options.Size = Size;
+            options.Duration = Duration;
+            options.Bitrate = Bitrate;
+            options.SampleFrequency = SampleFrequency;
+            options.BitsPerSample = BitsPerSample;
+            options.NrAudioChannels = NrAudioChannels;
+            options.Resolution = Resolution;
+            options.ColorDepth = ColorDepth;
+            options.ProtocolInfo = ProtocolInfo;
+            options.Protection = Protection;
+            options.ImportUri = ImportUri;
+        }
+
+        public ResourceOptions GetOptions ()
+        {
+            var options = new ResourceOptions ();
+            CopyToOptions (options);
+            return options;
+        }
         
         [XmlValue]
         public virtual Uri Uri { get; protected set; }
