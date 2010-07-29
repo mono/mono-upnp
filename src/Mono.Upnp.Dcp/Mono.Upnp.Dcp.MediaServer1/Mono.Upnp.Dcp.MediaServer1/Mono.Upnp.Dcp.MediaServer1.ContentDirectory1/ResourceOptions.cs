@@ -36,7 +36,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         public TimeSpan? Duration { get; set; }
 
-        public uint? Bitrate { get; set; }
+        public uint? BitRate { get; set; }
 
         public uint? SampleFrequency { get; set; }
 

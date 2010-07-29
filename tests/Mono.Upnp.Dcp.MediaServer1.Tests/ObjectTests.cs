@@ -28,6 +28,7 @@ using System;
 
 using NUnit.Framework;
 
+using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 
@@ -36,6 +37,46 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
     [TestFixture]
     public class ObjectTests
     {
+        [Test]
+        public void ResourceInstantiation ()
+        {
+            var options = new ResourceOptions ();
+            SetResourceOptions (options);
+            var resource = new Resource (new Uri ("http://0"), options);
+            AssertResource (resource, options);
+            AssertResource (resource, resource.GetOptions ());
+        }
+
+        static void SetResourceOptions (ResourceOptions options)
+        {
+            options.Size = 0;
+            options.Duration = new TimeSpan (0, 0, 1);
+            options.BitRate = 2;
+            options.SampleFrequency = 3;
+            options.BitsPerSample = 4;
+            options.NrAudioChannels = 5;
+            options.Resolution = new Resolution (6, 7);
+            options.ColorDepth = 8;
+            options.ProtocolInfo = new ProtocolInfo ("foo");
+            options.Protection = "9";
+            options.ImportUri = new Uri ("http://10");
+        }
+
+        static void AssertResource (Resource resource, ResourceOptions options)
+        {
+            Assert.AreEqual (resource.Size, options.Size);
+            Assert.AreEqual (resource.Duration, options.Duration);
+            Assert.AreEqual (resource.BitRate, options.BitRate);
+            Assert.AreEqual (resource.SampleFrequency, options.SampleFrequency);
+            Assert.AreEqual (resource.BitsPerSample, options.BitsPerSample);
+            Assert.AreEqual (resource.NrAudioChannels, options.NrAudioChannels);
+            Assert.AreEqual (resource.Resolution, options.Resolution);
+            Assert.AreEqual (resource.ColorDepth, options.ColorDepth);
+            Assert.AreEqual (resource.ProtocolInfo, options.ProtocolInfo);
+            Assert.AreEqual (resource.Protection, options.Protection);
+            Assert.AreEqual (resource.ImportUri, options.ImportUri);
+        }
+
         [Test]
         public void ObjectInstantiation ()
         {
@@ -53,15 +94,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.Creator = "2";
             options.WriteStatus = WriteStatus.Protected;
             options.IsRestricted = true;
+            var resource_options = new ResourceOptions ();
+            SetResourceOptions (resource_options);
+            options.Resources = new[] { new Resource (new Uri ("http://0"), resource_options) };
         }
 
         static void AssertObject (Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object @object, ObjectOptions options)
         {
-            Assert.AreEqual (options.Title, @object.Title);
-            Assert.AreEqual (options.Creator, @object.Creator);
-            Assert.AreEqual (options.WriteStatus, @object.WriteStatus);
-            Assert.AreEqual (options.IsRestricted, @object.IsRestricted);
+            Assert.AreEqual (@object.Title, options.Title);
+            Assert.AreEqual (@object.Creator, options.Creator);
+            Assert.AreEqual (@object.WriteStatus, options.WriteStatus);
+            Assert.AreEqual (@object.IsRestricted, options.IsRestricted);
             Assert.IsTrue (@object.Resources.IsReadOnly);
+            var object_enumerator = @object.Resources.GetEnumerator ();
+            var options_enumerator = options.Resources.GetEnumerator ();
+            Assert.IsTrue (object_enumerator.MoveNext ());
+            Assert.IsTrue (options_enumerator.MoveNext ());
+            AssertResource (object_enumerator.Current, options_enumerator.Current.GetOptions ());
         }
 
         [Test]
@@ -84,7 +133,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         static void AssertItem (Item item, ItemOptions options)
         {
             AssertObject (item, options);
-            Assert.AreEqual (options.RefId, item.RefId);
+            Assert.AreEqual (item.RefId, options.RefId);
         }
 
         [Test]
@@ -103,15 +152,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.Title = "5";
             options.ChildCount = 6;
             options.IsSearchable = true;
+            options.SearchClasses = new[] { new ClassReference (false, "foo") };
+            options.CreateClasses = new[] { new ClassReference (false, "bar") };
         }
 
         static void AssertContainer (Container container, ContainerOptions options)
         {
             AssertObject (container, options);
-            Assert.AreEqual (options.ChildCount, container.ChildCount);
-            Assert.AreEqual (options.IsSearchable, container.IsSearchable);
+            Assert.AreEqual (container.ChildCount, options.ChildCount);
+            Assert.AreEqual (container.IsSearchable, options.IsSearchable);
             Assert.IsTrue (container.SearchClasses.IsReadOnly);
             Assert.IsTrue (container.CreateClasses.IsReadOnly);
+            CollectionAssert.AreEqual (container.SearchClasses, options.SearchClasses);
+            CollectionAssert.AreEqual (container.CreateClasses, options.CreateClasses);
         }
 
         [Test]
@@ -131,6 +184,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.LongDescription = "8";
             options.Description = "9";
             options.Date = "10";
+            options.Publishers = new[] { "publisher" };
+            options.Contributors = new[] { "contributor" };
+            options.Relations = new[] { new Uri ("http://relation") };
+            options.Rights = new[] { "right" };
         }
 
         static void AssertAlbum (Album album, AlbumOptions options)
@@ -144,15 +201,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (album.Contributors.IsReadOnly);
             Assert.IsTrue (album.Relations.IsReadOnly);
             Assert.IsTrue (album.Rights.IsReadOnly);
+            CollectionAssert.AreEqual (album.Publishers, options.Publishers);
+            CollectionAssert.AreEqual (album.Contributors, options.Contributors);
+            CollectionAssert.AreEqual (album.Relations, options.Relations);
+            CollectionAssert.AreEqual (album.Rights, options.Rights);
         }
 
         [Test]
         public void AudioBookInstantiation ()
         {
-            var options = new AudioBookOptions {
-                StorageMedium = "11",
-                Date = "12"
-            };
+            var options = new AudioBookOptions ();
+            SetAudioBookOptions (options);
             var audio_book = new AudioBook ("-1", options);
             AssertAudioBook (audio_book, options);
             AssertAudioBook (audio_book, audio_book.GetOptions ());
@@ -163,6 +222,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             SetAudioItemOptions (options);
             options.StorageMedium = "13";
             options.Date = "14";
+            options.Producers = new[] { "producer" };
+            options.Contributors = new[] { "contributor" };
         }
 
         static void AssertAudioBook (AudioBook audioBook, AudioBookOptions options)
@@ -172,6 +233,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.AreEqual (audioBook.Date, options.Date);
             Assert.IsTrue (audioBook.Producers.IsReadOnly);
             Assert.IsTrue (audioBook.Contributors.IsReadOnly);
+            CollectionAssert.AreEqual (audioBook.Producers, options.Producers);
+            CollectionAssert.AreEqual (audioBook.Contributors, options.Contributors);
         }
 
         [Test]
@@ -220,6 +283,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.Description = "20";
             options.LongDescription = "21";
             options.Language = "22";
+            options.Genres = new[] { "genre" };
+            options.Publishers = new[] { "publisher" };
+            options.Relations = new[] { new Uri ("http://relation") };
+            options.Rights = new[] { "right" };
         }
 
         static void AssertAudioItem (AudioItem audioItem, AudioItemOptions options)
@@ -232,6 +299,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (audioItem.Publishers.IsReadOnly);
             Assert.IsTrue (audioItem.Relations.IsReadOnly);
             Assert.IsTrue (audioItem.Rights.IsReadOnly);
+            CollectionAssert.AreEqual (audioItem.Genres, options.Genres);
+            CollectionAssert.AreEqual (audioItem.Publishers, options.Publishers);
+            CollectionAssert.AreEqual (audioItem.Relations, options.Relations);
+            CollectionAssert.AreEqual (audioItem.Rights, options.Rights);
         }
 
         [Test]
@@ -276,6 +347,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.StorageMedium = "27";
             options.Rating = "28";
             options.Date = "29";
+            options.Publishers = new[] { "publisher" };
+            options.Rights = new[] { "right" };
         }
 
         static void AssertImageItem (ImageItem imageItem, ImageItemOptions options)
@@ -288,6 +361,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.AreEqual (imageItem.Date, options.Date);
             Assert.IsTrue (imageItem.Publishers.IsReadOnly);
             Assert.IsTrue (imageItem.Rights.IsReadOnly);
+            CollectionAssert.AreEqual (imageItem.Publishers, options.Publishers);
+            CollectionAssert.AreEqual (imageItem.Rights, options.Rights);
         }
 
         [Test]
@@ -300,12 +375,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertMovie (movie, movie.GetOptions ());
         }
 
-        static void SetMovieOptions (MovieOptions option)
+        static void SetMovieOptions (MovieOptions options)
         {
-            SetVideoItemOptions (option);
-            option.StorageMedium = "30";
-            option.DvdRegionCode = 31;
-            option.ChannelName = "32";
+            SetVideoItemOptions (options);
+            options.StorageMedium = "30";
+            options.DvdRegionCode = 31;
+            options.ChannelName = "32";
+            options.ScheduledStartTimes = new[] { DateTime.Now };
+            options.ScheduledEndTimes = new[] { DateTime.Now + new TimeSpan (0, 0, 10) };
         }
 
         static void AssertMovie (Movie movie, MovieOptions options)
@@ -316,6 +393,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.AreEqual (movie.ChannelName, options.ChannelName);
             Assert.IsTrue (movie.ScheduledStartTimes.IsReadOnly);
             Assert.IsTrue (movie.ScheduledEndTimes.IsReadOnly);
+            CollectionAssert.AreEqual (movie.ScheduledStartTimes, options.ScheduledStartTimes);
+            CollectionAssert.AreEqual (movie.ScheduledEndTimes, options.ScheduledEndTimes);
         }
 
         [Test]
@@ -332,6 +411,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             SetAlbumOptions (options);
             options.Toc = "33";
+            options.Artists = new[] { new PersonWithRole ("artist", "role") };
+            options.Genres = new[] { "genre" };
+            options.Producers = new[] { "genres" };
+            options.AlbumArtUris = new[] { new Uri ("http://albumart") };
         }
 
         static void AssertMusicAlbum (MusicAlbum musicAlbum, MusicAlbumOptions options)
@@ -342,6 +425,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (musicAlbum.Genres.IsReadOnly);
             Assert.IsTrue (musicAlbum.Producers.IsReadOnly);
             Assert.IsTrue (musicAlbum.AlbumArtUris.IsReadOnly);
+            CollectionAssert.AreEqual (musicAlbum.Artists, options.Artists);
+            CollectionAssert.AreEqual (musicAlbum.Genres, options.Genres);
+            CollectionAssert.AreEqual (musicAlbum.Producers, options.Producers);
+            CollectionAssert.AreEqual (musicAlbum.AlbumArtUris, options.AlbumArtUris);
         }
 
         [Test]
@@ -382,6 +469,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.OriginalTrackNumber = 36;
             options.StorageMedium = "37";
             options.Date = "38";
+            options.Artists = new[] { new PersonWithRole ("artist", "role") };
+            options.Albums = new[] { "album" };
+            options.Playlists = new[] { "playlist" };
+            options.Contributors = new[] { "contributor" };
         }
 
         static void AssertMusicTrack (MusicTrack musicTrack, MusicTrackOptions options)
@@ -395,6 +486,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (musicTrack.Albums.IsReadOnly);
             Assert.IsTrue (musicTrack.Playlists.IsReadOnly);
             Assert.IsTrue (musicTrack.Contributors.IsReadOnly);
+            CollectionAssert.AreEqual (musicTrack.Artists, options.Artists);
+            CollectionAssert.AreEqual (musicTrack.Albums, options.Albums);
+            CollectionAssert.AreEqual (musicTrack.Playlists, options.Playlists);
+            CollectionAssert.AreEqual (musicTrack.Contributors, options.Contributors);
         }
 
         [Test]
@@ -412,6 +507,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             SetVideoItemOptions (options);
             options.StorageMedium = "39";
             options.Date = "40";
+            options.Artists = new[] { new PersonWithRole ("artist", "role") };
+            options.Albums = new[] { "album" };
+            options.ScheduledStartTimes = new[] { DateTime.Now };
+            options.ScheduledEndTimes = new[] { DateTime.Now + new TimeSpan (0, 0, 10) };
+            options.Contributors = new[] { "contributor" };
         }
 
         static void AssertMusicVideoClip (MusicVideoClip musicVideoClip, MusicVideoClipOptions options)
@@ -424,6 +524,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (musicVideoClip.ScheduledStartTimes.IsReadOnly);
             Assert.IsTrue (musicVideoClip.ScheduledEndTimes.IsReadOnly);
             Assert.IsTrue (musicVideoClip.Contributors.IsReadOnly);
+            CollectionAssert.AreEqual (musicVideoClip.Artists, options.Artists);
+            CollectionAssert.AreEqual (musicVideoClip.Albums, options.Albums);
+            CollectionAssert.AreEqual (musicVideoClip.ScheduledStartTimes, options.ScheduledStartTimes);
+            CollectionAssert.AreEqual (musicVideoClip.ScheduledEndTimes, options.ScheduledEndTimes);
+            CollectionAssert.AreEqual (musicVideoClip.Contributors, options.Contributors);
         }
 
         [Test]
@@ -461,12 +566,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         static void SetPhotoOptions (PhotoOptions options)
         {
             SetImageItemOptions (options);
+            options.Albums = new[] { "album" };
         }
 
         static void AssertPhoto (Photo photo, PhotoOptions options)
         {
             AssertImageItem (photo, options);
             Assert.IsTrue (photo.Albums.IsReadOnly);
+            CollectionAssert.AreEqual (photo.Albums, options.Albums);
         }
 
         [Test]
@@ -487,6 +594,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.Description = "44";
             options.Date = "45";
             options.Language = "46";
+            options.Artists = new[] { new PersonWithRole ("artist", "role") };
+            options.Genres = new[] { "genre" };
+            options.Contributors = new[] { "contributor" };
+            options.Rights = new[] { "right" };
         }
 
         static void AssertPlaylistContainer (PlaylistContainer playlistContainer, PlaylistContainerOptions options)
@@ -501,6 +612,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (playlistContainer.Genres.IsReadOnly);
             Assert.IsTrue (playlistContainer.Contributors.IsReadOnly);
             Assert.IsTrue (playlistContainer.Rights.IsReadOnly);
+            CollectionAssert.AreEqual (playlistContainer.Artists, options.Artists);
+            CollectionAssert.AreEqual (playlistContainer.Genres, options.Genres);
+            CollectionAssert.AreEqual (playlistContainer.Contributors, options.Contributors);
+            CollectionAssert.AreEqual (playlistContainer.Rights, options.Rights);
         }
 
         [Test]
@@ -521,6 +636,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.Description = "49";
             options.Date = "50";
             options.Language = "51";
+            options.Artists = new[] { new PersonWithRole ("artist", "role") };
+            options.Genres = new[] { "genre" };
         }
 
         static void AssertPlaylistItem (PlaylistItem playlistItem, PlaylistItemOptions options)
@@ -533,6 +650,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.AreEqual (playlistItem.Language, options.Language);
             Assert.IsTrue (playlistItem.Artists.IsReadOnly);
             Assert.IsTrue (playlistItem.Genres.IsReadOnly);
+            CollectionAssert.AreEqual (playlistItem.Artists, options.Artists);
+            CollectionAssert.AreEqual (playlistItem.Genres, options.Genres);
         }
 
         [Test]
@@ -630,6 +749,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.Rating = "61";
             options.Date = "62";
             options.Language = "63";
+            options.Authors = new[] { new PersonWithRole ("artist", "role") };
+            options.Publishers = new[] { "publisher" };
+            options.Contributors = new[] { "contributor" };
+            options.Relations = new[] { new Uri ("http://relation") };
+            options.Rights = new[] { "right" };
         }
 
         static void AssertTextItem (TextItem textItem, TextItemOptions options)
@@ -646,6 +770,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (textItem.Contributors.IsReadOnly);
             Assert.IsTrue (textItem.Relations.IsReadOnly);
             Assert.IsTrue (textItem.Rights.IsReadOnly);
+            CollectionAssert.AreEqual (textItem.Authors, options.Authors);
+            CollectionAssert.AreEqual (textItem.Publishers, options.Publishers);
+            CollectionAssert.AreEqual (textItem.Contributors, options.Contributors);
+            CollectionAssert.AreEqual (textItem.Relations, options.Relations);
+            CollectionAssert.AreEqual (textItem.Rights, options.Rights);
         }
 
         [Test]
@@ -691,6 +820,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             options.Description = "68";
             options.Rating = "69";
             options.Language = "70";
+            options.Genres = new[] { "genre" };
+            options.Producers = new[] { "producer" };
+            options.Actors = new[] { new PersonWithRole ("artist", "role") };
+            options.Directors = new[] { "director" };
+            options.Publishers = new[] { "publisher" };
+            options.Relations = new[] { new Uri ("http://relation") };
         }
 
         static void AssertVideoItem (VideoItem videoItem, VideoItemOptions options)
@@ -706,6 +841,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsTrue (videoItem.Directors.IsReadOnly);
             Assert.IsTrue (videoItem.Publishers.IsReadOnly);
             Assert.IsTrue (videoItem.Relations.IsReadOnly);
+            CollectionAssert.AreEqual (videoItem.Genres, options.Genres);
+            CollectionAssert.AreEqual (videoItem.Producers, options.Producers);
+            CollectionAssert.AreEqual (videoItem.Actors, options.Actors);
+            CollectionAssert.AreEqual (videoItem.Directors, options.Directors);
+            CollectionAssert.AreEqual (videoItem.Publishers, options.Publishers);
+            CollectionAssert.AreEqual (videoItem.Relations, options.Relations);
         }
     }
 }

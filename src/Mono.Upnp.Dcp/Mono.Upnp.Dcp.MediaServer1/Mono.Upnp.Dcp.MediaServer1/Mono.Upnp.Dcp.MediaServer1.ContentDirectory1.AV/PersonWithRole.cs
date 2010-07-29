@@ -24,16 +24,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
-    public struct PersonWithRole
+    public class PersonWithRole
     {
+        protected PersonWithRole ()
+        {
+        }
+
+        public PersonWithRole (string name, string role)
+        {
+            if (name == null) {
+                throw new ArgumentNullException ("name");
+            } else if (role == null) {
+                throw new ArgumentNullException ("role");
+            }
+
+            Name = name;
+            Role = role;
+        }
+
         [XmlValue]
-        public string Name { get; set; }
+        public string Name { get; protected set; }
         
         [XmlAttribute ("role", Namespace = Schemas.UpnpSchema)]
-        public string Role { get; set;  }
+        public string Role { get; protected set;  }
+
+        public override bool Equals (object obj)
+        {
+            var person_with_role = obj as PersonWithRole;
+            return person_with_role != null
+                && person_with_role.Name == Name
+                && person_with_role.Role == Role;
+        }
+
+        public override int GetHashCode ()
+        {
+            return Name.GetHashCode () ^ Role.GetHashCode ();
+        }
     }
 }

@@ -31,14 +31,45 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class ClassReference : Class, IComparable<ClassReference>
+    public class ClassReference : Class, IComparable<ClassReference>, IEquatable<ClassReference>
     {
+        public ClassReference (bool includeDerived, string fullClassName)
+            : this (includeDerived, fullClassName, null)
+        {
+        }
+
+        public ClassReference (bool includeDerived, string fullClassName, string friendlyClassName)
+            : base (fullClassName, friendlyClassName)
+        {
+            IncludeDerived = includeDerived;
+        }
+
         [XmlAttribute ("includeDerived")]
         public virtual bool IncludeDerived { get; protected set; }
         
         int IComparable<ClassReference>.CompareTo (ClassReference classReference)
         {
             return FullClassName.CompareTo (classReference.FullClassName);
+        }
+
+        public override bool Equals (object obj)
+        {
+            return Equals (obj as ClassReference);
+        }
+
+        public bool Equals (ClassReference classReference)
+        {
+            return base.Equals (classReference) && classReference.IncludeDerived == IncludeDerived;
+        }
+
+        public override int GetHashCode ()
+        {
+            var hashCode = base.GetHashCode ();
+            if (IncludeDerived) {
+                return hashCode;
+            } else {
+                return ~hashCode;
+            }
         }
     }
 }

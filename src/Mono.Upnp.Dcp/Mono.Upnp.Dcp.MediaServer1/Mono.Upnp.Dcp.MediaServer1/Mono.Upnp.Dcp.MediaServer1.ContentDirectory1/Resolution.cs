@@ -33,7 +33,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         readonly uint x;
         readonly uint y;
         
-        Resolution (uint x, uint y)
+        public Resolution (uint x, uint y)
         {
             this.x = x;
             this.y = y;

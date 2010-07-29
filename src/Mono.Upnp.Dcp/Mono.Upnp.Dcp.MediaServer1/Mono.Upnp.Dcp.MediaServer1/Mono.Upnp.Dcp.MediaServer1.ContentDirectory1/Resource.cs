@@ -49,7 +49,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             Uri = uri;
             Size = options.Size;
             Duration = options.Duration;
-            Bitrate = options.Bitrate;
+            BitRate = options.BitRate;
             SampleFrequency = options.SampleFrequency;
             BitsPerSample = options.BitsPerSample;
             NrAudioChannels = options.NrAudioChannels;
@@ -68,7 +68,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             options.Size = Size;
             options.Duration = Duration;
-            options.Bitrate = Bitrate;
+            options.BitRate = BitRate;
             options.SampleFrequency = SampleFrequency;
             options.BitsPerSample = BitsPerSample;
             options.NrAudioChannels = NrAudioChannels;
@@ -96,7 +96,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public virtual TimeSpan? Duration { get; protected set; }
 
         [XmlAttribute ("bitrate", OmitIfNull = true)]
-        public virtual uint? Bitrate { get; protected set; }
+        public virtual uint? BitRate { get; protected set; }
 
         [XmlAttribute ("samplyFrequency", OmitIfNull = true)]
         public virtual uint? SampleFrequency { get; protected set; }

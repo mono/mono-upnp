@@ -24,11 +24,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public class Class
+    public class Class : IEquatable<Class>
     {
         protected Class ()
         {
@@ -41,6 +43,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         public Class (string fullClassName, string friendlyClassName)
         {
+            if (fullClassName == null) {
+                throw new ArgumentNullException ("fullClassName");
+            }
+
             FullClassName = fullClassName;
             FriendlyClassName = friendlyClassName;
         }
@@ -50,5 +56,20 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         [XmlValue]
         public virtual string FullClassName { get; protected set; }
+
+        public override bool Equals (object obj)
+        {
+            return Equals (obj as Class);
+        }
+
+        public bool Equals (Class @class)
+        {
+            return @class != null && @class.FullClassName == FullClassName;
+        }
+
+        public override int GetHashCode ()
+        {
+            return FullClassName.GetHashCode ();
+        }
     }
 }
