@@ -52,7 +52,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Description = options.Description;
             StorageMedium = options.StorageMedium;
             Rating = options.Rating;
-            Date = options.Protection;
+            Date = options.Date;
             Language = options.Language;
             Authors = Helper.MakeReadOnlyCopy (options.Authors);
             Publishers = Helper.MakeReadOnlyCopy (options.Publishers);

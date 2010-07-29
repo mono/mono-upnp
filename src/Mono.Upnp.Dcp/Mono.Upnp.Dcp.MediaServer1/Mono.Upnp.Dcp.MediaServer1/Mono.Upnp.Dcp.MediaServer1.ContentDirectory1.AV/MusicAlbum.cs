@@ -81,7 +81,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         public virtual IList<string> Producers { get; private set; }
         
         [XmlArrayItem ("albumArtURI", Schemas.UpnpSchema)]
-        protected virtual IList<Uri> AlbumArtUris { get; private set; }
+        public virtual IList<Uri> AlbumArtUris { get; private set; }
         
         [XmlElement ("toc", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string Toc { get; protected set; }

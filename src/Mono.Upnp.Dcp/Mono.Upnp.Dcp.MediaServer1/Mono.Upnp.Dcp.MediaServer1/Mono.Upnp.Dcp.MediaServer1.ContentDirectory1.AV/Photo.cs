@@ -52,6 +52,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 
             options.Albums = new List<string> (Albums);
         }
+
+        public new PhotoOptions GetOptions ()
+        {
+            var options = new PhotoOptions ();
+            CopyToOptions (options);
+            return options;
+        }
         
         [XmlArrayItem ("album", Schemas.UpnpSchema)]
         public virtual IList<string> Albums { get; private set; }

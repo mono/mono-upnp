@@ -46,7 +46,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         public MusicTrack (string id, MusicTrackOptions options)
             : base (id, options)
         {
-            AlbumArtURI = options.AlbumArtURI;
+            AlbumArtUri = options.AlbumArtUri;
             Date = options.Date;
             OriginalTrackNumber = options.OriginalTrackNumber;
             StorageMedium = options.StorageMedium;
@@ -60,7 +60,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
             base.CopyToOptions (options);
 
-            options.AlbumArtURI = AlbumArtURI;
+            options.AlbumArtUri = AlbumArtUri;
             options.Date = Date;
             options.OriginalTrackNumber = OriginalTrackNumber;
             options.StorageMedium = StorageMedium;
@@ -78,7 +78,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         }
         
         [XmlElement ("albumArtURI", Schemas.UpnpSchema, OmitIfNull = true)]
-        public virtual Uri AlbumArtURI { get; protected set; }
+        public virtual Uri AlbumArtUri { get; protected set; }
         
         [XmlArrayItem ("artist", Schemas.UpnpSchema)]
         public virtual IList<PersonWithRole> Artists { get; private set; }

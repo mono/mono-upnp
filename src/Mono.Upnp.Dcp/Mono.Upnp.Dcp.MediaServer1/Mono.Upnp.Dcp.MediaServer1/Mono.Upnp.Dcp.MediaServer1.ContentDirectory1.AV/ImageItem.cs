@@ -65,6 +65,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             options.Publishers = new List<string> (Publishers);
             options.Rights = new List<string> (Rights);
         }
+
+        public new ImageItemOptions GetOptions ()
+        {
+            var options = new ImageItemOptions ();
+            CopyToOptions (options);
+            return options;
+        }
         
         [XmlElement ("longDescription", Schemas.UpnpSchema, OmitIfNull = true)]
         public virtual string LongDescription { get; protected set; }

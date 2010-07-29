@@ -52,11 +52,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         }
 
         public IEnumerable<string> Contributors {
-            get { return contributors; }
+            get { return GetEnumerable (contributors); }
             set { contributors = value; }
         }
 
-        public virtual Uri AlbumArtURI { get; set; }
+        public virtual Uri AlbumArtUri { get; set; }
 
         public virtual int? OriginalTrackNumber { get;  set; }
 
