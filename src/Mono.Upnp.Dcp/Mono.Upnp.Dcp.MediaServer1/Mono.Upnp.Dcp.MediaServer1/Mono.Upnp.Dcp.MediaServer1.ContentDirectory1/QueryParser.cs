@@ -112,12 +112,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             const int parenthetical_priority = 3;
 
             protected readonly Query Expression;
-            protected int Parentheses;
+            int parentheses;
 
             public ExpressionParser (Query expression, int parentheses)
             {
-                Expression = expression;
-                Parentheses = parentheses;
+                this.Expression = expression;
+                this.parentheses = parentheses;
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -125,23 +125,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 if (IsWhiteSpace (character)) {
                     return this;
                 } else if (character == '(') {
-                    Parentheses++;
+                    parentheses++;
                     return this;
                 } else if (character == ')') {
-                    Parentheses--;
-                    if (Parentheses < 0) {
+                    parentheses--;
+                    if (parentheses < 0) {
                         throw new QueryParsingException ("The parentheses are unbalanced.");
                     } else {
                         return this;
                     }
                 } else if (character == 'a') {
                     var priority = GetPriority (conjunction_priority);
-                    return new ConjunctionParser (Parentheses, priority, MakeHandler (priority,
-                        (leftOperand, rightOperand) => visitor => visitor.VisitAnd (leftOperand, rightOperand)));
+                    return new OperatorParser ("and", new JunctionParser ("conjunction", parentheses, priority, MakeHandler (priority,
+                        (leftOperand, rightOperand) => visitor => visitor.VisitAnd (leftOperand, rightOperand)))).OnCharacter ('a');
                 } else if (character == 'o') {
                     var priority = GetPriority (disjunction_priority);
-                    return new DisjunctionParser (Parentheses, priority, MakeHandler (priority,
-                        (leftOperand, rightOperand) => visitor => visitor.VisitOr (leftOperand, rightOperand)));
+                    return new OperatorParser ("or", new JunctionParser ("disjunction", parentheses, priority, MakeHandler (priority,
+                        (leftOperand, rightOperand) => visitor => visitor.VisitOr (leftOperand, rightOperand)))).OnCharacter ('o');
                 } else {
                     throw new QueryParsingException (string.Format ("Unexpected operator begining: {0}.", character));
                 }
@@ -149,8 +149,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             int GetPriority (int priority)
             {
-                if (Parentheses > 0) {
-                    return parenthetical_priority + Parentheses + priority;
+                if (parentheses > 0) {
+                    return parenthetical_priority + parentheses + priority;
                 } else {
                     return priority;
                 }
@@ -170,7 +170,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             protected override Query OnDone ()
             {
-                if (Parentheses == 0) {
+                if (parentheses == 0) {
                     return Expression;
                 } else {
                     throw new QueryParsingException ("The parentheses are unbalanced.");
@@ -220,16 +220,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        abstract class JunctionParser : QueryParser
+        class JunctionParser : QueryParser
         {
+            readonly string junction;
             readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
             readonly int priority;
             int parentheses;
 
-            protected JunctionParser (int parentheses,
-                                      int priority,
-                                      Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
+            public JunctionParser (string junction,
+                                   int parentheses,
+                                   int priority,
+                                   Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
             {
+                this.junction = junction;
                 this.parentheses = parentheses;
                 this.priority = priority;
                 this.previous_handler = previousHandler;
@@ -259,149 +262,103 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             T Fail<T> ()
             {
                 throw new QueryParsingException (string.Format (
-                    "Expecting an expression after the {0}.", Junction));
+                    "Expecting an expression after the {0}.", junction));
             }
-
-            protected abstract string Junction { get; }
         }
 
-        class ConjunctionParser : JunctionParser
+        class OperatorParser : QueryParser
         {
-            const int a_state = 0;
-            const int n_state = 1;
-            const int d_state = 2;
+            readonly string token;
+            readonly QueryParser next_parser;
+            bool initialized;
+            int position;
 
-            int state;
-
-            public ConjunctionParser (int parentheses,
-                                      int priority,
-                                      Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
-                : base (parentheses, priority, previousHandler)
+            public OperatorParser (string token, QueryParser nextParser)
             {
+                this.token = token;
+                this.next_parser = nextParser;
             }
 
             protected override QueryParser OnCharacter (char character)
             {
-                switch (state) {
-                case a_state:
-                    if (character == 'n') {
-                        state++;
-                        return this;
-                    } else if (IsWhiteSpace (character)) {
-                        throw new QueryParsingException ("Unexpected operator: a.");
-                    } else {
-                        throw new QueryParsingException (string.Format (
-                            "Unexpected operator begining: a{0}.", character));
-                    }
-                case n_state:
-                    if (character == 'd') {
-                        state++;
-                        return this;
-                    } else if (IsWhiteSpace (character)) {
-                        throw new QueryParsingException ("Unexpected operator: an.");
-                    } else {
-                        throw new QueryParsingException (string.Format (
-                            "Unexpected operator begining: an{0}.", character));
-                    }
-                case d_state:
+                if (initialized) {
                     if (IsWhiteSpace (character)) {
-                        state++;
                         return this;
                     } else {
-                        throw new QueryParsingException (string.Format (
-                            "Unexpected operator begining: and{0}.", character));
+                        return next_parser.OnCharacter (character);
                     }
-                default:
-                    return base.OnCharacter (character);
+                } else if (position == token.Length) {
+                    if (IsWhiteSpace (character)) {
+                        initialized = true;
+                        return this;
+                    } else {
+                        return OnFailure (token + character);
+                    }
+                } else if (character != token[position]) {
+                    if (IsWhiteSpace (character)) {
+                        throw new QueryParsingException (string.Format (
+                            "Unexpected operator: {0}.", token.Substring (0, position)));
+                    } else {
+                        return OnFailure (token.Substring (0, position) + character);
+                    }
+                } else {
+                    position++;
+                    return this;
                 }
+            }
+
+            protected virtual QueryParser OnFailure (string token)
+            {
+                throw new QueryParsingException (string.Format (
+                    "Unexpected operator begining: {0}.", token));
             }
 
             protected override Query OnDone ()
             {
-                if (state < d_state) {
+                if (position == token.Length) {
                     throw new QueryParsingException (string.Format (
-                        "Unexpected operator: {0}.", "and".Substring (0, state + 1)));
+                        "There is no operand for the operator: {0}.", token));
                 } else {
-                    return base.OnDone ();
+                    throw new QueryParsingException (string.Format (
+                        "Unexpected operator: {0}.", token.Substring (0, position)));
                 }
             }
 
-            protected override string Junction {
-                get { return "conjunction"; }
-            }
-        }
-
-        class DisjunctionParser : JunctionParser
-        {
-            const int o_state = 0;
-            const int r_state = 1;
-
-            int state;
-
-            public DisjunctionParser (int parentheses,
-                                      int priority,
-                                      Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
-                : base (parentheses, priority, previousHandler)
+            public QueryParser Or (QueryParser otherParser)
             {
+                return new DisjoinedTokenParser (token, next_parser, otherParser);
             }
 
-            protected override QueryParser OnCharacter (char character)
+            class DisjoinedTokenParser : OperatorParser
             {
-                switch (state) {
-                case o_state:
-                    if (character == 'r') {
-                        state++;
-                        return this;
-                    } else if (IsWhiteSpace (character)) {
-                        throw new QueryParsingException ("Unexpected operator: o.");
-                    } else {
-                        throw new QueryParsingException (string.Format (
-                            "Unexpected operator begining: o{0}.", character));
+                readonly QueryParser alternative_parser;
+
+                public DisjoinedTokenParser (string token, QueryParser nextParser, QueryParser alternativeParser)
+                    : base (token, nextParser)
+                {
+                    alternative_parser = alternativeParser;
+                }
+
+                protected override QueryParser OnFailure (string token)
+                {
+                    var parser = alternative_parser;
+                    foreach (var character in token) {
+                        parser = parser.OnCharacter (character);
                     }
-                case r_state:
-                    if (IsWhiteSpace (character)) {
-                        state++;
-                        return this;
-                    } else {
-                        throw new QueryParsingException (string.Format (
-                            "Unexpected operator begining: or{0}.", character));
-                    }
-                default:
-                    return base.OnCharacter (character);
+                    return parser;
                 }
-            }
-
-            protected override Query OnDone ()
-            {
-                if (state < r_state) {
-                    throw new QueryParsingException ("Unexpected operator: o.");
-                } else {
-                    return base.OnDone ();
-                }
-            }
-
-            protected override string Junction {
-                get { return "disjunction"; }
             }
         }
 
-        abstract class PropertyOperatorParser : QueryParser
+        class RootPropertyOperatorParser : QueryParser
         {
-            protected readonly string Property;
-            protected readonly Func<Query, QueryParser> Consumer;
+            readonly string property;
+            readonly Func<Query, QueryParser> consumer;
 
-            protected PropertyOperatorParser (string property, Func<Query, QueryParser> consumer)
-            {
-                Property = property;
-                Consumer = consumer;
-            }
-        }
-
-        class RootPropertyOperatorParser : PropertyOperatorParser
-        {
             public RootPropertyOperatorParser (string property, Func<Query, QueryParser> consumer)
-                : base (property, consumer)
             {
+                this.property = property;
+                this.consumer = consumer;
             }
 
             protected override QueryParser OnCharacter (char character)
@@ -410,294 +367,49 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     return this;
                 }
 
+                QueryParser parser;
                 switch (character) {
-                case '=': return new EqualityParser (Property, Consumer);
-                case '!': return new InequalityParser (Property, Consumer);
-                case '<': return new LessThanParser (Property, Consumer);
-                case '>': return new GreaterThanParser (Property, Consumer);
-                case 'c': return new ContainsParser (Property, Consumer).OnCharacter ('c');
-                case 'e': return new ExistsParser (Property, Consumer).OnCharacter ('e');
-                case 'd': return new DerivedFromOrDoesNotContainParser (Property, Consumer);
+                case '=':
+                    parser = Operator ("=", value => visitor => visitor.VisitEquals (property, value));
+                    break;
+                case '!':
+                    parser = Operator ("!=", value => visitor => visitor.VisitDoesNotEqual (property, value));
+                    break;
+                case '<':
+                    parser = Operator ("<", value => visitor => visitor.VisitLessThan (property, value)). Or (
+                        Operator ("<=", value => visitor => visitor.VisitLessThanOrEqualTo (property, value)));
+                    break;
+                case '>':
+                    parser = Operator (">", value => visitor => visitor.VisitGreaterThan (property, value)). Or (
+                        Operator (">=", value => visitor => visitor.VisitGreaterThanOrEqualTo (property, value)));
+                    break;
+                case 'c':
+                    parser = Operator ("contains", value => visitor => visitor.VisitContains (property, value));
+                    break;
+                case 'e':
+                    parser = new OperatorParser ("exists",
+                        new BooleanParser (value => consumer (visitor => visitor.VisitExists (property, value))));
+                    break;
+                case 'd':
+                    parser = Operator ("derivedFrom", value => visitor => visitor.VisitDerivedFrom (property, value)).Or (
+                        Operator ("doesNotContain", value => visitor => visitor.VisitDoesNotContain (property, value)));
+                    break;
                 default: throw new QueryParsingException (string.Format (
                     "Unexpected operator begining: {0}.", character));
                 }
+
+                return parser.OnCharacter (character);
             }
 
             protected override Query OnDone ()
             {
                 throw new QueryParsingException (string.Format (
-                    "No operator is applied to the property identifier: {0}.", Property));
+                    "No operator is applied to the property identifier: {0}.", property));
             }
-        }
 
-        abstract class TokenOperatorParser : PropertyOperatorParser
-        {
-            protected bool Initialized;
-
-            protected TokenOperatorParser (string property, Func<Query, QueryParser> consumer)
-                : base (property, consumer)
+            OperatorParser Operator (string token, Func<string, Query> @operator)
             {
-            }
-
-            protected override QueryParser OnCharacter (char character)
-            {
-                if (Initialized) {
-                    if (IsWhiteSpace (character)) {
-                        return this;
-                    } else {
-                        return GetOperandParser ().OnCharacter (character);
-                    }
-                } else if (IsWhiteSpace (character)) {
-                    Initialized = true;
-                    return this;
-                } else {
-                    throw new QueryParsingException (string.Format (
-                        "Whitespace is required around the operator: {0}.", Operator));
-                }
-            }
-
-            protected abstract QueryParser GetOperandParser ();
-
-            protected abstract string Operator { get; }
-
-            protected override Query OnDone ()
-            {
-                throw new QueryParsingException (string.Format (
-                    "There is no operand for the operator: {0}.", Operator));
-            }
-        }
-
-        abstract class StringOperatorParser : TokenOperatorParser
-        {
-            readonly string @operator;
-            int position;
-
-            protected StringOperatorParser (string @operator, string property, Func<Query, QueryParser> consumer)
-                : base (property, consumer)
-            {
-                this.@operator = @operator;
-            }
-
-            protected override QueryParser OnCharacter (char character)
-            {
-                if (Initialized) {
-                    return base.OnCharacter (character);
-                } else if (position == @operator.Length) {
-                    if (IsWhiteSpace (character)) {
-                        return base.OnCharacter (character);
-                    } else {
-                        throw new QueryParsingException (string.Format (
-                            "Unexpected operator begining: {0}{1}.", @operator, character));
-                    }
-                } else if (character != @operator[position]) {
-                    if (IsWhiteSpace (character)) {
-                        throw new QueryParsingException (string.Format (
-                            "Unexpected operator: {0}.", @operator.Substring (0, position)));
-                    } else {
-                        throw new QueryParsingException (string.Format (
-                            "Unexpected operator begining: {0}{1}.", @operator.Substring (0, position), character));
-                    }
-                } else {
-                    position++;
-                    return this;
-                }
-            }
-
-            protected override string Operator {
-                get { return @operator; }
-            }
-        }
-
-        class ContainsParser : StringOperatorParser
-        {
-            public ContainsParser (string property, Func<Query, QueryParser> consumer)
-                : base ("contains", property, consumer)
-            {
-            }
-
-            protected override QueryParser GetOperandParser ()
-            {
-                return new StringParser (Operator,
-                    value => Consumer (visitor => visitor.VisitContains (Property, value)));
-            }
-        }
-
-        class ExistsParser : StringOperatorParser
-        {
-            public ExistsParser (string property, Func<Query, QueryParser> consumer)
-                : base ("exists", property, consumer)
-            {
-            }
-
-            protected override QueryParser GetOperandParser ()
-            {
-                return new BooleanParser (value => Consumer (visitor => visitor.VisitExists (Property, value)));
-            }
-        }
-
-        abstract class EqualityOperatorParser : TokenOperatorParser
-        {
-            protected bool HasEqualsSign;
-
-            protected EqualityOperatorParser (string property, Func<Query, QueryParser> consumer)
-                : base (property, consumer)
-            {
-            }
-
-            protected override QueryParser OnCharacter (char character)
-            {
-                if (HasEqualsSign || character != '=') {
-                    return base.OnCharacter (character);
-                } else {
-                    HasEqualsSign = true;
-                    return this;
-                }
-            }
-        }
-
-        class DerivedFromOrDoesNotContainParser : PropertyOperatorParser
-        {
-            public DerivedFromOrDoesNotContainParser (string property, Func<Query, QueryParser> consumer)
-                : base (property, consumer)
-            {
-            }
-
-            protected override QueryParser OnCharacter (char character)
-            {
-                if (character == 'e') {
-                    return new DerivedFromParser (Property, Consumer).OnCharacter ('d').OnCharacter ('e');
-                } else  if (character == 'o') {
-                    return new DoesNotContainParser (Property, Consumer).OnCharacter ('d').OnCharacter ('o');
-                } else if (IsWhiteSpace (character)) {
-                    throw new QueryParsingException ("Unexpected operator: d.");
-                } else {
-                    throw new QueryParsingException (string.Format (
-                        "Unexpected operator begining: d{0}.", character));
-                }
-            }
-
-            protected override Query OnDone ()
-            {
-                throw new QueryParsingException ("Unexpected operator begining: d.");
-            }
-        }
-
-        class DerivedFromParser : StringOperatorParser
-        {
-            public DerivedFromParser (string property, Func<Query, QueryParser> consumer)
-                : base ("derivedFrom", property, consumer)
-            {
-            }
-
-            protected override QueryParser GetOperandParser ()
-            {
-                return new StringParser (Operator,
-                    value => Consumer (visitor => visitor.VisitDerivedFrom (Property, value)));
-            }
-        }
-
-        class DoesNotContainParser : StringOperatorParser
-        {
-            public DoesNotContainParser (string property, Func<Query, QueryParser> consumer)
-                : base ("doesNotContain", property, consumer)
-            {
-            }
-
-            protected override QueryParser GetOperandParser ()
-            {
-                return new StringParser (Operator,
-                    value => Consumer (visitor => visitor.VisitDoesNotContain (Property, value)));
-            }
-        }
-
-        class EqualityParser : TokenOperatorParser
-        {
-            public EqualityParser (string property, Func<Query, QueryParser> consumer)
-                : base (property, consumer)
-            {
-            }
-
-            protected override QueryParser GetOperandParser ()
-            {
-                return new StringParser (Operator,
-                    value => Consumer (visitor => visitor.VisitEquals (Property, value)));
-            }
-
-            protected override string Operator {
-                get { return "="; }
-            }
-        }
-
-        class InequalityParser : EqualityOperatorParser
-        {
-            public InequalityParser (string property, Func<Query, QueryParser> consumer)
-                : base (property, consumer)
-            {
-            }
-
-            protected override QueryParser OnCharacter (char character)
-            {
-                var parser = base.OnCharacter (character);
-                if (Initialized && !HasEqualsSign) {
-                    throw new QueryParsingException ("Incomplete operator: !=.");
-                }
-                return parser;
-            }
-
-            protected override QueryParser GetOperandParser ()
-            {
-                return new StringParser (Operator,
-                    value => Consumer (visitor => visitor.VisitDoesNotEqual (Property, value)));
-            }
-
-            protected override string Operator {
-                get { return "!="; }
-            }
-        }
-
-        class LessThanParser : EqualityOperatorParser
-        {
-            public LessThanParser (string property, Func<Query, QueryParser> consumer)
-                : base (property, consumer)
-            {
-            }
-
-            protected override QueryParser GetOperandParser ()
-            {
-                if (HasEqualsSign) {
-                    return new StringParser (Operator,
-                        value => Consumer (visitor => visitor.VisitLessThanOrEqualTo (Property, value)));
-                } else {
-                    return new StringParser (Operator,
-                        value => Consumer (visitor => visitor.VisitLessThan (Property, value)));
-                }
-            }
-
-            protected override string Operator {
-                get { return HasEqualsSign ? "<=" : "<"; }
-            }
-        }
-
-        class GreaterThanParser : EqualityOperatorParser
-        {
-            public GreaterThanParser (string property, Func<Query, QueryParser> consumer)
-                : base (property, consumer)
-            {
-            }
-
-            protected override QueryParser GetOperandParser ()
-            {
-                if (HasEqualsSign) {
-                    return new StringParser (Operator,
-                        value => Consumer (visitor => visitor.VisitGreaterThanOrEqualTo (Property, value)));
-                } else {
-                    return new StringParser (Operator,
-                        value => Consumer (visitor => visitor.VisitGreaterThan (Property, value)));
-                }
-            }
-
-            protected override string Operator {
-                get { return HasEqualsSign ? ">=" : ">"; }
+                return new OperatorParser (token, new StringParser (token, value => consumer (@operator (value))));
             }
         }
 

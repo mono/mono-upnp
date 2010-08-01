@@ -263,7 +263,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             QueryParser.Parse ("");
         }
 
-        [Test, ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Incomplete operator: !=.")]
+        [Test, ExpectedException (typeof (QueryParsingException), ExpectedMessage = "Unexpected operator: !.")]
         public void IncompleteInequalityOperator ()
         {
             QueryParser.Parse (@"foo ! ""bar""");
@@ -295,7 +295,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Whitespace is required around the operator: =.")]
+            ExpectedMessage = @"Unexpected operator begining: ="".")]
         public void NoTrailingWhiteSpaceAroundOperator ()
         {
             QueryParser.Parse (@"foo =""bar""");
@@ -303,7 +303,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Whitespace is required around the operator: =.")]
+            ExpectedMessage = "Unexpected operator begining: ==.")]
         public void DoubleEqualityOperator ()
         {
             QueryParser.Parse (@"foo == ""bar""");
@@ -311,7 +311,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Whitespace is required around the operator: <.")]
+            ExpectedMessage = @"Unexpected operator begining: <"".")]
         public void NoTrailingWhiteSpaceAroundLessThan ()
         {
             QueryParser.Parse (@"foo <""bar""");
@@ -319,7 +319,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Whitespace is required around the operator: <=.")]
+            ExpectedMessage = @"Unexpected operator begining: <="".")]
         public void NoTrailingWhiteSpaceAroundLessThanOrEqualTo ()
         {
             QueryParser.Parse (@"foo <=""bar""");
@@ -327,7 +327,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Whitespace is required around the operator: >.")]
+            ExpectedMessage = @"Unexpected operator begining: >"".")]
         public void NoTrailingWhiteSpaceAroundGreaterThan ()
         {
             QueryParser.Parse (@"foo >""bar""");
@@ -335,7 +335,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Whitespace is required around the operator: >=.")]
+            ExpectedMessage = @"Unexpected operator begining: >="".")]
         public void NoTrailingWhiteSpaceAroundGreaterThanOrEqualTo ()
         {
             QueryParser.Parse (@"foo >=""bar""");
@@ -478,7 +478,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Unexpected operator begining: d.")]
+            ExpectedMessage = "Unexpected operator: d.")]
         public void IllegallyShortDerivedFromOrDoesNotContain ()
         {
             QueryParser.Parse ("foo d");
@@ -550,7 +550,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Expecting an expression after the conjunction.")]
+            ExpectedMessage = "There is no operand for the operator: and.")]
         public void IncompleteConjuction ()
         {
             QueryParser.Parse (@"foo = ""bar"" and");
@@ -558,7 +558,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Expecting an expression after the conjunction.")]
+            ExpectedMessage = "There is no operand for the operator: and.")]
         public void IncompleteConjuctionWithTrailingWhiteSpace ()
         {
             QueryParser.Parse ("foo = \"bar\" and \t\n");
@@ -598,7 +598,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Expecting an expression after the disjunction.")]
+            ExpectedMessage = "There is no operand for the operator: or.")]
         public void IncompleteDisjunction ()
         {
             QueryParser.Parse (@"foo = ""bar"" or");
@@ -606,7 +606,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
 
         [Test]
         [ExpectedException (typeof (QueryParsingException),
-            ExpectedMessage = "Expecting an expression after the disjunction.")]
+            ExpectedMessage = "There is no operand for the operator: or.")]
         public void IncompleteDisjunctionWithTrailingWhiteSpace ()
         {
             QueryParser.Parse (@"foo = ""bar"" or  ");
