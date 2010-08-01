@@ -9,3 +9,5 @@
 *.usertasks
 #ignore test results
 test-results/
+#ignore Mac OS files
+.DS_Store
