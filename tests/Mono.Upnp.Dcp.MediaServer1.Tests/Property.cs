@@ -58,32 +58,32 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             return visitor => visitor.VisitExists (name, value);
         }
 
-        public static Query operator ==(Property property, string value)
+        public static Query operator == (Property property, string value)
         {
             return visitor => visitor.VisitEquals (property.name, value);
         }
 
-        public static Query operator !=(Property property, string value)
+        public static Query operator != (Property property, string value)
         {
             return visitor => visitor.VisitDoesNotEqual (property.name, value);
         }
 
-        public static Query operator <(Property property, string value)
+        public static Query operator < (Property property, string value)
         {
             return visitor => visitor.VisitLessThan (property.name, value);
         }
 
-        public static Query operator <=(Property property, string value)
+        public static Query operator <= (Property property, string value)
         {
             return visitor => visitor.VisitLessThanOrEqualTo (property.name, value);
         }
 
-        public static Query operator >(Property property, string value)
+        public static Query operator > (Property property, string value)
         {
             return visitor => visitor.VisitGreaterThan (property.name, value);
         }
 
-        public static Query operator >=(Property property, string value)
+        public static Query operator >= (Property property, string value)
         {
             return visitor => visitor.VisitGreaterThanOrEqualTo (property.name, value);
         }

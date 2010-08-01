@@ -52,8 +52,12 @@ namespace Mono.Upnp.Xml.Compilation
                 if (xml_type != null) {
                     type_attribute = xml_type;
                     continue;
+                } else {
+                    var xml_namespace = custom_attribute as XmlNamespaceAttribute;
+                    if (xml_namespace != null) {
+                        namespaces.Add (xml_namespace);
+                    }
                 }
-                namespaces.Add (custom_attribute as XmlNamespaceAttribute);
             }
             
             if (type_attribute != null) {

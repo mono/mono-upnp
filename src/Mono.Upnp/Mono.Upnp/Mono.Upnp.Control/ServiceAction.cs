@@ -73,7 +73,11 @@ namespace Mono.Upnp.Control
         public virtual string Name { get; protected set; }
         
         [XmlArray ("argumentList")]
-        public virtual IMap<string, Argument> Arguments {
+        protected virtual ICollection<Argument> ArgumentCollection {
+            get { return arguments; }
+        }
+
+        public IMap<string, Argument> Arguments {
             get { return arguments; }
         }
         

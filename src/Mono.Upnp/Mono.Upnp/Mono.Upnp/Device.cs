@@ -123,15 +123,6 @@ namespace Mono.Upnp
             return options == null ? null : options.Icons;
         }
         
-        [XmlArray ("iconList", OmitIfEmpty = true)]
-        public virtual IList<Icon> Icons { get; private set; }
-        
-        [XmlArray ("serviceList", OmitIfEmpty = true)]
-        public virtual IList<Service> Services { get; private set; }
-        
-        [XmlArray ("deviceList", OmitIfEmpty = true)]
-        public virtual IList<Device> Devices { get; private set; }
-        
         [XmlElement ("deviceType")]
         public virtual DeviceType Type { get; protected set; }
         
@@ -146,7 +137,7 @@ namespace Mono.Upnp
         
         [XmlElement ("modelDescription", OmitIfNull = true)]
         public virtual string ModelDescription { get; protected set; }
-        
+
         [XmlElement ("modelName")]
         public virtual string ModelName { get; protected set; }
         
@@ -164,6 +155,15 @@ namespace Mono.Upnp
         
         [XmlElement ("UPC", OmitIfNull = true)]
         public virtual string Upc { get; protected set; }
+        
+        [XmlArray ("iconList", OmitIfEmpty = true)]
+        public virtual IList<Icon> Icons { get; private set; }
+        
+        [XmlArray ("serviceList", OmitIfEmpty = true)]
+        public virtual IList<Service> Services { get; private set; }
+        
+        [XmlArray ("deviceList", OmitIfEmpty = true)]
+        public virtual IList<Device> Devices { get; private set; }
 
         protected internal virtual void Initialize (XmlSerializer serializer, Root root, string deviceUrlFragment)
         {

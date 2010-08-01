@@ -217,14 +217,20 @@ namespace Mono.Upnp.Tests
             
             using (var client = new Client ()) {
                 client.Browse (new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)));
+                Exception exception = null;
                 client.ServiceAdded += (sender, args) => {
                     lock (mutex) {
-                        var controller = args.Service.GetService ().GetController ();
-                        var arguments = new Dictionary<string, string> (1);
-                        arguments["bar"] = "hello world!";
-                        var results = controller.Actions["Foo"].Invoke (arguments);
-                        Assert.AreEqual ("You said hello world!", results["result"]);
-                        Monitor.Pulse (mutex);
+                        try {
+                            var controller = args.Service.GetService ().GetController ();
+                            var arguments = new Dictionary<string, string> (1);
+                            arguments["bar"] = "hello world!";
+                            var results = controller.Actions["Foo"].Invoke (arguments);
+                            Assert.AreEqual ("You said hello world!", results["result"]);
+                        } catch (Exception e) {
+                            exception = e;
+                        } finally {
+                            Monitor.Pulse (mutex);
+                        }
                     }
                 };
                 
@@ -233,6 +239,8 @@ namespace Mono.Upnp.Tests
                         server.Start ();
                         if (!Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
                             Assert.Fail ("The server control timed out.");
+                        } else if (exception != null) {
+                            throw exception;
                         }
                     }
                 }

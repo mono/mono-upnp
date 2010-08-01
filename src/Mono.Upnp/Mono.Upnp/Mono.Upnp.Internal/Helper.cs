@@ -54,7 +54,11 @@ namespace Mono.Upnp.Internal
         {
             var list = items as IList<T>;
             if (list == null) {
-                list = new List<T> (items);
+                if (items == null) {
+                    list = new T[0];
+                } else {
+                    list = new List<T> (items);
+                }
             }
             return new ReadOnlyCollection<T> (list);
         }

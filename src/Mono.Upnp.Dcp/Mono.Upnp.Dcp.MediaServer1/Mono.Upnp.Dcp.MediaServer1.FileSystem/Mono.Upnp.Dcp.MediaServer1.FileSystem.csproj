@@ -35,11 +35,19 @@
     <Reference Include="System">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="taglib-sharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\taglib-sharp\src\taglib-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\FileSystemContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\File.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\MusicBuilder.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\ContainerBuilder.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\ContainerOptionsInfo.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\ContainerInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">
