@@ -136,12 +136,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     }
                 } else if (character == 'a') {
                     var priority = GetPriority (conjunction_priority);
-                    return new OperatorParser ("and", new JunctionParser ("conjunction", parentheses, priority, MakeHandler (priority,
-                        (leftOperand, rightOperand) => visitor => visitor.VisitAnd (leftOperand, rightOperand)))).OnCharacter ('a');
+                    return new OperatorParser ("and",
+                        new JunctionParser ("conjunction", parentheses, priority, MakeHandler (priority,
+                            (leftOperand, rightOperand) => visitor => visitor.VisitAnd (leftOperand, rightOperand))))
+                        .OnCharacter ('a');
                 } else if (character == 'o') {
                     var priority = GetPriority (disjunction_priority);
-                    return new OperatorParser ("or", new JunctionParser ("disjunction", parentheses, priority, MakeHandler (priority,
-                        (leftOperand, rightOperand) => visitor => visitor.VisitOr (leftOperand, rightOperand)))).OnCharacter ('o');
+                    return new OperatorParser ("or",
+                        new JunctionParser ("disjunction", parentheses, priority, MakeHandler (priority,
+                            (leftOperand, rightOperand) => visitor => visitor.VisitOr (leftOperand, rightOperand))))
+                        .OnCharacter ('o');
                 } else {
                     throw new QueryParsingException (string.Format ("Unexpected operator begining: {0}.", character));
                 }
@@ -268,14 +272,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class OperatorParser : QueryParser
         {
-            readonly string token;
+            readonly string @operator;
             readonly QueryParser next_parser;
             bool initialized;
             int position;
 
-            public OperatorParser (string token, QueryParser nextParser)
+            public OperatorParser (string @operator, QueryParser nextParser)
             {
-                this.token = token;
+                this.@operator = @operator;
                 this.next_parser = nextParser;
             }
 
@@ -287,19 +291,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     } else {
                         return next_parser.OnCharacter (character);
                     }
-                } else if (position == token.Length) {
+                } else if (position == @operator.Length) {
                     if (IsWhiteSpace (character)) {
                         initialized = true;
                         return this;
                     } else {
-                        return OnFailure (token + character);
+                        return OnFailure (@operator + character);
                     }
-                } else if (character != token[position]) {
+                } else if (character != @operator[position]) {
                     if (IsWhiteSpace (character)) {
                         throw new QueryParsingException (string.Format (
-                            "Unexpected operator: {0}.", token.Substring (0, position)));
+                            "Unexpected operator: {0}.", @operator.Substring (0, position)));
                     } else {
-                        return OnFailure (token.Substring (0, position) + character);
+                        return OnFailure (@operator.Substring (0, position) + character);
                     }
                 } else {
                     position++;
@@ -310,39 +314,39 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected virtual QueryParser OnFailure (string token)
             {
                 throw new QueryParsingException (string.Format (
-                    "Unexpected operator begining: {0}.", token));
+                    "Unexpected operator begining: {0}.", @operator));
             }
 
             protected override Query OnDone ()
             {
-                if (position == token.Length) {
+                if (position == @operator.Length) {
                     throw new QueryParsingException (string.Format (
-                        "There is no operand for the operator: {0}.", token));
+                        "There is no operand for the operator: {0}.", @operator));
                 } else {
                     throw new QueryParsingException (string.Format (
-                        "Unexpected operator: {0}.", token.Substring (0, position)));
+                        "Unexpected operator: {0}.", @operator.Substring (0, position)));
                 }
             }
 
             public QueryParser Or (QueryParser otherParser)
             {
-                return new DisjoinedTokenParser (token, next_parser, otherParser);
+                return new DisjoinedTokenParser (@operator, next_parser, otherParser);
             }
 
             class DisjoinedTokenParser : OperatorParser
             {
                 readonly QueryParser alternative_parser;
 
-                public DisjoinedTokenParser (string token, QueryParser nextParser, QueryParser alternativeParser)
-                    : base (token, nextParser)
+                public DisjoinedTokenParser (string @operator, QueryParser nextParser, QueryParser alternativeParser)
+                    : base (@operator, nextParser)
                 {
                     alternative_parser = alternativeParser;
                 }
 
-                protected override QueryParser OnFailure (string token)
+                protected override QueryParser OnFailure (string @operator)
                 {
                     var parser = alternative_parser;
-                    foreach (var character in token) {
+                    foreach (var character in @operator) {
                         parser = parser.OnCharacter (character);
                     }
                     return parser;
@@ -394,8 +398,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     parser = Operator ("derivedFrom", value => visitor => visitor.VisitDerivedFrom (property, value)).Or (
                         Operator ("doesNotContain", value => visitor => visitor.VisitDoesNotContain (property, value)));
                     break;
-                default: throw new QueryParsingException (string.Format (
-                    "Unexpected operator begining: {0}.", character));
+                default:
+                    throw new QueryParsingException (string.Format ("Unexpected operator begining: {0}.", character));
                 }
 
                 return parser.OnCharacter (character);
