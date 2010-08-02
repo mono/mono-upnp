@@ -26,6 +26,7 @@
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
+    // See NetCompat_WMP11.docx
     public static class Wmp11Ids
     {
         public const string Root = "0";

@@ -36,7 +36,6 @@ using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
-    // See NetCompat_WMP11.docx
     public class Wmp11MusicBuilder
     {
         List<UpnpObject> audio_items = new List<UpnpObject> ();
