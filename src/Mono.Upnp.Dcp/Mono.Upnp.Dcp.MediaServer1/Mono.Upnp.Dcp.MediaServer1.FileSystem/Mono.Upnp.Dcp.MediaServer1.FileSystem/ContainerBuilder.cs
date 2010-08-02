@@ -64,11 +64,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 containers[container] = container_options_info;
             }
             var reference = new Item (GetId (), new ItemOptions { RefId = item.Id });
-            container_options_info.Items.Add (reference);
+            container_options_info.Children.Add (reference);
             consumer (reference);
         }
 
-        public void OnDone (Action<ContainerInfo> consumer, ContainerProducer containerProducer)
+        public IList<UpnpObject> OnDone (Action<ContainerInfo> consumer, ContainerProducer containerProducer)
         {
             if (consumer == null) {
                 throw new ArgumentNullException ("consumer");
@@ -76,10 +76,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 throw new ArgumentNullException ("containerProducer");
             }
 
+            var children = new List<UpnpObject> (containers.Count);
+
             foreach (var container_info in containers.Values) {
-                container_info.Options.ChildCount = container_info.Items.Count;
-                consumer (new ContainerInfo (containerProducer (container_info.Options), container_info.Items));
+                container_info.Options.ChildCount = container_info.Children.Count;
+                var container = containerProducer (container_info.Options);
+                consumer (new ContainerInfo (container, container_info.Children));
+                children.Add (container);
             }
+
+            return children;
         }
 
         string GetId ()

@@ -39,7 +39,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
     // See NetCompat_WMP11.docx
     public class Wmp11MusicBuilder
     {
-        const string music_id = "1";
         const string all_music_id = "4";
         const string genre_id = "5";
         const string artist_id = "6";
@@ -55,6 +54,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         const string rating_3_star_id = "104";
         const string rating_4_star_id = "105";
         const string rating_5_star_id = "106";
+
+        List<UpnpObject> audio_items = new List<UpnpObject> ();
 
         ContainerBuilder<GenreOptions> genre_builder =
             new ContainerBuilder<GenreOptions> ();
@@ -81,6 +82,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 Artists = GetArtists (artists)
             });
 
+            audio_items.Add (music_track);
             consumer (music_track);
 
             foreach (var genre in genres) {
@@ -125,12 +127,43 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             return options;
         }
 
-        public void OnDone (Action<ContainerInfo> consumer)
+        public IList<UpnpObject> OnDone (Action<ContainerInfo> consumer)
         {
-            genre_builder.OnDone (consumer, options => new MusicGenre (genre_id, options));
-            artist_builder.OnDone (consumer, options => new MusicArtist (artist_id, options));
-            album_builder.OnDone (consumer, options => new MusicAlbum (album_id, options));
-            composer_builder.OnDone (consumer, options => new MusicArtist (composer_id, options));
+            var containers = new List<UpnpObject> (11);
+
+            var all_music = new Container (all_music_id, new ContainerOptions {
+                Title = "All Music",
+                ChildCount = audio_items.Count
+            });
+            consumer (new ContainerInfo (all_music, audio_items));
+            containers.Add (all_music);
+
+            containers.Add (BuildContainer (consumer, genre_id, "Genre",
+                genre_builder.OnDone (consumer, options => new MusicGenre (GetId (), options))));
+
+            containers.Add (BuildContainer (consumer, artist_id, "Artist",
+                artist_builder.OnDone (consumer, options => new MusicArtist (GetId (), options))));
+
+            containers.Add (BuildContainer (consumer, album_artist_id, "Album Artist",
+                album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options))));
+
+            containers.Add (BuildContainer (consumer, composer_id, "Composer",
+                composer_builder.OnDone (consumer, options => new MusicArtist (GetId (), options))));
+
+            return containers;
+        }
+
+        static Container BuildContainer (Action<ContainerInfo> consumer,
+                                         string id,
+                                         string title,
+                                         IList<UpnpObject> children)
+        {
+            var container = new Container (id, new ContainerOptions {
+                Title = title,
+                ChildCount = children.Count
+            });
+            consumer (new ContainerInfo (container, children));
+            return container;
         }
 
         string GetId ()

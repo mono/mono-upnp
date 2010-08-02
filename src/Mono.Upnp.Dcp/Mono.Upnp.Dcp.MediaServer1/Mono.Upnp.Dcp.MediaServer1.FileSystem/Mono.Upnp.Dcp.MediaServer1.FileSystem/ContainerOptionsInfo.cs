@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
+using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
+
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
     public class ContainerOptionsInfo<T>
@@ -36,11 +38,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         public ContainerOptionsInfo (T options)
         {
             Options = options;
-            Items = new List<Item> ();
+            Children = new List<UpnpObject> ();
         }
 
         public T Options { get; set; }
 
-        public IList<Item> Items { get; private set; }
+        public IList<UpnpObject> Children { get; private set; }
     }
 }

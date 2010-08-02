@@ -29,24 +29,26 @@ using System.Collections.Generic;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
+using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
+
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
     public class ContainerInfo
     {
-        public ContainerInfo (Container container, IList<Item> items)
+        public ContainerInfo (Container container, IList<UpnpObject> children)
         {
             if (container == null) {
                 throw new ArgumentNullException ("container");
-            } else if (items == null) {
-                throw new ArgumentNullException ("items");
+            } else if (children == null) {
+                throw new ArgumentNullException ("children");
             }
 
             Container = container;
-            Items = items;
+            Children = children;
         }
 
         public Container Container { get; private set; }
 
-        public IList<Item> Items { get; private set; }
+        public IList<UpnpObject> Children { get; private set; }
     }
 }

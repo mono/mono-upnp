@@ -76,7 +76,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
             var reference = objects[1] as Item;
             Assert.AreEqual (music_track.Id, reference.RefId);
 
-            var music_genre = objects[2] as MusicGenre;
+            var music_genre = objects[3] as MusicGenre;
             Assert.AreEqual ("Bat", music_genre.Title);
             Assert.AreEqual (1, music_genre.ChildCount);
         }
@@ -103,11 +103,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
 
             Assert.AreEqual (music_track.Id, ((Item)objects[2]).RefId);
 
-            var music_genre = objects[3] as MusicGenre;
+            var music_genre = objects[4] as MusicGenre;
             Assert.AreEqual ("Bat", music_genre.Title);
             Assert.AreEqual (1, music_genre.ChildCount);
 
-            music_genre = objects[4] as MusicGenre;
+            music_genre = objects[5] as MusicGenre;
             Assert.AreEqual ("Baz", music_genre.Title);
             Assert.AreEqual (1, music_genre.ChildCount);
         }
@@ -131,7 +131,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
 
             Assert.AreEqual (music_track.Id, ((Item)objects[1]).RefId);
 
-            var music_artist = objects[2] as MusicArtist;
+            var music_artist = objects[4] as MusicArtist;
             Assert.AreEqual ("Boo Far", music_artist.Title);
             Assert.AreEqual (1, music_artist.ChildCount);
         }
@@ -159,11 +159,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
 
             Assert.AreEqual (music_track.Id, ((Item)objects[2]).RefId);
 
-            var music_genre = objects[3] as MusicGenre;
+            var music_genre = objects[4] as MusicGenre;
             Assert.AreEqual ("Bat", music_genre.Title);
             Assert.AreEqual (1, music_genre.ChildCount);
 
-            var music_artist = objects[4] as MusicArtist;
+            var music_artist = objects[6] as MusicArtist;
             Assert.AreEqual ("Boo Far", music_artist.Title);
             Assert.AreEqual (1, music_artist.ChildCount);
             Assert.AreEqual ("Bat", music_artist.Genres[0]);
