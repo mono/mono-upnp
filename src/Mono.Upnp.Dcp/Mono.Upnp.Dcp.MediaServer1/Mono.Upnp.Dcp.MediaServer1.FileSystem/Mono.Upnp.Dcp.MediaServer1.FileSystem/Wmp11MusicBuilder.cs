@@ -135,35 +135,36 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 Title = "All Music",
                 ChildCount = audio_items.Count
             });
-            consumer (new ContainerInfo (all_music, audio_items));
             containers.Add (all_music);
+            consumer (new ContainerInfo (all_music, audio_items));
 
-            containers.Add (BuildContainer (consumer, genre_id, "Genre",
-                genre_builder.OnDone (consumer, options => new MusicGenre (GetId (), options))));
+            BuildContainer (consumer, containers, genre_id, "Genre",
+                genre_builder.OnDone (consumer, options => new MusicGenre (GetId (), options)));
 
-            containers.Add (BuildContainer (consumer, artist_id, "Artist",
-                artist_builder.OnDone (consumer, options => new MusicArtist (GetId (), options))));
+            BuildContainer (consumer, containers, artist_id, "Artist",
+                artist_builder.OnDone (consumer, options => new MusicArtist (GetId (), options)));
 
-            containers.Add (BuildContainer (consumer, album_artist_id, "Album Artist",
-                album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options))));
+            BuildContainer (consumer, containers, album_artist_id, "Album Artist",
+                album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options)));
 
-            containers.Add (BuildContainer (consumer, composer_id, "Composer",
-                composer_builder.OnDone (consumer, options => new MusicArtist (GetId (), options))));
+            BuildContainer (consumer, containers, composer_id, "Composer",
+                composer_builder.OnDone (consumer, options => new MusicArtist (GetId (), options)));
 
             return containers;
         }
 
-        static Container BuildContainer (Action<ContainerInfo> consumer,
-                                         string id,
-                                         string title,
-                                         IList<UpnpObject> children)
+        static void BuildContainer (Action<ContainerInfo> consumer,
+                                    List<UpnpObject> containers,
+                                    string id,
+                                    string title,
+                                    IList<UpnpObject> children)
         {
             var container = new Container (id, new ContainerOptions {
                 Title = title,
                 ChildCount = children.Count
             });
+            containers.Add (container);
             consumer (new ContainerInfo (container, children));
-            return container;
         }
 
         string GetId ()
