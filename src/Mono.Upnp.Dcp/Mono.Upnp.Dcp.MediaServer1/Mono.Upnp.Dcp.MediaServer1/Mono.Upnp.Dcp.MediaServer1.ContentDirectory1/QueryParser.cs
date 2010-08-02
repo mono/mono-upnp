@@ -31,6 +31,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     // Refer to ContentDirectory1 Service Template 1.0.1, Section 2.5.5.1: Search Criteria String Syntax
     public abstract class QueryParser
     {
+        // Look Mom, no 3.5 dependency!
         delegate TResult Func<T, TResult> (T argument);
         delegate TResult Func<T1, T2, TResult> (T1 argument1, T2 argument2);
 
@@ -200,7 +201,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected override Func<int, Func<Query, Query>, Func<Query, Query>> MakeHandler (int priority,
                                                                                               Func<Query, Query, Query> binaryOperator)
             {
-                // Even I admit this is unreadable. But is a very slick operator priority algorithm.
+                // An unintelligable but very slick operator priority algorithm.
                 if (this.priority < priority) {
                     return (priorPriority, priorOperator) => {
                         if (this.priority < priorPriority) {

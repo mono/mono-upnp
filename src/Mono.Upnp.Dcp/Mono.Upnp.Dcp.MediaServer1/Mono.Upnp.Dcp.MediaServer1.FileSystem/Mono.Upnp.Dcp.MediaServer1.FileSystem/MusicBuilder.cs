@@ -27,6 +27,8 @@
 using System;
 using System.Collections.Generic;
 
+using TagLib;
+
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 
@@ -36,53 +38,82 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
     public class MusicBuilder
     {
-        /*Container all_music;
-        Container genre;
-        Container artist;
-        Container album;
-        Container playlists;
-        Container folders;
-        Container contributing_artists;
-        Container album_artist;
-        Container composer;
-        Container rating;
-
         ContainerBuilder<GenreOptions> genre_builder = new ContainerBuilder<GenreOptions> ();
-        ContainerBuilder<MusicArtistOptions> artist_builder = new ContainerBuilder<MusicArtistOptions> ();*/
+        ContainerBuilder<BuildableMusicArtistOptions> artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> ();
+        ContainerBuilder<MusicAlbumOptions> album_builder = new ContainerBuilder<MusicAlbumOptions> ();
+        ContainerBuilder<BuildableMusicArtistOptions> album_artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> ();
+        ContainerBuilder<BuildableMusicArtistOptions> composer_builder = new ContainerBuilder<BuildableMusicArtistOptions> ();
 
-        public void OnFile (string path, Action<UpnpObject> consumer)
+        public void OnTag (Tag tag, Action<UpnpObject> consumer)
         {
-            var tags  = TagLib.File.Create (path);
-            var genres = tags.Tag.Genres;
-            var artists = tags.Tag.Performers;
-            var options = new MusicTrackOptions {
-                Title = tags.Tag.Title,
-                OriginalTrackNumber = (int)tags.Tag.Track,
+            var genres = tag.Genres;
+            var artists = tag.Performers;
+            var album_artists = tag.AlbumArtists;
+            var composers = tag.Composers;
+            var music_track_options = new MusicTrackOptions {
+                Title = tag.Title,
+                OriginalTrackNumber = (int)tag.Track,
                 Genres = genres,
                 Artists = GetArtists (artists)
             };
-            Console.WriteLine (options);
 
-            /*foreach (var genre in genres) {
+            var audioItem = new MusicTrack (GetId (), music_track_options);
+            consumer (audioItem);
+
+            foreach (var genre in genres) {
                 genre_builder.OnItem (genre, audioItem, consumer,
                     options => options != null ? options : new GenreOptions { Title = genre });
             }
 
             foreach (var artist in artists) {
                 artist_builder.OnItem (artist, audioItem, consumer,
-                    options => options 
-            }*/
+                    options => ArtistWithGenres (artist, genres, options));
+            }
+
+            album_builder.OnItem (tag.Album, audioItem, consumer,
+                options => options != null ? options : new MusicAlbumOptions {
+                    Title = tag.Album,
+                    Contributors = album_artists
+                });
+
+            foreach (var album_artist in album_artists) {
+                album_artist_builder.OnItem (album_artist, audioItem, consumer,
+                    options => ArtistWithGenres (album_artist, genres, options));
+            }
+
+            foreach (var composer in composers) {
+                composer_builder.OnItem (composer, audioItem, consumer,
+                    options => ArtistWithGenres (composer, genres, options));
+            }
+        }
+
+        static BuildableMusicArtistOptions ArtistWithGenres (string artist,
+                                                             IEnumerable<string> genres,
+                                                             BuildableMusicArtistOptions options)
+        {
+            if (options == null) {
+                options = new BuildableMusicArtistOptions { Title = artist };
+            }
+
+            foreach (var genre in genres) {
+                options.OnGenre (genre);
+            }
+
+            return options;
         }
 
         public void OnDone (Action<ContainerInfo> consumer)
         {
-            //genre_builder.OnDone (options_info =>
-            //    new ContainerInfo (new MusicGenre (GetId (), options_info.Options), options_info.Items), consumer);
+            genre_builder.OnDone (consumer, options => new MusicGenre (GetId (), options));
+            artist_builder.OnDone (consumer, options => new MusicArtist (GetId (), options));
+            album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options));
+            album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options));
+            composer_builder.OnDone (consumer, options => new MusicArtist (GetId (), options));
         }
 
         string GetId ()
         {
-            return null;
+            return string.Empty;
         }
 
         static IEnumerable<PersonWithRole> GetArtists (IEnumerable<string> artists)

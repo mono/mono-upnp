@@ -1,5 +1,5 @@
 // 
-// ContainerOptionsInfo.cs
+// BuildableMusicArtistOptions.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -24,23 +24,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 
-using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
-    public class ContainerOptionsInfo<T>
+    public class BuildableMusicArtistOptions : MusicArtistOptions
     {
-        public ContainerOptionsInfo (T options)
+        Dictionary<string, string> genres = new Dictionary<string, string> ();
+
+        public BuildableMusicArtistOptions ()
         {
-            Options = options;
-            Items = new List<Item> ();
+            Genres = genres.Keys;
         }
 
-        public T Options { get; set; }
-
-        public IList<Item> Items { get; private set; }
+        public void OnGenre (string genre)
+        {
+            genres[genre] = genre;
+        }
     }
 }

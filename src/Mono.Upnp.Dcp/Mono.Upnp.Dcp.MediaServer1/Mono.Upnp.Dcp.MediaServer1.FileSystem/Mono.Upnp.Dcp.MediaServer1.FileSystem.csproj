@@ -48,6 +48,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\ContainerBuilder.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\ContainerOptionsInfo.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\ContainerInfo.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\BuildableMusicArtistOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">

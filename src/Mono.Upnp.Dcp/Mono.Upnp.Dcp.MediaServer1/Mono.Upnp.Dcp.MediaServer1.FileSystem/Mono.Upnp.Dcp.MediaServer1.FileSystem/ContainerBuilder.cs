@@ -39,21 +39,21 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         // Public inner types are almost always Bad News. BUT in the interest of avoiding a 3.5 dependency, I am
         // willing to do this because these type names should never be needed outside of this file due to inference.
         public delegate T OptionsProducer (T options);
-        public delegate ContainerInfo ContainerProducer (ContainerOptionsInfo<T> options);
+        public delegate Container ContainerProducer (T options);
 
         Dictionary<string, ContainerOptionsInfo<T>> containers = new Dictionary<string, ContainerOptionsInfo<T>> ();
 
         public void OnItem (string container, Item item, Action<UpnpObject> consumer, OptionsProducer optionsProducer)
         {
-            // And have I mentioned how much I LOVE null checking? It's 2010 people. What is wrong with this picture?
+            // And have I mentioned how much I LOVE null checking! It's 2010: do you know where your type system is?
             if (container == null) {
-                throw new ArgumentNullException ("container");
+                return;
             } else if (item == null) {
                 throw new ArgumentNullException ("item");
-            } else if (optionsProducer == null) {
-                throw new ArgumentNullException ("optionsProducer");
             } else if (consumer == null) {
                 throw new ArgumentNullException ("consumer");
+            } else if (optionsProducer == null) {
+                throw new ArgumentNullException ("optionsProducer");
             }
 
             ContainerOptionsInfo<T> container_options_info;
@@ -70,21 +70,21 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
         public void OnDone (Action<ContainerInfo> consumer, ContainerProducer containerProducer)
         {
-            if (containerProducer == null) {
-                throw new ArgumentNullException ("containerProducer");
-            } else if (consumer == null) {
+            if (consumer == null) {
                 throw new ArgumentNullException ("consumer");
+            } else if (containerProducer == null) {
+                throw new ArgumentNullException ("containerProducer");
             }
 
-            /*foreach (var container_info in containers.Values) {
+            foreach (var container_info in containers.Values) {
                 container_info.Options.ChildCount = container_info.Items.Count;
-                consumer (containerProducer (container_info.Options));
-            }*/
+                consumer (new ContainerInfo (containerProducer (container_info.Options), container_info.Items));
+            }
         }
 
         string GetId ()
         {
-            return null;
+            return string.Empty;
         }
     }
 }
