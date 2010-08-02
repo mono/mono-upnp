@@ -107,7 +107,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         
         public override string ToString ()
         {
-            return string.Format("{0} ({1})", Id, Class.FullClassName);
+            if (Class == null) {
+                return Id;
+            } else {
+                return string.Format("{0} ({1})", Id, Class.FullClassName);
+            }
         }
 
         protected override void Deserialize (XmlDeserializationContext context)

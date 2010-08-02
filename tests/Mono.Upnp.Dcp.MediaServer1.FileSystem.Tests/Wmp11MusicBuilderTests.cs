@@ -61,11 +61,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         {
             var builder = new Wmp11MusicBuilder ();
             var objects = new List<UpnpObject> ();
+
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
                 Track = 42,
                 Genres = new[] { "Bat" },
             }, item => objects.Add (item));
+
             builder.OnDone (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
@@ -86,11 +88,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         {
             var builder = new Wmp11MusicBuilder ();
             var objects = new List<UpnpObject> ();
+
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
                 Track = 42,
                 Genres = new[] { "Bat", "Baz" },
             }, item => objects.Add (item));
+
             builder.OnDone (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
@@ -100,7 +104,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
             Assert.AreEqual ("Baz", music_track.Genres[1]);
 
             Assert.AreEqual (music_track.Id, ((Item)objects[1]).RefId);
-
             Assert.AreEqual (music_track.Id, ((Item)objects[2]).RefId);
 
             var music_genre = objects[4] as MusicGenre;
@@ -117,11 +120,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         {
             var builder = new Wmp11MusicBuilder ();
             var objects = new List<UpnpObject> ();
+
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
                 Track = 42,
                 Performers = new[] { "Boo Far" }
             }, item => objects.Add (item));
+
             builder.OnDone (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
@@ -141,12 +146,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         {
             var builder = new Wmp11MusicBuilder ();
             var objects = new List<UpnpObject> ();
+
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
                 Track = 42,
                 Performers = new[] { "Boo Far" },
                 Genres = new[] { "Bat" }
             }, item => objects.Add (item));
+
             builder.OnDone (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
@@ -156,7 +163,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
             Assert.AreEqual ("Bat", music_track.Genres[0]);
 
             Assert.AreEqual (music_track.Id, ((Item)objects[1]).RefId);
-
             Assert.AreEqual (music_track.Id, ((Item)objects[2]).RefId);
 
             var music_genre = objects[4] as MusicGenre;
@@ -167,6 +173,69 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
             Assert.AreEqual ("Boo Far", music_artist.Title);
             Assert.AreEqual (1, music_artist.ChildCount);
             Assert.AreEqual ("Bat", music_artist.Genres[0]);
+        }
+
+        [Test]
+        public void MultipleArtistAndGenreTags ()
+        {
+            var builder = new Wmp11MusicBuilder ();
+            var objects = new List<UpnpObject> ();
+            Action<UpnpObject> consumer = @object => objects.Add (@object);
+
+            builder.OnTag (new Tag {
+                Title = "Foo Bar",
+                Track = 42,
+                Performers = new[] { "Boo Far" },
+                Genres = new[] { "Bazz" }
+            }, consumer);
+
+            builder.OnTag (new Tag {
+                Title = "Hurt",
+                Track = 1,
+                Performers = new[] { "Our Lady J" },
+                Genres = new[] { "Bazz", "Electro Gospel" }
+            }, consumer);
+
+            builder.OnDone (info => objects.Add (info.Container));
+
+            var music_track = objects[0] as MusicTrack;
+            Assert.AreEqual ("Foo Bar", music_track.Title);
+            Assert.AreEqual (42, music_track.OriginalTrackNumber);
+            Assert.AreEqual ("Boo Far", music_track.Artists[0].Name);
+            Assert.AreEqual ("Bazz", music_track.Genres[0]);
+
+            Assert.AreEqual (music_track.Id, ((Item)objects[1]).RefId);
+            Assert.AreEqual (music_track.Id, ((Item)objects[2]).RefId);
+
+            music_track = objects[3] as MusicTrack;
+            Assert.AreEqual ("Hurt", music_track.Title);
+            Assert.AreEqual (1, music_track.OriginalTrackNumber);
+            Assert.AreEqual ("Our Lady J", music_track.Artists[0].Name);
+            Assert.AreEqual ("Bazz", music_track.Genres[0]);
+            Assert.AreEqual ("Electro Gospel", music_track.Genres[1]);
+
+            Assert.AreEqual (music_track.Id, ((Item)objects[4]).RefId);
+            Assert.AreEqual (music_track.Id, ((Item)objects[5]).RefId);
+            Assert.AreEqual (music_track.Id, ((Item)objects[6]).RefId);
+
+            var music_genre = objects[8] as MusicGenre;
+            Assert.AreEqual ("Bazz", music_genre.Title);
+            Assert.AreEqual (2, music_genre.ChildCount);
+
+            music_genre = objects[9] as MusicGenre;
+            Assert.AreEqual ("Electro Gospel", music_genre.Title);
+            Assert.AreEqual (1, music_genre.ChildCount);
+
+            var music_artist = objects[11] as MusicArtist;
+            Assert.AreEqual ("Boo Far", music_artist.Title);
+            Assert.AreEqual (1, music_artist.ChildCount);
+            Assert.AreEqual ("Bazz", music_artist.Genres[0]);
+
+            music_artist = objects[12] as MusicArtist;
+            Assert.AreEqual ("Our Lady J", music_artist.Title);
+            Assert.AreEqual (1, music_artist.ChildCount);
+            Assert.AreEqual ("Bazz", music_artist.Genres[0]);
+            Assert.AreEqual ("Electro Gospel", music_artist.Genres[1]);
         }
     }
 }
