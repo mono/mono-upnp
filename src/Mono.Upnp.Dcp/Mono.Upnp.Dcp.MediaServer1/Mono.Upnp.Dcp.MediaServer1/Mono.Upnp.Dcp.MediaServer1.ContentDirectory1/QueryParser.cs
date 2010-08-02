@@ -315,7 +315,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             protected virtual QueryParser OnFailure (string token)
             {
                 throw new QueryParsingException (string.Format (
-                    "Unexpected operator begining: {0}.", @operator));
+                    "Unexpected operator begining: {0}.", token));
             }
 
             protected override Query OnDone ()
