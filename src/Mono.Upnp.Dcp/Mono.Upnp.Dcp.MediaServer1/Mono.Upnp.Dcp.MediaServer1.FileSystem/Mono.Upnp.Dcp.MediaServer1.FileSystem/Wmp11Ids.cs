@@ -30,24 +30,51 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
     public static class Wmp11Ids
     {
         public const string Root = "0";
-
-        #region Music
         public const string Music = "1";
         public const string AllMusic = "4";
-        public const string Genre = "5";
-        public const string Artist = "6";
-        public const string Album = "7";
-        public const string Playlist = "F";
-        public const string Folder = "14";
-        public const string ContributingArtists = "100";
-        public const string AlbumArtist = "107";
-        public const string Composer = "108";
-        public const string Rating = "101";
-        public const string Rating1Star = "102";
-        public const string Rating2Star = "103";
-        public const string Rating3Star = "104";
-        public const string Rating4Star = "105";
-        public const string Rating5Star = "106";
-        #endregion
+        public const string MusicGenre = "5";
+        public const string MusicArtist = "6";
+        public const string MusicAlbum = "7";
+        public const string MusicPlaylists = "F";
+        public const string MusicFolders = "14";
+        public const string MusicContributingArtists = "100";
+        public const string MusicAlbumArtist = "107";
+        public const string MusicComposer = "108";
+        public const string MusicRating = "101";
+        public const string MusicRating1Star = "102";
+        public const string MusicRating2Star = "103";
+        public const string MusicRating3Star = "104";
+        public const string MusicRating4Star = "105";
+        public const string MusicRating5Star = "106";
+        public const string Video = "2";
+        public const string AllVideo = "8";
+        public const string VideoGenre = "9";
+        public const string VideoActor = "A";
+        public const string VideoSeries = "E";
+        public const string VidePlaylist = "10";
+        public const string VideoFolders = "15";
+        public const string VideoRating = "200";
+        public const string VideoRating1Star = "201";
+        public const string VideoRating2Star = "202";
+        public const string VideoRating3Star = "203";
+        public const string VideoRating4Star = "204";
+        public const string VideoRating5Star = "205";
+        public const string Pictures = "3";
+        public const string AllPictures = "B";
+        public const string PicturesDateTaken = "C";
+        public const string PicturesAlbums = "D";
+        public const string PicturesKeywords = "D2";
+        public const string PicturesPlaylist = "11";
+        public const string PicturesFolders = "16";
+        public const string PicturesRating = "300";
+        public const string PicturesRating1Star = "301";
+        public const string PicturesRating2Star = "302";
+        public const string PicturesRating3Star = "303";
+        public const string PicturesRating4Star = "304";
+        public const string PicturesRating5Star = "305";
+        public const string PicturesUnrated = "306";
+        public const string Playlists = "12";
+        public const string AllPlaylists = "13";
+        public const string PlaylistsFolders = "17";
     }
 }
