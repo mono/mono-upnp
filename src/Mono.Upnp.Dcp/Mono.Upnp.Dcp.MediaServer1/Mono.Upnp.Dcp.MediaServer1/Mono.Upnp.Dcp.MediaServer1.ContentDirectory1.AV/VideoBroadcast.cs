@@ -36,8 +36,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
         }
         
-        public VideoBroadcast (string id, VideoBroadcastOptions options)
-            : base (id, options)
+        public VideoBroadcast (string id, string parentId, VideoBroadcastOptions options)
+            : base (id, parentId, options)
         {
             Icon = options.Icon;
             Region = options.Region;

@@ -32,8 +32,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
     public class File : Item
     {
-        public File (string id, ItemOptions options)
-            : base (id, options)
+        public File (string id, string parentId, ItemOptions options)
+            : base (id, parentId, options)
         {
         }
     }

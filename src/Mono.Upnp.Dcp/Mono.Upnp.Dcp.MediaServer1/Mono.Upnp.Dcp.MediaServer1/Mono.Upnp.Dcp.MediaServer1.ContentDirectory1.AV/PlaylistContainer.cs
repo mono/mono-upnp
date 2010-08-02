@@ -39,8 +39,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
         }
 
-        public PlaylistContainer (string id, PlaylistContainerOptions options)
-            : base (id, options)
+        public PlaylistContainer (string id, string parentId, PlaylistContainerOptions options)
+            : base (id, parentId, options)
         {
             LongDescription = options.LongDescription;
             Description = options.Description;

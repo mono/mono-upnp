@@ -32,8 +32,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
 {
     public class StorageVolume : Container
     {
-        public StorageVolume (string id, StorageVolumeOptions options)
-            : base (id, options)
+        public StorageVolume (string id, string parentId, StorageVolumeOptions options)
+            : base (id, parentId, options)
         {
             StorageTotal = options.StorageTotal;
             StorageUsed = options.StorageUsed;

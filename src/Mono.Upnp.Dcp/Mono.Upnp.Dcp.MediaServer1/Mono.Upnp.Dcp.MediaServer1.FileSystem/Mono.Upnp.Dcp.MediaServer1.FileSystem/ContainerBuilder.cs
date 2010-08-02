@@ -60,10 +60,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             if (containers.TryGetValue (container, out container_options_info)) {
                 container_options_info.Options = optionsProducer (container_options_info.Options);
             } else {
-                container_options_info = new ContainerOptionsInfo<T> (optionsProducer (null));
+                container_options_info = new ContainerOptionsInfo<T> (GetId (), optionsProducer (null));
                 containers[container] = container_options_info;
             }
-            var reference = new Item (GetId (), new ItemOptions { RefId = item.Id });
+            var reference = new Item (GetId (), container_options_info.Id, new ItemOptions { RefId = item.Id });
             container_options_info.Children.Add (reference);
             consumer (reference);
         }

@@ -39,6 +39,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
     // See NetCompat_WMP11.docx
     public class Wmp11MusicBuilder
     {
+        const string music_id = "1";
         const string all_music_id = "4";
         const string genre_id = "5";
         const string artist_id = "6";
@@ -75,7 +76,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             var album_artists = tag.AlbumArtists;
             var composers = tag.Composers;
 
-            var music_track = new MusicTrack (GetId (), new MusicTrackOptions {
+            var music_track = new MusicTrack (GetId (), all_music_id, new MusicTrackOptions {
                 Title = tag.Title,
                 OriginalTrackNumber = (int)tag.Track,
                 Genres = genres,
@@ -131,24 +132,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         {
             var containers = new List<UpnpObject> (11);
 
-            var all_music = new Container (all_music_id, new ContainerOptions {
-                Title = "All Music",
-                ChildCount = audio_items.Count
-            });
-            containers.Add (all_music);
-            consumer (new ContainerInfo (all_music, audio_items));
+            BuildContainer (consumer, containers, all_music_id, "All Music", audio_items);
 
             BuildContainer (consumer, containers, genre_id, "Genre",
-                genre_builder.OnDone (consumer, options => new MusicGenre (GetId (), options)));
+                genre_builder.OnDone (consumer, options => new MusicGenre (GetId (), genre_id, options)));
 
             BuildContainer (consumer, containers, artist_id, "Artist",
-                artist_builder.OnDone (consumer, options => new MusicArtist (GetId (), options)));
+                artist_builder.OnDone (consumer, options => new MusicArtist (GetId (), artist_id, options)));
 
             BuildContainer (consumer, containers, album_artist_id, "Album Artist",
-                album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options)));
+                album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), album_artist_id, options)));
 
             BuildContainer (consumer, containers, composer_id, "Composer",
-                composer_builder.OnDone (consumer, options => new MusicArtist (GetId (), options)));
+                composer_builder.OnDone (consumer, options => new MusicArtist (GetId (), composer_id, options)));
 
             return containers;
         }
@@ -159,7 +155,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                                     string title,
                                     IList<UpnpObject> children)
         {
-            var container = new Container (id, new ContainerOptions {
+            var container = new Container (id, music_id, new ContainerOptions {
                 Title = title,
                 ChildCount = children.Count
             });

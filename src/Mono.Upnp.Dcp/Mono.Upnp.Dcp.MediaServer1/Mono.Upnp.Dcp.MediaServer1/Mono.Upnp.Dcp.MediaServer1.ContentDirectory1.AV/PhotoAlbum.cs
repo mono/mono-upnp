@@ -1,4 +1,4 @@
-// 
+ //
 // PhotoAlbum.cs
 //  
 // Author:
@@ -32,8 +32,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
         }
         
-        public PhotoAlbum (string id, AlbumOptions options)
-            : base (id, options)
+        public PhotoAlbum (string id, string parentId, AlbumOptions options)
+            : base (id, parentId, options)
         {
         }
     }

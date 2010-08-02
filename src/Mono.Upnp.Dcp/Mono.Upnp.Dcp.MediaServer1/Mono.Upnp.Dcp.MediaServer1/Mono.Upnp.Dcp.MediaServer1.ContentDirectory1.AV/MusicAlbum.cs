@@ -43,8 +43,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             AlbumArtUris = new List<Uri> ();
         }
         
-        public MusicAlbum (string id, MusicAlbumOptions options)
-            : base (id, options)
+        public MusicAlbum (string id, string parentId, MusicAlbumOptions options)
+            : base (id, parentId, options)
         {
             Toc = options.Toc;
             Artists = Helper.MakeReadOnlyCopy (options.Artists);

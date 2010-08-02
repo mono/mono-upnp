@@ -41,8 +41,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             ScheduledEndTimes = new List<DateTime> ();
         }
         
-        public Movie (string id, MovieOptions options)
-            : base (id, options)
+        public Movie (string id, string parentId, MovieOptions options)
+            : base (id, parentId, options)
         {
             StorageMedium = options.StorageMedium;
             DvdRegionCode = options.DvdRegionCode;

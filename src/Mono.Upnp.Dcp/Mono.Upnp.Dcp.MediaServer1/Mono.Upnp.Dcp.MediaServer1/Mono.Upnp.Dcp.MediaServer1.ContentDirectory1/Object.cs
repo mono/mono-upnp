@@ -40,15 +40,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             Resources = new List<Resource> ();
         }
         
-        public Object (string id, ObjectOptions options)
+        public Object (string id, string parentId, ObjectOptions options)
         {
             if (id == null) {
                 throw new ArgumentNullException ("id");
+            } else if (parentId == null) {
+                throw new ArgumentNullException ("parentId");
             } else if (options == null) {
                 throw new ArgumentNullException ("options");
             }
 
             Id = id;
+            ParentId = parentId;
             Title = options.Title;
             Creator = options.Creator;
             WriteStatus = options.WriteStatus;

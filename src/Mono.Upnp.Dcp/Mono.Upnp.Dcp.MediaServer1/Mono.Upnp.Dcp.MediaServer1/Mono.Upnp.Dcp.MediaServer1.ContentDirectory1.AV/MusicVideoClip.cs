@@ -44,8 +44,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Contributors = new List<string> ();
         }
         
-        public MusicVideoClip (string id, MusicVideoClipOptions options)
-            : base (id, options)
+        public MusicVideoClip (string id, string parentId, MusicVideoClipOptions options)
+            : base (id, parentId, options)
         {
             Date = options.Date;
             StorageMedium = options.StorageMedium;

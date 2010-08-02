@@ -43,8 +43,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Rights = new List<string> ();
         }
         
-        public AudioItem (string id, AudioItemOptions options)
-            : base (id, options)
+        public AudioItem (string id, string parentId, AudioItemOptions options)
+            : base (id, parentId, options)
         {
             Description = options.Description;
             LongDescription = options.LongDescription;

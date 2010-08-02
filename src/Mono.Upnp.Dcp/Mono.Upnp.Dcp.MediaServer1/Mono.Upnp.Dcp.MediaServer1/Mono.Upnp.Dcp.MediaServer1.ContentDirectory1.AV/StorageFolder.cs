@@ -36,8 +36,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
         }
         
-        public StorageFolder (string id, StorageFolderOptions options)
-            : base (id, options)
+        public StorageFolder (string id, string parentId, StorageFolderOptions options)
+            : base (id, parentId, options)
         {
             StorageUsed = options.StorageUsed;
         }

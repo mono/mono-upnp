@@ -37,8 +37,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
         }
 
-        public Item (string id, ItemOptions options)
-            : base (id, options)
+        public Item (string id, string parentId, ItemOptions options)
+            : base (id, parentId, options)
         {
             RefId = options.RefId;
         }

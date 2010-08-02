@@ -32,7 +32,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
     public class DummyObject : Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object
     {
         public DummyObject ()
-            : base ("-1", new ObjectOptions ())
+            : base ("-1", "-1", new ObjectOptions ())
         {
         }
 

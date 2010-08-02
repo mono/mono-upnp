@@ -45,8 +45,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Relations = new List<Uri> ();
         }
         
-        public VideoItem (string id, VideoItemOptions options)
-            : base (id, options)
+        public VideoItem (string id, string parentId, VideoItemOptions options)
+            : base (id, parentId, options)
         {
             Description = options.Description;
             LongDescription = options.LongDescription;

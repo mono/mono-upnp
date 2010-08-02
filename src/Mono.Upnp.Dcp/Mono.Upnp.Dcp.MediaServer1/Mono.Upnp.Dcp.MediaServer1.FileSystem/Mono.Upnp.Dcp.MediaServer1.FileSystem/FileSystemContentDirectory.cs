@@ -91,7 +91,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         {
             if (path == null) throw new ArgumentNullException ("path");
             
-            var root = new StorageFolder ((id++).ToString (), new StorageFolderOptions {
+            var root = new StorageFolder ((id++).ToString (), "-1", new StorageFolderOptions {
                 IsRestricted = true,
                 Title = "root",
                 ChildCount = 1
@@ -354,7 +354,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 //                    IsRestricted = true
 //                };
             default:
-                return new File ((id++).ToString (), new ItemOptions {
+                return new File ((id++).ToString (), parent.Id, new ItemOptions {
                     Title = Path.GetFileNameWithoutExtension (path),
                     IsRestricted = true
                 });
@@ -422,7 +422,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 seperator += 1;
                 name = name.Substring (seperator, name.Length - seperator);
             }
-            var folder = new StorageFolder ((id++).ToString (), new StorageFolderOptions {
+            var folder = new StorageFolder ((id++).ToString (), "-1", new StorageFolderOptions {
                 Title = name,
                 ChildCount = directories.Length + files.Length,
                 IsRestricted = true

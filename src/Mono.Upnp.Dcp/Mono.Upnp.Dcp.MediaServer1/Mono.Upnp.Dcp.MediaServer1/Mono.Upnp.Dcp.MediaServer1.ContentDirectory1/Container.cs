@@ -42,8 +42,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             CreateClasses = new List<ClassReference> ();
         }
 
-        public Container (string id, ContainerOptions options)
-            : base (id, options)
+        public Container (string id, string parentId, ContainerOptions options)
+            : base (id, parentId, options)
         {
             ChildCount = options.ChildCount;
             IsSearchable = options.IsSearchable;

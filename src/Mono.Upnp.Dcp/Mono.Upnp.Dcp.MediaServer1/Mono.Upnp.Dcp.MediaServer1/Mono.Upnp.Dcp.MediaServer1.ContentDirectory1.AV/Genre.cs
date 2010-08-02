@@ -36,8 +36,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
         }
         
-        public Genre (string id, GenreOptions options)
-            : base (id, options)
+        public Genre (string id, string parentId, GenreOptions options)
+            : base (id, parentId, options)
         {
             Description = options.Description;
             LongDescription = options.LongDescription;

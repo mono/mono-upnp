@@ -44,8 +44,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Rights = new List<string> ();
         }
         
-        public TextItem (string id, TextItemOptions options)
-            : base (id, options)
+        public TextItem (string id, string parentId, TextItemOptions options)
+            : base (id, parentId, options)
         {
             Protection = options.Protection;
             LongDescription = options.LongDescription;

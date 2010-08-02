@@ -41,8 +41,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Rights = new List<string> ();
         }
         
-        public ImageItem (string id, ImageItemOptions options)
-            : base (id, options)
+        public ImageItem (string id, string parentId, ImageItemOptions options)
+            : base (id, parentId, options)
         {
             LongDescription = options.LongDescription;
             StorageMedium = options.StorageMedium;

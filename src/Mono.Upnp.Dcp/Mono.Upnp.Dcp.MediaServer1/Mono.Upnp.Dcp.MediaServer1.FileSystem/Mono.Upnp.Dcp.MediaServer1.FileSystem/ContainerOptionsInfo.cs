@@ -35,11 +35,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
     public class ContainerOptionsInfo<T>
     {
-        public ContainerOptionsInfo (T options)
+        readonly string id;
+
+        public ContainerOptionsInfo (string id, T options)
         {
+            this.id = id;
             Options = options;
             Children = new List<UpnpObject> ();
         }
+
+        public string Id { get { return id; } }
 
         public T Options { get; set; }
 

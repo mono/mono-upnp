@@ -36,8 +36,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
         }
         
-        public AudioBroadcast (string id, AudioBroadcastOptions options)
-            : base (id, options)
+        public AudioBroadcast (string id, string parentId, AudioBroadcastOptions options)
+            : base (id, parentId, options)
         {
             Region = options.Region;
             RadioCallSign = options.RadioCallSign;

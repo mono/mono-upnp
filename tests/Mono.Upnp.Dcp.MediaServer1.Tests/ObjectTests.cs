@@ -82,7 +82,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new ObjectOptions ();
             SetObjectOptions (options);
-            var @object = new Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object ("-1", options);
+            var @object = new Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object ("-1", "-1", options);
             Assert.AreEqual ("-1", @object.Id);
             AssertObject (@object, options);
             AssertObject (@object, @object.GetOptions ());
@@ -118,7 +118,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new ItemOptions ();
             SetItemOptions (options);
-            var item = new Item ("-1", options);
+            var item = new Item ("-1", "-1", options);
             AssertItem (item, options);
             AssertItem (item, item.GetOptions ());
         }
@@ -141,7 +141,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new ContainerOptions ();
             SetContainerOptions (options);
-            var container = new Container ("-1", options);
+            var container = new Container ("-1", "-1", options);
             AssertContainer (container, options);
             AssertContainer (container, container.GetOptions ());
         }
@@ -172,7 +172,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new AlbumOptions ();
             SetAlbumOptions (options);
-            var album = new Album ("-1", options);
+            var album = new Album ("-1", "-1", options);
             AssertAlbum (album, options);
             AssertAlbum (album, album.GetOptions ());
         }
@@ -212,7 +212,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new AudioBookOptions ();
             SetAudioBookOptions (options);
-            var audio_book = new AudioBook ("-1", options);
+            var audio_book = new AudioBook ("-1", "-1", options);
             AssertAudioBook (audio_book, options);
             AssertAudioBook (audio_book, audio_book.GetOptions ());
         }
@@ -242,7 +242,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new AudioBroadcastOptions ();
             SetAudioBroadcastOptions (options);
-            var audio_broadcast = new AudioBroadcast ("-1", options);
+            var audio_broadcast = new AudioBroadcast ("-1", "-1", options);
             AssertAudioBroadcast (audio_broadcast, options);
             AssertAudioBroadcast (audio_broadcast, audio_broadcast.GetOptions ());
         }
@@ -272,7 +272,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new AudioItemOptions ();
             SetAudioItemOptions (options);
-            var audio_item = new AudioItem ("-1", options);
+            var audio_item = new AudioItem ("-1", "-1", options);
             AssertAudioItem (audio_item, options);
             AssertAudioItem (audio_item, audio_item.GetOptions ());
         }
@@ -310,7 +310,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new GenreOptions ();
             SetGenreOptions (options);
-            var genre = new Genre ("-1", options);
+            var genre = new Genre ("-1", "-1", options);
             AssertGenre (genre, options);
             AssertGenre (genre, genre.GetOptions ());
         }
@@ -334,7 +334,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new ImageItemOptions ();
             SetImageItemOptions (options);
-            var image_item = new ImageItem ("-1", options);
+            var image_item = new ImageItem ("-1", "-1", options);
             AssertImageItem (image_item, options);
             AssertImageItem (image_item, image_item.GetOptions ());
         }
@@ -370,7 +370,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new MovieOptions ();
             SetMovieOptions (options);
-            var movie = new Movie ("-1", options);
+            var movie = new Movie ("-1", "-1", options);
             AssertMovie (movie, options);
             AssertMovie (movie, movie.GetOptions ());
         }
@@ -402,7 +402,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new MusicAlbumOptions ();
             SetMusicAlbumOptions (options);
-            var music_album = new MusicAlbum ("-1", options);
+            var music_album = new MusicAlbum ("-1", "-1", options);
             AssertMusicAlbum (music_album, options);
             AssertMusicAlbum (music_album, music_album.GetOptions ());
         }
@@ -436,7 +436,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new MusicArtistOptions ();
             SetMusicArtistOptions (options);
-            var music_artist = new MusicArtist ("-1", options);
+            var music_artist = new MusicArtist ("-1", "-1", options);
             AssertMusicArtist (music_artist, options);
             AssertMusicArtist (music_artist, music_artist.GetOptions ());
         }
@@ -457,7 +457,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new MusicTrackOptions ();
             SetMusicTrackOptions (options);
-            var music_track = new MusicTrack ("-1", options);
+            var music_track = new MusicTrack ("-1", "-1", options);
             AssertMusicTrack (music_track, options);
             AssertMusicTrack (music_track, music_track.GetOptions ());
         }
@@ -497,7 +497,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new MusicVideoClipOptions ();
             SetMusicVideoClipOptions (options);
-            var music_video_clip = new MusicVideoClip ("-1", options);
+            var music_video_clip = new MusicVideoClip ("-1", "-1", options);
             AssertMusicVideoClip (music_video_clip, options);
             AssertMusicVideoClip (music_video_clip, music_video_clip.GetOptions ());
         }
@@ -536,7 +536,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new PersonOptions ();
             SetPersonOptions (options);
-            var person = new Person ("-1", options);
+            var person = new Person ("-1", "-1", options);
             AssertPerson (person, options);
             AssertPerson (person, person.GetOptions ());
         }
@@ -558,7 +558,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new PhotoOptions ();
             SetPhotoOptions (options);
-            var photo = new Photo ("-1", options);
+            var photo = new Photo ("-1", "-1", options);
             AssertPhoto (photo, options);
             AssertPhoto (photo, photo.GetOptions ());
         }
@@ -581,7 +581,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new PlaylistContainerOptions ();
             SetPlaylistContainerOptions (options);
-            var playlist_container = new PlaylistContainer ("-1", options);
+            var playlist_container = new PlaylistContainer ("-1", "-1", options);
             AssertPlaylistContainer (playlist_container, options);
             AssertPlaylistContainer (playlist_container, playlist_container.GetOptions ());
         }
@@ -623,7 +623,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new PlaylistItemOptions ();
             SetPlaylistItemOptions (options);
-            var playlist_item = new PlaylistItem ("-1", options);
+            var playlist_item = new PlaylistItem ("-1", "-1", options);
             AssertPlaylistItem (playlist_item, options);
             AssertPlaylistItem (playlist_item, playlist_item.GetOptions ());
         }
@@ -659,7 +659,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new StorageFolderOptions ();
             SetStorageFolderOptions (options);
-            var storage_folder = new StorageFolder ("-1", options);
+            var storage_folder = new StorageFolder ("-1", "-1", options);
             AssertStorageFolder (storage_folder, options);
             AssertStorageFolder (storage_folder, storage_folder.GetOptions ());
         }
@@ -681,7 +681,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new StorageSystemOptions ();
             SetStorageSystemOptions (options);
-            var storage_system = new StorageSystem ("-1", options);
+            var storage_system = new StorageSystem ("-1", "-1", options);
             AssertStorageSystem (storage_system, options);
             AssertStorageSystem (storage_system, storage_system.GetOptions ());
         }
@@ -707,7 +707,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new StorageVolumeOptions ();
             SetStorageVolumeOptions (options);
-            var storage_volume = new StorageVolume ("-1", options);
+            var storage_volume = new StorageVolume ("-1", "-1", options);
             AssertStorageVolume (storage_volume, options);
             AssertStorageVolume (storage_volume, storage_volume.GetOptions ());
         }
@@ -734,7 +734,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new TextItemOptions ();
             SetTextItemOptions (options);
-            var text_item = new TextItem ("-1", options);
+            var text_item = new TextItem ("-1", "-1", options);
             AssertTextItem (text_item, options);
             AssertTextItem (text_item, text_item.GetOptions ());
         }
@@ -782,7 +782,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new VideoBroadcastOptions ();
             SetVideoBroadcastOptions (options);
-            var video_broadcast = new VideoBroadcast ("-1", options);
+            var video_broadcast = new VideoBroadcast ("-1", "-1", options);
             AssertVideoBroadcast (video_broadcast, options);
             AssertVideoBroadcast (video_broadcast, video_broadcast.GetOptions ());
         }
@@ -808,7 +808,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var options = new VideoItemOptions ();
             SetVideoItemOptions (options);
-            var video_item = new VideoItem ("-1", options);
+            var video_item = new VideoItem ("-1", "-1", options);
             AssertVideoItem (video_item, options);
             AssertVideoItem (video_item, video_item.GetOptions ());
         }

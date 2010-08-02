@@ -43,8 +43,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Contributors = new List<string> ();
         }
         
-        public MusicTrack (string id, MusicTrackOptions options)
-            : base (id, options)
+        public MusicTrack (string id, string parentId, MusicTrackOptions options)
+            : base (id, parentId, options)
         {
             AlbumArtUri = options.AlbumArtUri;
             Date = options.Date;

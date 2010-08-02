@@ -32,8 +32,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
         }
         
-        public MusicGenre (string id, GenreOptions options)
-            : base (id, options)
+        public MusicGenre (string id, string parentId, GenreOptions options)
+            : base (id, parentId, options)
         {
         }
     }

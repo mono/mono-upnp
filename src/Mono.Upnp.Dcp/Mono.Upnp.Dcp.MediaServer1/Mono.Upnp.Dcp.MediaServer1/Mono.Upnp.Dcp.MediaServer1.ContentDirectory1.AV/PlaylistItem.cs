@@ -39,8 +39,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
         }
         
-        public PlaylistItem (string id, PlaylistItemOptions options)
-            : base (id, options)
+        public PlaylistItem (string id, string parentId, PlaylistItemOptions options)
+            : base (id, parentId, options)
         {
             LongDescription = options.LongDescription;
             StorageMedium = options.StorageMedium;

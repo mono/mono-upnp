@@ -41,8 +41,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Contributors = new List<string> ();
         }
         
-        public AudioBook (string id, AudioBookOptions options)
-            : base (id, options)
+        public AudioBook (string id, string parentId, AudioBookOptions options)
+            : base (id, parentId, options)
         {
             StorageMedium = options.StorageMedium;
             Date = options.Date;

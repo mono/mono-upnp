@@ -36,8 +36,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
         }
         
-        public Person (string id, PersonOptions options)
-            : base (id, options)
+        public Person (string id, string parentId, PersonOptions options)
+            : base (id, parentId, options)
         {
             Language = options.Language;
         }

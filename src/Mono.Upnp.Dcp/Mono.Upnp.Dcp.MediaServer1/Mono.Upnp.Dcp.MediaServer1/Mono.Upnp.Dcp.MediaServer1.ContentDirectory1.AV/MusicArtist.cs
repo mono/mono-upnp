@@ -40,8 +40,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Genres = new List<string> ();
         }
         
-        public MusicArtist (string id, MusicArtistOptions options)
-            : base (id, options)
+        public MusicArtist (string id, string parentId, MusicArtistOptions options)
+            : base (id, parentId, options)
         {
             ArtistDiscographyUri = options.ArtistDiscographyUri;
             Genres = Helper.MakeReadOnlyCopy (options.Genres);

@@ -40,8 +40,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             Albums = new List<string> ();
         }
         
-        public Photo (string id, PhotoOptions options)
-            : base (id, options)
+        public Photo (string id, string parentId, PhotoOptions options)
+            : base (id, parentId, options)
         {
             Albums = Helper.MakeReadOnlyCopy (options.Albums);
         }
