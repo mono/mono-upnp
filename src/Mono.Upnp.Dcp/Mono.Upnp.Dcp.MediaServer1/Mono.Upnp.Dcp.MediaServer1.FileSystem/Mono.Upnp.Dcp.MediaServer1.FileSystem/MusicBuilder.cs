@@ -73,39 +73,38 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             var artists = tag.Performers;
             var album_artists = tag.AlbumArtists;
             var composers = tag.Composers;
-            var music_track_options = new MusicTrackOptions {
+
+            var music_track = new MusicTrack (GetId (), new MusicTrackOptions {
                 Title = tag.Title,
                 OriginalTrackNumber = (int)tag.Track,
                 Genres = genres,
                 Artists = GetArtists (artists)
-            };
-
-            var audioItem = new MusicTrack (GetId (), music_track_options);
-            consumer (audioItem);
+            });
+            consumer (music_track);
 
             foreach (var genre in genres) {
-                genre_builder.OnItem (genre, audioItem, consumer,
+                genre_builder.OnItem (genre, music_track, consumer,
                     options => options != null ? options : new GenreOptions { Title = genre });
             }
 
             foreach (var artist in artists) {
-                artist_builder.OnItem (artist, audioItem, consumer,
+                artist_builder.OnItem (artist, music_track, consumer,
                     options => ArtistWithGenres (artist, genres, options));
             }
 
-            album_builder.OnItem (tag.Album, audioItem, consumer,
+            album_builder.OnItem (tag.Album, music_track, consumer,
                 options => options != null ? options : new MusicAlbumOptions {
                     Title = tag.Album,
                     Contributors = album_artists
                 });
 
             foreach (var album_artist in album_artists) {
-                album_artist_builder.OnItem (album_artist, audioItem, consumer,
+                album_artist_builder.OnItem (album_artist, music_track, consumer,
                     options => ArtistWithGenres (album_artist, genres, options));
             }
 
             foreach (var composer in composers) {
-                composer_builder.OnItem (composer, audioItem, consumer,
+                composer_builder.OnItem (composer, music_track, consumer,
                     options => ArtistWithGenres (composer, genres, options));
             }
         }
@@ -128,10 +127,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         public void OnDone (Action<ContainerInfo> consumer)
         {
             genre_builder.OnDone (consumer, options => new MusicGenre (genre_id, options));
-            artist_builder.OnDone (consumer, options => new MusicArtist (GetId (), options));
-            album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options));
-            album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options));
-            composer_builder.OnDone (consumer, options => new MusicArtist (GetId (), options));
+            artist_builder.OnDone (consumer, options => new MusicArtist (artist_id, options));
+            album_builder.OnDone (consumer, options => new MusicAlbum (album_id, options));
+            composer_builder.OnDone (consumer, options => new MusicArtist (composer_id, options));
         }
 
         string GetId ()
