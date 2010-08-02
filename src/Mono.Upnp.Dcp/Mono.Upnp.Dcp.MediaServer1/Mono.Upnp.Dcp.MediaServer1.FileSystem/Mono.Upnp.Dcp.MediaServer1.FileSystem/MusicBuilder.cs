@@ -36,13 +36,36 @@ using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
+    // See NetCompat_WMP11.docx
     public class MusicBuilder
     {
-        ContainerBuilder<GenreOptions> genre_builder = new ContainerBuilder<GenreOptions> ();
-        ContainerBuilder<BuildableMusicArtistOptions> artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> ();
-        ContainerBuilder<MusicAlbumOptions> album_builder = new ContainerBuilder<MusicAlbumOptions> ();
-        ContainerBuilder<BuildableMusicArtistOptions> album_artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> ();
-        ContainerBuilder<BuildableMusicArtistOptions> composer_builder = new ContainerBuilder<BuildableMusicArtistOptions> ();
+        const string music_id = "1";
+        const string all_music_id = "4";
+        const string genre_id = "5";
+        const string artist_id = "6";
+        const string album_id = "7";
+        const string playlist_id = "F";
+        const string folder_id = "14";
+        const string contributing_artists_id = "100";
+        const string album_artist_id = "107";
+        const string composer_id = "108";
+        const string rating_id = "101";
+        const string rating_1_star_id = "102";
+        const string rating_2_star_id = "103";
+        const string rating_3_star_id = "104";
+        const string rating_4_star_id = "105";
+        const string rating_5_star_id = "106";
+
+        ContainerBuilder<GenreOptions> genre_builder =
+            new ContainerBuilder<GenreOptions> ();
+        ContainerBuilder<BuildableMusicArtistOptions> artist_builder =
+            new ContainerBuilder<BuildableMusicArtistOptions> ();
+        ContainerBuilder<MusicAlbumOptions> album_builder =
+            new ContainerBuilder<MusicAlbumOptions> ();
+        ContainerBuilder<BuildableMusicArtistOptions> album_artist_builder =
+            new ContainerBuilder<BuildableMusicArtistOptions> ();
+        ContainerBuilder<BuildableMusicArtistOptions> composer_builder =
+            new ContainerBuilder<BuildableMusicArtistOptions> ();
 
         public void OnTag (Tag tag, Action<UpnpObject> consumer)
         {
@@ -104,7 +127,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
         public void OnDone (Action<ContainerInfo> consumer)
         {
-            genre_builder.OnDone (consumer, options => new MusicGenre (GetId (), options));
+            genre_builder.OnDone (consumer, options => new MusicGenre (genre_id, options));
             artist_builder.OnDone (consumer, options => new MusicArtist (GetId (), options));
             album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options));
             album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), options));
