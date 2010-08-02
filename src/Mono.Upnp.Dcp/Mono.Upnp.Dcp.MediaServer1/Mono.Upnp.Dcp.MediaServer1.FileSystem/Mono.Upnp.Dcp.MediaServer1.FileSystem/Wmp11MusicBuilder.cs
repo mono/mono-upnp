@@ -1,5 +1,5 @@
 // 
-// MusicBuilder.cs
+// Wmp11MusicBuilder.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -37,7 +37,7 @@ using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
     // See NetCompat_WMP11.docx
-    public class MusicBuilder
+    public class Wmp11MusicBuilder
     {
         const string music_id = "1";
         const string all_music_id = "4";
@@ -80,6 +80,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 Genres = genres,
                 Artists = GetArtists (artists)
             });
+
             consumer (music_track);
 
             foreach (var genre in genres) {

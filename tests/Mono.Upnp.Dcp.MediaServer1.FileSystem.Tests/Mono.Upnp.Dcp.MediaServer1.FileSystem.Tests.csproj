@@ -45,7 +45,7 @@
   <ItemGroup>
     <Compile Include="ContentDirectoryTests.cs" />
     <Compile Include="DummyConnectionManager.cs" />
-    <Compile Include="MusicBuilderTests.cs" />
+    <Compile Include="Wmp11MusicBuilderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">

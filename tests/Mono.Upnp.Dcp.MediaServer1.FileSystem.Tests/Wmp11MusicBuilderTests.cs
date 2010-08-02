@@ -1,5 +1,5 @@
 // 
-// MusicBuilderTests.cs
+// Wmp11MusicBuilderTests.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -38,12 +38,12 @@ using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
 {
     [TestFixture]
-    public class MusicBuilderTests
+    public class Wmp11MusicBuilderTests
     {
         [Test]
         public void BasicTag ()
         {
-            var builder = new MusicBuilder ();
+            var builder = new Wmp11MusicBuilder ();
             var objects = new List<UpnpObject> ();
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
@@ -59,7 +59,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         [Test]
         public void BasicGenreTag ()
         {
-            var builder = new MusicBuilder ();
+            var builder = new Wmp11MusicBuilder ();
             var objects = new List<UpnpObject> ();
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
@@ -84,7 +84,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         [Test]
         public void MultipleGenresTag ()
         {
-            var builder = new MusicBuilder ();
+            var builder = new Wmp11MusicBuilder ();
             var objects = new List<UpnpObject> ();
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
@@ -115,7 +115,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         [Test]
         public void BasicArtistTag ()
         {
-            var builder = new MusicBuilder ();
+            var builder = new Wmp11MusicBuilder ();
             var objects = new List<UpnpObject> ();
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
@@ -139,7 +139,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         [Test]
         public void BasicArtistAndGenreTag ()
         {
-            var builder = new MusicBuilder ();
+            var builder = new Wmp11MusicBuilder ();
             var objects = new List<UpnpObject> ();
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
