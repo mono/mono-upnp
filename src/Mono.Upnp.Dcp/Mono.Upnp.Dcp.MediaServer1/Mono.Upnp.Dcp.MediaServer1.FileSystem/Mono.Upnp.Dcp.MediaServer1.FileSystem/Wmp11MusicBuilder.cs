@@ -116,17 +116,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
             BuildContainer (consumer, containers, Wmp11Ids.AllMusic, "All Music", audio_items);
 
-            BuildContainer (consumer, containers, Wmp11Ids.Genre, "Genre",
-                genre_builder.OnDone (consumer, options => new MusicGenre (GetId (), Wmp11Ids.Genre, options)));
+            BuildContainer (consumer, containers, Wmp11Ids.MusicGenre, "Genre", genre_builder.OnDone (
+                consumer, options => new MusicGenre (GetId (), Wmp11Ids.MusicGenre, options)));
 
-            BuildContainer (consumer, containers, Wmp11Ids.Artist, "Artist",
-                artist_builder.OnDone (consumer, options => new MusicArtist (GetId (), Wmp11Ids.Artist, options)));
+            BuildContainer (consumer, containers, Wmp11Ids.MusicArtist, "Artist", artist_builder.OnDone (
+                consumer, options => new MusicArtist (GetId (), Wmp11Ids.MusicArtist, options)));
 
-            BuildContainer (consumer, containers, Wmp11Ids.AlbumArtist, "Album Artist",
-                album_builder.OnDone (consumer, options => new MusicAlbum (GetId (), Wmp11Ids.AlbumArtist, options)));
+            BuildContainer (consumer, containers, Wmp11Ids.MusicAlbumArtist, "Album Artist", album_builder.OnDone (
+                consumer, options => new MusicAlbum (GetId (), Wmp11Ids.MusicAlbumArtist, options)));
 
-            BuildContainer (consumer, containers, Wmp11Ids.Composer, "Composer",
-                composer_builder.OnDone (consumer, options => new MusicArtist (GetId (), Wmp11Ids.Composer, options)));
+            BuildContainer (consumer, containers, Wmp11Ids.MusicComposer, "Composer", composer_builder.OnDone (
+                consumer, options => new MusicArtist (GetId (), Wmp11Ids.MusicComposer, options)));
 
             return containers;
         }
