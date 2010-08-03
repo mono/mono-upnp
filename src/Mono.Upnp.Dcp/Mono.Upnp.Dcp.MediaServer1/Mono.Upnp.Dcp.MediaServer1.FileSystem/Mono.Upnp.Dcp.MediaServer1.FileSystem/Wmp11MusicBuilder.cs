@@ -141,8 +141,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 Title = title,
                 ChildCount = children.Count
             });
-            containers.Add (container);
             consumer (new ContainerInfo (container, children));
+            containers.Add (container);
         }
 
         string GetId ()
