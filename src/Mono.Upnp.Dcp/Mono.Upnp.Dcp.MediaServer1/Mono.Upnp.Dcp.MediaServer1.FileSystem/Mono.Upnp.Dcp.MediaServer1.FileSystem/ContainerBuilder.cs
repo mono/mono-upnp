@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
-using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
+using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
@@ -43,7 +43,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
         Dictionary<string, ContainerOptionsInfo<T>> containers = new Dictionary<string, ContainerOptionsInfo<T>> ();
 
-        public void OnItem (string container, Item item, Action<UpnpObject> consumer, OptionsProducer optionsProducer)
+        public void OnItem (string container, Item item, Action<Object> consumer, OptionsProducer optionsProducer)
         {
             // And have I mentioned how much I LOVE null checking! It's 2010: do you know where your type system is?
             if (container == null) {
@@ -68,7 +68,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             consumer (reference);
         }
 
-        public IList<UpnpObject> OnDone (Action<ContainerInfo> consumer, ContainerProducer containerProducer)
+        public IList<Object> OnDone (Action<ContainerInfo> consumer, ContainerProducer containerProducer)
         {
             if (consumer == null) {
                 throw new ArgumentNullException ("consumer");
@@ -76,7 +76,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 throw new ArgumentNullException ("containerProducer");
             }
 
-            var children = new List<UpnpObject> (containers.Count);
+            var children = new List<Object> (containers.Count);
 
             foreach (var container_info in containers.Values) {
                 container_info.Options.ChildCount = container_info.Children.Count;

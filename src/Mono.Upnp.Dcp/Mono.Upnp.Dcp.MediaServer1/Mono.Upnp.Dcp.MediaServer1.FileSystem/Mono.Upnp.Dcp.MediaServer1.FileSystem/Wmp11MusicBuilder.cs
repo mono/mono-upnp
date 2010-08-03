@@ -32,13 +32,13 @@ using TagLib;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 
-using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
+using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
     public class Wmp11MusicBuilder
     {
-        List<UpnpObject> audio_items = new List<UpnpObject> ();
+        List<Object> audio_items = new List<Object> ();
 
         ContainerBuilder<GenreOptions> genre_builder =
             new ContainerBuilder<GenreOptions> ();
@@ -51,7 +51,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         ContainerBuilder<BuildableMusicArtistOptions> composer_builder =
             new ContainerBuilder<BuildableMusicArtistOptions> ();
 
-        public void OnTag (Tag tag, Action<UpnpObject> consumer)
+        public void OnTag (Tag tag, Action<Object> consumer)
         {
             var genres = tag.Genres;
             var artists = tag.Performers;
@@ -110,9 +110,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             return options;
         }
 
-        public IList<UpnpObject> OnDone (Action<ContainerInfo> consumer)
+        public IList<Object> OnDone (Action<ContainerInfo> consumer)
         {
-            var containers = new List<UpnpObject> (11);
+            var containers = new List<Object> (11);
 
             containers.Add (BuildContainer (consumer, Wmp11Ids.AllMusic, "All Music", audio_items));
 
@@ -134,7 +134,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         static Container BuildContainer (Action<ContainerInfo> consumer,
                                         string id,
                                         string title,
-                                        IList<UpnpObject> children)
+                                        IList<Object> children)
         {
             var container = new Container (id, Wmp11Ids.Music, new ContainerOptions {
                 Title = title,

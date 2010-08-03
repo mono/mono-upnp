@@ -294,12 +294,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             get { return string.Empty; }
         }
         
-        protected override IXmlSerializable GetObject (string objectId)
+        protected override Object GetObject (string objectId)
         {
             return object_cache[int.Parse (objectId)].Object;
         }
         
-        protected override IEnumerable<IXmlSerializable> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria, out int totalMatches)
+        protected override IEnumerable<Object> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria, out int totalMatches)
         {
             var id = int.Parse (objectId);
             var container = (Container)object_cache[id].Object;
@@ -307,7 +307,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             return GetChildren (objectId, startIndex, requestCount, sortCriteria);
         }
         
-        protected virtual IEnumerable<IXmlSerializable> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria)
+        protected virtual IEnumerable<Object> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria)
         {
             Range range;
             

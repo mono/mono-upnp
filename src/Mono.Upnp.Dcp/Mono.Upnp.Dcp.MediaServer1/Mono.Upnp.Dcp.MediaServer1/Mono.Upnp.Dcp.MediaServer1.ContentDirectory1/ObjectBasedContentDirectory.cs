@@ -33,49 +33,70 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class ObjectBasedContentDirectory : ContentDirectory
     {
-        [XmlType ("DIDL-Lite", Schemas.DidlLiteSchema)]
-        [XmlNamespace (Schemas.DublinCoreSchema, "dc")]
-        [XmlNamespace (Schemas.UpnpSchema, "upnp")]
-        class ResultsWrapper : IXmlSerializable
-        {
-            readonly IEnumerable<IXmlSerializable> results;
-            
-            public ResultsWrapper (IXmlSerializable result)
-                : this (Single (result))
-            {
-            }
-            
-            public ResultsWrapper (IEnumerable<IXmlSerializable> results)
-            {
-                this.results = results;
-            }
-            
-            public IEnumerable<IXmlSerializable> Results {
-                get { return results; }
-            }
-            
-            public int ResultsCount { get; private set; }
-            
-            static IEnumerable<IXmlSerializable> Single (IXmlSerializable item)
-            {
-                yield return item;
-            }
-            
-            public void SerializeSelfAndMembers (XmlSerializationContext context)
-            {
-                context.AutoSerializeObjectAndMembers (this);
-            }
-            
-            public void SerializeMembersOnly (XmlSerializationContext context)
-            {
-                foreach (var result in Results) {
-                    result.SerializeSelfAndMembers (context);
-                    ResultsCount++;
-                }
-            }
-        }
-        
         readonly XmlSerializer serializer = new XmlSerializer ();
+        Dictionary<Type, ObjectQueryContext> queryContexts = new Dictionary<Type, ObjectQueryContext>();
+
+        ObjectQueryContext GetQueryContext (Type type)
+        {
+            if (type == null) {
+                return null;
+            }
+
+            ObjectQueryContext context;
+            if (!queryContexts.TryGetValue (type, out context)) {
+                context = new ObjectQueryContext (type, GetQueryContext (type.BaseType));
+                queryContexts[type] = context;
+            }
+
+            return context;
+        }
+
+        public override bool CanSearch {
+            get { return true; }
+        }
+
+        protected override string Search (string containerId,
+                                          Query query,
+                                          string filter,
+                                          int startingIndex,
+                                          int requestCount,
+                                          string sortCriteria,
+                                          out int numberReturned,
+                                          out int totalMatches,
+                                          out string updateId)
+        {
+            updateId = "0";
+            var results = new ResultsWrapper (
+                Search (containerId, query, filter, startingIndex, requestCount, sortCriteria, out totalMatches));
+            var xml = serializer.GetString (results,
+                new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.None });
+            numberReturned = results.ResultsCount;
+            return xml;
+        }
+
+        protected virtual IEnumerable<Object> Search (string containerId,
+                                                      Query query,
+                                                      string filter,
+                                                      int startingIndex,
+                                                      int requestCount,
+                                                      string sortCriteria,
+                                                      out int totalMatches)
+        {
+            var results = new List<Object> (requestCount);
+            var count = 0;
+            Action<Object> consumer = result => {
+                if (startingIndex > 0) {
+                    startingIndex--;
+                } else if (results.Count < requestCount) {
+                    results.Add (result);
+                }
+                count++;
+            };
+            foreach (var child in GetChildren (containerId, 0, -1, sortCriteria, out totalMatches)) {
+                query (new ObjectQueryVisitor (GetQueryContext (child.GetType ()), child, consumer));
+            }
+            return results;
+        }
         
         protected override string Browse (string objectId,
                                           BrowseFlag browseFlag,
@@ -89,8 +110,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             updateId = "0";
             if (browseFlag == BrowseFlag.BrowseDirectChildren) {
-                var children = GetChildren (objectId, startIndex, requestCount, sortCriteria, out totalMatches);
-                var results = new ResultsWrapper (children);
+                var results = new ResultsWrapper (
+                    GetChildren (objectId, startIndex, requestCount, sortCriteria, out totalMatches));
                 var xml = serializer.GetString (results,
                     new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.None });
                 numberReturned = results.ResultsCount;
@@ -109,12 +130,54 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
         
-        protected abstract IEnumerable<IXmlSerializable> GetChildren (string objectId,
-                                                                      int startIndex,
-                                                                      int requestCount,
-                                                                      string sortCriteria,
-                                                                      out int totalMatches);
+        protected abstract IEnumerable<Object> GetChildren (string objectId,
+                                                            int startIndex,
+                                                            int requestCount,
+                                                            string sortCriteria,
+                                                            out int totalMatches);
         
-        protected abstract IXmlSerializable GetObject (string objectId);
+        protected abstract Object GetObject (string objectId);
+
+        [XmlType ("DIDL-Lite", Schemas.DidlLiteSchema)]
+        [XmlNamespace (Schemas.DublinCoreSchema, "dc")]
+        [XmlNamespace (Schemas.UpnpSchema, "upnp")]
+        class ResultsWrapper : IXmlSerializable
+        {
+            readonly IEnumerable<Object> results;
+            
+            public ResultsWrapper (Object result)
+                : this (Single (result))
+            {
+            }
+            
+            public ResultsWrapper (IEnumerable<Object> results)
+            {
+                this.results = results;
+            }
+            
+            public IEnumerable<Object> Results {
+                get { return results; }
+            }
+            
+            public int ResultsCount { get; private set; }
+            
+            static IEnumerable<Object> Single (Object item)
+            {
+                yield return item;
+            }
+            
+            public void SerializeSelfAndMembers (XmlSerializationContext context)
+            {
+                context.AutoSerializeObjectAndMembers (this);
+            }
+            
+            public void SerializeMembersOnly (XmlSerializationContext context)
+            {
+                foreach (IXmlSerializable result in Results) {
+                    result.SerializeSelfAndMembers (context);
+                    ResultsCount++;
+                }
+            }
+        }
     }
 }

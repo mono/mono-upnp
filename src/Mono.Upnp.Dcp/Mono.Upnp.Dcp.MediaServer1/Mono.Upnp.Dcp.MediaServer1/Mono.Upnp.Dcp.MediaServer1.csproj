@@ -112,7 +112,6 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectQueryVisitor.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\PropertyName.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectQueryContext.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectBasedQueryProvider.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ProtocolInfo.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\StorageVolumeOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV\StorageSystemOptions.cs" />
