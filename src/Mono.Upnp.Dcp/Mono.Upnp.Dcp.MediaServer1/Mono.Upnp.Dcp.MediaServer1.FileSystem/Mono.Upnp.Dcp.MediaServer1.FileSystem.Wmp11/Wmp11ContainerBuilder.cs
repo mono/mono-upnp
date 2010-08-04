@@ -1,5 +1,5 @@
-//
-// Wmp11RootBuilder.cs
+// 
+// Wmp11ContainerBuilder.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -26,40 +26,28 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
-using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 
 using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
-namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
+namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
-    public class Wmp11RootBuilder : Wmp11ContainerBuilder
+    public abstract class Wmp11ContainerBuilder
     {
-        Wmp11MusicBuilder music_builder = new Wmp11MusicBuilder ();
-
-        public void OnFile (string path, Action<Object> consumer)
+        protected Container BuildContainer (Action<ContainerInfo> consumer,
+                                            string id,
+                                            string title,
+                                            IList<Object> children)
         {
-            switch (Path.GetExtension (path)) {
-            case "mp3":
-                music_builder.OnTag (TagLib.File.Create (path).Tag, consumer);
-                break;
-            }
+            var container = new Container (id, ContainerId, new ContainerOptions {
+                Title = title,
+                ChildCount = children.Count
+            });
+            consumer (new ContainerInfo (container, children));
+            return container;
         }
 
-        public void OnDone (Action<ContainerInfo> consumer)
-        {
-            var containers = new List<Object> (4);
-
-            containers.Add (BuildContainer (consumer, Wmp11Ids.Music, "Music", music_builder.OnDone (consumer)));
-
-            consumer (new ContainerInfo (new Container (Wmp11Ids.Root, "-1",
-                new ContainerOptions { Title = "Root", ChildCount = 4 }), containers));
-        }
-
-        protected override string ContainerId {
-            get { return Wmp11Ids.Root; }
-        }
+        protected abstract string ContainerId { get; }
     }
 }

@@ -34,7 +34,7 @@ using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 
 using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
-namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
+namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
     public class Wmp11MusicBuilder : Wmp11ContainerBuilder
     {

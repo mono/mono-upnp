@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
+namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
     // See NetCompat_WMP11.docx
     public static class Wmp11Ids
