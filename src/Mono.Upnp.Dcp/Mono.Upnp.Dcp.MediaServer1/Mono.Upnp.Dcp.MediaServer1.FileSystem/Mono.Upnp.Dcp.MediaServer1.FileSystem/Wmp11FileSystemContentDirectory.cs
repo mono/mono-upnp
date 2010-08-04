@@ -67,12 +67,52 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
         }
 
+        protected override IEnumerable<Object> Search (string containerId,
+                                                       Query query,
+                                                       int startingIndex,
+                                                       int requestCount,
+                                                       string sortCriteria,
+                                                       out int totalMatches)
+        {
+            var visitor = new Wmp11QueryVisitor (this);
+            if (visitor.Results != null) {
+                totalMatches = visitor.Results.Count;
+                return GetResults (visitor.Results, startingIndex, requestCount);
+            } else {
+                return base.Search (containerId, query, startingIndex, requestCount, sortCriteria, out totalMatches);
+            }
+        }
+
         protected override string SearchCapabilities {
             get { return string.Empty; }
         }
 
         protected override string SortCapabilities {
             get { return string.Empty; }
+        }
+
+        class Wmp11QueryVisitor : QueryVisitor
+        {
+            readonly Wmp11FileSystemContentDirectory content_directory;
+
+            public Wmp11QueryVisitor (Wmp11FileSystemContentDirectory contentDirectory)
+            {
+                this.content_directory = contentDirectory;
+            }
+
+            public override void VisitDerivedFrom (string property, string value)
+            {
+                if (property != "upnp:class") {
+                    return;
+                }
+                switch (value) {
+                case "object.item.audioItem":
+                    Results = content_directory.containers[Wmp11Ids.AllMusic].Children;
+                    break;
+                }
+            }
+
+            public IList<Object> Results { get; private set; }
         }
     }
 }

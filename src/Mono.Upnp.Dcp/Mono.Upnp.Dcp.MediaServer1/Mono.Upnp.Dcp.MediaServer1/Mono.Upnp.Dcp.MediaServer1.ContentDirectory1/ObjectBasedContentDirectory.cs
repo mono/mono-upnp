@@ -67,7 +67,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             updateId = "0";
             var results = new ResultsWrapper (
-                Search (containerId, query, filter, startingIndex, requestCount, sortCriteria, out totalMatches));
+                Search (containerId, query, startingIndex, requestCount, sortCriteria, out totalMatches));
             var xml = serializer.GetString (results,
                 new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.None });
             numberReturned = results.ResultsCount;
@@ -76,7 +76,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         protected virtual IEnumerable<Object> Search (string containerId,
                                                       Query query,
-                                                      string filter,
                                                       int startingIndex,
                                                       int requestCount,
                                                       string sortCriteria,

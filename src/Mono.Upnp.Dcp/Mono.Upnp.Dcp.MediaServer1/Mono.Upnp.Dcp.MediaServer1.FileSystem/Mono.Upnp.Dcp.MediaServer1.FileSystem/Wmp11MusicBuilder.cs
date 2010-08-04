@@ -36,7 +36,7 @@ using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
-    public class Wmp11MusicBuilder
+    public class Wmp11MusicBuilder : Wmp11ContainerBuilder
     {
         List<Object> audio_items = new List<Object> ();
 
@@ -131,17 +131,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             return containers;
         }
 
-        static Container BuildContainer (Action<ContainerInfo> consumer,
-                                        string id,
-                                        string title,
-                                        IList<Object> children)
-        {
-            var container = new Container (id, Wmp11Ids.Music, new ContainerOptions {
-                Title = title,
-                ChildCount = children.Count
-            });
-            consumer (new ContainerInfo (container, children));
-            return container;
+        protected override string ContainerId {
+            get { return Wmp11Ids.Music; }
         }
 
         string GetId ()
