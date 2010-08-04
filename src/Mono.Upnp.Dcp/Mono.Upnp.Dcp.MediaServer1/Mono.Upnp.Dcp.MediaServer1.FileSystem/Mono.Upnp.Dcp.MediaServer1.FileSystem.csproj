@@ -49,10 +49,10 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\ContainerInfo.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\BuildableMusicArtistOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11ContainerBuilder.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11FileSystemContentDirectory.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11ContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11Ids.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11MusicBuilder.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11RootBuilder.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11ContentDirectoryBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">

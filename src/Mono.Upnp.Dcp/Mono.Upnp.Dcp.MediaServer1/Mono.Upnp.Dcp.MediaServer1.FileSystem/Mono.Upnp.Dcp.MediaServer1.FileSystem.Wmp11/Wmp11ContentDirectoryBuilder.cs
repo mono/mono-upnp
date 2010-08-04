@@ -1,5 +1,5 @@
 //
-// Wmp11RootBuilder.cs
+// Wmp11ContentDirectoryBuilder.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -35,27 +35,46 @@ using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
-    public class Wmp11RootBuilder : Wmp11ContainerBuilder
+    public class Wmp11ContentDirectoryBuilder : Wmp11ContainerBuilder
     {
+        Dictionary<string, Object> objects = new Dictionary<string, Object> ();
+        Dictionary<string, ContainerInfo> containers = new Dictionary<string, ContainerInfo> ();
+
         Wmp11MusicBuilder music_builder = new Wmp11MusicBuilder ();
 
-        public void OnFile (string path, Action<Object> consumer)
+        public void OnFile (string path)
         {
             switch (Path.GetExtension (path)) {
             case "mp3":
-                music_builder.OnTag (TagLib.File.Create (path).Tag, consumer);
+                music_builder.OnTag (TagLib.File.Create (path).Tag, ObjectConsumer);
                 break;
             }
         }
 
-        public void OnDone (Action<ContainerInfo> consumer)
+        void ObjectConsumer (Object @object)
+        {
+            objects.Add (@object.Id, @object);
+        }
+
+        void ContainerInfoConsumer (ContainerInfo containerInfo)
+        {
+            containers.Add (containerInfo.Container.Id, containerInfo);
+        }
+
+        public Wmp11ContentDirectory Build ()
         {
             var containers = new List<Object> (4);
 
-            containers.Add (BuildContainer (consumer, Wmp11Ids.Music, "Music", music_builder.OnDone (consumer)));
+            containers.Add (BuildContainer (
+                ContainerInfoConsumer, Wmp11Ids.Music, "Music", music_builder.OnDone (ContainerInfoConsumer)));
 
-            consumer (new ContainerInfo (new Container (Wmp11Ids.Root, "-1",
+            ContainerInfoConsumer (new ContainerInfo (new Container (Wmp11Ids.Root, "-1",
                 new ContainerOptions { Title = "Root", ChildCount = 4 }), containers));
+
+            var content_directory = new Wmp11ContentDirectory (this.objects, this.containers);
+            this.objects = new Dictionary<string, Object> ();
+            this.containers = new Dictionary<string, ContainerInfo> ();
+            return content_directory;
         }
 
         protected override string ContainerId {

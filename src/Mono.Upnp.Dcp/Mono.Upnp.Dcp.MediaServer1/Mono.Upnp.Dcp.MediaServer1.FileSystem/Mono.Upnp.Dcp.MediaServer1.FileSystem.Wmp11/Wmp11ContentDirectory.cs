@@ -1,5 +1,5 @@
 // 
-// Wmp11FileSystemContentDirectory.cs
+// Wmp11ContentDirectory.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -34,13 +34,22 @@ using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
-    public class Wmp11FileSystemContentDirectory : ObjectBasedContentDirectory
+    public class Wmp11ContentDirectory : ObjectBasedContentDirectory
     {
-        Dictionary<string, Object> objects = new Dictionary<string, Object> ();
-        Dictionary<string, ContainerInfo> containers = new Dictionary<string, ContainerInfo> ();
+        IDictionary<string, Object> objects;
+        IDictionary<string, ContainerInfo> containers;
 
-        public Wmp11FileSystemContentDirectory ()
+        public Wmp11ContentDirectory (IDictionary<string, Object> objects,
+                                      IDictionary<string, ContainerInfo> containers)
         {
+            if (objects == null) {
+                throw new ArgumentNullException ("objects");
+            } else if (containers == null) {
+                throw new ArgumentNullException ("containers");
+            }
+
+            this.objects = objects;
+            this.containers = containers;
         }
 
         protected override Object GetObject (string objectId)
@@ -74,7 +83,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
                                                        string sortCriteria,
                                                        out int totalMatches)
         {
-            var visitor = new Wmp11QueryVisitor (this);
+            var visitor = new Wmp11QueryVisitor (this, containerId);
             if (visitor.Results != null) {
                 totalMatches = visitor.Results.Count;
                 return GetResults (visitor.Results, startingIndex, requestCount);
@@ -93,11 +102,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 
         class Wmp11QueryVisitor : QueryVisitor
         {
-            readonly Wmp11FileSystemContentDirectory content_directory;
+            readonly Wmp11ContentDirectory content_directory;
+            readonly string container_id;
 
-            public Wmp11QueryVisitor (Wmp11FileSystemContentDirectory contentDirectory)
+            public Wmp11QueryVisitor (Wmp11ContentDirectory contentDirectory, string container_id)
             {
                 this.content_directory = contentDirectory;
+                this.container_id = container_id;
             }
 
             public override void VisitDerivedFrom (string property, string value)
@@ -107,7 +118,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
                 }
                 switch (value) {
                 case "object.item.audioItem":
-                    Results = content_directory.containers[Wmp11Ids.AllMusic].Children;
+                    if (container_id == Wmp11Ids.AllMusic) {
+                        Results = content_directory.containers[Wmp11Ids.AllMusic].Children;
+                    }
                     break;
                 }
             }
