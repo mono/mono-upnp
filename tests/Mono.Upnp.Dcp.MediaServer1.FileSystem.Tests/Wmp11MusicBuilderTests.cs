@@ -32,6 +32,7 @@ using TagLib.Id3v2;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
+using Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11;
 
 using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
@@ -40,16 +41,21 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
     [TestFixture]
     public class Wmp11MusicBuilderTests
     {
+        static Wmp11MusicBuilder GetBuilder ()
+        {
+            return new Wmp11MusicBuilder (new Uri ("http://localhost"));
+        }
+
         [Test]
         public void BasicTag ()
         {
-            var builder = new Wmp11MusicBuilder ();
+            var builder = GetBuilder ();
             var objects = new List<UpnpObject> ();
             builder.OnTag (new Tag {
                 Title = "Foo Bar",
                 Track = 42
             }, item => objects.Add (item));
-            builder.OnDone (info => objects.Add (info.Container));
+            builder.Build (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
             Assert.AreEqual ("Foo Bar", music_track.Title);
@@ -59,7 +65,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         [Test]
         public void BasicGenreTag ()
         {
-            var builder = new Wmp11MusicBuilder ();
+            var builder = GetBuilder ();
             var objects = new List<UpnpObject> ();
 
             builder.OnTag (new Tag {
@@ -68,7 +74,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
                 Genres = new[] { "Bat" },
             }, item => objects.Add (item));
 
-            builder.OnDone (info => objects.Add (info.Container));
+            builder.Build (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
             Assert.AreEqual ("Foo Bar", music_track.Title);
@@ -86,7 +92,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         [Test]
         public void MultipleGenresTag ()
         {
-            var builder = new Wmp11MusicBuilder ();
+            var builder = GetBuilder ();
             var objects = new List<UpnpObject> ();
 
             builder.OnTag (new Tag {
@@ -95,7 +101,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
                 Genres = new[] { "Bat", "Baz" },
             }, item => objects.Add (item));
 
-            builder.OnDone (info => objects.Add (info.Container));
+            builder.Build (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
             Assert.AreEqual ("Foo Bar", music_track.Title);
@@ -118,7 +124,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         [Test]
         public void BasicArtistTag ()
         {
-            var builder = new Wmp11MusicBuilder ();
+            var builder = GetBuilder ();
             var objects = new List<UpnpObject> ();
 
             builder.OnTag (new Tag {
@@ -127,7 +133,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
                 Performers = new[] { "Boo Far" }
             }, item => objects.Add (item));
 
-            builder.OnDone (info => objects.Add (info.Container));
+            builder.Build (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
             Assert.AreEqual ("Foo Bar", music_track.Title);
@@ -144,7 +150,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         [Test]
         public void BasicArtistAndGenreTag ()
         {
-            var builder = new Wmp11MusicBuilder ();
+            var builder = GetBuilder ();
             var objects = new List<UpnpObject> ();
 
             builder.OnTag (new Tag {
@@ -154,7 +160,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
                 Genres = new[] { "Bat" }
             }, item => objects.Add (item));
 
-            builder.OnDone (info => objects.Add (info.Container));
+            builder.Build (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
             Assert.AreEqual ("Foo Bar", music_track.Title);
@@ -178,7 +184,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
         [Test]
         public void MultipleArtistAndGenreTags ()
         {
-            var builder = new Wmp11MusicBuilder ();
+            var builder = GetBuilder ();
             var objects = new List<UpnpObject> ();
             Action<UpnpObject> consumer = @object => objects.Add (@object);
 
@@ -196,7 +202,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
                 Genres = new[] { "Bazz", "Electro Gospel" }
             }, consumer);
 
-            builder.OnDone (info => objects.Add (info.Container));
+            builder.Build (info => objects.Add (info.Container));
 
             var music_track = objects[0] as MusicTrack;
             Assert.AreEqual ("Foo Bar", music_track.Title);

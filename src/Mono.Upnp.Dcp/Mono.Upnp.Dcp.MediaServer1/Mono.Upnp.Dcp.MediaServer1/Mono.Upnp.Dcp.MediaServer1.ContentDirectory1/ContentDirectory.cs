@@ -32,24 +32,28 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class ContentDirectory : IDisposable
     {
-        bool started;
+        bool is_started;
         ulong system_id;
         
         protected virtual void OnSystemUpdate ()
         {
-            if (started) {
+            if (is_started) {
                 system_id++;
             }
         }
         
         public virtual void Start ()
         {
-            started = true;
+            is_started = true;
         }
         
         public virtual void Stop ()
         {
-            started = false;
+            is_started = false;
+        }
+
+        public bool IsStarted {
+            get { return is_started; }
         }
         
         public static readonly ServiceType ServiceType = new ServiceType (

@@ -33,21 +33,35 @@ using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
-    public abstract class Wmp11ContainerBuilder
+    public class Wmp11ContainerBuilder
     {
+        readonly Uri url;
+
+        protected Wmp11ContainerBuilder (Uri url)
+        {
+            if (url == null) {
+                throw new ArgumentNullException ("url");
+            }
+
+            this.url = url;
+        }
+
+        public Uri Url {
+            get { return url; }
+        }
+
         protected Container BuildContainer (Action<ContainerInfo> consumer,
                                             string id,
+                                            string parentId,
                                             string title,
                                             IList<Object> children)
         {
-            var container = new Container (id, ContainerId, new ContainerOptions {
+            var container = new Container (id, parentId, new ContainerOptions {
                 Title = title,
                 ChildCount = children.Count
             });
             consumer (new ContainerInfo (container, children));
             return container;
         }
-
-        protected abstract string ContainerId { get; }
     }
 }

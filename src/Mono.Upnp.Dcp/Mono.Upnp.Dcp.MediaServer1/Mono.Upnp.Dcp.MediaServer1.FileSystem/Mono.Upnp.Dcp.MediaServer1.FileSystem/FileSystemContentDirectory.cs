@@ -28,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Net.Sockets;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
@@ -41,104 +40,47 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
     public class FileSystemContentDirectory : ObjectBasedContentDirectory
     {
-        struct Range
-        {
-            public readonly int Lower;
-            public readonly int Upper;
-            
-            public Range (int lower, int upper)
-            {
-                Lower = lower;
-                Upper = upper;
-            }
-        }
-        
-        struct ObjectInfo
-        {
-            public readonly Object Object;
-            public readonly string Path;
-            
-            public ObjectInfo (Object @object, string path)
-            {
-                Object = @object;
-                Path = path;
-            }
-        }
-        
-        class FolderInfo
-        {
-            public readonly StorageFolder Folder;
-            public readonly string[] Directories;
-            public readonly string[] Files;
-            
-            public FolderInfo (StorageFolder folder, string[] directories, string[] files)
-            {
-                Folder = folder;
-                Directories = directories;
-                Files = files;
-            }
-        }
-        
-        readonly List<ObjectInfo> object_cache = new List<ObjectInfo> ();
-        readonly Dictionary<string, Range> object_hierarchy = new Dictionary<string, Range> ();
-        readonly Dictionary<string, FolderInfo> folder_cache = new Dictionary<string, FolderInfo> ();
-        readonly string prefix = GeneratePrefix ();
-        volatile bool started;
         HttpListener listener;
-        int id;
-        
-        public FileSystemContentDirectory (string path)
+        IDictionary<string, ObjectInfo> objects;
+        IDictionary<string, ContainerInfo> containers;
+
+        public FileSystemContentDirectory (Uri url,
+                                           IDictionary<string, ObjectInfo> objects,
+                                           IDictionary<string, ContainerInfo> containers)
         {
-            if (path == null) throw new ArgumentNullException ("path");
-            
-            var root = new StorageFolder ((id++).ToString (), "-1", new StorageFolderOptions {
-                IsRestricted = true,
-                Title = "root",
-                ChildCount = 1
-            });
-            object_cache.Add (new ObjectInfo (root, null));
-            object_hierarchy.Add ("0", new Range (1, 2));
-            CreateFolder (path, root);
-            
-            listener = new HttpListener { IgnoreWriteExceptions = true };
-            listener.Prefixes.Add (prefix);
+            if (objects == null) {
+                throw new ArgumentNullException ("objects");
+            } else if (containers == null) {
+                throw new ArgumentNullException ("containers");
+            }
+
+            this.objects = objects;
+            this.containers = containers;
+            this.listener = new HttpListener { IgnoreWriteExceptions = true };
+            listener.Prefixes.Add (url.ToString ());
         }
-        
-        public bool IsStarted {
-            get { return started; }
-        }
-        
-        public bool IsDisposed {
-            get { return listener == null; }
-        }
-        
+
         public override void Start ()
         {
             CheckDisposed ();
-            
-            if (started) {
+
+            if (IsStarted) {
                 return;
             }
-            
+
+            listener.Start ();
+            listener.BeginGetContext (OnGetContext, null);
+
             base.Start ();
-            
-            started = true;
-            
-            lock (listener) {
-                listener.Start ();
-                listener.BeginGetContext (OnGotContext, null);
-            }
         }
 
         public override void Stop ()
         {
             CheckDisposed ();
-            
-            if (!started) {
+
+            if (!IsStarted) {
                 return;
             }
-            
-            started = false;
             
             base.Stop ();
             
@@ -163,7 +105,49 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             listener = null;
         }
         
-        void OnGotContext (IAsyncResult result)
+        public bool IsDisposed {
+            get { return listener == null; }
+        }
+        
+        void CheckDisposed ()
+        {
+            if (IsDisposed) {
+                throw new ObjectDisposedException (ToString ());
+            }
+        }
+
+        protected override Object GetObject (string objectId)
+        {
+            return objects[objectId].Object;
+        }
+
+        protected override int VisitChildren (Action<Object> consumer,
+                                              string objectId,
+                                              int startIndex,
+                                              int requestCount,
+                                              string sortCriteria,
+                                              out int totalMatches)
+        {
+            var children = GetChildren (objectId);
+            totalMatches = children.Count;
+            return GetResults (consumer, children, startIndex, requestCount);
+        }
+
+        protected static int GetResults<T> (Action<T> consumer, IList<T> objects, int startIndex, int requestCount)
+        {
+            var endIndex = System.Math.Min (startIndex + requestCount, objects.Count);
+            for (var i = startIndex; i < endIndex; i++) {
+                consumer (objects[i]);
+            }
+            return endIndex - startIndex;
+        }
+
+        protected IList<Object> GetChildren (string containerId)
+        {
+            return containers[containerId].Children;
+        }
+        
+        void OnGetContext (IAsyncResult result)
         {
             lock (listener) {
                 if (!listener.IsListening) {
@@ -173,59 +157,38 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 var context = listener.EndGetContext (result);
                 var query = context.Request.Url.Query;
                 
-                if (query.StartsWith ("?id="))
-                {
-                    GetFile (context.Response, query);
-                } else if (query.StartsWith ("?art="))
-                {
+                if (query.StartsWith ("?id=") && query.Length > 4) {
+                    GetFile (context.Response, query.Substring (4));
+                } else if (query.StartsWith ("?art=")) {
                     //GetArtwork (context.Response, query);
-                } else
-                {
+                } else {
                     context.Response.StatusCode = 404;
                 }
                 
-                listener.BeginGetContext (OnGotContext, null);
+                listener.BeginGetContext (OnGetContext, null);
             }
         }
         
-        void GetFile (HttpListenerResponse response, string query)
+        void GetFile (HttpListenerResponse response, string id)
         {
             using (response) {
-                if (query.Length < 5) {
+                ObjectInfo object_info;
+                if (!objects.TryGetValue (id, out object_info) || object_info.Path == null) {
                     response.StatusCode = 404;
                     return;
                 }
-                
-                int id;
-                
-                if (!int.TryParse (query.Substring (4), out id)) {
-                    response.StatusCode = 404;
-                    return;
-                }
-                
-                Console.WriteLine ("Serving music for: {0}", object_cache[id].Path);
-                
-                if (id >= object_cache.Count) {
-                    response.StatusCode = 404;
-                    return;
-                }
-                
-                try {
-                    using (var reader = System.IO.File.OpenRead (object_cache[id].Path)) {
-                        response.ContentType = "audio/mpeg";
-                        response.ContentLength64 = reader.Length;
-                        using (var stream = response.OutputStream) {
-                            using (var writer = new BinaryWriter (stream)) {
-                                var buffer = new byte[8192];
-                                int read;
-                                do {
-                                    read = reader.Read (buffer, 0, buffer.Length);
-                                    writer.Write (buffer, 0, read);
-                                } while (started && read > 0);
-                            }
-                        }
+
+                using (var reader = System.IO.File.OpenRead (object_info.Path)) {
+                    response.ContentType = object_info.Object.Resources[0].ProtocolInfo.ContentFormat;
+                    response.ContentLength64 = reader.Length;
+                    using (var writer = new BinaryWriter (response.OutputStream)) {
+                        var buffer = new byte[8192];
+                        int read;
+                        do {
+                            read = reader.Read (buffer, 0, buffer.Length);
+                            writer.Write (buffer, 0, read);
+                        } while (IsStarted && read > 0);
                     }
-                } catch {
                 }
             }
         }
@@ -279,170 +242,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
         }*/
         
-        void CheckDisposed ()
-        {
-            if (IsDisposed) {
-                throw new ObjectDisposedException (ToString ());
-            }
-        }
-        
         protected override string SearchCapabilities {
             get { return string.Empty; }
         }
 
         protected override string SortCapabilities {
             get { return string.Empty; }
-        }
-        
-        protected override Object GetObject (string objectId)
-        {
-            return object_cache[int.Parse (objectId)].Object;
-        }
-        
-        protected override IEnumerable<Object> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria, out int totalMatches)
-        {
-            var id = int.Parse (objectId);
-            var container = (Container)object_cache[id].Object;
-            totalMatches = container.ChildCount.Value;
-            return GetChildren (objectId, startIndex, requestCount, sortCriteria);
-        }
-        
-        protected virtual IEnumerable<Object> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria)
-        {
-            Range range;
-            
-            if (!object_hierarchy.TryGetValue (objectId, out range)) {
-                range = GetChildren (objectId);
-                object_hierarchy[objectId] = range;
-            }
-            
-            for (int i = range.Lower + startIndex, numberReturned = 0; i < range.Upper && numberReturned < requestCount; i++) {
-                yield return object_cache[i].Object;
-                numberReturned++;
-            }
-        }
-        
-        Range GetChildren (string id)
-        {
-            var container = folder_cache[id];
-            var lower = object_cache.Count;
-            
-            foreach (var directory in container.Directories) {
-                CreateFolder (directory, container.Folder);
-            }
-            
-            foreach (var file in container.Files) {
-                var obj = CreateObject (file, container.Folder);
-                if (obj != null) {
-                    object_cache.Add (new ObjectInfo (obj, file));
-                }
-            }
-            
-            folder_cache.Remove (id);
-            
-            return new Range (lower, object_cache.Count);
-        }
-        
-        protected virtual Object CreateObject (string path, Container parent)
-        {
-            switch (Path.GetExtension (path)) {
-            case ".mp3":
-                return GetTrack(path, parent);
-            case ".avi":
-//                return new Movie (this, parent) {
-//                    Title = Path.GetFileNameWithoutExtension (path),
-//                    IsRestricted = true
-//                };
-            default:
-                return new File ((id++).ToString (), parent.Id, new ItemOptions {
-                    Title = Path.GetFileNameWithoutExtension (path),
-                    IsRestricted = true
-                });
-            }
-        }
-        
-        MusicTrack GetTrack(string path, Container parent)
-        {
-            /*var tags = TagLib.File.Create (path);
-            
-            var options = new MusicTrackOptions {
-                Title = tags.Tag.Title,
-                OriginalTrackNumber = (int)tags.Tag.Track
-            };
-            
-            foreach (var artist in tags.Tag.Performers) {
-                options.ArtistCollection.Add (new PersonWithRole { Name = artist });
-            }
-            
-            options.AlbumCollection.Add (tags.Tag.Album);
-            
-            var track = new MusicTrack(options, this, parent);
-            var resourceSettings = new ResourceSettings
-                (new Uri (string.Format ("{0}object?id={1}", prefix, track.Id)))
-                {
-                    ProtocolInfo = new ProtocolInfo (Protocols.HttpGet, "audio/mpeg"),
-                    Size = (ulong)new FileInfo(path).Length,
-                    Duration = tags.Properties.Duration,
-                    Bitrate = (uint)tags.Properties.AudioBitrate,
-                    NrAudioChannels = (uint)tags.Properties.AudioChannels
-                };
-            track.AddResource (new Resource (resourceSettings));
-            
-            options = new MusicTrackOptions(track);
-            options.AlbumArtURI = new Uri (string.Format ("{0}object?art={1}", prefix, track.Id));
-            
-            track.UpdateFromOptions (options);
-            
-            return track;*/
-            return null;
-        }
-        
-        /*TagLib.IPicture GetAlbumArt (string path)
-        {
-            var tags = TagLib.File.Create (path);
-            
-            if (tags.Tag.Pictures.Length > 0)
-            {
-                return tags.Tag.Pictures [0];
-            }
-            
-            return null;
-        }*/
-        
-        void CreateFolder (string path, StorageFolder parent)
-        {
-            var directories = Directory.GetDirectories (path);
-            var files = Directory.GetFiles (path);
-            var name = path;
-            var seperator = name.LastIndexOf (Path.DirectorySeparatorChar);
-            if (seperator == name.Length) {
-                var start = System.Math.Max (0, name.LastIndexOf (Path.DirectorySeparatorChar, seperator - 1));
-                name = name.Substring (start, seperator - start);
-            } else if (seperator != -1) {
-                seperator += 1;
-                name = name.Substring (seperator, name.Length - seperator);
-            }
-            var folder = new StorageFolder ((id++).ToString (), "-1", new StorageFolderOptions {
-                Title = name,
-                ChildCount = directories.Length + files.Length,
-                IsRestricted = true
-            });
-            object_cache.Add (new ObjectInfo (folder, path));
-            folder_cache[folder.Id] = new FolderInfo (folder, directories, files);
-        }
-        
-        readonly static Random random = new Random ();
-                
-        static string GeneratePrefix ()
-        {
-            foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
-                if (address.AddressFamily == AddressFamily.InterNetwork) {
-                    return string.Format (
-                        "http://{0}:{1}/upnp/media-server/", address, random.Next (1024, 5000));
-                }
-            }
-            
-            return null;
         }
     }
 }

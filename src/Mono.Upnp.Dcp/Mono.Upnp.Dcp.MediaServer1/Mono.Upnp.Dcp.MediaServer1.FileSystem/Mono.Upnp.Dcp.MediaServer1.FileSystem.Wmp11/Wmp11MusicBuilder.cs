@@ -38,18 +38,23 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
     public class Wmp11MusicBuilder : Wmp11ContainerBuilder
     {
+        int ids;
         List<Object> audio_items = new List<Object> ();
+        ContainerBuilder<GenreOptions> genre_builder;
+        ContainerBuilder<BuildableMusicArtistOptions> artist_builder;
+        ContainerBuilder<MusicAlbumOptions> album_builder;
+        ContainerBuilder<BuildableMusicArtistOptions> album_artist_builder;
+        ContainerBuilder<BuildableMusicArtistOptions> composer_builder;
 
-        ContainerBuilder<GenreOptions> genre_builder =
-            new ContainerBuilder<GenreOptions> ();
-        ContainerBuilder<BuildableMusicArtistOptions> artist_builder =
-            new ContainerBuilder<BuildableMusicArtistOptions> ();
-        ContainerBuilder<MusicAlbumOptions> album_builder =
-            new ContainerBuilder<MusicAlbumOptions> ();
-        ContainerBuilder<BuildableMusicArtistOptions> album_artist_builder =
-            new ContainerBuilder<BuildableMusicArtistOptions> ();
-        ContainerBuilder<BuildableMusicArtistOptions> composer_builder =
-            new ContainerBuilder<BuildableMusicArtistOptions> ();
+        public Wmp11MusicBuilder (Uri url)
+            : base (url)
+        {
+            genre_builder = new ContainerBuilder<GenreOptions> (GetId);
+            artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> (GetId);
+            album_builder = new ContainerBuilder<MusicAlbumOptions> (GetId);
+            album_artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> (GetId);
+            composer_builder = new ContainerBuilder<BuildableMusicArtistOptions> (GetId);
+        }
 
         public void OnTag (Tag tag, Action<Object> consumer)
         {
@@ -57,12 +62,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
             var artists = tag.Performers;
             var album_artists = tag.AlbumArtists;
             var composers = tag.Composers;
+            var id = GetId ();
 
-            var music_track = new MusicTrack (GetId (), Wmp11Ids.AllMusic, new MusicTrackOptions {
+            var music_track = new MusicTrack (id, Wmp11Ids.AllMusic, new MusicTrackOptions {
                 Title = tag.Title,
                 OriginalTrackNumber = (int)tag.Track,
                 Genres = genres,
-                Artists = GetArtists (artists)
+                Artists = GetArtists (artists),
+                Resources = new[] { new Resource (new Uri (Url, "?id=" + id), new ResourceOptions ()) }
             });
 
             audio_items.Add (music_track);
@@ -110,34 +117,34 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
             return options;
         }
 
-        public IList<Object> OnDone (Action<ContainerInfo> consumer)
+        public Container Build (Action<ContainerInfo> consumer)
         {
             var containers = new List<Object> (11);
 
-            containers.Add (BuildContainer (consumer, Wmp11Ids.AllMusic, "All Music", audio_items));
+            containers.Add (BuildContainer (consumer, Wmp11Ids.AllMusic, Wmp11Ids.Music, "All Music", audio_items));
 
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicGenre, "Genre", genre_builder.OnDone (
-                consumer, options => new MusicGenre (GetId (), Wmp11Ids.MusicGenre, options))));
+            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicGenre, Wmp11Ids.Music, "Genre",
+                genre_builder.Build (consumer, options =>
+                    new MusicGenre (GetId (), Wmp11Ids.MusicGenre, options))));
 
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicArtist, "Artist", artist_builder.OnDone (
-                consumer, options => new MusicArtist (GetId (), Wmp11Ids.MusicArtist, options))));
+            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicArtist, Wmp11Ids.Music, "Artist",
+                artist_builder.Build (consumer, options =>
+                    new MusicArtist (GetId (), Wmp11Ids.MusicArtist, options))));
 
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicAlbumArtist, "Album Artist", album_builder.OnDone (
-                consumer, options => new MusicAlbum (GetId (), Wmp11Ids.MusicAlbumArtist, options))));
+            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicAlbumArtist, Wmp11Ids.Music, "Album Artist",
+                album_builder.Build (consumer, options =>
+                    new MusicAlbum (GetId (), Wmp11Ids.MusicAlbumArtist, options))));
 
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicComposer, "Composer", composer_builder.OnDone (
-                consumer, options => new MusicArtist (GetId (), Wmp11Ids.MusicComposer, options))));
+            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicComposer, Wmp11Ids.Music, "Composer",
+                composer_builder.Build (consumer, options =>
+                    new MusicArtist (GetId (), Wmp11Ids.MusicComposer, options))));
 
-            return containers;
-        }
-
-        protected override string ContainerId {
-            get { return Wmp11Ids.Music; }
+            return BuildContainer (consumer, Wmp11Ids.Music, Wmp11Ids.Root, "Music", containers);
         }
 
         string GetId ()
         {
-            return string.Empty;
+            return string.Concat ("music", (ids++).ToString());
         }
 
         static IEnumerable<PersonWithRole> GetArtists (IEnumerable<string> artists)

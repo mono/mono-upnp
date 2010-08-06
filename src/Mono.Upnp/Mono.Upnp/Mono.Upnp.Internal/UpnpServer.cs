@@ -43,10 +43,8 @@ namespace Mono.Upnp.Internal
 
         public virtual void Start ()
         {
-            lock (listener) {
-                listener.Start ();
-                listener.BeginGetContext (OnGetContext, null);
-            }
+            listener.Start ();
+            listener.BeginGetContext (OnGetContext, null);
         }
 
         void OnGetContext (IAsyncResult asyncResult)

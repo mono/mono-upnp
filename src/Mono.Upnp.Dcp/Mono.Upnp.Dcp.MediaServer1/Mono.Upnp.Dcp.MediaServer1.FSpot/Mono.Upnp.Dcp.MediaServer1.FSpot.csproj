@@ -78,10 +78,6 @@
       <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
       <Name>Mono.Upnp</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mono.Upnp.Dcp.MSMediaServerRegistrar1\Mono.Upnp.Dcp.MSMediaServerRegistrar1.csproj">
-      <Project>{1203E9D4-B1F3-4838-8275-91782C8EC6E4}</Project>
-      <Name>Mono.Upnp.Dcp.MSMediaServerRegistrar1</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Upnp.addin.xml" />

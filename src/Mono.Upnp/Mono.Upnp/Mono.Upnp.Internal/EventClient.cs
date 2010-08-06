@@ -62,6 +62,7 @@ namespace Mono.Upnp.Internal
 
         static string GeneratePrefix ()
         {
+            // FIXME configure the network interface
             foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
                 if (address.AddressFamily == AddressFamily.InterNetwork) {
                     return string.Format (

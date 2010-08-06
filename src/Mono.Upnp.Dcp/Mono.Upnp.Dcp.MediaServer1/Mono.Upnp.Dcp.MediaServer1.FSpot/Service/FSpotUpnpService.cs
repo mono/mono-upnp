@@ -84,8 +84,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             string upc = null;
 
             try {
-                var ms_media_server_registrar = new Service<MSMediaServerRegistrar> (
-                MSMediaServerRegistrar.ServiceType, "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar", new DummyMSMediaServerRegistrar ());
+                var ms_media_server_registrar = new Service<MSMediaReceiverRegistrar> (
+                MSMediaReceiverRegistrar.ServiceType, "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar", new DummyMSMediaServerRegistrar ());
                 
                 media_server = new MediaServer (
                     udn,

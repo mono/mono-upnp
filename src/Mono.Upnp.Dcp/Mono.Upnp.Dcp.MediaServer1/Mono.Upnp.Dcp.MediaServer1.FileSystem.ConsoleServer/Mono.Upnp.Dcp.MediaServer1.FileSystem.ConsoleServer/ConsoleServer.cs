@@ -25,13 +25,16 @@
 // THE SOFTWARE.
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
 
 using NDesk.Options;
 
 using Mono.Upnp.Control;
-using Mono.Upnp.Dcp.MSMediaServerRegistrar1;
+using Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11;
+using Mono.Upnp.Dcp.MSMediaReceiverRegistrar1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
 {
@@ -111,9 +114,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
             Console.WriteLine ("Serving " + path);
             
             var connection_manager = new DummyConnectionManager ();
-            var content_directory = new FileSystemContentDirectory (path);
-            var ms_media_server_registrar = new Service<MSMediaServerRegistrar> (
-                MSMediaServerRegistrar.ServiceType, "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar", new DummyMSMediaServerRegistrar ());
+            var content_directory = BuildContentDirectory (path);
+            var ms_media_server_registrar = new Service<MSMediaReceiverRegistrar> (
+                MSMediaReceiverRegistrar.ServiceType,
+                "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar",
+                new DummyMSMediaReceiverRegistrar ());
             var media_server = new MediaServer (
                 udn,
                 friendly_name,
@@ -137,6 +142,36 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
                 Console.WriteLine ("Press ENTER to exit.");
                 Console.ReadLine ();
             }
+        }
+
+        static FileSystemContentDirectory BuildContentDirectory (string path)
+        {
+            var builder = new Wmp11ContentDirectoryBuilder (GenerateUrl ());
+            OnDirectory (path, builder);
+            return builder.Build ();
+        }
+
+        static void OnDirectory (string path, Wmp11ContentDirectoryBuilder builder)
+        {
+            foreach (var file in Directory.GetFiles (path)) {
+                builder.OnFile (file);
+            }
+
+            foreach (var directory in Directory.GetDirectories (path)) {
+                OnDirectory (directory, builder);
+            }
+        }
+
+        static Uri GenerateUrl ()
+        {
+            foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
+                if (address.AddressFamily == AddressFamily.InterNetwork) {
+                    return new Uri (string.Format (
+                        "http://{0}:{1}/upnp/media-server/", address, new Random ().Next (1024, 5000)));
+                }
+            }
+            
+            return null;
         }
         
         static void ShowHelp (OptionSet options)

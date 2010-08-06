@@ -30,7 +30,7 @@ using Mono.Upnp.Dcp.MSMediaServerRegistrar1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 {
-    public class DummyMSMediaServerRegistrar : MSMediaServerRegistrar
+    public class DummyMSMediaServerRegistrar : MSMediaReceiverRegistrar
     {
         protected override long IsAuthorized (string deviceId)
         {

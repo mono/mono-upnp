@@ -1,5 +1,5 @@
 // 
-// MSMediaServerRegistrar.cs
+// MSMediaReceiverRegistrar.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -28,9 +28,9 @@ using System;
 
 using Mono.Upnp.Control;
 
-namespace Mono.Upnp.Dcp.MSMediaServerRegistrar1
+namespace Mono.Upnp.Dcp.MSMediaReceiverRegistrar1
 {
-    public abstract class MSMediaServerRegistrar
+    public abstract class MSMediaReceiverRegistrar
     {
         public static readonly ServiceType ServiceType =
             new ServiceType ("microsoft.com", "X_MS_MediaReceiverRegistrar", new Version (1, 0));

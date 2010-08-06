@@ -126,26 +126,12 @@ namespace Mono.Upnp
 
         readonly int port = random.Next (1024, 5000);
 
-        static IPAddress host;
-        static IPAddress Host {
-            get {
-                if (host == null) {
-                    foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
-                        if (address.AddressFamily == AddressFamily.InterNetwork) {
-                            host = address;
-                            break;
-                        }
-                    }
-                }
-                return host;
-            }
-        }
-
         Uri MakeUrl ()
         {
+            // FIXME configure the network interface
             foreach (var address in Dns.GetHostAddresses (Dns.GetHostName ())) {
                 if (address.AddressFamily == AddressFamily.InterNetwork) {
-                    return new Uri (String.Format ("http://{0}:{1}/upnp/", Host, port));
+                    return new Uri (String.Format ("http://{0}:{1}/upnp/", address, port));
                 }
             }
             return null;

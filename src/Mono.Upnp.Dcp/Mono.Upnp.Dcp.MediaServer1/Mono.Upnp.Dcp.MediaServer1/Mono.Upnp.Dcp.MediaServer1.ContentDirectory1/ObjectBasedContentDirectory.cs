@@ -26,6 +26,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Xml;
 
 using Mono.Upnp.Xml;
 
@@ -33,7 +35,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public abstract class ObjectBasedContentDirectory : ContentDirectory
     {
-        readonly XmlSerializer serializer = new XmlSerializer ();
+        XmlSerializer serializer = new XmlSerializer ();
         Dictionary<Type, ObjectQueryContext> queryContexts = new Dictionary<Type, ObjectQueryContext>();
 
         ObjectQueryContext GetQueryContext (Type type)
@@ -66,37 +68,40 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                           out string updateId)
         {
             updateId = "0";
-            var results = new ResultsWrapper (
-                Search (containerId, query, startingIndex, requestCount, sortCriteria, out totalMatches));
-            var xml = serializer.GetString (results,
-                new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.None });
-            numberReturned = results.ResultsCount;
-            return xml;
+            var serializer = new ResultsSerializer (this.serializer);
+            Search (result => serializer.Serialize (result), containerId, query, startingIndex,
+                requestCount, sortCriteria, out numberReturned, out totalMatches);
+            return serializer.ToString ();
         }
 
-        protected virtual IEnumerable<Object> Search (string containerId,
-                                                      Query query,
-                                                      int startingIndex,
-                                                      int requestCount,
-                                                      string sortCriteria,
-                                                      out int totalMatches)
+        protected virtual void Search (Action<Object> consumer,
+                                       string containerId,
+                                       Query query,
+                                       int startingIndex,
+                                       int requestCount,
+                                       string sortCriteria,
+                                       out int numberReturned,
+                                       out int totalMatches)
         {
-            var results = new List<Object> (requestCount);
+            var total = 0;
             var count = 0;
-            Action<Object> consumer = result => {
-                if (startingIndex > 0) {
-                    startingIndex--;
-                } else if (results.Count < requestCount) {
-                    results.Add (result);
+
+            Action<Object> query_consumer = result => {
+                total++;
+                if (total >= startingIndex && count < requestCount) {
+                    consumer (result);
+                    count++;
                 }
-                count++;
             };
-            foreach (var child in GetChildren (containerId, 0, -1, sortCriteria, out totalMatches)) {
-                query (new ObjectQueryVisitor (GetQueryContext (child.GetType ()), child, consumer));
-            }
-            return results;
+
+            VisitChildren (child => {
+                query (new ObjectQueryVisitor (GetQueryContext (child.GetType ()), child, query_consumer));
+            }, containerId, 0, -1, string.Empty, out totalMatches);
+
+            totalMatches = total;
+            numberReturned = count;
         }
-        
+
         protected override string Browse (string objectId,
                                           BrowseFlag browseFlag,
                                           string filter,
@@ -107,75 +112,60 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                           out int totalMatches,
                                           out string updateId)
         {
-            updateId = "0";
+            var serializer = new ResultsSerializer (this.serializer);
+
             if (browseFlag == BrowseFlag.BrowseDirectChildren) {
-                var results = new ResultsWrapper (
-                    GetChildren (objectId, startIndex, requestCount, sortCriteria, out totalMatches));
-                var xml = serializer.GetString (results,
-                    new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.None });
-                numberReturned = results.ResultsCount;
-                return xml;
+                numberReturned = VisitChildren (child => serializer.Serialize (child),
+                    objectId, startIndex, requestCount, sortCriteria, out totalMatches);
             } else {
                 var @object = GetObject (objectId);
                 if (@object == null) {
                     numberReturned = 0;
                     totalMatches = 0;
                 } else {
+                    serializer.Serialize (@object);
                     numberReturned = 1;
                     totalMatches = 1;
                 }
-                return serializer.GetString (new ResultsWrapper (@object),
-                    new XmlSerializationOptions { XmlDeclarationType = XmlDeclarationType.None });
             }
+
+            updateId = "0";
+            return serializer.ToString ();
         }
         
-        protected abstract IEnumerable<Object> GetChildren (string objectId,
-                                                            int startIndex,
-                                                            int requestCount,
-                                                            string sortCriteria,
-                                                            out int totalMatches);
+        protected abstract int VisitChildren (Action<Object> consumer,
+                                              string objectId,
+                                              int startIndex,
+                                              int requestCount,
+                                              string sortCriteria,
+                                              out int totalMatches);
         
         protected abstract Object GetObject (string objectId);
 
-        [XmlType ("DIDL-Lite", Schemas.DidlLiteSchema)]
-        [XmlNamespace (Schemas.DublinCoreSchema, "dc")]
-        [XmlNamespace (Schemas.UpnpSchema, "upnp")]
-        class ResultsWrapper : IXmlSerializable
+        class ResultsSerializer
         {
-            readonly IEnumerable<Object> results;
-            
-            public ResultsWrapper (Object result)
-                : this (Single (result))
+            XmlSerializer serializer;
+            StringBuilder builder = new StringBuilder ();
+            XmlWriter writer;
+
+            public ResultsSerializer (XmlSerializer serializer)
             {
+                this.serializer = serializer;
+                writer = XmlWriter.Create (builder);
+                writer.WriteStartElement ("DIDL-Lite", Schemas.DidlLiteSchema);
+                writer.WriteAttributeString ("xmlns", "dc", null, Schemas.DublinCoreSchema);
+                writer.WriteAttributeString ("xmlns", "upnp", null, Schemas.UpnpSchema);
             }
-            
-            public ResultsWrapper (IEnumerable<Object> results)
+
+            public void Serialize<T> (T item)
             {
-                this.results = results;
+                serializer.Serialize (item, writer);
             }
-            
-            public IEnumerable<Object> Results {
-                get { return results; }
-            }
-            
-            public int ResultsCount { get; private set; }
-            
-            static IEnumerable<Object> Single (Object item)
+
+            public override string ToString ()
             {
-                yield return item;
-            }
-            
-            public void SerializeSelfAndMembers (XmlSerializationContext context)
-            {
-                context.AutoSerializeObjectAndMembers (this);
-            }
-            
-            public void SerializeMembersOnly (XmlSerializationContext context)
-            {
-                foreach (IXmlSerializable result in Results) {
-                    result.SerializeSelfAndMembers (context);
-                    ResultsCount++;
-                }
+                writer.WriteEndElement ();
+                return builder.ToString ();
             }
         }
     }

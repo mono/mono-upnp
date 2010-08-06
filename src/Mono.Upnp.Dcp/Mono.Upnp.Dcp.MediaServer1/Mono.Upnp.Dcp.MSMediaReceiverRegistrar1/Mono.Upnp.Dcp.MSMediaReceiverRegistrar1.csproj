@@ -8,7 +8,8 @@
     <ProjectGuid>{1203E9D4-B1F3-4838-8275-91782C8EC6E4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-    <RootNamespace>Mono.Upnp.Dcp.MSMediaServerRegistrar1</RootNamespace>
+    <RootNamespace>Mono.Upnp.Dcp.MSMediaReceiverRegistrar1</RootNamespace>
+    <BaseDirectory>.</BaseDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,7 +21,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ConsolePause>false</ConsolePause>
-    <AssemblyName>Mono.Upnp.Dcp.MSMediaServerRegistrar1</AssemblyName>
+    <AssemblyName>Mono.Upnp.Dcp.MSMediaReceiverRegistrar1</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -39,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MSMediaServerRegistrar1\MSMediaServerRegistrar.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MSMediaReceiverRegistrar1\MSMediaReceiverRegistrar.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
@@ -48,7 +49,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Mono.Upnp.Dcp.MSMediaServerRegistrar1\" />
+    <Folder Include="Mono.Upnp.Dcp.MSMediaReceiverRegistrar1\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,10 +1,10 @@
 // 
-// Test.cs
+// ObjectInfo.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Thomas
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,45 +25,37 @@
 // THE SOFTWARE.
 
 using System;
-using System.IO;
 
-using NUnit.Framework;
+using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
-namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
+namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
-    [Ignore, TestFixture]
-    public class Test
+    public class ObjectInfo
     {
-        MediaServer media_server;
-        
-        [SetUp]
-        public void SetUp ()
+        readonly Object @object;
+        readonly string path;
+
+        public ObjectInfo (Object @object)
+            : this (@object, null)
         {
-            var path = Path.Combine (Directory.GetCurrentDirectory (), "ContentDirectory");
-            var connection_manager = new DummyConnectionManager ();
-            var content_directory = new FileSystemContentDirectory (path);
-            
-            media_server = new MediaServer (
-                "uuid:mono-upnp-dcp-mediaserver1-filesystem-test",
-                "Mono.Upnp Test FileSystem MediaServer",
-                "Mono Project",
-                "FileSystem MediaServer",
-                connection_manager,
-                content_directory
-            );
-            
-            media_server.Start ();
         }
-        
-        [TearDown]
-        public void TearDown ()
+
+        public ObjectInfo (Object @object, string path)
         {
-            media_server.Dispose ();
+            if (@object == null) {
+                throw new ArgumentNullException ("object");
+            }
+
+            this.@object = @object;
+            this.path = path;
         }
-        
-        [Test]
-        public void TestCase ()
-        {
+
+        public Object Object {
+            get { return @object; }
+        }
+
+        public string Path {
+            get { return path; }
         }
     }
 }

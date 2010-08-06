@@ -171,9 +171,12 @@ namespace Mono.Upnp.Tests
                     client.BrowseAll ();
                     client.ServiceAdded += (obj, args) => {
                         lock (mutex) {
-                            var controller = args.Service.GetService ().GetController ();
-                            Assert.IsNotNull (controller);
-                            Monitor.Pulse (mutex);
+                            try {
+                                var controller = args.Service.GetService ().GetController ();
+                                Assert.IsNotNull (controller);
+                            } finally {
+                                Monitor.Pulse (mutex);
+                            }
                         }
                     };
                     lock (mutex) {

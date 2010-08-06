@@ -26,11 +26,11 @@
 
 using System;
 
-using Mono.Upnp.Dcp.MSMediaServerRegistrar1;
+using Mono.Upnp.Dcp.MSMediaReceiverRegistrar1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
 {
-    public class DummyMSMediaServerRegistrar : MSMediaServerRegistrar
+    public class DummyMSMediaReceiverRegistrar : MSMediaReceiverRegistrar
     {
         protected override long IsAuthorized (string deviceId)
         {

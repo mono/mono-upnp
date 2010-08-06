@@ -43,7 +43,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContentDirectoryTests.cs" />
     <Compile Include="DummyConnectionManager.cs" />
     <Compile Include="Wmp11MusicBuilderTests.cs" />
   </ItemGroup>

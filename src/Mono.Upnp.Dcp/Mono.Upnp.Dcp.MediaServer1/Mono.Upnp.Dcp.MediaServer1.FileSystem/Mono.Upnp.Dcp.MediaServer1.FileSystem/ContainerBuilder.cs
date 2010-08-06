@@ -40,6 +40,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         // willing to do this because these type names should never be needed outside of this file due to inference.
         public delegate T OptionsProducer (T options);
         public delegate Container ContainerProducer (T options);
+        public delegate string IdProducer ();
+
+        readonly IdProducer idProducer;
+
+        public ContainerBuilder (IdProducer idProducer)
+        {
+            if (idProducer == null) {
+                throw new ArgumentNullException ("idProducer");
+            }
+
+            this.idProducer = idProducer;
+        }
 
         Dictionary<string, ContainerOptionsInfo<T>> containers = new Dictionary<string, ContainerOptionsInfo<T>> ();
 
@@ -60,15 +72,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             if (containers.TryGetValue (container, out container_options_info)) {
                 container_options_info.Options = optionsProducer (container_options_info.Options);
             } else {
-                container_options_info = new ContainerOptionsInfo<T> (GetId (), optionsProducer (null));
+                container_options_info = new ContainerOptionsInfo<T> (idProducer (), optionsProducer (null));
                 containers[container] = container_options_info;
             }
-            var reference = new Item (GetId (), container_options_info.Id, new ItemOptions { RefId = item.Id });
+            var reference = new Item (idProducer (), container_options_info.Id, new ItemOptions { RefId = item.Id });
             container_options_info.Children.Add (reference);
             consumer (reference);
         }
 
-        public IList<Object> OnDone (Action<ContainerInfo> consumer, ContainerProducer containerProducer)
+        public IList<Object> Build (Action<ContainerInfo> consumer, ContainerProducer containerProducer)
         {
             if (consumer == null) {
                 throw new ArgumentNullException ("consumer");
@@ -86,11 +98,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             }
 
             return children;
-        }
-
-        string GetId ()
-        {
-            return string.Empty;
         }
     }
 }

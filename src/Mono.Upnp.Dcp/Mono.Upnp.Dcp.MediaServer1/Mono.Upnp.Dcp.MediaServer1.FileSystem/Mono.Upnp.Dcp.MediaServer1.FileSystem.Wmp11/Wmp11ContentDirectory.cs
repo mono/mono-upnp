@@ -34,61 +34,32 @@ using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
-    public class Wmp11ContentDirectory : ObjectBasedContentDirectory
+    public class Wmp11ContentDirectory : FileSystemContentDirectory
     {
-        IDictionary<string, Object> objects;
-        IDictionary<string, ContainerInfo> containers;
-
-        public Wmp11ContentDirectory (IDictionary<string, Object> objects,
+        public Wmp11ContentDirectory (Uri url,
+                                      IDictionary<string, ObjectInfo> objects,
                                       IDictionary<string, ContainerInfo> containers)
+            : base (url, objects, containers)
         {
-            if (objects == null) {
-                throw new ArgumentNullException ("objects");
-            } else if (containers == null) {
-                throw new ArgumentNullException ("containers");
-            }
-
-            this.objects = objects;
-            this.containers = containers;
         }
 
-        protected override Object GetObject (string objectId)
-        {
-            return objects[objectId];
-        }
-
-        protected override IEnumerable<Object> GetChildren (string objectId,
-                                                            int startIndex,
-                                                            int requestCount,
-                                                            string sortCriteria,
-                                                            out int totalMatches)
-        {
-            var container = containers[objectId];
-            totalMatches = container.Children.Count;
-            return GetResults (container.Children, startIndex, requestCount);
-        }
-
-        static IEnumerable<T> GetResults<T> (IList<T> objects, int startIndex, int requestCount)
-        {
-            var endIndex = System.Math.Min (startIndex + requestCount, objects.Count);
-            for (var i = startIndex; i < endIndex; i++) {
-                yield return objects[i];
-            }
-        }
-
-        protected override IEnumerable<Object> Search (string containerId,
-                                                       Query query,
-                                                       int startingIndex,
-                                                       int requestCount,
-                                                       string sortCriteria,
-                                                       out int totalMatches)
+        protected override void Search (Action<Object> consumer,
+                                        string containerId,
+                                        Query query,
+                                        int startingIndex,
+                                        int requestCount,
+                                        string sortCriteria,
+                                        out int numberReturned,
+                                        out int totalMatches)
         {
             var visitor = new Wmp11QueryVisitor (this, containerId);
+            query (visitor);
             if (visitor.Results != null) {
                 totalMatches = visitor.Results.Count;
-                return GetResults (visitor.Results, startingIndex, requestCount);
+                numberReturned = GetResults (consumer, visitor.Results, startingIndex, requestCount);
             } else {
-                return base.Search (containerId, query, startingIndex, requestCount, sortCriteria, out totalMatches);
+                base.Search (consumer, containerId, query, startingIndex,
+                    requestCount, sortCriteria, out numberReturned, out totalMatches);
             }
         }
 
@@ -119,7 +90,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
                 switch (value) {
                 case "object.item.audioItem":
                     if (container_id == Wmp11Ids.AllMusic) {
-                        Results = content_directory.containers[Wmp11Ids.AllMusic].Children;
+                        Results = content_directory.GetChildren (Wmp11Ids.AllMusic);
                     }
                     break;
                 }

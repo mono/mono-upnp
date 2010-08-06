@@ -20,7 +20,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Commandlineparameters>-f "mac: upnp" "/home/scott/Music/Starfucker - Starfucker (V0)"</Commandlineparameters>
+    <Commandlineparameters>-f "mac2: upnp" -n "Windows Media Connect" "/Users/lunchtimemama/Music/Rdio Downloads"</Commandlineparameters>
     <Externalconsole>true</Externalconsole>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -41,7 +41,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\ConsoleServer.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\DummyConnectionManager.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\Options.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\DummyMSMediaServerRegistrar.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\DummyMSMediaReceiverRegistrar.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\" />
@@ -59,9 +59,9 @@
       <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
       <Name>Mono.Upnp</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mono.Upnp.Dcp.MSMediaServerRegistrar1\Mono.Upnp.Dcp.MSMediaServerRegistrar1.csproj">
+    <ProjectReference Include="..\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1.csproj">
       <Project>{1203E9D4-B1F3-4838-8275-91782C8EC6E4}</Project>
-      <Name>Mono.Upnp.Dcp.MSMediaServerRegistrar1</Name>
+      <Name>Mono.Upnp.Dcp.MSMediaReceiverRegistrar1</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

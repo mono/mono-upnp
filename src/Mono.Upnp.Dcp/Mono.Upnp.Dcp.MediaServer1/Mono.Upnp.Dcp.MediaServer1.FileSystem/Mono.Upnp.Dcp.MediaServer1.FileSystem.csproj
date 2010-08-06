@@ -53,6 +53,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11Ids.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11MusicBuilder.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11\Wmp11ContentDirectoryBuilder.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem\ObjectInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">

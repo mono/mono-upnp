@@ -35,29 +35,32 @@ using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
-    public class Wmp11ContentDirectoryBuilder : Wmp11ContainerBuilder
+    public class Wmp11ContentDirectoryBuilder
     {
-        Dictionary<string, Object> objects = new Dictionary<string, Object> ();
+        Dictionary<string, ObjectInfo> objects = new Dictionary<string, ObjectInfo> ();
         Dictionary<string, ContainerInfo> containers = new Dictionary<string, ContainerInfo> ();
+        Wmp11MusicBuilder music_builder;
 
-        Wmp11MusicBuilder music_builder = new Wmp11MusicBuilder ();
+        public Wmp11ContentDirectoryBuilder (Uri url)
+        {
+            this.music_builder = new Wmp11MusicBuilder (url);
+        }
 
         public void OnFile (string path)
         {
             switch (Path.GetExtension (path)) {
+            case "wma":
+            case "wav":
             case "mp3":
-                music_builder.OnTag (TagLib.File.Create (path).Tag, ObjectConsumer);
+                music_builder.OnTag (TagLib.File.Create (path).Tag,
+                    @object => objects.Add (@object.Id, new ObjectInfo (@object, path)));
                 break;
             }
         }
 
-        void ObjectConsumer (Object @object)
-        {
-            objects.Add (@object.Id, @object);
-        }
-
         void ContainerInfoConsumer (ContainerInfo containerInfo)
         {
+            objects.Add (containerInfo.Container.Id, new ObjectInfo (containerInfo.Container));
             containers.Add (containerInfo.Container.Id, containerInfo);
         }
 
@@ -65,20 +68,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
         {
             var containers = new List<Object> (4);
 
-            containers.Add (BuildContainer (
-                ContainerInfoConsumer, Wmp11Ids.Music, "Music", music_builder.OnDone (ContainerInfoConsumer)));
+            containers.Add (music_builder.Build (ContainerInfoConsumer));
 
             ContainerInfoConsumer (new ContainerInfo (new Container (Wmp11Ids.Root, "-1",
                 new ContainerOptions { Title = "Root", ChildCount = 4 }), containers));
 
-            var content_directory = new Wmp11ContentDirectory (this.objects, this.containers);
-            this.objects = new Dictionary<string, Object> ();
+            var content_directory = new Wmp11ContentDirectory (music_builder.Url, this.objects, this.containers);
+            this.objects = new Dictionary<string, ObjectInfo> ();
             this.containers = new Dictionary<string, ContainerInfo> ();
             return content_directory;
-        }
-
-        protected override string ContainerId {
-            get { return Wmp11Ids.Root; }
         }
     }
 }
