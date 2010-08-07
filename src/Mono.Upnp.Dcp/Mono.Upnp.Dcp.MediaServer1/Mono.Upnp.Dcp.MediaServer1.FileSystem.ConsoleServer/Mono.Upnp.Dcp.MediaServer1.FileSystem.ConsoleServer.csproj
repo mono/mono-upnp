@@ -20,8 +20,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Commandlineparameters>-f "mac2: upnp" -n "Windows Media Connect" "/Users/lunchtimemama/Music/Rdio Downloads"</Commandlineparameters>
+    <Commandlineparameters>-f "mac5: upnp" -n "Windows Media Connect" "/Users/lunchtimemama/Music/Rdio Downloads"</Commandlineparameters>
     <Externalconsole>true</Externalconsole>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="MONO_UPNP_DEBUG" value="TRUE" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>

@@ -122,6 +122,15 @@ namespace Mono.Upnp.Internal
                 }
             }
         }
+
+        public static string MakeErrorDescription (string errorDescription, string message)
+        {
+            if (message == null) {
+                return errorDescription;
+            } else {
+                return string.Concat (errorDescription, ": ", message);
+            }
+        }
         
         public readonly static Encoding UTF8Unsigned = new UTF8Encoding (false);
     }

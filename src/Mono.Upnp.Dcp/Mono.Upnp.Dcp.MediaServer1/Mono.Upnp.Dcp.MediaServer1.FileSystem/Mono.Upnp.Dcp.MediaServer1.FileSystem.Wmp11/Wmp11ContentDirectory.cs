@@ -82,7 +82,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
                 this.container_id = container_id;
             }
 
-            public override void VisitDerivedFrom (string property, string value)
+            public override void VisitEquals (string property, string value)
             {
                 if (property != "upnp:class") {
                     return;

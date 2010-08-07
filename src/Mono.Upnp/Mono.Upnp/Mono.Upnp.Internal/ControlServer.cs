@@ -29,6 +29,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Xml;
 
 using Mono.Upnp.Control;
@@ -103,8 +104,9 @@ namespace Mono.Upnp.Internal
                         
                         Log.Information (string.Format ("{0} invoked {1} on {2}.",
                             context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
-                    } catch {
+                    } catch (TargetInvocationException e) {
                         // TODO handle faults
+                        Log.Error (string.Format ("Control invocation failed: {0}.", e.InnerException));
                     }
                 } else {
                     Log.Error (string.Format (

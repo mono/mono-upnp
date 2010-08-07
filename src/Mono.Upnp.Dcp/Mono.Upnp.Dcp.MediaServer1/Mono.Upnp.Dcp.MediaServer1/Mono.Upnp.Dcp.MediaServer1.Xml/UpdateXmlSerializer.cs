@@ -29,7 +29,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 
-using Mono.Upnp.Dcp.MediaServer1.Internal;
+using Mono.Upnp.Internal;
 using Mono.Upnp.Xml;
 using Mono.Upnp.Xml.Compilation;
 

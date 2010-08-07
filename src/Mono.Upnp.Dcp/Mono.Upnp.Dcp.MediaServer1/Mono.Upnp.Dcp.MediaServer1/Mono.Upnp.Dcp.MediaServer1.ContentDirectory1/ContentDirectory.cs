@@ -155,6 +155,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                           [UpnpArgument ("ObjectID"), UpnpRelatedStateVariable ("A_ARG_TYPE_Result")] out string objectId,
                                           [UpnpArgument ("Result"), UpnpRelatedStateVariable ("A_ARG_TYPE_Result")] out string result)
         {
+            objectId = CreateObject (containerId, elements, out result);
+        }
+
+        protected virtual string CreateObject (string containerId, string elements, out string result)
+        {
             throw new NotImplementedException ();
         }
         
@@ -189,6 +194,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                             [UpnpArgument ("DestinationURI"), UpnpRelatedStateVariable ("A_ARG_TYPE_URI")] Uri destinationUri,
                                             [UpnpArgument ("TransferID")] out int transferId)
         {
+            transferId = ImportResource (sourceUri, destinationUri);
+        }
+
+        protected virtual int ImportResource (Uri sourceUri, Uri destinationUri)
+        {
             throw new NotImplementedException ();
         }
         
@@ -200,6 +210,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public virtual void ExportResource ([UpnpArgument ("SourceURI"), UpnpRelatedStateVariable ("A_ARG_TYPE_URI")] Uri sourceUri,
                                             [UpnpArgument ("DestinationURI"), UpnpRelatedStateVariable ("A_ARG_TYPE_URI")] Uri destinationUri,
                                             [UpnpArgument ("TransferID")] out int transferId)
+        {
+            transferId = ExportResource (sourceUri, destinationUri);
+        }
+
+        protected virtual int ExportResource (Uri sourceUri, Uri destinationUri)
         {
             throw new NotImplementedException ();
         }
@@ -224,6 +239,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                                  [UpnpArgument ("TransferLength")] out string transferLength,
                                                  [UpnpArgument ("TransferTotal")] out string transferTotal)
         {
+            transferStatus = GetTransferProgress (transferId, out transferLength, out transferTotal);
+        }
+
+        protected virtual string GetTransferProgress (int transferId,
+                                                      out string transferLength,
+                                                      out string transferTotal)
+        {
             throw new NotImplementedException ();
         }
         
@@ -245,6 +267,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         public virtual void CreateReference ([UpnpArgument ("ContainerId"), UpnpRelatedStateVariable ("A_ARG_TYPE_ObjectID")] string containerId,
                                              [UpnpArgument ("ObjectID")] string objectId,
                                              [UpnpArgument ("NewID"), UpnpRelatedStateVariable ("A_ARG_TYPE_ObjectID")] out string newId)
+        {
+            newId = CreateReference (containerId, objectId);
+        }
+
+        protected virtual string CreateReference (string containerId, string objectId)
         {
             throw new NotImplementedException ();
         }

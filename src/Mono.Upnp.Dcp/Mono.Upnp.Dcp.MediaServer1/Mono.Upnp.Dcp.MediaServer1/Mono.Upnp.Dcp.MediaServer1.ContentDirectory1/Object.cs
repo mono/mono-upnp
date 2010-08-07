@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using Mono.Upnp.Dcp.MediaServer1.Internal;
+using Mono.Upnp.Internal;
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1

@@ -26,7 +26,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
+using System.Text;
 
 using Mono.Upnp.Control;
 
@@ -107,6 +109,8 @@ namespace Mono.Upnp.Internal
                 }
                 var return_argument = BuildArgumentInfo (method.ReturnParameter, name, stateVariables);
                 return new ServiceAction (name, Combine (arguments, return_argument), args => {
+                    Trace (name, args.Values);
+
                     var argument_array = new object[arguments.Length];
                     for (var i = 0; i < arguments.Length; i++) {
                         var argument = arguments[i];
@@ -149,6 +153,24 @@ namespace Mono.Upnp.Internal
             } else {
                 return null;
             }
+        }
+
+        [Conditional ("TRACE")]
+        static void Trace (string name, IEnumerable<string> values)
+        {
+            var builder = new StringBuilder ();
+            builder.Append (name);
+            builder.Append (" (");
+            foreach (var value in values) {
+                if (name == null) {
+                    builder.Append (", ");
+                } else {
+                    name = null;
+                }
+                builder.Append (value);
+            }
+            builder.Append (')');
+            Log.Trace (builder.ToString ());
         }
         
         static ArgumentInfo BuildArgumentInfo (ParameterInfo parameterInfo,

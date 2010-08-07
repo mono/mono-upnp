@@ -10,13 +10,15 @@
     <AssemblyName>Mono.Upnp.Dcp.MediaServer1</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <RootNamespace>Mono.Upnp.Dcp.MediaServer1</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>mono-upnp-dcp-mediaserver1.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>.</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
+    <DefineConstants>DEBUG,TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -104,7 +106,6 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\UpdateXmlSerializer.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\FilteringDelegateSerializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\FilteringContext.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\Helper.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\QueryVisitor.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Query.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\QueryParser.cs" />
@@ -138,6 +139,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ItemOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ResourceOptions.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1\Error.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">

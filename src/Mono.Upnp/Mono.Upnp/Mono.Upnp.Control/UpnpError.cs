@@ -60,7 +60,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError Unknown (string message)
         {
-            return new UpnpError (0, MakeErrorDescription ("Unknown", message));
+            return new UpnpError (0, Helper.MakeErrorDescription ("Unknown", message));
         }
         
         public static UpnpError InvalidAction ()
@@ -70,7 +70,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError InvalidAction (string message)
         {
-            return new UpnpError (401, MakeErrorDescription ("Invalid Action", message));
+            return new UpnpError (401, Helper.MakeErrorDescription ("Invalid Action", message));
         }
         
         public static UpnpError InvalidArgs ()
@@ -80,7 +80,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError InvalidArgs (string message)
         {
-            return new UpnpError (402, MakeErrorDescription ("Invalid Args", message));
+            return new UpnpError (402, Helper.MakeErrorDescription ("Invalid Args", message));
         }
         
         public static UpnpError InvalidVar ()
@@ -90,7 +90,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError InvalidVar (string message)
         {
-            return new UpnpError (404, MakeErrorDescription ("Invalid Var", message));
+            return new UpnpError (404, Helper.MakeErrorDescription ("Invalid Var", message));
         }
         
         public static UpnpError ActionFailed ()
@@ -100,7 +100,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError ActionFailed (string message)
         {
-            return new UpnpError (501, MakeErrorDescription ("Action Failed", message));
+            return new UpnpError (501, Helper.MakeErrorDescription ("Action Failed", message));
         }
         
         public static UpnpError ArgumentValueInvalid ()
@@ -110,7 +110,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError ArgumentValueInvalid (string message)
         {
-            return new UpnpError (600, MakeErrorDescription ("Argument Value Invalid", message));
+            return new UpnpError (600, Helper.MakeErrorDescription ("Argument Value Invalid", message));
         }
         
         public static UpnpError ArgumentValueOutOfRange ()
@@ -120,7 +120,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError ArgumentValueOutOfRange (string message)
         {
-            return new UpnpError (601, MakeErrorDescription ("Argument Value Out Of Range", message));
+            return new UpnpError (601, Helper.MakeErrorDescription ("Argument Value Out Of Range", message));
         }
         
         public static UpnpError OptionalActionNotImplemented ()
@@ -130,7 +130,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError OptionalActionNotImplemented (string message)
         {
-            return new UpnpError (602, MakeErrorDescription ("Optional Action Not Implemented", message));
+            return new UpnpError (602, Helper.MakeErrorDescription ("Optional Action Not Implemented", message));
         }
         
         public static UpnpError OutOfMemory ()
@@ -140,7 +140,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError OutOfMemory (string message)
         {
-            return new UpnpError (603, MakeErrorDescription ("Out Of Memory", message));
+            return new UpnpError (603, Helper.MakeErrorDescription ("Out Of Memory", message));
         }
         
         public static UpnpError HumanInterventionRequired ()
@@ -150,7 +150,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError HumanInterventionRequired (string message)
         {
-            return new UpnpError (604, MakeErrorDescription ("Human Intervention Required", message));
+            return new UpnpError (604, Helper.MakeErrorDescription ("Human Intervention Required", message));
         }
         
         public static UpnpError StringArgumentTooLong ()
@@ -160,7 +160,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError StringArgumentTooLong (string message)
         {
-            return new UpnpError (605, MakeErrorDescription ("String Argument Too Long", message));
+            return new UpnpError (605, Helper.MakeErrorDescription ("String Argument Too Long", message));
         }
         
         public static UpnpError ActionNotAuthorized ()
@@ -170,7 +170,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError ActionNotAuthorized (string message)
         {
-            return new UpnpError (606, MakeErrorDescription ("Action Not Authorized", message));
+            return new UpnpError (606, Helper.MakeErrorDescription ("Action Not Authorized", message));
         }
         
         public static UpnpError SignatureFailure ()
@@ -180,7 +180,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError SignatureFailure (string message)
         {
-            return new UpnpError (607, MakeErrorDescription ("Signature Failure", message));
+            return new UpnpError (607, Helper.MakeErrorDescription ("Signature Failure", message));
         }
         
         public static UpnpError SignatureMissing ()
@@ -190,7 +190,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError SignatureMissing (string message)
         {
-            return new UpnpError (608, MakeErrorDescription ("Signature Missing", message));
+            return new UpnpError (608, Helper.MakeErrorDescription ("Signature Missing", message));
         }
         
         public static UpnpError NotEncrypted ()
@@ -200,7 +200,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError NotEncrypted (string message)
         {
-            return new UpnpError (609, MakeErrorDescription ("Not Encrypted", message));
+            return new UpnpError (609, Helper.MakeErrorDescription ("Not Encrypted", message));
         }
         
         public static UpnpError InvalidSequence ()
@@ -210,7 +210,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError InvalidSequence (string message)
         {
-            return new UpnpError (610, MakeErrorDescription ("Invalid Sequence", message));
+            return new UpnpError (610, Helper.MakeErrorDescription ("Invalid Sequence", message));
         }
         
         public static UpnpError InvalidControlUrl ()
@@ -220,7 +220,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError InvalidControlUrl (string message)
         {
-            return new UpnpError (611, MakeErrorDescription ("Invalid Control URL", message));
+            return new UpnpError (611, Helper.MakeErrorDescription ("Invalid Control URL", message));
         }
         
         public static UpnpError NoSuchSession ()
@@ -230,16 +230,7 @@ namespace Mono.Upnp.Control
         
         public static UpnpError NoSuchSession (string message)
         {
-            return new UpnpError (612, MakeErrorDescription ("No Such Session", message));
-        }
-        
-        static string MakeErrorDescription (string errorDescription, string message)
-        {
-            if (message == null) {
-                return errorDescription;
-            } else {
-                return string.Concat (errorDescription, ": ", message);
-            }
+            return new UpnpError (612, Helper.MakeErrorDescription ("No Such Session", message));
         }
     }
 }

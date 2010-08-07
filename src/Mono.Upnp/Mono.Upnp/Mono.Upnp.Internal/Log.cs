@@ -40,7 +40,7 @@ namespace Mono.Upnp.Internal
                     enabled = Environment.GetEnvironmentVariable ("MONO_UPNP_DEBUG") != null;
                 }
 
-                return enabled.Value || true;
+                return enabled.Value;
             }
         }
 
@@ -74,6 +74,14 @@ namespace Mono.Upnp.Internal
         {
             if (Enabled) {
                 Console.WriteLine ("Mono.Upnp Message: {0}", message);
+            }
+        }
+
+        [Conditional ("TRACE")]
+        public static void Trace (string message)
+        {
+            if (Enabled) {
+                Console.WriteLine ("Mono.Upnp Trace: {0}", message);
             }
         }
     }

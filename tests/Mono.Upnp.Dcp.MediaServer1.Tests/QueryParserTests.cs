@@ -127,6 +127,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
+        public void NamespacedDerivedFromOperator ()
+        {
+            var @class = new Property ("upnp:class");
+            AssertEquality (@class.DerivedFrom ("object.item"), @"upnp:class derivedFrom ""object.item""");
+        }
+
+        [Test]
         public void DoesNotContainOperator ()
         {
             AssertEquality (foo.DoesNotContain ("bar"), @"foo doesNotContain ""bar""");
