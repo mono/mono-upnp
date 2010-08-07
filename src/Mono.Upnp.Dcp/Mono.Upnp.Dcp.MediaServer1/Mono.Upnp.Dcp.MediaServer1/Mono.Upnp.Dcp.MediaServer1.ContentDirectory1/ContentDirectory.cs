@@ -124,8 +124,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                     [UpnpArgument ("TotalMatches")] out int totalMatches,
                                     [UpnpArgument ("UpdateID")] out string updateId)
         {
-            result = Search (containerId, QueryParser.Parse (searchCriteria), filter, startingIndex,
-                requestCount, sortCriteria, out numberReturned, out totalMatches, out updateId);
+            try {
+                result = Search (containerId, QueryParser.Parse (searchCriteria), filter, startingIndex,
+                    requestCount, sortCriteria, out numberReturned, out totalMatches, out updateId);
+            } catch (QueryParsingException e) {
+                throw new UpnpControlException (
+                    Error.UnsupportedOrInvalidSearchCriteria (), "Unable to parse searchCriteria.", e);
+            }
         }
         
         public virtual bool CanSearch {
@@ -142,7 +147,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                          out int totalMatches,
                                          out string updateId)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         public virtual bool CanCreateObject {
@@ -160,7 +165,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         protected virtual string CreateObject (string containerId, string elements, out string result)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         public virtual bool CanDestroyObject {
@@ -170,7 +175,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [UpnpAction (OmitUnless = "CanDestroyObject")]
         public virtual void DestroyObject ([UpnpArgument ("ObjectID")] string objectId)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         public virtual bool CanUpdateObject {
@@ -182,7 +187,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                           [UpnpArgument ("CurrentTagValue"), UpnpRelatedStateVariable ("A_ARG_TYPE_TagValueList")] string currentTagValue,
                                           [UpnpArgument ("NewTagValue"), UpnpRelatedStateVariable ("A_ARG_TYPE_TagValueList")] string newTagValue)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         public virtual bool CanImportResource {
@@ -199,7 +204,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         protected virtual int ImportResource (Uri sourceUri, Uri destinationUri)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         public virtual bool CanExportResource {
@@ -216,7 +221,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         protected virtual int ExportResource (Uri sourceUri, Uri destinationUri)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         public virtual bool CanStopTransferResource {
@@ -226,7 +231,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [UpnpAction (OmitUnless = "CanStopTransferResource")]
         public virtual void StopTransferResource ([UpnpArgument ("TransferId")] int transferId)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         public virtual bool CanGetTransferProgress {
@@ -246,7 +251,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                                       out string transferLength,
                                                       out string transferTotal)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         public virtual bool CanDeleteResource {
@@ -256,7 +261,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [UpnpAction (OmitUnless = "CanDeleteResource")]
         public virtual void DeleteResource ([UpnpArgument ("ResourceURI"), UpnpRelatedStateVariable ("A_ARG_TYPE_URI")] Uri resourceUri)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         public virtual bool CanCreateReference {
@@ -273,7 +278,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         protected virtual string CreateReference (string containerId, string objectId)
         {
-            throw new NotImplementedException ();
+            throw new UpnpControlException (UpnpError.OptionalActionNotImplemented ());
         }
         
         [UpnpStateVariable ("SystemUpdateID")]

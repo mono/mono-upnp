@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 
+using Mono.Upnp.Control;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 using Mono.Upnp.Xml;
@@ -118,7 +119,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
         protected override Object GetObject (string objectId)
         {
-            return objects[objectId].Object;
+            ObjectInfo @object;
+            if (!objects.TryGetValue (objectId, out @object)) {
+                throw new UpnpControlException (
+                    Error.NoSuchObject (), string.Format (@"The object ""{0}"" does not exist.", objectId));
+            }
+            return @object.Object;
         }
 
         protected override int VisitChildren (Action<Object> consumer,
@@ -144,7 +150,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
         protected IList<Object> GetChildren (string containerId)
         {
-            return containers[containerId].Children;
+            ContainerInfo container;
+            if (!containers.TryGetValue (containerId, out container)) {
+                throw new UpnpControlException (
+                    Error.NoSuchContainer (), string.Format (@"The container ""{0}"" does not exist.", containerId));
+            }
+            return container.Children;
         }
         
         void OnGetContext (IAsyncResult result)

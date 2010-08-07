@@ -93,26 +93,31 @@ namespace Mono.Upnp.Internal
                 }
                 
                 ServiceAction action;
-                if (actions.TryGetValue (arguments.ActionName, out action)) {
-                    var stream = context.Response.OutputStream;
-                    try {
-                        serializer.Serialize (
-                            new SoapEnvelope<Arguments> (
-                                new Arguments (service_type, action.Name, action.Execute (arguments.Values), true)),
-                            stream
-                        );
-                        
+                try {
+                    if (actions.TryGetValue (arguments.ActionName, out action)) {
                         Log.Information (string.Format ("{0} invoked {1} on {2}.",
                             context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
-                    } catch (TargetInvocationException e) {
-                        // TODO handle faults
-                        Log.Error (string.Format ("Control invocation failed: {0}.", e.InnerException));
+                        var stream = context.Response.OutputStream;
+                        try {
+                            serializer.Serialize (
+                                new SoapEnvelope<Arguments> (new Arguments (
+                                    service_type, action.Name, action.Execute (arguments.Values), true)),
+                                stream
+                            );
+                        } catch (TargetInvocationException e) {
+                            if (e.InnerException is UpnpControlException) {
+                                throw e.InnerException;
+                            } else {
+                                throw new UpnpControlException (UpnpError.Unknown (), "Unexpected exception.", e);
+                            }
+                        }
+                    } else {
+                        throw new UpnpControlException (UpnpError.InvalidAction (), string.Format (
+                            "{0} attempted to invoke the non-existant action {1} on {2}.",
+                            context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
                     }
-                } else {
-                    Log.Error (string.Format (
-                        "{0} attempted to invoke the non-existant action {1} on {2}.",
-                        context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
-                    // TODO generate fault
+                } catch (UpnpControlException e) {
+                    Log.Error (e);
                 }
             }
         }

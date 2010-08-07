@@ -114,19 +114,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             var serializer = new ResultsSerializer (this.serializer);
 
+            var @object = GetObject (objectId);
             if (browseFlag == BrowseFlag.BrowseDirectChildren) {
                 numberReturned = VisitChildren (child => serializer.Serialize (child),
-                    objectId, startIndex, requestCount, sortCriteria, out totalMatches);
+                    @object.Id, startIndex, requestCount, sortCriteria, out totalMatches);
             } else {
-                var @object = GetObject (objectId);
-                if (@object == null) {
-                    numberReturned = 0;
-                    totalMatches = 0;
-                } else {
-                    serializer.Serialize (@object);
-                    numberReturned = 1;
-                    totalMatches = 1;
-                }
+                serializer.Serialize (@object);
+                numberReturned = 1;
+                totalMatches = 1;
             }
 
             updateId = "0";

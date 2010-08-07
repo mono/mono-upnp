@@ -30,8 +30,6 @@ namespace Mono.Upnp.Control
 {
     public class UpnpControlException : Exception
     {
-        readonly UpnpError upnp_error;
-        
         public UpnpControlException (UpnpError upnpError, string message)
             : this (upnpError, message, null)
         {
@@ -40,11 +38,9 @@ namespace Mono.Upnp.Control
         public UpnpControlException (UpnpError upnpError, string message, Exception innerException)
             : base (message, innerException)
         {
-            upnp_error = upnpError;
+            UpnpError = upnpError;
         }
         
-        public UpnpError UpnpError {
-            get { return upnp_error; }
-        }
+        public UpnpError UpnpError { get; private set; }
     }
 }
