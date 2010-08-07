@@ -212,7 +212,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             }
         }
 
-        protected override IEnumerable<UpnpObject> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria, out int totalMatches)
+        protected override int VisitChildren (Action<UpnpObject> consumer, string objectId, int startIndex, int requestCount, string sortCriteria, out int totalMatches)
         {
             var tag_key_value = tags_cache.Where ((kv) => kv.Value.Id == objectId).FirstOrDefault ();
             if (tag_key_value.Value != null) {
@@ -240,12 +240,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
                         upnp_result.Add (GetPhoto (photo, tag_key_value.Value));
                     }
 
-                    return upnp_result;
+                    foreach (var result in upnp_result) {
+                        consumer (result);
+                    }
+
+                    return upnp_result.Count;
                 }
             }
 
             totalMatches = 0;
-            return null;
+            return 0;
         }
 
         UpnpPhoto GetPhoto (FSpotPhoto photo, Container parent)
