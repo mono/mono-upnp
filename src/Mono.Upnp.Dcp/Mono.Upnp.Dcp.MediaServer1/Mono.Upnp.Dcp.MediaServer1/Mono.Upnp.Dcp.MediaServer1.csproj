@@ -139,7 +139,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ItemOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ResourceOptions.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1\Error.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Error.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
@@ -152,5 +152,6 @@
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Internal\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Xml\" />
+    <Folder Include="Mono.Upnp.Dcp.MediaServer1\" />
   </ItemGroup>
 </Project>
