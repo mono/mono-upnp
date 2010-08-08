@@ -30,6 +30,11 @@ namespace Mono.Upnp.Control
 {
     public class UpnpControlException : Exception
     {
+        public UpnpControlException (UpnpError upnpError)
+            : this (upnpError, null)
+        {
+        }
+
         public UpnpControlException (UpnpError upnpError, string message)
             : this (upnpError, message, null)
         {

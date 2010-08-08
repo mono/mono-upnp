@@ -117,7 +117,7 @@ namespace Mono.Upnp.Internal
                             context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
                     }
                 } catch (UpnpControlException e) {
-                    Log.Error (e);
+                    Log.Exception (e);
                 }
             }
         }
