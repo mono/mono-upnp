@@ -88,7 +88,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             Action<Object> query_consumer = result => {
                 total++;
-                if (total >= startingIndex && count < requestCount) {
+                if (total > startingIndex && count < requestCount) {
                     consumer (result);
                     count++;
                 }
