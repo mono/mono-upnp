@@ -106,7 +106,7 @@ namespace Mono.Upnp
         void AnnounceDevice (Device device)
         {
             ssdp_server.Announce (device.Udn, device.Udn, false);
-            ssdp_server.Announce (device.Type.ToString (), String.Format ("{0}::{1}", device.Udn, device.Type), false);
+            ssdp_server.Announce (device.Type.ToString (), string.Format ("{0}::{1}", device.Udn, device.Type), false);
 
             foreach (var child_device in device.Devices) {
                 AnnounceDevice (child_device);
@@ -119,7 +119,7 @@ namespace Mono.Upnp
 
         void AnnounceService (Device device, Service service)
         {
-            ssdp_server.Announce (service.Type.ToString (), String.Format ("{0}::{1}", device.Udn,service.Type), false);
+            ssdp_server.Announce (service.Type.ToString (), string.Format ("{0}::{1}", device.Udn,service.Type), false);
         }
 
         static readonly Random random = new Random ();
