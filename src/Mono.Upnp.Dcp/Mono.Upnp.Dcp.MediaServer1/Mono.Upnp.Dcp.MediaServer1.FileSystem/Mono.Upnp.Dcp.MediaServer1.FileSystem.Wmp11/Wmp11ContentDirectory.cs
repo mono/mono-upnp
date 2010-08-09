@@ -46,6 +46,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
         protected override void Search (Action<Object> consumer,
                                         string containerId,
                                         Query query,
+                                        string filter,
                                         int startingIndex,
                                         int requestCount,
                                         string sortCriteria,
@@ -58,7 +59,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
                 totalMatches = visitor.Results.Count;
                 numberReturned = GetResults (consumer, visitor.Results, startingIndex, requestCount);
             } else {
-                base.Search (consumer, containerId, query, startingIndex,
+                base.Search (consumer, containerId, query, filter, startingIndex,
                     requestCount, sortCriteria, out numberReturned, out totalMatches);
             }
         }

@@ -69,14 +69,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         {
             updateId = "0";
             var serializer = new ResultsSerializer (this.serializer);
-            Search (result => serializer.Serialize (result), containerId, query, startingIndex,
-                requestCount, sortCriteria, out numberReturned, out totalMatches);
+            Search (result => serializer.Serialize (result), containerId, query, filter,
+                startingIndex, requestCount, sortCriteria, out numberReturned, out totalMatches);
             return serializer.ToString ();
         }
 
         protected virtual void Search (Action<Object> consumer,
                                        string containerId,
                                        Query query,
+                                       string filter,
                                        int startingIndex,
                                        int requestCount,
                                        string sortCriteria,
