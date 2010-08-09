@@ -197,8 +197,8 @@ namespace Mono.Upnp
             where TResult : class
         {
             foreach (var url in urls) {
-                if (descriptions.ContainsKey (url)) {
-                    var root = descriptions[url];
+                Root root;
+                if (descriptions.TryGetValue (url, out root)) {
                     if (!root.IsDisposed) {
                         var result = getter (announcement, root.RootDevice);
                         if (result != null) {
@@ -209,7 +209,7 @@ namespace Mono.Upnp
                 
                 try {
                     var deserializer = Helper.Get<XmlDeserializer> (static_deserializer);
-                    var root = deserializer_producer (deserializer).DeserializeRoot (new Uri (url));
+                    root = deserializer_producer (deserializer).DeserializeRoot (new Uri (url));
                     if (root == null) {
                         continue;
                     }
