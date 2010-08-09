@@ -48,6 +48,7 @@ namespace Mono.Ssdp
         public string Name { get; set; }
 
         ushort max_age = Protocol.DefaultMaxAge;
+        [CLSCompliantAttribute (false)]
         public ushort MaxAge {
             get { return max_age; }
             set { max_age = System.Math.Max (Protocol.DefaultMaxAge, value); }

@@ -45,6 +45,7 @@ namespace Mono.Ssdp
         }
 
         private ushort mx = Protocol.DefaultMx;
+        [CLSCompliantAttribute (false)]
         public ushort MX {
             get { return mx; }
             set { mx = System.Math.Min (value, Protocol.MaxMX); }
