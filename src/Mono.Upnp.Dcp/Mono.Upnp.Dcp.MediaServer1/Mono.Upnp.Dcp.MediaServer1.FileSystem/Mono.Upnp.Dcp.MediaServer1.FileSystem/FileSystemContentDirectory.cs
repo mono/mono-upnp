@@ -41,6 +41,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
     public class FileSystemContentDirectory : ObjectBasedContentDirectory
     {
+        const int file_buffer_size = 8192;
+
         HttpListener listener;
         IDictionary<string, ObjectInfo> objects;
         IDictionary<string, ContainerInfo> containers;
@@ -193,7 +195,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                     response.ContentType = object_info.Object.Resources[0].ProtocolInfo.ContentFormat;
                     response.ContentLength64 = reader.Length;
                     using (var writer = new BinaryWriter (response.OutputStream)) {
-                        var buffer = new byte[8192];
+                        var buffer = new byte[file_buffer_size];
                         int read;
                         do {
                             read = reader.Read (buffer, 0, buffer.Length);
