@@ -108,7 +108,8 @@ namespace Mono.Upnp.Internal
                             if (e.InnerException is UpnpControlException) {
                                 throw e.InnerException;
                             } else {
-                                throw new UpnpControlException (UpnpError.Unknown (), "Unexpected exception.", e);
+                                throw new UpnpControlException (
+                                    UpnpError.Unknown (), "Unexpected exception.", e.InnerException);
                             }
                         }
                     } else {
