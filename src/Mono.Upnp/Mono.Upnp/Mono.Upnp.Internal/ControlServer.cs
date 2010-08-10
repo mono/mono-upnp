@@ -97,13 +97,10 @@ namespace Mono.Upnp.Internal
                     if (actions.TryGetValue (arguments.ActionName, out action)) {
                         Log.Information (string.Format ("{0} invoked {1} on {2}.",
                             context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
-                        var stream = context.Response.OutputStream;
+                        Arguments result;
                         try {
-                            serializer.Serialize (
-                                new SoapEnvelope<Arguments> (new Arguments (
-                                    service_type, action.Name, action.Execute (arguments.Values), true)),
-                                stream
-                            );
+                            result = new Arguments (
+                                service_type, action.Name, action.Execute (arguments.Values), true);
                         } catch (TargetInvocationException e) {
                             if (e.InnerException is UpnpControlException) {
                                 throw e.InnerException;
@@ -111,7 +108,12 @@ namespace Mono.Upnp.Internal
                                 throw new UpnpControlException (
                                     UpnpError.Unknown (), "Unexpected exception.", e.InnerException);
                             }
+                        } catch (UpnpControlException) {
+                            throw;
+                        } catch (Exception e) {
+                            throw new UpnpControlException (UpnpError.Unknown (), "Unexpected exception.", e);
                         }
+                        serializer.Serialize (new SoapEnvelope<Arguments> (result), context.Response.OutputStream);
                     } else {
                         throw new UpnpControlException (UpnpError.InvalidAction (), string.Format (
                             "{0} attempted to invoke the non-existant action {1} on {2}.",
@@ -119,6 +121,8 @@ namespace Mono.Upnp.Internal
                     }
                 } catch (UpnpControlException e) {
                     Log.Exception (e);
+                    serializer.Serialize (new SoapEnvelope<SoapFault<UpnpError>> (
+                        new SoapFault<UpnpError> (e.UpnpError)), context.Response.OutputStream);
                 }
             }
         }
