@@ -138,10 +138,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
         {
             var children = GetChildren (objectId);
             totalMatches = children.Count;
-            return GetResults (consumer, children, startIndex, requestCount);
+            return VisitResults (consumer, children, startIndex, requestCount);
         }
 
-        protected static int GetResults<T> (Action<T> consumer, IList<T> objects, int startIndex, int requestCount)
+        protected static int VisitResults<T> (Action<T> consumer, IList<T> objects, int startIndex, int requestCount)
         {
             var endIndex = System.Math.Min (startIndex + requestCount, objects.Count);
             for (var i = startIndex; i < endIndex; i++) {

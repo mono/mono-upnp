@@ -56,7 +56,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
             query (visitor);
             if (visitor.Results != null) {
                 totalMatches = visitor.Results.Count;
-                numberReturned = GetResults (consumer, visitor.Results, startingIndex, requestCount);
+                numberReturned = VisitResults (consumer, visitor.Results, startingIndex, requestCount);
             } else {
                 base.Search (consumer, containerId, query, startingIndex,
                     requestCount, sortCriteria, out numberReturned, out totalMatches);
