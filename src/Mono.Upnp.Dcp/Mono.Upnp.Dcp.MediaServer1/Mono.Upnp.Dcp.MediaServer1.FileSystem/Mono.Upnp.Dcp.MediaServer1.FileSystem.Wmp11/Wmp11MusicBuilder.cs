@@ -131,9 +131,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
                 artist_builder.Build (consumer, options =>
                     new MusicArtist (GetId (), Wmp11Ids.MusicArtist, options))));
 
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicAlbumArtist, Wmp11Ids.Music, "Album Artist",
+            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicAlbum, Wmp11Ids.Music, "Album",
                 album_builder.Build (consumer, options =>
-                    new MusicAlbum (GetId (), Wmp11Ids.MusicAlbumArtist, options))));
+                    new MusicAlbum (GetId (), Wmp11Ids.MusicAlbum, options))));
+
+            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicAlbumArtist, Wmp11Ids.Music, "Album Artist",
+                album_artist_builder.Build (consumer, options =>
+                    new MusicArtist (GetId (), Wmp11Ids.MusicAlbumArtist, options))));
 
             containers.Add (BuildContainer (consumer, Wmp11Ids.MusicComposer, Wmp11Ids.Music, "Composer",
                 composer_builder.Build (consumer, options =>
