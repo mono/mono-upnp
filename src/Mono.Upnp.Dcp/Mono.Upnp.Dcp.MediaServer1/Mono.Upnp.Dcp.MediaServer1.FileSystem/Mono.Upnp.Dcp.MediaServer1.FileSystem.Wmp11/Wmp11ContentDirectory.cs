@@ -52,6 +52,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
                                         out int numberReturned,
                                         out int totalMatches)
         {
+            if (query == null) {
+                throw new ArgumentNullException ("query");
+            }
+
             var visitor = new Wmp11QueryVisitor (this, containerId);
             query (visitor);
             if (visitor.Results != null) {

@@ -83,6 +83,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                                        out int numberReturned,
                                        out int totalMatches)
         {
+            if (consumer == null) {
+                throw new ArgumentNullException ("consumer");
+            } else if (query == null) {
+                throw new ArgumentNullException ("query");
+            }
+
             var total = 0;
             var count = 0;
 
