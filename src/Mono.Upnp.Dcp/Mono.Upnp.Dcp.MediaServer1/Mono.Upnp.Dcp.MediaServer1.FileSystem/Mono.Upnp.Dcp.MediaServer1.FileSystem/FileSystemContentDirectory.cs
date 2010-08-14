@@ -143,6 +143,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
         protected static int VisitResults<T> (Action<T> consumer, IList<T> objects, int startIndex, int requestCount)
         {
+            if (consumer == null) {
+                throw new ArgumentNullException ("consumer");
+            } else if (objects == null) {
+                throw new ArgumentNullException ("objects");
+            }
+
             var endIndex = System.Math.Min (startIndex + requestCount, objects.Count);
             for (var i = startIndex; i < endIndex; i++) {
                 consumer (objects[i]);

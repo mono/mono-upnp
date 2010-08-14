@@ -136,7 +136,19 @@ namespace Mono.Upnp.Internal
                             // TODO throw
                         }
                     }
-                    var result = method.Invoke (service, argument_array);
+
+                    object result;
+                    try {
+                        result = method.Invoke (service, argument_array);
+                    } catch (TargetInvocationException e) {
+                        if (e.InnerException is UpnpControlException) {
+                            throw e.InnerException;
+                        } else {
+                            throw new UpnpControlException (
+                                UpnpError.Unknown (), "Unexpected exception.", e.InnerException);
+                        }
+                    }
+
                     var out_arguments = new Dictionary<string, string> ();
                     for (var i = 0; i < arguments.Length; i++) {
                         if (arguments[i].Argument.Direction == ArgumentDirection.In) {

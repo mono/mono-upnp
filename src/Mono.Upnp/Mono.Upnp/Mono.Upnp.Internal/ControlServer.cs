@@ -73,8 +73,16 @@ namespace Mono.Upnp.Internal
                         context.Request.RemoteEndPoint, context.Request.Url));
                     return;
                 }
-                
-                var requestEnvelope = deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
+
+                SoapEnvelope<Arguments> requestEnvelope;
+                try {
+                    requestEnvelope = deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
+                } catch (Exception e) {
+                    Log.Exception (string.Format (
+                        "Failed to deserialize a control request from {0} to {1}.",
+                        context.Request.RemoteEndPoint, context.Request.Url), e);
+                    return;
+                }
                 
                 if (requestEnvelope == null) {
                     Log.Error (string.Format (
@@ -91,6 +99,13 @@ namespace Mono.Upnp.Internal
                         context.Request.RemoteEndPoint, context.Request.Url));
                     return;
                 }
+
+                if (arguments.ActionName == null) {
+                    Log.Error (string.Format (
+                        "A control request from {0} to {1} does not have an action name.",
+                        context.Request.RemoteEndPoint, context.Request.Url));
+                    return;
+                }
                 
                 ServiceAction action;
                 try {
@@ -101,13 +116,6 @@ namespace Mono.Upnp.Internal
                         try {
                             result = new Arguments (
                                 service_type, action.Name, action.Execute (arguments.Values), true);
-                        } catch (TargetInvocationException e) {
-                            if (e.InnerException is UpnpControlException) {
-                                throw e.InnerException;
-                            } else {
-                                throw new UpnpControlException (
-                                    UpnpError.Unknown (), "Unexpected exception.", e.InnerException);
-                            }
                         } catch (UpnpControlException) {
                             throw;
                         } catch (Exception e) {
