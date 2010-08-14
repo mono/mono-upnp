@@ -34,6 +34,7 @@ using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Internal
 {
+    // FIXME I am not happy with the state of this class. Let's clean it up later.
     static class ServiceControllerBuilder
     {
         class Eventer : StateVariableEventer

@@ -129,6 +129,8 @@ namespace Mono.Upnp.Internal
                     }
                 } catch (UpnpControlException e) {
                     Log.Exception (e);
+                    context.Response.StatusCode = 500;
+                    context.Response.StatusDescription = "Internal Server Error";
                     serializer.Serialize (new SoapEnvelope<SoapFault<UpnpError>> (
                         new SoapFault<UpnpError> (e.UpnpError)), context.Response.OutputStream);
                 }
