@@ -112,7 +112,9 @@ namespace Mono.Upnp.Internal
                     if (actions.TryGetValue (arguments.ActionName, out action)) {
                         Log.Information (string.Format ("{0} invoked {1} on {2}.",
                             context.Request.RemoteEndPoint, arguments.ActionName, context.Request.Url));
+
                         Arguments result;
+
                         try {
                             result = new Arguments (
                                 service_type, action.Name, action.Execute (arguments.Values), true);
@@ -121,6 +123,7 @@ namespace Mono.Upnp.Internal
                         } catch (Exception e) {
                             throw new UpnpControlException (UpnpError.Unknown (), "Unexpected exception.", e);
                         }
+
                         try {
                             serializer.Serialize (new SoapEnvelope<Arguments> (result), context.Response.OutputStream);
                         } catch (Exception e) {
@@ -133,8 +136,10 @@ namespace Mono.Upnp.Internal
                     }
                 } catch (UpnpControlException e) {
                     Log.Exception (e);
+                    
                     context.Response.StatusCode = 500;
                     context.Response.StatusDescription = "Internal Server Error";
+
                     try {
                         serializer.Serialize (new SoapEnvelope<SoapFault<UpnpError>> (
                             new SoapFault<UpnpError> (e.UpnpError)), context.Response.OutputStream);
