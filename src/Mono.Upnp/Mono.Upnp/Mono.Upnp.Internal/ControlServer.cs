@@ -75,6 +75,7 @@ namespace Mono.Upnp.Internal
                 }
 
                 SoapEnvelope<Arguments> requestEnvelope;
+
                 try {
                     requestEnvelope = deserializer.Deserialize<SoapEnvelope<Arguments>> (reader);
                 } catch (Exception e) {
@@ -108,6 +109,7 @@ namespace Mono.Upnp.Internal
                 }
                 
                 ServiceAction action;
+
                 try {
                     if (actions.TryGetValue (arguments.ActionName, out action)) {
                         Log.Information (string.Format ("{0} invoked {1} on {2}.",
@@ -136,15 +138,15 @@ namespace Mono.Upnp.Internal
                     }
                 } catch (UpnpControlException e) {
                     Log.Exception (e);
-                    
+
                     context.Response.StatusCode = 500;
                     context.Response.StatusDescription = "Internal Server Error";
 
                     try {
                         serializer.Serialize (new SoapEnvelope<SoapFault<UpnpError>> (
                             new SoapFault<UpnpError> (e.UpnpError)), context.Response.OutputStream);
-                    } catch (Exception e) {
-                        Log.Exception ("Failed to serialize erroneous control response.", e);
+                    } catch (Exception exception) {
+                        Log.Exception ("Failed to serialize erroneous control response.", exception);
                     }
                 }
             }
