@@ -121,7 +121,11 @@ namespace Mono.Upnp.Internal
                         } catch (Exception e) {
                             throw new UpnpControlException (UpnpError.Unknown (), "Unexpected exception.", e);
                         }
-                        serializer.Serialize (new SoapEnvelope<Arguments> (result), context.Response.OutputStream);
+                        try {
+                            serializer.Serialize (new SoapEnvelope<Arguments> (result), context.Response.OutputStream);
+                        } catch (Exception e) {
+                            Log.Exception ("Failed to serialize successful control response.", e);
+                        }
                     } else {
                         throw new UpnpControlException (UpnpError.InvalidAction (), string.Format (
                             "{0} attempted to invoke the non-existant action {1} on {2}.",
@@ -131,8 +135,12 @@ namespace Mono.Upnp.Internal
                     Log.Exception (e);
                     context.Response.StatusCode = 500;
                     context.Response.StatusDescription = "Internal Server Error";
-                    serializer.Serialize (new SoapEnvelope<SoapFault<UpnpError>> (
-                        new SoapFault<UpnpError> (e.UpnpError)), context.Response.OutputStream);
+                    try {
+                        serializer.Serialize (new SoapEnvelope<SoapFault<UpnpError>> (
+                            new SoapFault<UpnpError> (e.UpnpError)), context.Response.OutputStream);
+                    } catch (Exception e) {
+                        Log.Exception ("Failed to serialize erroneous control response.", e);
+                    }
                 }
             }
         }
