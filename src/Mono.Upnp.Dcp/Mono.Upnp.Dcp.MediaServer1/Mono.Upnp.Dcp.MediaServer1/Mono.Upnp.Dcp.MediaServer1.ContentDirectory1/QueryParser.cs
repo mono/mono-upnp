@@ -396,7 +396,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                         new BooleanParser (value => consumer (visitor => visitor.VisitExists (property, value))));
                     break;
                 case 'd':
-                    parser = Operator ("derivedFrom", value => visitor => visitor.VisitDerivedFrom (property, value)).Or (
+                    parser = Operator ("derivedfrom", value => visitor => visitor.VisitDerivedFrom (property, value)).Or (
                         Operator ("doesNotContain", value => visitor => visitor.VisitDoesNotContain (property, value)));
                     break;
                 default:

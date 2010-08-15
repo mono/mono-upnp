@@ -64,7 +64,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
             album_builder = new ContainerBuilder<MusicAlbumOptions> (
                 Wmp11Ids.MusicAlbum, "Album", GetId, (id, options) => new MusicAlbum (GetId (), id, options));
             playlists_builder = new ContainerBuilder<PlaylistContainerOptions> (
-                Wmp11Ids.Playlists, "Playlists", GetId, (id, options) => new PlaylistContainer (GetId (), id, options));
+                Wmp11Ids.MusicPlaylists, "Playlists", GetId, (id, options) => new PlaylistContainer (GetId (), id, options));
             folders_builder = new ContainerBuilder<StorageFolderOptions> (
                 Wmp11Ids.MusicFolders, "Folders", GetId, (id, options) => new StorageFolder (GetId (), id, options));
             contributing_artists_builder = new ContainerBuilder<MusicArtistOptions> (

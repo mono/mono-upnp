@@ -123,14 +123,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         [Test]
         public void DerivedFromOperator ()
         {
-            AssertEquality (foo.DerivedFrom ("object.item"), @"foo derivedFrom ""object.item""");
+            AssertEquality (foo.DerivedFrom ("object.item"), @"foo derivedfrom ""object.item""");
         }
 
         [Test]
         public void NamespacedDerivedFromOperator ()
         {
             var @class = new Property ("upnp:class");
-            AssertEquality (@class.DerivedFrom ("object.item"), @"upnp:class derivedFrom ""object.item""");
+            AssertEquality (@class.DerivedFrom ("object.item"), @"upnp:class derivedfrom ""object.item""");
         }
 
         [Test]
@@ -262,6 +262,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertEquality (expected, @"foo =  ""bar""");
             AssertEquality (expected, @"foo = ""bar"" ");
             AssertEquality (expected, @" foo  =  ""bar"" ");
+        }
+
+        [Test]
+        public void DerivedFromOperatorWithParentheses ()
+        {
+            AssertEquality (
+                new Property ("upnp:class").DerivedFrom ("object.item.audioItem"),
+                @"(upnp:class derivedfrom ""object.item.audioItem"")");
         }
 
         [Test, ExpectedException (typeof (QueryParsingException), ExpectedMessage = "The query is empty.")]
