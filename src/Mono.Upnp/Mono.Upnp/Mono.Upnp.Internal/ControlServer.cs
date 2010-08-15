@@ -126,11 +126,10 @@ namespace Mono.Upnp.Internal
                             throw new UpnpControlException (UpnpError.Unknown (), "Unexpected exception.", e);
                         }
 
-                        try {
-                            serializer.Serialize (new SoapEnvelope<Arguments> (result), context.Response.OutputStream);
-                        } catch (Exception e) {
-                            Log.Exception ("Failed to serialize successful control response.", e);
-                        }
+                        // TODO If we're allowing consumer code to subclass Argument, then we need to expose that in a
+                        // Mono.Upnp.Serializer class. We would then need to put this in a try/catch because custom
+                        // serialization code could throw.
+                        serializer.Serialize (new SoapEnvelope<Arguments> (result), context.Response.OutputStream);
                     } else {
                         throw new UpnpControlException (UpnpError.InvalidAction (), string.Format (
                             "{0} attempted to invoke the non-existant action {1} on {2}.",
@@ -142,12 +141,9 @@ namespace Mono.Upnp.Internal
                     context.Response.StatusCode = 500;
                     context.Response.StatusDescription = "Internal Server Error";
 
-                    try {
-                        serializer.Serialize (new SoapEnvelope<SoapFault<UpnpError>> (
-                            new SoapFault<UpnpError> (e.UpnpError)), context.Response.OutputStream);
-                    } catch (Exception exception) {
-                        Log.Exception ("Failed to serialize erroneous control response.", exception);
-                    }
+                    // TODO This needs to be a try/catch in the future too.
+                    serializer.Serialize (new SoapEnvelope<SoapFault<UpnpError>> (
+                        new SoapFault<UpnpError> (e.UpnpError)), context.Response.OutputStream);
                 }
             }
         }
