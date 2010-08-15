@@ -35,3 +35,12 @@ using System.Runtime.CompilerServices;
                                "2974F2E5D86049D7F44706839CD76C57FAC02E" +
                                "86C977188DD5185F5DDBA8EE46CA8F6F40224F" +
                                "9D8653092BBAFE9F")]
+
+[assembly: InternalsVisibleTo ("Mono.Upnp.Dcp.MediaServer1.FileSystem, PublicKey=" +
+                               "0024000004800000940000000602000000240000525341310" +
+                               "0040000110000007FD08FD4F03157DEE6573823B967BCF78D" +
+                               "A200777DF681030D1C8EC06BEA3BE2C9CEC6735CF0046953E" +
+                               "1949882B0FB1D6F13ED43A72465BDA6EB3DA794D98D3921AF" +
+                               "D24996E2FFE2FCF87B2B715DA8F20363314259C8F280E71C7" +
+                               "46781846E73D54C383DC32B8C19038F317F9394815C0307BE" +
+                               "92D0BA9CB278C2019B31A28D83")]

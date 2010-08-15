@@ -61,6 +61,7 @@
     <Compile Include="Property.cs" />
     <Compile Include="QueryTests.cs" />
     <Compile Include="ObjectTests.cs" />
+    <Compile Include="ObjectSerializationTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

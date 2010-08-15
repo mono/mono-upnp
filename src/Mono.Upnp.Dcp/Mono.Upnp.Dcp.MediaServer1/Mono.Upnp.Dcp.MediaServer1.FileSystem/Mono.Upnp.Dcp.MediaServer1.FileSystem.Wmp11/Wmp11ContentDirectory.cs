@@ -88,9 +88,20 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 
             public override void VisitEquals (string property, string value)
             {
+                VisitClassCheck (property, value);
+            }
+
+            public override void VisitDerivedFrom (string property, string value)
+            {
+                VisitClassCheck (property, value);
+            }
+
+            void VisitClassCheck (string property, string value)
+            {
                 if (property != "upnp:class") {
                     return;
                 }
+
                 switch (value) {
                 case "object.item.audioItem":
                     if (container_id == Wmp11Ids.AllMusic) {

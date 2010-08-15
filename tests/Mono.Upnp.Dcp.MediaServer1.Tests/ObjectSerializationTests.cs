@@ -1,5 +1,5 @@
 // 
-// Wmp11ContainerBuilder.cs
+// ObjectSerializationTests.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -23,42 +23,36 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 using System;
-using System.Collections.Generic;
 
+using NUnit.Framework;
+
+using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
+using Mono.Upnp.Xml;
 
-using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
-
-namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
+namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
-    public class Wmp11ContainerBuilder : ContainerBuilder
+    [TestFixture]
+    public class ObjectSerializationTests
     {
-        public Wmp11ContainerBuilder (string id, string title)
-            : base (id, title)
-        {
-        }
+        XmlSerializer serializer = new XmlSerializer ();
 
-        protected Container Build<T> (Action<ContainerInfo> consumer,
-                                      ContainerBuilder<T> containerBuilder)
-            where T : ContainerOptions
+        [Test]
+        public void MusicTrackSerialization ()
         {
-            if (containerBuilder == null) {
-                throw new ArgumentNullException ("containerBuilder");
-            }
-
-            return containerBuilder.Build (consumer, Id);
-        }
-
-        protected Container Build (Action<ContainerInfo> consumer, IList<Object> children)
-        {
-            return Build (consumer, Title, Id, Wmp11Ids.Root, children);
-        }
-
-        protected Container Build (Action<ContainerInfo> consumer, string title, string id, IList<Object> children)
-        {
-            return Build (consumer, title, id, this.Id, children);
+            var music_track = new MusicTrack ("0", "-1", new MusicTrackOptions {
+                Title = "Foo",
+                Artists = new[] { new PersonWithRole ("Fooer", "performer") },
+                Albums = new[] { "Footown" },
+                OriginalTrackNumber = 1,
+                Genres = new[] { "Fooish" },
+                Resources = new[] { new Resource (new Uri ("http://foo/"), new ResourceOptions {
+                        Size = 42
+                    })}
+            });
+            serializer.GetString (music_track);
         }
     }
 }

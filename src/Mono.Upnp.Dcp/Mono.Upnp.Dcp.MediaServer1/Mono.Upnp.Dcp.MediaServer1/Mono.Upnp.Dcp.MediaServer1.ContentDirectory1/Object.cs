@@ -57,6 +57,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             WriteStatus = options.WriteStatus;
             IsRestricted = options.IsRestricted;
             Resources = Helper.MakeReadOnlyCopy (options.Resources);
+            Class = new Class (ClassManager.GetClassNameFromType (GetType ()));
         }
 
         protected void CopyToOptions (ObjectOptions options)

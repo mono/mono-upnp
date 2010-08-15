@@ -32,6 +32,7 @@ using System.Net;
 using Mono.Upnp.Control;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
+using Mono.Upnp.Internal;
 using Mono.Upnp.Xml;
 
 using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
@@ -43,6 +44,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
     {
         const int file_buffer_size = 8192;
 
+        readonly Uri url;
         HttpListener listener;
         IDictionary<string, ObjectInfo> objects;
         IDictionary<string, ContainerInfo> containers;
@@ -51,16 +53,21 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                                            IDictionary<string, ObjectInfo> objects,
                                            IDictionary<string, ContainerInfo> containers)
         {
-            if (objects == null) {
+            if (url == null) {
+                throw new ArgumentNullException ("url");
+            } else if (objects == null) {
                 throw new ArgumentNullException ("objects");
             } else if (containers == null) {
                 throw new ArgumentNullException ("containers");
             }
 
+            this.url = url;
             this.objects = objects;
             this.containers = containers;
             this.listener = new HttpListener { IgnoreWriteExceptions = true };
             listener.Prefixes.Add (url.ToString ());
+
+            Log.Information (string.Format ("FileSystemContentDirectory created at {0}.", url));
         }
 
         public override void Start ()
@@ -174,15 +181,21 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 }
                 
                 var context = listener.EndGetContext (result);
-                var query = context.Request.Url.Query;
+
+                Log.Information (string.Format ("Got request from {0} for {1}.",
+                    context.Request.RemoteEndPoint, context.Request.Url));
+
+                var url = this.url.MakeRelativeUri (context.Request.Url);
+
+                GetFile (context.Response, url.ToString ());
                 
-                if (query.StartsWith ("?id=") && query.Length > 4) {
+                /*if (query.StartsWith ("?id=") && query.Length > 4) {
                     GetFile (context.Response, query.Substring (4));
                 } else if (query.StartsWith ("?art=")) {
                     //GetArtwork (context.Response, query);
                 } else {
                     context.Response.StatusCode = 404;
-                }
+                }*/
                 
                 listener.BeginGetContext (OnGetContext, null);
             }
@@ -193,9 +206,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             using (response) {
                 ObjectInfo object_info;
                 if (!objects.TryGetValue (id, out object_info) || object_info.Path == null) {
+                    Log.Error (string.Format ("The requested object {0} does not exist.", id));
+
                     response.StatusCode = 404;
                     return;
                 }
+
+                Log.Information (string.Format ("Serving file {0}.", object_info.Path));
 
                 using (var reader = System.IO.File.OpenRead (object_info.Path)) {
                     response.ContentType = object_info.Object.Resources[0].ProtocolInfo.ContentFormat;

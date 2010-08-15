@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 using TagLib;
 
+using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 
@@ -54,8 +55,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
         ContainerBuilder<ContainerOptions> four_star_builder;
         ContainerBuilder<ContainerOptions> five_star_builder;
 
-        public Wmp11MusicBuilder (Uri url)
-            : base (url, Wmp11Ids.Music, "Music")
+        public Wmp11MusicBuilder ()
+            : base (Wmp11Ids.Music, "Music")
         {
             genre_builder = new ContainerBuilder<GenreOptions> (
                 Wmp11Ids.MusicGenre, "Genre", GetId, (id, options) => new MusicGenre (GetId (), id, options));
@@ -85,20 +86,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
                 Wmp11Ids.MusicRating5Star, "5+ stars", GetId, RatingProvider);
         }
 
-        public void OnTag (Tag tag, Action<Object> consumer)
+        public void OnTag (string id, IEnumerable<Resource> resources, Tag tag, Action<Object> consumer)
         {
             var genres = tag.Genres;
             var artists = tag.Performers;
             var album_artists = tag.AlbumArtists;
             var composers = tag.Composers;
-            var id = GetId ();
 
             var music_track = new MusicTrack (id, Wmp11Ids.AllMusic, new MusicTrackOptions {
                 Title = tag.Title,
                 OriginalTrackNumber = (int)tag.Track,
                 Genres = genres,
                 Artists = GetArtists (artists),
-                Resources = new[] { new Resource (new Uri (Url, "?id=" + id), new ResourceOptions ()) }
+                Resources = resources
             });
 
             audio_items.Add (music_track);

@@ -161,6 +161,9 @@ namespace Mono.Upnp.Internal
                     if (return_argument != null) {
                         out_arguments.Add (return_argument.Argument.Name, result.ToString ());
                     }
+
+                    Trace (name, out_arguments);
+
                     return out_arguments;
                 });
             } else {
@@ -183,6 +186,21 @@ namespace Mono.Upnp.Internal
                 builder.Append (value);
             }
             builder.Append (')');
+            Log.Trace (builder.ToString ());
+        }
+
+        [Conditional ("TRACE")]
+        static void Trace (string name, IDictionary<string, string> results)
+        {
+            var builder = new StringBuilder ();
+            builder.Append (name);
+            builder.Append (": ");
+            foreach (var result in results) {
+                builder.Append ("\n\t");
+                builder.Append (result.Key);
+                builder.Append (": ");
+                builder.Append (result.Value);
+            }
             Log.Trace (builder.ToString ());
         }
         
