@@ -20,7 +20,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Commandlineparameters>-f "mac0: upnp" -n "Windows Media Connect" "/Users/lunchtimemama/Music/Rdio Downloads"</Commandlineparameters>
+    <Commandlineparameters>-f "mac1: upnp" -n "Windows Media Connect" "/Users/lunchtimemama/Music/Rdio Downloads"</Commandlineparameters>
     <Externalconsole>true</Externalconsole>
     <EnvironmentVariables>
       <EnvironmentVariables>

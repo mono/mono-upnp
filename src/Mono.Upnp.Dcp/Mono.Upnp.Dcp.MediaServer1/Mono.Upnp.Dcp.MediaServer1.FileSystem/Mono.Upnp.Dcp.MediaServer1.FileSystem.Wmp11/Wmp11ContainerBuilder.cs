@@ -33,11 +33,12 @@ using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 {
-    public class Wmp11ContainerBuilder
+    public class Wmp11ContainerBuilder : ContainerBuilder
     {
         readonly Uri url;
 
-        protected Wmp11ContainerBuilder (Uri url)
+        public Wmp11ContainerBuilder (Uri url, string id, string title)
+            : base (id, title)
         {
             if (url == null) {
                 throw new ArgumentNullException ("url");
@@ -50,18 +51,26 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
             get { return url; }
         }
 
-        protected Container BuildContainer (Action<ContainerInfo> consumer,
-                                            string id,
-                                            string parentId,
-                                            string title,
-                                            IList<Object> children)
+        protected Container Build<T> (Action<ContainerInfo> consumer,
+                                      ContainerBuilder<T> containerBuilder,
+                                      ContainerBuilder<T>.ContainerProducer containerProducer)
+            where T : ContainerOptions
         {
-            var container = new Container (id, parentId, new ContainerOptions {
-                Title = title,
-                ChildCount = children.Count
-            });
-            consumer (new ContainerInfo (container, children));
-            return container;
+            if (containerBuilder == null) {
+                throw new ArgumentNullException ("containerBuilder");
+            }
+
+            return containerBuilder.Build (consumer, containerProducer, Id);
+        }
+
+        protected Container Build (Action<ContainerInfo> consumer, IList<Object> children)
+        {
+            return Build (consumer, Title, Id, Wmp11Ids.Root, children);
+        }
+
+        protected Container Build (Action<ContainerInfo> consumer, string title, string id, IList<Object> children)
+        {
+            return Build (consumer, title, id, this.Id, children);
         }
     }
 }

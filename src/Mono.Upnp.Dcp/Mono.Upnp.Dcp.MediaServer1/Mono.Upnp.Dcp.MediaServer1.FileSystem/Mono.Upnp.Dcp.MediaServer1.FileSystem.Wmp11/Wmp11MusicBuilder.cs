@@ -43,17 +43,46 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
         ContainerBuilder<GenreOptions> genre_builder;
         ContainerBuilder<BuildableMusicArtistOptions> artist_builder;
         ContainerBuilder<MusicAlbumOptions> album_builder;
+        ContainerBuilder<PlaylistContainerOptions> playlists_builder;
+        ContainerBuilder<StorageFolderOptions> folders_builder;
+        ContainerBuilder<MusicArtistOptions> contributing_artists_builder;
         ContainerBuilder<BuildableMusicArtistOptions> album_artist_builder;
         ContainerBuilder<BuildableMusicArtistOptions> composer_builder;
+        ContainerBuilder<ContainerOptions> one_star_builder;
+        ContainerBuilder<ContainerOptions> two_star_builder;
+        ContainerBuilder<ContainerOptions> three_star_builder;
+        ContainerBuilder<ContainerOptions> four_star_builder;
+        ContainerBuilder<ContainerOptions> five_star_builder;
 
         public Wmp11MusicBuilder (Uri url)
-            : base (url)
+            : base (url, Wmp11Ids.Music, "Music")
         {
-            genre_builder = new ContainerBuilder<GenreOptions> (GetId);
-            artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> (GetId);
-            album_builder = new ContainerBuilder<MusicAlbumOptions> (GetId);
-            album_artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> (GetId);
-            composer_builder = new ContainerBuilder<BuildableMusicArtistOptions> (GetId);
+            genre_builder = new ContainerBuilder<GenreOptions> (
+                Wmp11Ids.MusicGenre, "Genre", GetId);
+            artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> (
+                Wmp11Ids.MusicArtist, "Artist", GetId);
+            album_builder = new ContainerBuilder<MusicAlbumOptions> (
+                Wmp11Ids.MusicAlbum, "Album", GetId);
+            playlists_builder = new ContainerBuilder<PlaylistContainerOptions> (
+                Wmp11Ids.Playlists, "Playlists", GetId);
+            folders_builder = new ContainerBuilder<StorageFolderOptions> (
+                Wmp11Ids.MusicFolders, "Folders", GetId);
+            contributing_artists_builder = new ContainerBuilder<MusicArtistOptions> (
+                Wmp11Ids.MusicContributingArtists, "Contributing Artists", GetId);
+            album_artist_builder = new ContainerBuilder<BuildableMusicArtistOptions> (
+                Wmp11Ids.MusicAlbumArtist, "Album Artist", GetId);
+            composer_builder = new ContainerBuilder<BuildableMusicArtistOptions> (
+                Wmp11Ids.MusicComposer, "Composer", GetId);
+            one_star_builder = new ContainerBuilder<ContainerOptions> (
+                Wmp11Ids.MusicRating1Star, "1+ stars", GetId);
+            two_star_builder = new ContainerBuilder<ContainerOptions> (
+                Wmp11Ids.MusicRating2Star, "2+ stars", GetId);
+            three_star_builder = new ContainerBuilder<ContainerOptions> (
+                Wmp11Ids.MusicRating3Star, "3+ stars", GetId);
+            four_star_builder = new ContainerBuilder<ContainerOptions> (
+                Wmp11Ids.MusicRating4Star, "4+ stars", GetId);
+            five_star_builder = new ContainerBuilder<ContainerOptions> (
+                Wmp11Ids.MusicRating5Star, "5+ stars", GetId);
         }
 
         public void OnTag (Tag tag, Action<Object> consumer)
@@ -119,31 +148,34 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 
         public Container Build (Action<ContainerInfo> consumer)
         {
-            var containers = new List<Object> (11);
+            return Build (consumer, new Object[] {
+                Build (consumer, "All Music", Wmp11Ids.AllMusic, audio_items),
+                Build (consumer, genre_builder, (id, options) => new MusicGenre (GetId (), id, options)),
+                Build (consumer, artist_builder, ArtistProvider),
+                Build (consumer, album_builder, (id, options) => new MusicAlbum (GetId (), id, options)),
+                Build (consumer, playlists_builder, (id, options) => new PlaylistContainer (GetId (), id, options)),
+                Build (consumer, folders_builder, (id, options) => new StorageFolder (GetId (), id, options)),
+                Build (consumer, contributing_artists_builder, ArtistProvider),
+                Build (consumer, album_artist_builder, ArtistProvider),
+                Build (consumer, composer_builder, ArtistProvider),
+                Build (consumer, "Rating", Wmp11Ids.MusicRating, new Object[] {
+                    Build (consumer, one_star_builder, RatingProvider),
+                    Build (consumer, two_star_builder, RatingProvider),
+                    Build (consumer, three_star_builder, RatingProvider),
+                    Build (consumer, four_star_builder, RatingProvider),
+                    Build (consumer, five_star_builder, RatingProvider),
+                })
+            });
+        }
 
-            containers.Add (BuildContainer (consumer, Wmp11Ids.AllMusic, Wmp11Ids.Music, "All Music", audio_items));
+        MusicArtist ArtistProvider (string parentId, MusicArtistOptions options)
+        {
+            return new MusicArtist (GetId (), parentId, options);
+        }
 
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicGenre, Wmp11Ids.Music, "Genre",
-                genre_builder.Build (consumer, options =>
-                    new MusicGenre (GetId (), Wmp11Ids.MusicGenre, options))));
-
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicArtist, Wmp11Ids.Music, "Artist",
-                artist_builder.Build (consumer, options =>
-                    new MusicArtist (GetId (), Wmp11Ids.MusicArtist, options))));
-
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicAlbum, Wmp11Ids.Music, "Album",
-                album_builder.Build (consumer, options =>
-                    new MusicAlbum (GetId (), Wmp11Ids.MusicAlbum, options))));
-
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicAlbumArtist, Wmp11Ids.Music, "Album Artist",
-                album_artist_builder.Build (consumer, options =>
-                    new MusicArtist (GetId (), Wmp11Ids.MusicAlbumArtist, options))));
-
-            containers.Add (BuildContainer (consumer, Wmp11Ids.MusicComposer, Wmp11Ids.Music, "Composer",
-                composer_builder.Build (consumer, options =>
-                    new MusicArtist (GetId (), Wmp11Ids.MusicComposer, options))));
-
-            return BuildContainer (consumer, Wmp11Ids.Music, Wmp11Ids.Root, "Music", containers);
+        Container RatingProvider (string parentId, ContainerOptions options)
+        {
+            return new Container (GetId (), parentId, options);
         }
 
         string GetId ()

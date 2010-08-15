@@ -33,18 +33,66 @@ using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 {
-    public class ContainerBuilder<T>
+    public class ContainerBuilder
+    {
+        readonly string id;
+        readonly string title;
+
+        public ContainerBuilder (string id, string title)
+        {
+            if (id == null) {
+                throw new ArgumentNullException ("id");
+            }
+
+            this.id = id;
+            this.title = title;
+        }
+
+        public string Id {
+            get { return id; }
+        }
+
+        public string Title {
+            get { return title; }
+        }
+
+        public Container Build (Action<ContainerInfo> consumer,
+                                string title,
+                                string id,
+                                string parentId,
+                                IList<Object> children)
+        {
+            if (consumer == null) {
+                throw new ArgumentNullException ("consumer");
+            } else if (children == null) {
+                throw new ArgumentNullException ("children");
+            }
+
+            var container = new Container (id, parentId, new ContainerOptions {
+                Title = title,
+                ChildCount = children.Count
+            });
+
+            consumer (new ContainerInfo (container, children));
+
+            return container;
+        }
+    }
+
+    public class ContainerBuilder<T> : ContainerBuilder
         where T : ContainerOptions
     {
         // Public inner types are almost always Bad News. BUT in the interest of avoiding a 3.5 dependency, I am
         // willing to do this because these type names should never be needed outside of this file due to inference.
+        // TODO Agh! We do reference these by name in Wmp11ContainerBuilder. Whatever.
         public delegate T OptionsProducer (T options);
-        public delegate Container ContainerProducer (T options);
+        public delegate Container ContainerProducer (string id, T options);
         public delegate string IdProducer ();
 
         readonly IdProducer idProducer;
 
-        public ContainerBuilder (IdProducer idProducer)
+        public ContainerBuilder (string id, string title, IdProducer idProducer)
+            : base (id, title)
         {
             if (idProducer == null) {
                 throw new ArgumentNullException ("idProducer");
@@ -80,7 +128,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             consumer (reference);
         }
 
-        public IList<Object> Build (Action<ContainerInfo> consumer, ContainerProducer containerProducer)
+        public Container Build (Action<ContainerInfo> consumer, ContainerProducer containerProducer, string parentId)
         {
             if (consumer == null) {
                 throw new ArgumentNullException ("consumer");
@@ -92,12 +140,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
 
             foreach (var container_info in containers.Values) {
                 container_info.Options.ChildCount = container_info.Children.Count;
-                var container = containerProducer (container_info.Options);
+                var container = containerProducer (Id, container_info.Options);
                 consumer (new ContainerInfo (container, container_info.Children));
                 children.Add (container);
             }
 
-            return children;
+            return Build (consumer, Title, Id, parentId, children);
         }
     }
 }
