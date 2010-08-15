@@ -52,15 +52,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
         }
 
         protected Container Build<T> (Action<ContainerInfo> consumer,
-                                      ContainerBuilder<T> containerBuilder,
-                                      ContainerBuilder<T>.ContainerProducer containerProducer)
+                                      ContainerBuilder<T> containerBuilder)
             where T : ContainerOptions
         {
             if (containerBuilder == null) {
                 throw new ArgumentNullException ("containerBuilder");
             }
 
-            return containerBuilder.Build (consumer, containerProducer, Id);
+            return containerBuilder.Build (consumer, Id);
         }
 
         protected Container Build (Action<ContainerInfo> consumer, IList<Object> children)

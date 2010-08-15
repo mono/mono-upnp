@@ -84,21 +84,24 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
     {
         // Public inner types are almost always Bad News. BUT in the interest of avoiding a 3.5 dependency, I am
         // willing to do this because these type names should never be needed outside of this file due to inference.
-        // TODO Agh! We do reference these by name in Wmp11ContainerBuilder. Whatever.
         public delegate T OptionsProducer (T options);
         public delegate Container ContainerProducer (string id, T options);
         public delegate string IdProducer ();
 
-        readonly IdProducer idProducer;
+        readonly IdProducer id_producer;
+        readonly ContainerProducer container_producer;
 
-        public ContainerBuilder (string id, string title, IdProducer idProducer)
+        public ContainerBuilder (string id, string title, IdProducer idProducer, ContainerProducer containerProducer)
             : base (id, title)
         {
             if (idProducer == null) {
                 throw new ArgumentNullException ("idProducer");
+            } else if (containerProducer == null) {
+                throw new ArgumentNullException ("containerProducer");
             }
 
-            this.idProducer = idProducer;
+            id_producer = idProducer;
+            container_producer = containerProducer;
         }
 
         Dictionary<string, ContainerOptionsInfo<T>> containers = new Dictionary<string, ContainerOptionsInfo<T>> ();
@@ -120,27 +123,25 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             if (containers.TryGetValue (container, out container_options_info)) {
                 container_options_info.Options = optionsProducer (container_options_info.Options);
             } else {
-                container_options_info = new ContainerOptionsInfo<T> (idProducer (), optionsProducer (null));
+                container_options_info = new ContainerOptionsInfo<T> (id_producer (), optionsProducer (null));
                 containers[container] = container_options_info;
             }
-            var reference = new Item (idProducer (), container_options_info.Id, new ItemOptions { RefId = item.Id });
+            var reference = new Item (id_producer (), container_options_info.Id, new ItemOptions { RefId = item.Id });
             container_options_info.Children.Add (reference);
             consumer (reference);
         }
 
-        public Container Build (Action<ContainerInfo> consumer, ContainerProducer containerProducer, string parentId)
+        public Container Build (Action<ContainerInfo> consumer, string parentId)
         {
             if (consumer == null) {
                 throw new ArgumentNullException ("consumer");
-            } else if (containerProducer == null) {
-                throw new ArgumentNullException ("containerProducer");
             }
 
             var children = new List<Object> (containers.Count);
 
             foreach (var container_info in containers.Values) {
                 container_info.Options.ChildCount = container_info.Children.Count;
-                var container = containerProducer (Id, container_info.Options);
+                var container = container_producer (Id, container_info.Options);
                 consumer (new ContainerInfo (container, container_info.Children));
                 children.Add (container);
             }
