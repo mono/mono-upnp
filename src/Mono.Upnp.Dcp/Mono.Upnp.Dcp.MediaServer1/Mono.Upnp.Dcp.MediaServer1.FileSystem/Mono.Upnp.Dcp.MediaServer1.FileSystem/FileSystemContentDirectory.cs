@@ -64,7 +64,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
             this.url = url;
             this.objects = objects;
             this.containers = containers;
-            this.listener = new HttpListener { IgnoreWriteExceptions = true };
+            this.listener = new HttpListener ();
             listener.Prefixes.Add (url.ToString ());
 
             Log.Information (string.Format ("FileSystemContentDirectory created at {0}.", url));
@@ -217,13 +217,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 using (var reader = System.IO.File.OpenRead (object_info.Path)) {
                     response.ContentType = object_info.Object.Resources[0].ProtocolInfo.ContentFormat;
                     response.ContentLength64 = reader.Length;
-                    using (var writer = new BinaryWriter (response.OutputStream)) {
-                        var buffer = new byte[file_buffer_size];
-                        int read;
-                        do {
-                            read = reader.Read (buffer, 0, buffer.Length);
-                            writer.Write (buffer, 0, read);
-                        } while (IsStarted && read > 0);
+                    try {
+                        using (var writer = new BinaryWriter (response.OutputStream)) {
+                            var buffer = new byte[file_buffer_size];
+                            int read;
+                            do {
+                                read = reader.Read (buffer, 0, buffer.Length);
+                                writer.Write (buffer, 0, read);
+                            } while (IsStarted && read > 0);
+                        }
+                    } catch (Exception e) {
+                        Log.Exception (string.Format ("Failed while serving file {0}.", object_info.Path), e);
                     }
                 }
             }
