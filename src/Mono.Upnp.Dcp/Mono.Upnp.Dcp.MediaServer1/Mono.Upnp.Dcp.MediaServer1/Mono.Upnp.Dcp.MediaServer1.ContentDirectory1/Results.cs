@@ -24,99 +24,75 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public abstract class Results<T> : IEnumerable<T> where T : Object
+    public abstract class Results<T> : IEnumerable<T>
     {
-        readonly Deserializer deserializer;
-        readonly string object_id;
-        readonly string sort_criteria;
-        readonly string filter;
-        readonly uint request_count;
-        readonly uint offset;
-        readonly List<T> results = new List<T> ();
-        
-        internal Results (Deserializer deserializer, string objectId, string sortCriteria,
-                          string filter, uint requestCount, uint offset)
+        public Results (Container container,
+                        string sortCriteria,
+                        string filter,
+                        uint requestCount,
+                        uint offset,
+                        uint totalCount,
+                        IList<T> results)
         {
-            this.deserializer = deserializer;
-            this.object_id = objectId;
-            this.sort_criteria = sortCriteria;
-            this.filter = filter;
-            this.request_count = requestCount;
-            this.offset = offset;
+            if (container == null) {
+                throw new ArgumentNullException ("container");
+            } else if (results == null) {
+                throw new ArgumentNullException ("results");
+            }
+
+            this.Container = container;
+            this.SortCriteria = sortCriteria;
+            this.Filter = filter;
+            this.RequestCount = requestCount;
+            this.Offset = offset;
+            this.TotalCount = totalCount;
+            this.ResultsList = results;
         }
         
-        protected Deserializer Deserializer {
-            get { return deserializer; }
-        }
+        protected Container Container { get; private set; }
         
-        protected string ObjectId {
-            get { return object_id; }
-        }
+        protected string SortCriteria { get; private set; }
         
-        protected string SortCriteria {
-            get { return sort_criteria; }
-        }
+        protected string Filter { get; private set; }
         
-        protected string Filter {
-            get { return filter; }
-        }
+        protected uint RequestCount { get; private set; }
         
-        protected uint RequestCount {
-            get { return request_count; }
-        }
-        
-        public uint Offset {
-            get { return offset; }
-        }
-        
-        public uint ReturnedCount {
-            get; private set;
-        }
+        public uint Offset { get; private set; }
         
         public uint TotalCount { get; private set; }
-        
-        public bool IsOutOfDate { get; private set; }
+
+        public uint Count {
+            get { return (uint)ResultsList.Count; }
+        }
+
+        public IList<T> ResultsList { get; private set; }
         
         public bool HasMoreResults {
-            get { return Offset + ReturnedCount < TotalCount; }
+            get { return Offset + ResultsList.Count < TotalCount; }
         }
-        
-        internal void FetchResults ()
+
+        public Results<T> GetMoreResults (RemoteContentDirectory contentDirectory)
         {
-            //uint returned_count, total_count, update_id;
-            //var xml = FetchXml (out returned_count, out total_count, out update_id);
-            //ReturnedCount = returned_count;
-            //TotalCount = total_count;
-//            if (content_directory.CheckIfContainerIsOutOfDate (object_id, update_id) && offset != 0) {
-//                IsOutOfDate = true;
-//            } else {
-//                foreach (var result in content_directory.Deserialize<T> (filter, xml)) {
-//                    results.Add (result);
-//                }
-//            }
+            return GetMoreResults (contentDirectory, new ResultsSettings {
+                SortCriteria = SortCriteria,
+                Filter = Filter,
+                RequestCount = System.Math.Min (RequestCount, TotalCount - (Offset + Count)),
+                Offset = Offset + Count
+            });
         }
         
-        protected abstract string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId);
-        
-        public Results<T> GetMoreResults ()
-        {
-            if (!HasMoreResults) return null;
-            
-            var results = CreateMoreResults ();
-            results.FetchResults ();
-            return results;
-        }
-        
-        protected abstract Results<T> CreateMoreResults ();
+        protected abstract Results<T> GetMoreResults (RemoteContentDirectory contentDirectory,
+                                                      ResultsSettings settings);
         
         public IEnumerator<T> GetEnumerator ()
         {
-            return results.GetEnumerator ();
+            return ResultsList.GetEnumerator ();
         }
         
         IEnumerator IEnumerable.GetEnumerator ()

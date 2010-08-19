@@ -300,7 +300,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             Assert.IsFalse (Matches (data, nested_nullable_number_attribute != "13"));
         }
 
-        static bool Matches (Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object @object, Query query)
+        static bool Matches (Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object @object, Action<QueryVisitor> query)
         {
             var match = false;
             query (new ObjectQueryVisitor (new ObjectQueryContext (@object.GetType ()), @object, result => {

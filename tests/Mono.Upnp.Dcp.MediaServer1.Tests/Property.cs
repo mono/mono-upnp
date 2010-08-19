@@ -28,6 +28,8 @@ using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
+    using Query = System.Action<QueryVisitor>;
+
     #pragma warning disable 0660, 0661
     public class Property
     {

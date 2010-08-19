@@ -28,6 +28,8 @@ using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
+    using Query = System.Action<QueryVisitor>;
+    
     public class QueryTests
     {
         protected static Query Conjoin (Query leftOperand, Query rightOperand)

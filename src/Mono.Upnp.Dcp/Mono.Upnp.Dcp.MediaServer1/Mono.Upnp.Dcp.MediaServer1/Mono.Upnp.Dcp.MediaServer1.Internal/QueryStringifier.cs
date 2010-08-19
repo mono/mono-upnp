@@ -28,9 +28,11 @@ using System.Text;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
-namespace Mono.Upnp.Dcp.MediaServer1.Tests
+namespace Mono.Upnp.Dcp.MediaServer1.Internal
 {
-    public class QueryStringifier : QueryVisitor
+    using Query = System.Action<QueryVisitor>;
+    
+    class QueryStringifier : QueryVisitor
     {
         StringBuilder builder;
 

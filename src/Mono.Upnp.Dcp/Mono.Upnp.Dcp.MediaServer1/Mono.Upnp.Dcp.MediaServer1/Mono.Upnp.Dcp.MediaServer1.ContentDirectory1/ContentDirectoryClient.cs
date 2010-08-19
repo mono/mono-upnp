@@ -10,7 +10,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     {
         readonly Client client;
 
-        public event EventHandler<DiscoveryEventArgs<ContentDirectory>> ContentDirectoryAdded;
+        public event EventHandler<DiscoveryEventArgs<LocalContentDirectory>> ContentDirectoryAdded;
 
         public ContentDirectoryClient ()
             : this (null)
@@ -29,7 +29,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         void ClientServiceAdded (object sender, ServiceEventArgs args)
         {
-            if (args.Service.Type != ContentDirectory.ServiceType) return;
+            if (args.Service.Type != LocalContentDirectory.ServiceType) return;
 
             try {
                 var description = args.Service.GetService ();
@@ -46,7 +46,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         public void Browse ()
         {
-            client.Browse (ContentDirectory.ServiceType);
+            client.Browse (LocalContentDirectory.ServiceType);
         }
 
         /*void OnContentDirectoryAdded (DiscoveryEventArgs<ContentDirectory> e)

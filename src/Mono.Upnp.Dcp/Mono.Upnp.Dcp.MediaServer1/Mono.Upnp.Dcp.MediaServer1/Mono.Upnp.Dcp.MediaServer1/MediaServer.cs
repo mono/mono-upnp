@@ -37,14 +37,14 @@ namespace Mono.Upnp.Dcp.MediaServer1
         public static readonly DeviceType DeviceType = new DeviceType ("schemas-upnp-org", "MediaServer", new Version (1, 0));
         
         Server server;
-        readonly ContentDirectory content_directory;
+        readonly LocalContentDirectory content_directory;
         
-        public MediaServer (string udn, string friendlyName, string manufacturer, string modelName, ConnectionManager connectionManager, ContentDirectory contentDirectory)
+        public MediaServer (string udn, string friendlyName, string manufacturer, string modelName, ConnectionManager connectionManager, LocalContentDirectory contentDirectory)
             : this (udn, friendlyName, manufacturer, modelName, null, connectionManager, contentDirectory)
         {
         }
         
-        public MediaServer (string udn, string friendlyName, string manufacturer, string modelName, RootDeviceOptions options, ConnectionManager connectionManager, ContentDirectory contentDirectory)
+        public MediaServer (string udn, string friendlyName, string manufacturer, string modelName, RootDeviceOptions options, ConnectionManager connectionManager, LocalContentDirectory contentDirectory)
         {
             if (connectionManager == null) throw new ArgumentNullException ("connnectionManager");
             if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
@@ -56,7 +56,7 @@ namespace Mono.Upnp.Dcp.MediaServer1
             this.content_directory = contentDirectory;
             
             var connectionManagerService = new Service<ConnectionManager> (ConnectionManager.ServiceType, "urn:upnp-org:serviceId:ConnectionManager", connectionManager);
-            var contentDirectoryService = new Service<ContentDirectory> (ContentDirectory.ServiceType, "urn:upnp-org:serviceId:ContentDirectory", contentDirectory);
+            var contentDirectoryService = new Service<LocalContentDirectory> (LocalContentDirectory.ServiceType, "urn:upnp-org:serviceId:ContentDirectory", contentDirectory);
             options.Services = Combine (new Service[] { connectionManagerService, contentDirectoryService }, options.Services);
             server = new Server (new Root (DeviceType, udn, friendlyName, manufacturer, modelName, options));
         }

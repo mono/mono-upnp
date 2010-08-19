@@ -1,5 +1,5 @@
 // 
-// ContentDirectory.cs
+// LocalContentDirectory.cs
 //  
 // Author:
 //       Scott Peterson <lunchtimemama@gmail.com>
@@ -30,7 +30,7 @@ using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public abstract class ContentDirectory : IDisposable
+    public abstract class LocalContentDirectory : IDisposable
     {
         bool is_started;
         ulong system_id;
@@ -138,7 +138,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         }
         
         protected virtual string Search (string containerId,
-                                         Query query,
+                                         Action<QueryVisitor> query,
                                          string filter,
                                          int startingIndex,
                                          int requestCount,

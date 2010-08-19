@@ -28,6 +28,8 @@ using System.Text;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
+    using Query = System.Action<QueryVisitor>;
+    
     // Refer to ContentDirectory1 Service Template 1.0.1, Section 2.5.5.1: Search Criteria String Syntax
     public abstract class QueryParser
     {

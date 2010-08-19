@@ -45,7 +45,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
 
         protected override void Search (Action<Object> consumer,
                                         string containerId,
-                                        Query query,
+                                        Action<QueryVisitor> query,
                                         int startingIndex,
                                         int requestCount,
                                         string sortCriteria,

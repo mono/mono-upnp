@@ -46,13 +46,11 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\DiscoveryEventArgs.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\TransferStatus.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\BrowseFlag.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\BrowseResults.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Class.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ClassManager.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ClassNameAttribute.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ClassReference.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Container.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Deserializer.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContentDirectoryClient.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContentDirectoryController.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\DeserializationException.cs" />
@@ -63,9 +61,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Results.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ResultsSettings.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Schemas.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\SearchResults.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\WriteStatus.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectBasedContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1\MediaServer.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ConnectionManager1\ConnectionManagerController.cs" />
@@ -107,7 +103,6 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\FilteringDelegateSerializationCompiler.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\FilteringContext.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\QueryVisitor.cs" />
-    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Query.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\QueryParser.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\QueryParsingException.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectQueryVisitor.cs" />
@@ -140,6 +135,11 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ObjectOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ResourceOptions.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Error.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\LocalContentDirectory.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\RemoteContentDirectory.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\SearchResults.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\BrowseResults.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\QueryStringifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
@@ -153,5 +153,7 @@
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Internal\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Xml\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1\" />
+    <Folder Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\" />
+    <Folder Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\" />
   </ItemGroup>
 </Project>

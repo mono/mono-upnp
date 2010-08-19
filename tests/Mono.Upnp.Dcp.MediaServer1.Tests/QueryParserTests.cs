@@ -30,6 +30,7 @@ using System.Text;
 using NUnit.Framework;
 
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
+using Mono.Upnp.Dcp.MediaServer1.Internal;
 
 namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
@@ -751,7 +752,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             QueryParser.Parse (@"foo = ""\tbar""");
         }
 
-        void AssertEquality (Query expectedQuery, string actualQuery)
+        void AssertEquality (Action<QueryVisitor> expectedQuery, string actualQuery)
         {
             var expected_builder = new StringBuilder ();
             var actual_builder = new StringBuilder ();

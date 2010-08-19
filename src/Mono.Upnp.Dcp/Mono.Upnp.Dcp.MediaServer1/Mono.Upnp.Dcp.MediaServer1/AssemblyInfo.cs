@@ -23,6 +23,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -48,3 +49,12 @@ using System.Runtime.CompilerServices;
 // if desired. See the Mono documentation for more information about signing.
 
 [assembly: AssemblyDelaySign (false)]
+[assembly: InternalsVisibleTo ("Mono.Upnp.Dcp.MediaServer1.Tests, PublicKey=" +
+                               "00240000048000009400000006020000002400005253" +
+                               "41310004000011000000C3030A2933D77BEDEF4CB040" +
+                               "07AF2DFBAEC11AB77693AD580B6B6900B1441006A8FE" +
+                               "CA691E010996573F3DF3E273F4589468125D446128DF" +
+                               "93A1CEEA9407A948990CE3DE2E5531BF4D3063ECA91E" +
+                               "10D4C84B6A77FCDC88F0FDEB9A0FED16D866687DACB8" +
+                               "5659DB48FD017FD94222433D9C453813A591F4E1CF25" +
+                               "CFD2ABFBFE94")]

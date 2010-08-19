@@ -26,6 +26,8 @@
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
+    using Query = System.Action<QueryVisitor>;
+    
     public class QueryVisitor
     {
         public virtual void VisitAllResults ()

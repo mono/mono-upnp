@@ -28,7 +28,7 @@ using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
 
 namespace Mono.Upnp.Dcp.MediaServer1.Tests
 {
-    public class DummyContentDirectory : ContentDirectory
+    public class DummyContentDirectory : LocalContentDirectory
     {
         protected override string SearchCapabilities {
             get { return string.Empty; }

@@ -10,6 +10,8 @@
     <RootNamespace>Mono.Upnp.Dcp.MediaServer1.Tests</RootNamespace>
     <AssemblyName>Mono.Upnp.Dcp.MediaServer1.Tests</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>mono-upnp-dcp-mediaserver1-tests.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,7 +53,6 @@
     <Compile Include="UpdateTextWriterTests.cs" />
     <Compile Include="UpdateXmlSerializerTests.cs" />
     <Compile Include="FilteringXmlSerializerTests.cs" />
-    <Compile Include="QueryStringifier.cs" />
     <Compile Include="Consumer.cs" />
     <Compile Include="QueryParserTests.cs" />
     <Compile Include="ObjectQueryContextTests.cs" />

@@ -24,35 +24,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 
-namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
+
+namespace Mono.Upnp.Dcp.MediaServer1.Internal
 {
-    sealed class BrowseResults : Results<Object>
+    sealed class BrowseResults<T> : Results<T>
     {
-        public BrowseResults (Deserializer deserializer, string objectId, ResultsSettings settings)
-            : this (deserializer, objectId, settings.SortCriteria,
-                    settings.Filter, settings.RequestCount, settings.Offset)
+        public BrowseResults (Container container,
+                        string sortCriteria,
+                        string filter,
+                        uint requestCount,
+                        uint offset,
+                        uint totalCount,
+                        IList<T> results)
+            : base (container, sortCriteria, filter, requestCount, offset, totalCount, results)
         {
         }
         
-        BrowseResults (Deserializer deserializer, string objectId,
-                       string sortCriteria, string filter, uint requestCount, uint offset)
-            : base (deserializer, objectId, sortCriteria, filter, requestCount, offset)
+        protected override Results<T> GetMoreResults (RemoteContentDirectory contentDirectory,
+                                                           ResultsSettings settings)
         {
-        }
-        
-        protected override string FetchXml (out uint returnedCount, out uint totalCount, out uint updateId)
-        {
-            return Deserializer.Controller.Browse (
-                ObjectId, BrowseFlag.BrowseDirectChildren, Filter, Offset, RequestCount, SortCriteria,
-                out returnedCount, out totalCount, out updateId);
-        }
-        
-        protected override Results<Object> CreateMoreResults ()
-        {
-            return new BrowseResults (Deserializer, ObjectId, SortCriteria,
-                 Filter, RequestCount, Offset + ReturnedCount);
+            if (contentDirectory == null) {
+                throw new ArgumentNullException ("contentDirectory");
+            }
+
+            return contentDirectory.GetChildren<T> (Container, settings);
         }
     }
 }

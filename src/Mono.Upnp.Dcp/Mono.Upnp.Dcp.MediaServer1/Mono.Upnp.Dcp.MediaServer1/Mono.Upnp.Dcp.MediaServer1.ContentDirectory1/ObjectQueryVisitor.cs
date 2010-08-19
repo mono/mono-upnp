@@ -30,6 +30,8 @@ using System.Reflection;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
+    using Query = System.Action<QueryVisitor>;
+    
     public class ObjectQueryVisitor : QueryVisitor
     {
         readonly ObjectQueryContext context;

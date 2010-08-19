@@ -33,7 +33,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    public abstract class ObjectBasedContentDirectory : ContentDirectory
+    public abstract class ObjectBasedContentDirectory : LocalContentDirectory
     {
         XmlSerializer serializer = new XmlSerializer ();
         Dictionary<Type, ObjectQueryContext> queryContexts = new Dictionary<Type, ObjectQueryContext>();
@@ -58,7 +58,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         }
 
         protected override string Search (string containerId,
-                                          Query query,
+                                          Action<QueryVisitor> query,
                                           string filter,
                                           int startingIndex,
                                           int requestCount,
@@ -76,7 +76,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         protected virtual void Search (Action<Object> consumer,
                                        string containerId,
-                                       Query query,
+                                       Action<QueryVisitor> query,
                                        int startingIndex,
                                        int requestCount,
                                        string sortCriteria,
