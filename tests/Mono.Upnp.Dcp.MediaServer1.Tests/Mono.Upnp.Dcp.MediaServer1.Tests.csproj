@@ -59,7 +59,6 @@
     <Compile Include="ObjectQueryTests.cs" />
     <Compile Include="DummyObject.cs" />
     <Compile Include="DummyContentDirectory.cs" />
-    <Compile Include="Property.cs" />
     <Compile Include="QueryTests.cs" />
     <Compile Include="ObjectTests.cs" />
     <Compile Include="ObjectSerializationTests.cs" />

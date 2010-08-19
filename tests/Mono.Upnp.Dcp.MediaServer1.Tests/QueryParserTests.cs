@@ -37,11 +37,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
     [TestFixture]
     public class QueryParserTests : QueryTests
     {
-        static readonly Property foo = new Property ("foo");
-        static readonly Property bat = new Property ("bat");
-        static readonly Property name = new Property ("name");
-        static readonly Property eyes = new Property ("eyes");
-        static readonly Property age = new Property ("age");
+        static readonly Query foo = new Query ("foo");
+        static readonly Query bat = new Query ("bat");
+        static readonly Query name = new Query ("name");
+        static readonly Query eyes = new Query ("eyes");
+        static readonly Query age = new Query ("age");
 
         [Test]
         public void EqualityOperator ()
@@ -130,7 +130,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         [Test]
         public void NamespacedDerivedFromOperator ()
         {
-            var @class = new Property ("upnp:class");
+            var @class = new Query ("upnp:class");
             AssertEquality (@class.DerivedFrom ("object.item"), @"upnp:class derivedfrom ""object.item""");
         }
 
@@ -269,7 +269,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         public void DerivedFromOperatorWithParentheses ()
         {
             AssertEquality (
-                new Property ("upnp:class").DerivedFrom ("object.item.audioItem"),
+                new Query ("upnp:class").DerivedFrom ("object.item.audioItem"),
                 @"(upnp:class derivedfrom ""object.item.audioItem"")");
         }
 

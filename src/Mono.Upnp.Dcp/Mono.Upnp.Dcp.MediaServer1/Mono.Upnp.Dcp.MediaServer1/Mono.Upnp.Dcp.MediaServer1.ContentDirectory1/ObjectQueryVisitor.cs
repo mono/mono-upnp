@@ -30,8 +30,6 @@ using System.Reflection;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    using Query = System.Action<QueryVisitor>;
-    
     public class ObjectQueryVisitor : QueryVisitor
     {
         readonly ObjectQueryContext context;
@@ -65,12 +63,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             Yield ();
         }
 
-        public override void VisitAnd (Query leftOperand, Query rightOperand)
+        public override void VisitAnd (Action<QueryVisitor> leftOperand, Action<QueryVisitor> rightOperand)
         {
             leftOperand (new ObjectQueryVisitor (context, @object, result => rightOperand (this)));
         }
 
-        public override void VisitOr (Query leftOperand, Query rightOperand)
+        public override void VisitOr (Action<QueryVisitor> leftOperand, Action<QueryVisitor> rightOperand)
         {
             Object leftResult = null;
             leftOperand (new ObjectQueryVisitor (context, @object, result => leftResult = result));

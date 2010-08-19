@@ -1,5 +1,5 @@
 // 
-// Property.cs
+// Query.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
@@ -24,68 +24,66 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
+using System;
 
-namespace Mono.Upnp.Dcp.MediaServer1.Tests
+namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    using Query = System.Action<QueryVisitor>;
-
     #pragma warning disable 0660, 0661
-    public class Property
+    public class Query
     {
         readonly string name;
 
-        public Property (string name)
+        public Query (string name)
         {
             this.name = name;
         }
 
-        public Query Contains (string value)
+        public Action<QueryVisitor> Contains (string value)
         {
             return visitor => visitor.VisitContains (name, value);
         }
 
-        public Query DoesNotContain (string value)
+        public Action<QueryVisitor> DoesNotContain (string value)
         {
             return visitor => visitor.VisitDoesNotContain (name, value);
         }
 
-        public Query DerivedFrom (string value)
+        public Action<QueryVisitor> DerivedFrom (string value)
         {
             return visitor => visitor.VisitDerivedFrom (name, value);
         }
 
-        public Query Exists (bool value)
+        public Action<QueryVisitor> Exists (bool value)
         {
             return visitor => visitor.VisitExists (name, value);
         }
 
-        public static Query operator == (Property property, string value)
+        public static Action<QueryVisitor> operator == (Query property, string value)
         {
             return visitor => visitor.VisitEquals (property.name, value);
         }
 
-        public static Query operator != (Property property, string value)
+        public static Action<QueryVisitor> operator != (Query property, string value)
         {
             return visitor => visitor.VisitDoesNotEqual (property.name, value);
         }
 
-        public static Query operator < (Property property, string value)
+        public static Action<QueryVisitor> operator < (Query property, string value)
         {
             return visitor => visitor.VisitLessThan (property.name, value);
         }
 
-        public static Query operator <= (Property property, string value)
+        public static Action<QueryVisitor> operator <= (Query property, string value)
         {
             return visitor => visitor.VisitLessThanOrEqualTo (property.name, value);
         }
 
-        public static Query operator > (Property property, string value)
+        public static Action<QueryVisitor> operator > (Query property, string value)
         {
             return visitor => visitor.VisitGreaterThan (property.name, value);
         }
 
-        public static Query operator >= (Property property, string value)
+        public static Action<QueryVisitor> operator >= (Query property, string value)
         {
             return visitor => visitor.VisitGreaterThanOrEqualTo (property.name, value);
         }

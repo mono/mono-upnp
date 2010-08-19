@@ -24,10 +24,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    using Query = System.Action<QueryVisitor>;
-    
     public class QueryVisitor
     {
         public virtual void VisitAllResults ()
@@ -84,12 +84,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             VisitExpression ();
         }
 
-        public virtual void VisitAnd (Query leftOperand, Query rightOperand)
+        public virtual void VisitAnd (Action<QueryVisitor> leftOperand, Action<QueryVisitor> rightOperand)
         {
             VisitBinaryExpression (leftOperand, rightOperand);
         }
 
-        public virtual void VisitOr (Query leftOperand, Query rightOperand)
+        public virtual void VisitOr (Action<QueryVisitor> leftOperand, Action<QueryVisitor> rightOperand)
         {
             VisitBinaryExpression (leftOperand, rightOperand);
         }
@@ -99,7 +99,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             VisitExpression ();
         }
 
-        protected virtual void VisitBinaryExpression (Query leftOperand, Query rightOperand)
+        protected virtual void VisitBinaryExpression (Action<QueryVisitor> leftOperand,
+                                                      Action<QueryVisitor> rightOperand)
         {
             VisitExpression ();
         }

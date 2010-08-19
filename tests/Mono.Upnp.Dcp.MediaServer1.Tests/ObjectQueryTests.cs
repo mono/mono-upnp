@@ -37,15 +37,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
     [TestFixture]
     public class ObjectQueryTests : QueryTests
     {
-        static readonly Property text = new Property ("Text");
-        static readonly Property number = new Property ("Number");
-        static readonly Property nullable_number = new Property ("NullableNumber");
-        static readonly Property text_attribute = new Property ("@Text");
-        static readonly Property number_attribute = new Property ("@Number");
-        static readonly Property nullable_number_attribute = new Property ("@NullableNumber");
-        static readonly Property nested_text_attribute = new Property ("Data@Text");
-        static readonly Property nested_number_attribute = new Property ("Data@Number");
-        static readonly Property nested_nullable_number_attribute = new Property ("Data@NullableNumber");
+        static readonly Query text = new Query ("Text");
+        static readonly Query number = new Query ("Number");
+        static readonly Query nullable_number = new Query ("NullableNumber");
+        static readonly Query text_attribute = new Query ("@Text");
+        static readonly Query number_attribute = new Query ("@Number");
+        static readonly Query nullable_number_attribute = new Query ("@NullableNumber");
+        static readonly Query nested_text_attribute = new Query ("Data@Text");
+        static readonly Query nested_number_attribute = new Query ("Data@Number");
+        static readonly Query nested_nullable_number_attribute = new Query ("Data@NullableNumber");
 
         class Data : DummyObject
         {

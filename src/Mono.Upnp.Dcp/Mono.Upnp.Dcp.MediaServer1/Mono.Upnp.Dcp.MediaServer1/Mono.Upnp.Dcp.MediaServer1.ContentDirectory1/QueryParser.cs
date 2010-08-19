@@ -28,7 +28,7 @@ using System.Text;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
-    using Query = System.Action<QueryVisitor>;
+    using Expression = System.Action<QueryVisitor>;
     
     // Refer to ContentDirectory1 Service Template 1.0.1, Section 2.5.5.1: Search Criteria String Syntax
     public abstract class QueryParser
@@ -39,7 +39,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         protected abstract QueryParser OnCharacter (char character);
 
-        protected abstract Query OnDone ();
+        protected abstract Expression OnDone ();
 
         protected static bool IsWhiteSpace (char character)
         {
@@ -98,7 +98,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
             }
 
-            protected override Query OnDone ()
+            protected override Expression OnDone ()
             {
                 if (parentheses == -1) {
                     return visitor => visitor.VisitAllResults ();
@@ -114,10 +114,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             const int conjunction_priority = 2;
             const int parenthetical_priority = 3;
 
-            protected readonly Query Expression;
+            protected readonly Expression Expression;
             int parentheses;
 
-            public ExpressionParser (Query expression, int parentheses)
+            public ExpressionParser (Expression expression, int parentheses)
             {
                 this.Expression = expression;
                 this.parentheses = parentheses;
@@ -163,8 +163,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
             }
 
-            protected virtual Func<int, Func<Query, Query>, Func<Query, Query>> MakeHandler (int priority,
-                                                                                             Func<Query, Query, Query> binaryOperator)
+            protected virtual Func<int, Func<Expression, Expression>, Func<Expression, Expression>> MakeHandler (int priority,
+                                                                                                                 Func<Expression, Expression, Expression> binaryOperator)
             {
                 return (priorPriority, priorOperator) => {
                     if (priorPriority < priority) {
@@ -175,7 +175,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 };
             }
 
-            protected override Query OnDone ()
+            protected override Expression OnDone ()
             {
                 if (parentheses == 0) {
                     return Expression;
@@ -187,21 +187,21 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class JoinedExpressionParser : ExpressionParser
         {
-            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
+            readonly Func<int, Func<Expression, Expression>, Func<Expression, Expression>> previous_handler;
             readonly int priority;
 
-            public JoinedExpressionParser (Query expression,
+            public JoinedExpressionParser (Expression expression,
                                            int parentheses,
                                            int priority,
-                                           Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
+                                           Func<int, Func<Expression, Expression>, Func<Expression, Expression>> previousHandler)
                 : base (expression, parentheses)
             {
                 this.previous_handler = previousHandler;
                 this.priority = priority;
             }
 
-            protected override Func<int, Func<Query, Query>, Func<Query, Query>> MakeHandler (int priority,
-                                                                                              Func<Query, Query, Query> binaryOperator)
+            protected override Func<int, Func<Expression, Expression>, Func<Expression, Expression>> MakeHandler (int priority,
+                                                                                                                  Func<Expression, Expression, Expression> binaryOperator)
             {
                 // An unintelligable but very slick operator priority algorithm.
                 if (this.priority < priority) {
@@ -221,7 +221,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
             }
 
-            protected override Query OnDone ()
+            protected override Expression OnDone ()
             {
                 return previous_handler (priority, operand => operand) (Expression);
             }
@@ -230,14 +230,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         class JunctionParser : QueryParser
         {
             readonly string junction;
-            readonly Func<int, Func<Query, Query>, Func<Query, Query>> previous_handler;
+            readonly Func<int, Func<Expression, Expression>, Func<Expression, Expression>> previous_handler;
             readonly int priority;
             int parentheses;
 
             public JunctionParser (string junction,
                                    int parentheses,
                                    int priority,
-                                   Func<int, Func<Query, Query>, Func<Query, Query>> previousHandler)
+                                   Func<int, Func<Expression, Expression>, Func<Expression, Expression>> previousHandler)
             {
                 this.junction = junction;
                 this.parentheses = parentheses;
@@ -261,9 +261,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
             }
 
-            protected override Query OnDone ()
+            protected override Expression OnDone ()
             {
-                return Fail<Query> ();
+                return Fail<Expression> ();
             }
 
             T Fail<T> ()
@@ -320,7 +320,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                     "Unexpected operator begining: {0}.", token));
             }
 
-            protected override Query OnDone ()
+            protected override Expression OnDone ()
             {
                 if (position == @operator.Length) {
                     throw new QueryParsingException (string.Format (
@@ -360,9 +360,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         class RootPropertyOperatorParser : QueryParser
         {
             readonly string property;
-            readonly Func<Query, QueryParser> consumer;
+            readonly Func<Expression, QueryParser> consumer;
 
-            public RootPropertyOperatorParser (string property, Func<Query, QueryParser> consumer)
+            public RootPropertyOperatorParser (string property, Func<Expression, QueryParser> consumer)
             {
                 this.property = property;
                 this.consumer = consumer;
@@ -408,13 +408,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 return parser.OnCharacter (character);
             }
 
-            protected override Query OnDone ()
+            protected override Expression OnDone ()
             {
                 throw new QueryParsingException (string.Format (
                     "No operator is applied to the property identifier: {0}.", property));
             }
 
-            OperatorParser Operator (string token, Func<string, Query> @operator)
+            OperatorParser Operator (string token, Func<string, Expression> @operator)
             {
                 return new OperatorParser (token, new StringParser (token, value => consumer (@operator (value))));
             }
@@ -440,7 +440,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
             }
 
-            protected override Query OnDone ()
+            protected override Expression OnDone ()
             {
                 throw new QueryParsingException (string.Format (
                     @"The property identifier is not a part of an expression: {0}.", builder.ToString ()));
@@ -492,7 +492,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
             }
 
-            protected override Query OnDone ()
+            protected override Expression OnDone ()
             {
                 throw new QueryParsingException (string.Format (
                     @"The double-quoted string is not terminated: ""{0}"".", builder.ToString ()));
@@ -530,19 +530,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
             }
 
-            protected override Query OnDone ()
+            protected override Expression OnDone ()
             {
                 if (@true) {
                     if (position == "true".Length) {
                         return consumer (true).OnDone ();
                     } else {
-                        return Fail<Query> ();
+                        return Fail<Expression> ();
                     }
                 } else {
                     if (position == "false".Length) {
                         return consumer (false).OnDone ();
                     } else {
-                        return Fail<Query> ();
+                        return Fail<Expression> ();
                     }
                 }
             }
@@ -571,7 +571,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        public static Query Parse (string query)
+        public static Expression Parse (string query)
         {
             QueryParser parser = new RootQueryParser ();
 
