@@ -26,17 +26,16 @@
 
 using System.Text;
 
+using Mono.Upnp.Internal;
+
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     using Expression = System.Action<QueryVisitor>;
+    using OperatorHandler = Func<int, Func<Expression, Expression>, Func<Expression, Expression>>;
     
     // Refer to ContentDirectory1 Service Template 1.0.1, Section 2.5.5.1: Search Criteria String Syntax
     public abstract class QueryParser
     {
-        // Look Mom, no 3.5 dependency!
-        delegate TResult Func<T, TResult> (T argument);
-        delegate TResult Func<T1, T2, TResult> (T1 argument1, T2 argument2);
-
         protected abstract QueryParser OnCharacter (char character);
 
         protected abstract Expression OnDone ();
@@ -163,8 +162,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
                 }
             }
 
-            protected virtual Func<int, Func<Expression, Expression>, Func<Expression, Expression>> MakeHandler (int priority,
-                                                                                                                 Func<Expression, Expression, Expression> binaryOperator)
+            protected virtual OperatorHandler MakeHandler (int priority,
+                                                           Func<Expression, Expression, Expression> binaryOperator)
             {
                 return (priorPriority, priorOperator) => {
                     if (priorPriority < priority) {
@@ -187,21 +186,21 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         class JoinedExpressionParser : ExpressionParser
         {
-            readonly Func<int, Func<Expression, Expression>, Func<Expression, Expression>> previous_handler;
+            readonly OperatorHandler previous_handler;
             readonly int priority;
 
             public JoinedExpressionParser (Expression expression,
                                            int parentheses,
                                            int priority,
-                                           Func<int, Func<Expression, Expression>, Func<Expression, Expression>> previousHandler)
+                                           OperatorHandler previousHandler)
                 : base (expression, parentheses)
             {
                 this.previous_handler = previousHandler;
                 this.priority = priority;
             }
 
-            protected override Func<int, Func<Expression, Expression>, Func<Expression, Expression>> MakeHandler (int priority,
-                                                                                                                  Func<Expression, Expression, Expression> binaryOperator)
+            protected override OperatorHandler MakeHandler (int priority,
+                                                            Func<Expression, Expression, Expression> binaryOperator)
             {
                 // An unintelligable but very slick operator priority algorithm.
                 if (this.priority < priority) {
@@ -230,14 +229,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         class JunctionParser : QueryParser
         {
             readonly string junction;
-            readonly Func<int, Func<Expression, Expression>, Func<Expression, Expression>> previous_handler;
+            readonly OperatorHandler previous_handler;
             readonly int priority;
             int parentheses;
 
             public JunctionParser (string junction,
                                    int parentheses,
                                    int priority,
-                                   Func<int, Func<Expression, Expression>, Func<Expression, Expression>> previousHandler)
+                                   OperatorHandler previousHandler)
             {
                 this.junction = junction;
                 this.parentheses = parentheses;

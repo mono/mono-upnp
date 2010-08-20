@@ -1,10 +1,10 @@
 // 
-// GtkClient.cs
+// Main.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Thomas
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,22 +25,42 @@
 // THE SOFTWARE.
 
 using System;
-using Gtk;
+using System.Collections.Generic;
+using System.Linq;
+using MonoTouch.Foundation;
+using MonoTouch.UIKit;
 
-using Mono.Addins;
-
-namespace Mono.Upnp.GtkClient
+namespace Mono.Upnp.Dcp.MediaServer1.GtkClient
 {
-    class GtkClient
+    public class Application
     {
-        public static void Main (string[] args)
+        static void Main (string[] args)
         {
-            Application.Init ();
-            AddinManager.Initialize ();
-            AddinManager.Registry.Update (null);
-            MainWindow win = new MainWindow ();
-            win.Show ();
-            Application.Run ();
+            UIApplication.Main (args);
+        }
+    }
+
+    // The name AppDelegate is referenced in the MainWindow.xib file.
+    public partial class AppDelegate : UIApplicationDelegate
+    {
+        // This method is invoked when the application has loaded its UI and is ready to run
+        public override void FinishedLaunching (UIApplication app)
+        {
+            glView.Run (60.0);
+        }
+
+        public override void OnResignActivation (UIApplication app)
+        {
+            glView.Stop ();
+            glView.Run (5.0);
+        }
+
+        // This method is required in iPhoneOS 3.0
+        public override void OnActivated (UIApplication app)
+        {
+            glView.Stop ();
+            glView.Run (60.0);
         }
     }
 }
+

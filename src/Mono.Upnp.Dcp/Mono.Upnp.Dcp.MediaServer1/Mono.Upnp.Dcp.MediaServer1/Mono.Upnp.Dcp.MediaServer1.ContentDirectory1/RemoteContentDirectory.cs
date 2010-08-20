@@ -71,6 +71,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return default (T);
         }
 
+        public Results<T> GetChildren<T> (Container container)
+        {
+            return GetChildren<T> (container, new ResultsSettings ());
+        }
+
         public Results<T> GetChildren<T> (Container container, ResultsSettings settings)
         {
             if (container == null) {

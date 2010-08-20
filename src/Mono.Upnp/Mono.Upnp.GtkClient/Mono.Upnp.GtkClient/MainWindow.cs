@@ -176,9 +176,9 @@ namespace Mono.Upnp.GtkClient
                 yield return new ServiceScpdInfoProvider ();
                 yield return new RawServiceDescriptionInfoProvider ();
                 yield return new RawServiceScdpInfoProvider ();
-                //foreach (IServiceInfoProvider extension in AddinManager.GetExtensionObjects (typeof (IServiceInfoProvider))) {
-                //    yield return extension;
-                //}
+                foreach (IServiceInfoProvider extension in AddinManager.GetExtensionObjects (typeof (IServiceInfoProvider))) {
+                    yield return extension;
+                }
             }
         }
     }

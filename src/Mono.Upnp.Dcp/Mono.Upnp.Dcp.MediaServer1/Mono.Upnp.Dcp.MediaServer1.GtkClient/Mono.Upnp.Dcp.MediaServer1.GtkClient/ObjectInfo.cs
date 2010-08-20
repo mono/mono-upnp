@@ -1,10 +1,10 @@
 // 
-// GtkClient.cs
+// ObjectInfo.cs
 //  
 // Author:
 //       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Thomas
+// Copyright (c) 2010 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,22 +25,25 @@
 // THE SOFTWARE.
 
 using System;
+
 using Gtk;
 
-using Mono.Addins;
+using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
-namespace Mono.Upnp.GtkClient
+namespace Mono.Upnp.Dcp.MediaServer1.GtkClient
 {
-    class GtkClient
+    public class ObjectInfo
     {
-        public static void Main (string[] args)
+        Object @object;
+
+        public ObjectInfo (Object @object)
         {
-            Application.Init ();
-            AddinManager.Initialize ();
-            AddinManager.Registry.Update (null);
-            MainWindow win = new MainWindow ();
-            win.Show ();
-            Application.Run ();
+            if (@object == null) {
+                throw new ArgumentNullException ("object");
+            }
+
+            this.@object = @object;
         }
     }
 }
+

@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MSMediaReceiverRegistrar1", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1.csproj", "{1203E9D4-B1F3-4838-8275-91782C8EC6E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.GtkClient", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.GtkClient\Mono.Upnp.Dcp.MediaServer1.GtkClient.csproj", "{CA92678C-BC68-4E02-A14E-C213BF6403F6}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DEA343EA-6B89-4360-B169-F0474A32B259}"
 	ProjectSection(SolutionItems) = preProject
 		README = README
@@ -102,6 +104,14 @@ Global
 		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Debug Linq|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Debug Linq|Any CPU.Build.0 = Debug|Any CPU
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Release Linq|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Release Linq|Any CPU.Build.0 = Debug|Any CPU
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Debug Linq|Any CPU.ActiveCfg = Debug Linq|Any CPU
 		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Debug Linq|Any CPU.Build.0 = Debug Linq|Any CPU
 		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -145,9 +155,10 @@ Global
 		{DA49F3FC-22F1-4714-8C21-5971B62262FE} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
 		{2EC6A92C-816D-45DB-B73E-8CA25BD92E57} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer.csproj
+		StartupItem = src\Mono.Upnp\Mono.Upnp.GtkClient\Mono.Upnp.GtkClient.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = Flat

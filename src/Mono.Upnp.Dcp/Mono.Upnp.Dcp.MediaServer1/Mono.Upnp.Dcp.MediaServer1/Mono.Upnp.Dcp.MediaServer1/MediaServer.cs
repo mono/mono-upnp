@@ -56,7 +56,7 @@ namespace Mono.Upnp.Dcp.MediaServer1
             this.content_directory = contentDirectory;
             
             var connectionManagerService = new Service<ConnectionManager> (ConnectionManager.ServiceType, "urn:upnp-org:serviceId:ConnectionManager", connectionManager);
-            var contentDirectoryService = new Service<LocalContentDirectory> (LocalContentDirectory.ServiceType, "urn:upnp-org:serviceId:ContentDirectory", contentDirectory);
+            var contentDirectoryService = new Service<LocalContentDirectory> (ContentDirectory.ServiceType, "urn:upnp-org:serviceId:ContentDirectory", contentDirectory);
             options.Services = Combine (new Service[] { connectionManagerService, contentDirectoryService }, options.Services);
             server = new Server (new Root (DeviceType, udn, friendlyName, manufacturer, modelName, options));
         }

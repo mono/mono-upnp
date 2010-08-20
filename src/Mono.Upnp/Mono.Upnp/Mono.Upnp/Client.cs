@@ -37,8 +37,6 @@ namespace Mono.Upnp
 {
     public class Client : IDisposable
     {
-        delegate TResult Func<T1, T2, TResult> (T1 t1, T2 t2);
-        
         static WeakReference static_deserializer = new WeakReference (null);
         
         readonly Dictionary<DeviceAnnouncement, DeviceAnnouncement> devices =

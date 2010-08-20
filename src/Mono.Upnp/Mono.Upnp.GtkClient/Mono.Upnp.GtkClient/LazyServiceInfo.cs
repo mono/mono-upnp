@@ -50,7 +50,7 @@ namespace Mono.Upnp.GtkClient
             loading.Text = Catalog.GetString (string.Format ("Loading {0}", provider.Name));
         }
 
-        protected virtual void OnMapped (object sender, System.EventArgs e)
+        protected virtual void OnMapped (object sender, EventArgs e)
         {
             if (!mapped) {
                 mapped = true;
@@ -63,6 +63,7 @@ namespace Mono.Upnp.GtkClient
                         vbox.PackStart (new Gtk.Label ("Failed to Load " + provider.Name), true, true, 0);
                         var expander = new Expander ("Error");
                         expander.Add (new Label (exception.ToString ()));
+                        vbox.PackStart (expander, true, true, 0);
                         widget = vbox;
                     }
                     Gtk.Application.Invoke ((o, a) => {

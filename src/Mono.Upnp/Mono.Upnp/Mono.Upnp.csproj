@@ -136,6 +136,7 @@
     <Compile Include="Mono.Upnp.Control\UpnpServiceDefinitionException.cs" />
     <Compile Include="Mono.Upnp\DeserializerProducer.cs" />
     <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompilerProvider.cs" />
+    <Compile Include="Mono.Upnp.Internal\Func.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
