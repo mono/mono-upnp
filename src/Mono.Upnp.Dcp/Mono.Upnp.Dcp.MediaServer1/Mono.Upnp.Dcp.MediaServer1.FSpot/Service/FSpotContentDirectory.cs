@@ -26,7 +26,7 @@
 using System;
 using System.Linq;
 using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1;
-using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av;
+using Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV;
 using System.Net;
 using System.Collections.Generic;
 using Mono.Upnp.Xml;
@@ -35,7 +35,7 @@ using System.Net.Sockets;
 using FSpot.Query;
 
 using FSpotPhoto = FSpot.Photo;
-using UpnpPhoto = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Av.Photo;
+using UpnpPhoto = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV.Photo;
 using UpnpObject = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 using System.Collections;
 using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
@@ -54,6 +54,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
 
         List<uint> shared_tags;
         bool share_all_tags = GConfHelper.ShareAllCategories;
+
+        int id = 0;
 
         public FSpotContentDirectory ()
         {
@@ -81,11 +83,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
                 child_count = db.Tags.RootCategory.Children.Count;
             }
 
-            var root = new StorageFolder (this) {
+            var rootOptions = new StorageFolderOptions {
                 IsRestricted = true,
                 Title = "F-Spot RootCategory",
                 ChildCount = child_count
             };
+
+            var root = new StorageFolder(id.ToString (), "-1", rootOptions);
 
             tags_cache.Add (db.Tags.RootCategory.Id, root);
         }
@@ -208,7 +212,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             }
         }
 
-        protected override IEnumerable<IXmlSerializable> GetChildren (string objectId, int startIndex, int requestCount, string sortCriteria, out int totalMatches)
+        protected override int VisitChildren (Action<UpnpObject> consumer, string objectId, int startIndex, int requestCount, string sortCriteria, out int totalMatches)
         {
             var tag_key_value = tags_cache.Where ((kv) => kv.Value.Id == objectId).FirstOrDefault ();
             if (tag_key_value.Value != null) {
@@ -236,29 +240,36 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
                         upnp_result.Add (GetPhoto (photo, tag_key_value.Value));
                     }
 
-                    return upnp_result.Cast <IXmlSerializable> ();
+                    foreach (var result in upnp_result) {
+                        consumer (result);
+                    }
+
+                    return upnp_result.Count;
                 }
             }
 
             totalMatches = 0;
-            return null;
+            return 0;
         }
 
         UpnpPhoto GetPhoto (FSpotPhoto photo, Container parent)
         {
             UpnpPhoto upnp_photo = null;
             if (!photos_cache.ContainsKey (photo.Id)) {
+                var resource_options = new ResourceOptions {
+                    ProtocolInfo = new ProtocolInfo (Protocols.HttpGet, MimeTypeHelper.GetMimeType(photo.DefaultVersion.Uri))
+                };
+
+                var resource_uri = new Uri (string.Format ("{0}object?id={1}", prefix, upnp_photo.Id));
+
                 var photo_options = new PhotoOptions {
                     Title = photo.Name,
                     Rating = photo.Rating.ToString(),
-                    Description = photo.Description
+                    Description = photo.Description,
+                    Resources = new [] { new Resource (resource_uri, resource_options) }
                 };
-                upnp_photo = new UpnpPhoto (photo_options, this, parent);
 
-                var resource_settings = new ResourceSettings (new Uri (string.Format ("{0}object?id={1}", prefix, upnp_photo.Id))) {
-                    ProtocolInfo = new ProtocolInfo (Protocols.HttpGet, MimeTypeHelper.GetMimeType(photo.DefaultVersion.Uri))
-                };
-                upnp_photo.AddResource (new Resource (resource_settings));
+                upnp_photo = new UpnpPhoto ((id++).ToString (), parent.Id, photo_options);
 
                 photos_cache.Add (photo.Id, upnp_photo);
             } else {
@@ -272,8 +283,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
         {
             Container container = null;
             if (!tags_cache.ContainsKey (tag.Id)) {
-                var photo_album_options = new PhotoAlbumOptions { Title = tag.Name, Description = "Tag" };
-                var photo_album = new PhotoAlbum (photo_album_options, this, parent);
+                var album_options = new AlbumOptions { Title = tag.Name, Description = "Tag" };
+                var photo_album = new PhotoAlbum ((id++).ToString (), parent.Id, album_options);
                 tags_cache.Add (tag.Id, photo_album);
                 container = photo_album;
             } else
@@ -284,13 +295,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.FSpot
             return container;
         }
 
-        protected override IXmlSerializable GetObject (string objectId)
+        protected override UpnpObject GetObject (string objectId)
         {
             var tags = tags_cache.Values.Cast <UpnpObject> ();
             var photos = photos_cache.Values.Cast <UpnpObject> ();
             var objects = tags.Union (photos);
 
-            var obj = objects.Where ((o) => o.Id == objectId).FirstOrDefault ();
+            var obj = objects.Where (o => o.Id == objectId).FirstOrDefault ();
             if (obj != null) {
                 return obj;
             }
