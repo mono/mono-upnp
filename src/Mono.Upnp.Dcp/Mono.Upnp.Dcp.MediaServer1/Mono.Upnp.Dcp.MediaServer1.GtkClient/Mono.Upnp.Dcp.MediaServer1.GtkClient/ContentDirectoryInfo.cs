@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 using Gtk;
@@ -86,22 +87,51 @@ namespace Mono.Upnp.Dcp.MediaServer1.GtkClient
                         TreeIter iter, loading_iter;
                         store.GetIter (out iter, path);
                         store.IterNthChild (out loading_iter, iter, 0);
+                        List<ItemRow> items = null;
+                        var position = -1;
                         foreach (var child in children) {
+                            position++;
                             var item = child as Item;
                             if (item != null && item.IsReference) {
-                                store.AppendValues (iter, loading);
+                                if (items == null) {
+                                    items = new List<ItemRow> ();
+                                }
+                                items.Add (new ItemRow (item, store.GetPath (store.InsertWithValues (iter, position, loading))));
                                 continue;
                             }
-                            var child_iter = store.AppendValues (iter, new ObjectRow (child));
+                            var child_iter = store.InsertWithValues (iter, position, new ObjectRow (child));
                             var c = child as Container;
                             if (c != null && c.ChildCount > 0) {
                                 store.AppendValues (child_iter, loading);
                             }
                         }
                         store.Remove (ref loading_iter);
+                        if (items != null) {
+                            Load (items);
+                        }
                     });
                 } catch (Exception e) {
                     Console.WriteLine (e);
+                }
+            });
+        }
+
+        void Load (IEnumerable<ItemRow> items)
+        {
+            ThreadPool.QueueUserWorkItem (state => {
+                foreach (var item in items) {
+                    var @object = content_directry.GetObject <Item> (item.Item.RefId);
+                    Load (@object, item.Path);
+                }
+            });
+        }
+
+        void Load (Item item, TreePath path)
+        {
+            Application.Invoke ((sender, args) => {
+                TreeIter iter;
+                if (store.GetIter (out iter, path)) {
+                    store.SetValue (iter, 0, new ObjectRow (item));
                 }
             });
         }
@@ -125,6 +155,19 @@ namespace Mono.Upnp.Dcp.MediaServer1.GtkClient
         void HandleObjectsSelectionChanged (object sender, EventArgs e)
         {
         }
+    }
+
+    struct ItemRow
+    {
+        public ItemRow (Item item, TreePath path)
+        {
+            Item = item;
+            Path = path;
+        }
+
+        public Item Item { get; private set; }
+
+        public TreePath Path { get; private set; }
     }
 
     class ObjectRow
