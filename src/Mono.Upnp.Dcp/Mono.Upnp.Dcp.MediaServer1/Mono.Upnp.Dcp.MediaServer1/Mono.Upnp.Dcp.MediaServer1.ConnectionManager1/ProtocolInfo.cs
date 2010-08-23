@@ -23,7 +23,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
 using System;
+
 namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
 {
     public class ProtocolInfo
@@ -66,16 +68,16 @@ namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
             return string.Format ("{0}:{1}:{2}:{3}", Protocol, network, content_format, additional_info);
         }
 
-        public static implicit operator string(ProtocolInfo protocolInfo)
+        public static ProtocolInfo Parse (string text)
         {
-            return protocolInfo.ToString ();
-        }
+            if (text == null) {
+                throw new ArgumentNullException ("text");
+            }
 
-        public static implicit operator ProtocolInfo(string textValue)
-        {
-            var tokens = textValue.Split (':');
+            var tokens = text.Split (':');
             if (tokens.Length != 4) {
-                throw new ArgumentException ("textValue");
+                throw new ArgumentException ("text",
+                    @"The string must be of the form ""protocol:network:contentFormat:additionalInfo"".");
             }
 
             var result = new ProtocolInfo (tokens [0]);
@@ -105,4 +107,3 @@ namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
         public const string IEC61883 = "iec61883";
     }
 }
-

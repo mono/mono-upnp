@@ -944,5 +944,19 @@ namespace Mono.Upnp.Tests
             var deserialized_object = Deserialize<ElementTestClass<DeserializablePrivateConstructorClass>> (@"<Test><Foo Bar=""bar"" /></Test>");
             Assert.AreEqual ("bar", deserialized_object.Foo.Bar);
         }
+
+        class AttributeAndValueTestClass
+        {
+            [XmlAttribute] public string Foo { get; set; }
+            [XmlValue] public string Bar { get; set; }
+        }
+
+        [Test]
+        public void AttributeAndValueTest ()
+        {
+            var deserialized_object = Deserialize<AttributeAndValueTestClass> (@"<Test Foo=""foo"">bar</Test>");
+            Assert.AreEqual ("foo", deserialized_object.Foo);
+            Assert.AreEqual ("bar", deserialized_object.Bar);
+        }
     }
 }

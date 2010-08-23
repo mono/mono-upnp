@@ -32,7 +32,7 @@ using Mono.Upnp.Dcp.MediaServer1.ConnectionManager1;
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     [XmlType ("res", Schemas.DidlLiteSchema)]
-    public class Resource : XmlAutomatable
+    public class Resource : XmlAutomatable, IXmlDeserializer<ProtocolInfo>
     {
         protected Resource ()
         {
@@ -145,6 +145,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         protected override void SerializeMembersOnly (XmlSerializationContext context)
         {
             context.AutoSerializeMembersOnly (this);
+        }
+
+        ProtocolInfo IXmlDeserializer<ProtocolInfo>.Deserialize (XmlDeserializationContext context)
+        {
+            // FIXME I'd like to do a better job with this. Maybe make ProtocolInfo an IXmlDeserializable and
+            // support IXmlDeserializable attributes (which would require using the Activator).
+            return ProtocolInfo.Parse (context.Reader["protocolInfo"]);
         }
     }
 }

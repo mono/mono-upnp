@@ -151,6 +151,7 @@ namespace Mono.Upnp.Xml.Compilation
                             throw;
                         }
                     }
+                    context.Reader.MoveToElement ();
                     element_deserializer (obj, context, depth);
                 } catch {
                     throw;

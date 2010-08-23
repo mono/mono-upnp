@@ -27,10 +27,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 
 using Mono.Upnp.Dcp.MediaServer1.Internal;
+using Mono.Upnp.Internal;
 using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
@@ -39,6 +41,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     {
         ContentDirectoryController controller;
         XmlDeserializer deserializer;
+        MethodInfo deserialize_method;
 
         public RemoteContentDirectory (ContentDirectoryController controller)
             : this (controller, null)
@@ -53,6 +56,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
             this.controller = controller;
             this.deserializer = deserializer ?? new XmlDeserializer ();
+            this.deserialize_method = this.deserializer.GetType ().GetMethod (
+                "Deserialize", new Type[] { typeof (XmlReader) });
         }
 
         public Container GetRootObject ()
@@ -122,32 +127,59 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 
         protected virtual IEnumerable<T> Deserialize<T> (string xml)
         {
+            var types = new List<Type> ();
+            foreach (var @object in Deserialize<Object> (xml, Deserializers ())) {
+                types.Add (ClassManager.GetTypeFromClassName (@object.Class.FullClassName));
+            }
+            return Deserialize<T> (xml, Deserializers<T> (types));
+        }
+
+        IEnumerable<Func<XmlReader, Object>> Deserializers ()
+        {
+            while (true) {
+                yield return reader => deserializer.Deserialize<Object> (reader);
+            }
+        }
+
+        IEnumerable<Func<XmlReader, T>> Deserializers<T> (IEnumerable<Type> types)
+        {
+            foreach (var type in types) {
+                var method = deserialize_method.MakeGenericMethod (type);
+                yield return reader => (T)method.Invoke (deserializer, new object[] { reader });
+            }
+        }
+
+        IEnumerable<T> Deserialize<T> (string xml, IEnumerable<Func<XmlReader, T>> deserializers)
+        {
+            var enumerator = deserializers.GetEnumerator ();
             using (var reader = XmlReader.Create (new StringReader (xml))) {
                 if (reader.MoveToContent () != XmlNodeType.Element) {
+                    throw new DeserializationException ("Unable to read XML content");
                 }
-                if (!reader.ReadToFollowing ("DIDL-Lite")) {
+                if (reader.LocalName != "DIDL-Lite" && !reader.ReadToFollowing ("DIDL-Lite")) {
+                        throw new DeserializationException ("There is no DIDL-Lite element.");
                 }
                 if (!reader.Read ()) {
+                    throw new DeserializationException ("The DIDL-Lite element has no proper children.");
                 }
                 while (reader.NodeType != XmlNodeType.Element) {
                     if (!reader.Read ()) {
-                        // TODO throw
+                        throw new DeserializationException ("The DIDL-Lite element has no proper children.");
                     }
                 }
                 while (reader.NodeType == XmlNodeType.Element) {
                     using (var subtree = reader.ReadSubtree ()) {
                         subtree.Read ();
-                        yield return Deserialize<T> (subtree);
+                        if (!enumerator.MoveNext ()) {
+                            throw new ArgumentNullException ("types", "The enumeration of deserializers must have" +
+                                " as many elements are there are objects in the XML.");
+                        }
+                        yield return enumerator.Current (subtree);
                     }
                     if (!reader.ReadToNextSibling (reader.LocalName)) {
                     }
                 }
             }
-        }
-
-        protected virtual T Deserialize<T> (XmlReader reader)
-        {
-            return deserializer.Deserialize<T> (reader);
         }
     }
 }
