@@ -781,9 +781,9 @@ namespace Mono.Upnp.Tests
                 serializer.GetString (new EnumTestClass { Thing = EnumTestEnum.Bar, Doohicky = EnumTestEnum.Bat })
             );
         }
-        
-        [XmlNamespace ("udn:mono-upnp:foo", "f")]
+
         [XmlNamespace ("udn:mono-upnp:bar", "b")]
+        [XmlNamespace ("udn:mono-upnp:foo", "f")]
         class NamespaceTestClass
         {
             [XmlElement (Namespace = "udn:mono-upnp:foo")] public string Foo { get; set; }
