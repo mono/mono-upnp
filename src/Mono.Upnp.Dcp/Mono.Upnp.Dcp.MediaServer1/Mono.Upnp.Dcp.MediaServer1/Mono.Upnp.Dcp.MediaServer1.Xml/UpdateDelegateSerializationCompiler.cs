@@ -42,14 +42,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
             : base (xmlSerializer, type)
         {
         }
-        
-        protected override Serializer<UpdateContext> CreateTypeAutoSerializer (string name,
-                                                                               string @namespace,
-                                                                               string prefix,
-                                                                               IEnumerable<XmlNamespaceAttribute> namespaces)
+
+        protected override Serializer<UpdateContext> CreateTypeStartAutoSerializer (string name,
+                                                                                    string @namespace,
+                                                                                    string prefix,
+                                                                                    IEnumerable<XmlNamespaceAttribute> namespaces)
         {
-            var type_auto_serializer = base.CreateTypeAutoSerializer (name, @namespace, prefix, namespaces);
-            var member_serializer = MemberSerializer;
+            var type_start_auto_serializer = base.CreateTypeStartAutoSerializer (name, @namespace, prefix, namespaces);
             return (obj, context) => {
                 if (context.Context == null) {
                     throw new InvalidOperationException ("You must provide an UpdateContext to the serializer.");
@@ -60,9 +59,18 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
                         throw new InvalidOperationException (
                             "Two object must be serialize as a common compatable type for an update.");
                     }
-                    member_serializer (obj, context);
                 } else {
-                    type_auto_serializer (obj, context);
+                    type_start_auto_serializer (obj, context);
+                }
+            };
+        }
+
+        protected override Serializer<UpdateContext> CreateTypeEndAutoSerializer ()
+        {
+            var type_end_auto_serializer = base.CreateTypeEndAutoSerializer ();
+            return (obj, context) => {
+                if (context.Context.OtherValue == null) {
+                    type_end_auto_serializer (obj, context);
                 }
             };
         }

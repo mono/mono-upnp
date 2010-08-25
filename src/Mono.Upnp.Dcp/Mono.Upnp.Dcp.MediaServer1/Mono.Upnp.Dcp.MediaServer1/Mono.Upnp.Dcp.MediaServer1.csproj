@@ -142,6 +142,7 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\BrowseResults.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\QueryStringifier.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContentDirectory.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Reference.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">

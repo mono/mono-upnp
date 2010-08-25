@@ -38,7 +38,7 @@ namespace Mono.Upnp.Xml.Compilation
         {
         }
         
-        protected override Serializer<TContext> CreateTypeAutoSerializer ()
+        protected override Serializer<TContext> CreateTypeStartAutoSerializer ()
         {
             var name = Type.Name;
             string @namespace = null;
@@ -68,33 +68,32 @@ namespace Mono.Upnp.Xml.Compilation
                 prefix = type_attribute.Prefix;
             }
             
-            return CreateTypeAutoSerializer (
+            return CreateTypeStartAutoSerializer (
                 name, @namespace, prefix, namespaces.Count == 0 ? null : namespaces.ToArray ());
         }
         
-        protected virtual Serializer<TContext> CreateTypeAutoSerializer (string name,
-                                                                         string @namespace,
-                                                                         string prefix,
-                                                                         IEnumerable<XmlNamespaceAttribute> namespaces)
+        protected virtual Serializer<TContext> CreateTypeStartAutoSerializer (string name,
+                                                                              string @namespace,
+                                                                              string prefix,
+                                                                              IEnumerable<XmlNamespaceAttribute> namespaces)
         {
-            var next = MemberSerializer;
-            
             if (namespaces != null) {
                 return (obj, context) => {
                     context.Writer.WriteStartElement (prefix, name, @namespace);
                     foreach (var ns in namespaces) {
                         context.Writer.WriteAttributeString ("xmlns", ns.Prefix, null, ns.Namespace);
                     }
-                    next (obj, context);
-                    context.Writer.WriteEndElement ();
                 };
             } else {
                 return (obj, context) => {
                     context.Writer.WriteStartElement (prefix, name, @namespace);
-                    next (obj, context);
-                    context.Writer.WriteEndElement ();
                 };
             }
+        }
+
+        protected override Serializer<TContext> CreateTypeEndAutoSerializer ()
+        {
+            return (obj, context) => context.Writer.WriteEndElement ();
         }
         
         protected override Serializer<TContext> CreateMemberAutoSerializer ()

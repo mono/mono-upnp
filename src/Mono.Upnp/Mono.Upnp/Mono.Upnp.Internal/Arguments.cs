@@ -67,12 +67,12 @@ namespace Mono.Upnp.Internal
             get { return arguments; }
         }
         
-        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        protected override void Serialize (XmlSerializationContext context)
         {
-            SerializeMembersOnly (context);
+            SerializeMembers (context);
         }
         
-        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        protected override void SerializeMembers (XmlSerializationContext context)
         {
             var writer = context.Writer;
             writer.WriteStartElement ("u", response ? ActionName + "Response" : ActionName, ServiceType);

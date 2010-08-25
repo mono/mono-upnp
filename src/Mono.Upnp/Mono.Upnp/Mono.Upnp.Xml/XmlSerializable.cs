@@ -28,35 +28,35 @@ namespace Mono.Upnp.Xml
 {
     public abstract class XmlSerializable : IXmlSerializable
     {
-        void IXmlSerializable.SerializeSelfAndMembers (XmlSerializationContext context)
+        void IXmlSerializable.Serialize (XmlSerializationContext context)
         {
-            SerializeSelfAndMembers (context);
+            Serialize (context);
         }
         
-        void IXmlSerializable.SerializeMembersOnly (XmlSerializationContext context)
+        void IXmlSerializable.SerializeMembers (XmlSerializationContext context)
         {
-            SerializeMembersOnly (context);
+            SerializeMembers (context);
         }
         
-        protected abstract void SerializeSelfAndMembers (XmlSerializationContext context);
+        protected abstract void Serialize (XmlSerializationContext context);
         
-        protected abstract void SerializeMembersOnly (XmlSerializationContext context);
+        protected abstract void SerializeMembers (XmlSerializationContext context);
     }
     
     public abstract class XmlSerializable<TContext> : IXmlSerializable<TContext>
     {
-        void IXmlSerializable<TContext>.SerializeSelfAndMembers (XmlSerializationContext<TContext> context)
+        void IXmlSerializable<TContext>.Serialize (XmlSerializationContext<TContext> context)
         {
-            SerializeSelfAndMembers (context);
+            Serialize (context);
         }
         
-        void IXmlSerializable<TContext>.SerializeMembersOnly (XmlSerializationContext<TContext> context)
+        void IXmlSerializable<TContext>.SerializeMembers (XmlSerializationContext<TContext> context)
         {
-            SerializeMembersOnly (context);
+            SerializeMembers (context);
         }
         
-        protected abstract void SerializeSelfAndMembers (XmlSerializationContext<TContext> context);
+        protected abstract void Serialize (XmlSerializationContext<TContext> context);
         
-        protected abstract void SerializeMembersOnly (XmlSerializationContext<TContext> context);
+        protected abstract void SerializeMembers (XmlSerializationContext<TContext> context);
     }
 }

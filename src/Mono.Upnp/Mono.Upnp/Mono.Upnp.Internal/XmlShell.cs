@@ -69,14 +69,14 @@ namespace Mono.Upnp.Internal
             }
         }
         
-        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        protected override void SerializeMembers (XmlSerializationContext context)
         {
             context.Writer.WriteStartElement (prefix, local_name, @namespace);
             context.Serialize (Value);
             context.Writer.WriteEndElement ();
         }
         
-        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        protected override void Serialize (XmlSerializationContext context)
         {
             throw new InvalidOperationException ("An XmlShell cannot be the root of a serialization operation.");
         }

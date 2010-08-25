@@ -30,62 +30,66 @@ namespace Mono.Upnp.Xml
 {
     public abstract class XmlAutomatable : XmlDeserializable, IXmlSerializable
     {
-        void IXmlSerializable.SerializeSelfAndMembers (XmlSerializationContext context)
+        void IXmlSerializable.Serialize (XmlSerializationContext context)
         {
-            SerializeSelfAndMembers (context);
+            Serialize (context);
         }
         
-        void IXmlSerializable.SerializeMembersOnly (XmlSerializationContext context)
+        void IXmlSerializable.SerializeMembers (XmlSerializationContext context)
         {
-            SerializeMembersOnly (context);
+            SerializeMembers (context);
         }
         
-        protected abstract void SerializeSelfAndMembers (XmlSerializationContext context);
+        protected abstract void Serialize (XmlSerializationContext context);
         
-        protected abstract void SerializeMembersOnly (XmlSerializationContext context);
+        protected abstract void SerializeMembers (XmlSerializationContext context);
 
-        internal static void AutoSerializeObjectAndMembers<T> (T @this, XmlSerializationContext context)
+        protected void AutoSerialize<T> (T @this, XmlSerializationContext context)
         {
             if (context == null) {
                 throw new ArgumentNullException ("context");
             }
 
-            context.AutoSerializeObjectAndMembers (@this);
+            context.AutoSerializeObjectStart (@this);
+            SerializeMembers (context);
+            context.AutoSerializeObjectEnd (@this);
         }
 
-        internal static void AutoSerializeMembersOnly<T> (T @this, XmlSerializationContext context)
+        protected static void AutoSerializeMembers<T> (T @this, XmlSerializationContext context)
         {
             if (context == null) {
                 throw new ArgumentNullException ("context");
             }
 
-            context.AutoSerializeMembersOnly (@this);
+            context.AutoSerializeMembers (@this);
         }
     }
     
     public abstract class XmlAutomatable<TContext> : XmlDeserializable, IXmlSerializable<TContext>
     {
-        void IXmlSerializable<TContext>.SerializeSelfAndMembers (XmlSerializationContext<TContext> context)
+        void IXmlSerializable<TContext>.Serialize (XmlSerializationContext<TContext> context)
         {
-            SerializeSelfAndMembers (context);
+            Serialize (context);
         }
         
-        void IXmlSerializable<TContext>.SerializeMembersOnly (XmlSerializationContext<TContext> context)
+        void IXmlSerializable<TContext>.SerializeMembers (XmlSerializationContext<TContext> context)
         {
-            SerializeMembersOnly (context);
+            SerializeMembers (context);
         }
         
-        protected abstract void SerializeSelfAndMembers (XmlSerializationContext<TContext> context);
+        protected abstract void Serialize (XmlSerializationContext<TContext> context);
         
-        protected abstract void SerializeMembersOnly (XmlSerializationContext<TContext> context);
+        protected abstract void SerializeMembers (XmlSerializationContext<TContext> context);
 
-        internal static void AutoSerializeObjectAndMembers<T> (T @this, XmlSerializationContext<TContext> context)
+        internal void AutoSerialize<T> (T @this, XmlSerializationContext<TContext> context)
         {
             if (context == null) {
                 throw new ArgumentNullException ("context");
             }
 
-            context.AutoSerializeObjectAndMembers (@this);
+            context.AutoSerializeObjectStart (@this);
+            SerializeMembers (context);
+            context.AutoSerializeObjectEnd (@this);
         }
 
         internal static void AutoSerializeMembersOnly<T> (T @this, XmlSerializationContext<TContext> context)
@@ -94,7 +98,7 @@ namespace Mono.Upnp.Xml
                 throw new ArgumentNullException ("context");
             }
 
-            context.AutoSerializeMembersOnly (@this);
+            context.AutoSerializeMembers (@this);
         }
     }
 }

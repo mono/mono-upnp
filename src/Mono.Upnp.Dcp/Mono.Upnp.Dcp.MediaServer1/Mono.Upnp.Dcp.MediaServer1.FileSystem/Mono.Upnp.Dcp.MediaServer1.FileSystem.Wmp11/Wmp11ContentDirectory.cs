@@ -108,6 +108,11 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.Wmp11
                         Results = content_directory.GetChildren (Wmp11Ids.AllMusic);
                     }
                     break;
+                case "object.container.album.musicAlbum":
+                    if (container_id == Wmp11Ids.MusicAlbum) {
+                        Results = content_directory.GetChildren (Wmp11Ids.MusicAlbum);
+                    }
+                    break;
                 }
             }
 

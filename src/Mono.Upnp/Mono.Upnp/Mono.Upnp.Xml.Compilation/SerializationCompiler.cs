@@ -36,7 +36,8 @@ namespace Mono.Upnp.Xml.Compilation
         readonly XmlSerializer<TContext> xml_serializer;
         
         Serializer<TContext> type_serializer;
-        Serializer<TContext> type_auto_serializer;
+        Serializer<TContext> type_start_auto_serializer;
+        Serializer<TContext> type_end_auto_serializer;
         Serializer<TContext> member_serializer;
         Serializer<TContext> member_auto_serializer;
         
@@ -60,12 +61,21 @@ namespace Mono.Upnp.Xml.Compilation
             }
         }
         
-        public Serializer<TContext> TypeAutoSerializer {
+        public Serializer<TContext> TypeStartAutoSerializer {
             get {
-                if (type_auto_serializer == null) {
-                    type_auto_serializer = CreateTypeAutoSerializer ();
+                if (type_start_auto_serializer == null) {
+                    type_start_auto_serializer = CreateTypeStartAutoSerializer ();
                 }
-                return type_auto_serializer;
+                return type_start_auto_serializer;
+            }
+        }
+        
+        public Serializer<TContext> TypeEndAutoSerializer {
+            get {
+                if (type_end_auto_serializer == null) {
+                    type_end_auto_serializer = CreateTypeEndAutoSerializer ();
+                }
+                return type_end_auto_serializer;
             }
         }
         
@@ -93,22 +103,28 @@ namespace Mono.Upnp.Xml.Compilation
         protected virtual Serializer<TContext> CreateTypeSerializer ()
         {
             if (typeof (IXmlSerializable<TContext>).IsAssignableFrom (Type)) {
-                return (obj, context) => ((IXmlSerializable<TContext>)obj).SerializeSelfAndMembers (context);
+                return (obj, context) => ((IXmlSerializable<TContext>)obj).Serialize (context);
             } else if (typeof (IXmlSerializable).IsAssignableFrom (Type)) {
-                return (obj, context) => ((IXmlSerializable)obj).SerializeSelfAndMembers (context);
+                return (obj, context) => ((IXmlSerializable)obj).Serialize (context);
             } else {
-                return TypeAutoSerializer;
+                return (obj, context) => {
+                    TypeStartAutoSerializer (obj, context);
+                    MemberSerializer (obj, context);
+                    TypeEndAutoSerializer (obj, context);
+                };
             }
         }
         
-        protected abstract Serializer<TContext> CreateTypeAutoSerializer ();
+        protected abstract Serializer<TContext> CreateTypeStartAutoSerializer ();
+        
+        protected abstract Serializer<TContext> CreateTypeEndAutoSerializer ();
         
         protected virtual Serializer<TContext> CreateMemberSerializer ()
         {
             if (typeof (IXmlSerializable<TContext>).IsAssignableFrom (Type)) {
-                return (obj, context) => ((IXmlSerializable<TContext>)obj).SerializeMembersOnly (context);
+                return (obj, context) => ((IXmlSerializable<TContext>)obj).SerializeMembers (context);
             } else if (typeof (IXmlSerializable).IsAssignableFrom (Type)) {
-                return (obj, context) => ((IXmlSerializable)obj).SerializeMembersOnly (context);
+                return (obj, context) => ((IXmlSerializable)obj).SerializeMembers (context);
             } else if (Type.IsEnum) {
                 var map = GetEnumMap (Type);
                 return (obj, context) => context.Writer.WriteValue (map [obj]);

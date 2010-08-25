@@ -79,14 +79,14 @@ namespace Mono.Upnp.Control
             AutoDeserializeElement (this, context);
         }
 
-        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        protected override void Serialize (XmlSerializationContext context)
         {
-            AutoSerializeObjectAndMembers (this, context);
+            AutoSerialize (this, context);
         }
 
-        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        protected override void SerializeMembers (XmlSerializationContext context)
         {
-            AutoSerializeMembersOnly (this, context);
+            AutoSerializeMembers (this, context);
         }
         
         string IMappable<string>.Map ()

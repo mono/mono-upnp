@@ -25,6 +25,7 @@
 // THE SOFTWARE.
 
 using System;
+using System.Reflection;
 
 using Gtk;
 
@@ -32,17 +33,29 @@ using Object = Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.Object;
 
 namespace Mono.Upnp.Dcp.MediaServer1.GtkClient
 {
-    public class ObjectInfo
+    public class ObjectInfo : VBox
     {
-        Object @object;
-
         public ObjectInfo (Object @object)
         {
             if (@object == null) {
                 throw new ArgumentNullException ("object");
             }
 
-            this.@object = @object;
+            var properties = @object.GetType ().GetProperties (BindingFlags.Instance | BindingFlags.Public);
+            var table = new Table ((uint)properties.Length, 2, false);
+            uint row = 0;
+            foreach (var property in properties) {
+                table.Attach (new Label (property.Name), 0, 1, row, row + 1);
+                var value = property.GetValue (@object, null);
+                if (value == null) {
+                    value = "";
+                }
+                table.Attach (new Label (value.ToString ()), 1, 2, row, row + 1);
+                row++;
+            }
+
+            Add (table);
+            ShowAll ();
         }
     }
 }

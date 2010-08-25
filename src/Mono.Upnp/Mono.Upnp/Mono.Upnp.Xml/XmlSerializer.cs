@@ -206,13 +206,19 @@ namespace Mono.Upnp.Xml
             serializer (obj, context);
         }
 
-        internal void AutoSerializeObjectAndMembers<TObject> (TObject obj, XmlSerializationContext<TContext> context)
+        internal void AutoSerializeObjectStart<TObject> (TObject obj, XmlSerializationContext<TContext> context)
         {
-            var serializer = GetCompilerForType (typeof (TObject)).TypeAutoSerializer;
+            var serializer = GetCompilerForType (typeof (TObject)).TypeStartAutoSerializer;
+            serializer (obj, context);
+        }
+
+        internal void AutoSerializeObjectEnd<TObject> (TObject obj, XmlSerializationContext<TContext> context)
+        {
+            var serializer = GetCompilerForType (typeof (TObject)).TypeEndAutoSerializer;
             serializer (obj, context);
         }
         
-        internal void AutoSerializeMembersOnly<TObject> (TObject obj, XmlSerializationContext<TContext> context)
+        internal void AutoSerializeMembers<TObject> (TObject obj, XmlSerializationContext<TContext> context)
         {
             var serialzer = GetCompilerForType (typeof (TObject)).MemberAutoSerializer;
             serialzer (obj, context);

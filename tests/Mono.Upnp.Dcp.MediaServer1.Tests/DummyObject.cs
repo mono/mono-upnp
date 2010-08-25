@@ -36,12 +36,12 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
         }
 
-        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        protected override void SerializeMembers (XmlSerializationContext context)
         {
             throw new System.NotImplementedException ();
         }
 
-        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        protected override void Serialize (XmlSerializationContext context)
         {
             throw new System.NotImplementedException ();
         }

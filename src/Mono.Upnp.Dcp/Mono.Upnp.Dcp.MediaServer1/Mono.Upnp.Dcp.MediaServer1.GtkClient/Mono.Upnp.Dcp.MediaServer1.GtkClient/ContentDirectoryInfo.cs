@@ -43,6 +43,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.GtkClient
         ObjectRow loading = new ObjectRow (new Object ("0", "-1", new ObjectOptions { Title = "Loading..." }));
         RemoteContentDirectory content_directry;
         TreeStore store;
+        ObjectInfo object_info;
 
         public ContentDirectoryInfo (RemoteContentDirectory contentDirectory)
         {
@@ -70,7 +71,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.GtkClient
             store.AppendValues (iter, loading);
 
             Add (objects);
-            Add (new Label ("bye bye"));
         }
 
         void HandleObjectsRowExpanded (object o, RowExpandedArgs args)
@@ -154,6 +154,17 @@ namespace Mono.Upnp.Dcp.MediaServer1.GtkClient
 
         void HandleObjectsSelectionChanged (object sender, EventArgs e)
         {
+            if (object_info != null) {
+                Remove (object_info);
+            }
+
+            var selection = (TreeSelection)sender;
+            TreeIter iter;
+            if (!selection.GetSelected (out iter)) {
+                return;
+            }
+            object_info = new ObjectInfo (((ObjectRow)store.GetValue (iter, 0)).Object);
+            Add (object_info);
         }
     }
 

@@ -41,12 +41,16 @@ namespace Mono.Upnp.Xml
         public XmlWriter Writer {
             get { return writer; }
         }
+
+        public abstract void AutoSerializeObjectStart<TObject> (TObject obj);
+
+        public abstract void AutoSerializeObjectEnd<TObject> (TObject obj);
         
-        public abstract void AutoSerializeObjectAndMembers<TObject> (TObject obj);
-        
-        public abstract void AutoSerializeMembersOnly<TObject> (TObject obj);
+        public abstract void AutoSerializeMembers<TObject> (TObject obj);
         
         public abstract void Serialize<TObject> (TObject obj);
+
+        public abstract XmlSerializationContext Without (string name, string @namespace);
     }
     
     public sealed class XmlSerializationContext<TContext> : XmlSerializationContext
@@ -54,7 +58,7 @@ namespace Mono.Upnp.Xml
         readonly XmlSerializer<TContext> serializer;
         readonly TContext context;
         
-        internal XmlSerializationContext(XmlSerializer<TContext> serializer, XmlWriter writer, TContext context)
+        internal XmlSerializationContext (XmlSerializer<TContext> serializer, XmlWriter writer, TContext context)
             : base (writer)
         {
             this.serializer = serializer;
@@ -65,33 +69,48 @@ namespace Mono.Upnp.Xml
             get { return context; }
         }
         
-        public override void AutoSerializeObjectAndMembers<TObject> (TObject obj)
+        public override void AutoSerializeObjectStart<TObject> (TObject obj)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            serializer.AutoSerializeObjectAndMembers (obj, this);
+            serializer.AutoSerializeObjectStart (obj, this);
         }
         
-        public void AutoSerializeObjectAndMembers<TObject> (TObject obj, TContext context)
+        public void AutoSerializeObjectStart<TObject> (TObject obj, TContext context)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            serializer.AutoSerializeObjectAndMembers (obj,
+            serializer.AutoSerializeObjectStart (obj,
                 new XmlSerializationContext<TContext> (serializer, Writer, context));
         }
         
-        public override void AutoSerializeMembersOnly<TObject> (TObject obj)
+        public override void AutoSerializeObjectEnd<TObject> (TObject obj)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            serializer.AutoSerializeMembersOnly (obj, this);
+            serializer.AutoSerializeObjectEnd (obj, this);
         }
         
-        public void AutoSerializeMembersOnly<TObject> (TObject obj, TContext context)
+        public void AutoSerializeObjectEnd<TObject> (TObject obj, TContext context)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            serializer.AutoSerializeMembersOnly (obj,
+            serializer.AutoSerializeObjectEnd (obj,
+                new XmlSerializationContext<TContext> (serializer, Writer, context));
+        }
+        
+        public override void AutoSerializeMembers<TObject> (TObject obj)
+        {
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            serializer.AutoSerializeMembers (obj, this);
+        }
+        
+        public void AutoSerializeMembers<TObject> (TObject obj, TContext context)
+        {
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            serializer.AutoSerializeMembers (obj,
                 new XmlSerializationContext<TContext> (serializer, Writer, context));
         }
         
@@ -103,6 +122,12 @@ namespace Mono.Upnp.Xml
         public void Serialize<TObject> (TObject obj, TContext context)
         {
             serializer.Serialize (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
+        }
+
+        public override XmlSerializationContext Without (string name, string @namespace)
+        {
+            //if (
+            return this;
         }
     }
 }

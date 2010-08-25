@@ -113,9 +113,9 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
             context.AutoDeserializeElement (this);
         }
 
-        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        protected override void SerializeMembers (XmlSerializationContext context)
         {
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembers (this, context);
         }
     }
 }

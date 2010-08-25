@@ -613,14 +613,14 @@ namespace Mono.Upnp.Tests
         {
             public string Foo { get; set; }
             
-            public void SerializeSelfAndMembers (XmlSerializationContext context)
+            public void Serialize (XmlSerializationContext context)
             {
                 context.Writer.WriteStartElement ("test");
-                SerializeMembersOnly (context);
+                SerializeMembers (context);
                 context.Writer.WriteEndElement ();
             }
             
-            public void SerializeMembersOnly (XmlSerializationContext context)
+            public void SerializeMembers (XmlSerializationContext context)
             {
                 context.Writer.WriteAttributeString ("foo", Foo);
             }
@@ -705,14 +705,16 @@ namespace Mono.Upnp.Tests
         {
             [XmlAttribute] public virtual string Foo { get; set; }
             
-            protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+            protected override void Serialize (XmlSerializationContext context)
             {
-                context.AutoSerializeObjectAndMembers (this);
+                context.AutoSerializeObjectStart (this);
+                SerializeMembers (context);
+                context.AutoSerializeObjectEnd (this);
             }
             
-            protected override void SerializeMembersOnly (XmlSerializationContext context)
+            protected override void SerializeMembers (XmlSerializationContext context)
             {
-                context.AutoSerializeMembersOnly (this);
+                context.AutoSerializeMembers (this);
             }
         }
         
@@ -723,9 +725,9 @@ namespace Mono.Upnp.Tests
                 set { base.Foo = value; }
             }
             
-            protected override void SerializeMembersOnly (XmlSerializationContext context)
+            protected override void SerializeMembers (XmlSerializationContext context)
             {
-                context.AutoSerializeMembersOnly (this);
+                context.AutoSerializeMembers (this);
             }
         }
         
@@ -875,15 +877,17 @@ namespace Mono.Upnp.Tests
         {
             [XmlElement (OmitIfNull = true)] public SerializationContextTestClass Child { get; set; }
             
-            public void SerializeSelfAndMembers (XmlSerializationContext<int> context)
+            public void Serialize (XmlSerializationContext<int> context)
             {
-                context.AutoSerializeObjectAndMembers (this);
+                context.AutoSerializeObjectStart (this);
+                SerializeMembers (context);
+                context.AutoSerializeObjectEnd (this);
             }
             
-            public void SerializeMembersOnly (XmlSerializationContext<int> context)
+            public void SerializeMembers (XmlSerializationContext<int> context)
             {
                 context.Writer.WriteAttributeString ("depth", context.Context.ToString ());
-                context.AutoSerializeMembersOnly (this, context.Context + 1);
+                context.AutoSerializeMembers (this, context.Context + 1);
             }
         }
         

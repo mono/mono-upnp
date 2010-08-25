@@ -137,14 +137,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             context.AutoDeserializeElement (this);
         }
 
-        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        protected override void Serialize (XmlSerializationContext context)
         {
-            context.AutoSerializeObjectAndMembers (this);
+            AutoSerialize (this, context);
         }
-
-        protected override void SerializeMembersOnly (XmlSerializationContext context)
+        
+        protected override void SerializeMembers (XmlSerializationContext context)
         {
-            context.AutoSerializeMembersOnly (this);
+            AutoSerializeMembers (this, context);
         }
 
         ProtocolInfo IXmlDeserializer<ProtocolInfo>.Deserialize (XmlDeserializationContext context)

@@ -217,14 +217,14 @@ namespace Mono.Upnp.Control
             context.AutoDeserializeElement (this);
         }
 
-        protected override void SerializeSelfAndMembers (XmlSerializationContext context)
+        protected override void Serialize (XmlSerializationContext context)
         {
-            AutoSerializeObjectAndMembers (this, context);
+            AutoSerialize (this, context);
         }
 
-        protected override void SerializeMembersOnly (Mono.Upnp.Xml.XmlSerializationContext context)
+        protected override void SerializeMembers (Mono.Upnp.Xml.XmlSerializationContext context)
         {
-            AutoSerializeMembersOnly (this, context);
+            AutoSerializeMembers (this, context);
         }
         
         string IMappable<string>.Map ()

@@ -40,20 +40,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
         {
         }
 
-        protected override Serializer<FilteringContext> CreateTypeAutoSerializer (string name,
-                                                                                  string @namespace,
-                                                                                  string prefix,
-                                                                                  IEnumerable<XmlNamespaceAttribute> namespaces)
-        {
-            var serializer = base.CreateTypeAutoSerializer (name, @namespace, prefix, namespaces);
-            return (obj, context) => {
-                if (context == null) {
-                    throw new InvalidOperationException ("You must provide a FilteringContext to the serializer.");
-                }
-                serializer (obj, context);
-            };
-        }
-
         protected override Serializer<FilteringContext> CreateAttributeSerializer (PropertyInfo property,
                                                                                    XmlAttributeAttribute attributeAttribute)
         {
