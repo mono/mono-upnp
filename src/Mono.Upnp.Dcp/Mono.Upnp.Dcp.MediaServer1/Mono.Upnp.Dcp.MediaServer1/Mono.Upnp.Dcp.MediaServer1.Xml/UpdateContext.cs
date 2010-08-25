@@ -68,7 +68,8 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
         public void DelineateUpdate ()
         {
             if (stream == null) {
-                throw new InvalidOperationException ("You cannot call DelineateUpdate unless a Stream and Encoding were passed to the constructor.");
+                throw new InvalidOperationException (
+                    "You cannot call DelineateUpdate unless a Stream and Encoding were passed to the constructor.");
             }
             
             if (delineated) {

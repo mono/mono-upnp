@@ -143,6 +143,9 @@
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.Internal\QueryStringifier.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\ContentDirectory.cs" />
     <Compile Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\Reference.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\VirtualDelegateSerializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\VirtualContext.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.Xml\Override.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">

@@ -49,8 +49,6 @@ namespace Mono.Upnp.Xml
         public abstract void AutoSerializeMembers<TObject> (TObject obj);
         
         public abstract void Serialize<TObject> (TObject obj);
-
-        public abstract XmlSerializationContext Without (string name, string @namespace);
     }
     
     public sealed class XmlSerializationContext<TContext> : XmlSerializationContext
@@ -122,12 +120,6 @@ namespace Mono.Upnp.Xml
         public void Serialize<TObject> (TObject obj, TContext context)
         {
             serializer.Serialize (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
-        }
-
-        public override XmlSerializationContext Without (string name, string @namespace)
-        {
-            //if (
-            return this;
         }
     }
 }
