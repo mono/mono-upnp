@@ -52,6 +52,22 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertAreEqual ("<element><foo>foo</foo></element>", data, new Override ("foo", "foo"));
         }
 
+        [Test]
+        public void ElementWithoutMatchingOverrides ()
+        {
+            var data = new Element<string> { Foo = "bar" };
+            AssertAreEqual ("<element><foo>bar</foo></element>", data,
+                new Override ("bat", "bat"), new Override ("baz", "baz"));
+        }
+
+        [Test]
+        public void ElementWithMatchingAndNonMatchingOverrides ()
+        {
+            var data = new Element<string> { Foo = "bar" };
+            AssertAreEqual ("<element><foo>foo</foo></element>", data,
+                new Override ("bat", "bat"), new Override ("foo", "foo"));
+        }
+
         class ElementOverride<T> : IXmlSerializable<VirtualContext>
         {
             Element<T> element;
