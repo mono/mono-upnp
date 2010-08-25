@@ -68,6 +68,13 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
                 new Override ("bat", "bat"), new Override ("foo", "foo"));
         }
 
+        [Test]
+        public void UnmatchingNamespacedElement ()
+        {
+            var data = new Element<string> { Foo = "bar" };
+            AssertAreEqual ("<element><foo>bar</foo></element>", data, new Override ("foo", "foo", "http://test"));
+        }
+
         class ElementOverride<T> : IXmlSerializable<VirtualContext>
         {
             Element<T> element;
@@ -115,6 +122,77 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         {
             var element = new ElementOmitIfNull ();
             AssertAreEqual ("<element><foo>bar</foo></element>", element, new Override ("bar", "foo"));
+        }
+
+        [Test]
+        public void IntElement ()
+        {
+            var element = new Element<int> { Foo = 42 };
+            AssertAreEqual ("<element><foo>13</foo></element>", element, new Override (13, "foo"));
+        }
+
+        [XmlType ("element")]
+        class NamespacedElement<T>
+        {
+            [XmlElement ("foo", "http://test")] public T Foo { get; set; }
+        }
+
+        [Test]
+        public void NamespacedElement ()
+        {
+            var element = new NamespacedElement<string> { Foo = "bar" };
+            AssertAreEqual (@"<element><foo xmlns=""http://test"">foo</foo></element>", element,
+                new Override ("foo", "foo", "http://test"));
+        }
+
+        [Test]
+        public void UnmatchingUnnamespacedElement ()
+        {
+            var element = new NamespacedElement<string> { Foo = "bar" };
+            AssertAreEqual (@"<element><foo xmlns=""http://test"">bar</foo></element>", element,
+                new Override ("foo", "foo"));
+        }
+
+        [XmlType ("attribute")]
+        class Attribute<T>
+        {
+            [XmlAttribute ("foo")] public T Foo { get; set; }
+        }
+
+        [Test]
+        public void Attribute ()
+        {
+            var attribute = new Attribute<string> { Foo = "bar" };
+            AssertAreEqual (@"<attribute foo=""foo"" />", attribute, new Override ("foo", "foo"));
+        }
+
+        [Test]
+        public void UnmatchingNamespacedAttribute ()
+        {
+            var attribute = new Attribute<string> { Foo = "bar" };
+            AssertAreEqual (@"<attribute foo=""bar"" />", attribute, new Override ("foo", "foo", "http://test"));
+        }
+
+        [XmlType ("attribute")]
+        class NamespacedAttribute<T>
+        {
+            [XmlAttribute ("foo", "http://test", "t")] public T Foo { get; set; }
+        }
+
+        [Test]
+        public void NamespacedAttribute ()
+        {
+            var attribute = new NamespacedAttribute<string> { Foo = "bar" };
+            AssertAreEqual (@"<attribute t:foo=""foo"" xmlns:t=""http://test"" />", attribute,
+                new Override ("foo", "foo", "http://test"));
+        }
+
+        [Test]
+        public void UnmatchingWronglyNamespacedAttribute ()
+        {
+            var attribute = new NamespacedAttribute<string> { Foo = "bar" };
+            AssertAreEqual (@"<attribute t:foo=""bar"" xmlns:t=""http://test"" />", attribute,
+                new Override ("foo", "foo", "http://fail"));
         }
 
         void AssertAreEqual<T> (string xml, T obj, params Override[] overrides)
