@@ -41,20 +41,20 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
         }
 
         protected override Serializer<VirtualContext> CreateAttributeSerializer (PropertyInfo property,
-                                                                                 string name,
-                                                                                 string @namespace,
-                                                                                 string prefix)
+                                                                                 XmlAttributeAttribute attributeAttribute)
         {
-            var serializer = base.CreateAttributeSerializer (property, name, @namespace, prefix);
+            var name = string.IsNullOrEmpty (attributeAttribute.Name) ? property.Name : attributeAttribute.Name;
+            var @namespace = attributeAttribute.Namespace;
+            var serializer = base.CreateAttributeSerializer (property, attributeAttribute);
             return CreateSerializer (name, @namespace, serializer);
         }
 
         protected override Serializer<VirtualContext> CreateElementSerializer (PropertyInfo property,
-                                                                               string name,
-                                                                               string @namespace,
-                                                                               string prefix)
+                                                                               XmlElementAttribute elementAttribute)
         {
-            var serializer = base.CreateElementSerializer (property, name, @namespace, prefix);
+            var name = string.IsNullOrEmpty (elementAttribute.Name) ? property.Name : elementAttribute.Name;
+            var @namespace = elementAttribute.Namespace;
+            var serializer = base.CreateElementSerializer (property, elementAttribute);
             return CreateSerializer (name, @namespace, serializer);
         }
 

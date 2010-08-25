@@ -97,6 +97,26 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
             AssertAreEqual ("<element><foo>bat</foo></element>", element_override);
         }
 
+        [XmlType ("element")]
+        class ElementOmitIfNull
+        {
+            [XmlElement ("foo", OmitIfNull = true)] public string Foo { get; set; }
+        }
+
+        [Test]
+        public void OverrideElementWithNull ()
+        {
+            var element = new ElementOmitIfNull { Foo = "bar" };
+            AssertAreEqual ("<element />", element, new Override (null, "foo"));
+        }
+
+        [Test]
+        public void OverrideElementWithNonNull ()
+        {
+            var element = new ElementOmitIfNull ();
+            AssertAreEqual ("<element><foo>bar</foo></element>", element, new Override ("bar", "foo"));
+        }
+
         void AssertAreEqual<T> (string xml, T obj, params Override[] overrides)
         {
             Assert.AreEqual (xml, xml_serializer.GetString (obj, new XmlSerializationOptions<VirtualContext> {
