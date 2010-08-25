@@ -46,10 +46,39 @@ namespace Mono.Upnp.Dcp.MediaServer1.Tests
         }
 
         [Test]
-        public void TestCase ()
+        public void Element ()
         {
             var data = new Element<string> { Foo = "bar" };
             AssertAreEqual ("<element><foo>foo</foo></element>", data, new Override ("foo", "foo"));
+        }
+
+        class ElementOverride<T> : IXmlSerializable<VirtualContext>
+        {
+            Element<T> element;
+
+            public ElementOverride (Element<T> element)
+            {
+                this.element = element;
+            }
+
+            public void Serialize (XmlSerializationContext<VirtualContext> context)
+            {
+                context.AutoSerializeObjectStart (element);
+                SerializeMembers (context);
+                context.AutoSerializeObjectEnd (element);
+            }
+
+            public void SerializeMembers (XmlSerializationContext<VirtualContext> context)
+            {
+                context.AutoSerializeMembers (element, new VirtualContext (new Override ("bat", "foo")));
+            }
+        }
+
+        [Test]
+        public void ElementOverride ()
+        {
+            var element_override = new ElementOverride<string> (new Element<string> { Foo = "foo" });
+            AssertAreEqual ("<element><foo>bat</foo></element>", element_override);
         }
 
         void AssertAreEqual<T> (string xml, T obj, params Override[] overrides)

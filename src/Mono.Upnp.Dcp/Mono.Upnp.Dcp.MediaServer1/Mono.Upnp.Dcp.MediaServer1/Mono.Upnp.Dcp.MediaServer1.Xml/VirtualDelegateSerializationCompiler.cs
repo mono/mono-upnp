@@ -66,10 +66,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.Xml
                 foreach (var @override in context.Context.Overrides) {
                     if (@override.Name == name && @override.Namespace == @namespace) {
                         serializer (@override.Value, context);
-                    } else {
-                        serializer (obj, context);
+                        return;
                     }
                 }
+                serializer (obj, context);
             };
         }
     }
