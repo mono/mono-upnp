@@ -207,6 +207,30 @@ namespace Mono.Upnp.Tests
             );
             ServiceDescriptionTests.AssertEquality (controller, service.GetController ());
         }
+
+        class ReturnArgumentDirectionTestClass
+        {
+            [UpnpAction]
+            public string Foo()
+            {
+                return null;
+            }
+        }
+
+        [Test]
+        public void ReturnArgumentDirectionTest ()
+        {
+            var service = new DummyService<ReturnArgumentDirectionTestClass> ();
+            var controller = new ServiceController (
+                new[] {
+                    new DummyServiceAction ("Foo", new[] { new Argument ("result", "A_ARG_result", ArgumentDirection.Out, true) })
+                },
+                new[] {
+                    new StateVariable ("A_ARG_result", "string")
+                }
+            );
+            ServiceDescriptionTests.AssertEquality (controller, service.GetController());
+        }
         
         class RelatedStateVariableNameTestClass
         {

@@ -108,7 +108,7 @@ namespace Mono.Upnp.Internal
                 for (var i = 0; i < parameters.Length; i++) {
                     arguments[i] = BuildArgumentInfo (parameters[i], name, stateVariables);
                 }
-                var return_argument = BuildArgumentInfo (method.ReturnParameter, name, stateVariables);
+                var return_argument = BuildArgumentInfo (method.ReturnParameter, name, stateVariables, true);
                 return new ServiceAction (name, Combine (arguments, return_argument), args => {
                     Trace (name, args.Values);
 
@@ -208,6 +208,14 @@ namespace Mono.Upnp.Internal
                                                string actionName,
                                                Dictionary<string, StateVariableInfo> stateVariables)
         {
+            return BuildArgumentInfo(parameterInfo, actionName, stateVariables, false);
+        }
+
+        static ArgumentInfo BuildArgumentInfo (ParameterInfo parameterInfo,
+                                               string actionName,
+                                               Dictionary<string, StateVariableInfo> stateVariables,
+                                               bool isReturnValue)
+        {
             if (parameterInfo.ParameterType == typeof (void)) {
                 return null;
             }
@@ -223,13 +231,13 @@ namespace Mono.Upnp.Internal
                        : parameterInfo.Name);
             var related_state_variable = BuildRelatedStateVariable (
                 parameterInfo, actionName, name, stateVariables);
-            var direction = parameterInfo.IsRetval || parameterInfo.ParameterType.IsByRef
+            var direction = parameterInfo.IsRetval || parameterInfo.ParameterType.IsByRef || isReturnValue
                 ? ArgumentDirection.Out
                 : ArgumentDirection.In;
             return new ArgumentInfo {
                 ParameterInfo = parameterInfo,
                 Argument = new Argument (
-                    name, related_state_variable.StateVariable.Name, direction, parameterInfo.IsRetval)
+                    name, related_state_variable.StateVariable.Name, direction, parameterInfo.IsRetval || isReturnValue)
             };
         }
         
