@@ -156,7 +156,8 @@ namespace Mono.Upnp.Xml
             
             using (var stream = new MemoryStream ()) {
                 using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
-                    Encoding = serializationOptions.Encoding ?? Helper.UTF8Unsigned, OmitXmlDeclaration = true, })) {
+                    Encoding = serializationOptions.Encoding ?? Helper.UTF8Unsigned,
+                    OmitXmlDeclaration = serializationOptions.XmlDeclarationType == XmlDeclarationType.None})) {
                     WriteXmlDeclaration (writer, serializationOptions);
                     SerializeCore (obj, writer, serializationOptions.Context);
                 }
