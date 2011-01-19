@@ -54,7 +54,12 @@ namespace Mono.Ssdp.Internal
             }
             var host_name = Dns.GetHostName ();
             foreach (var address in properties.UnicastAddresses) {
-                if (address.Address.AddressFamily == AddressFamily.InterNetwork && Dns.GetHostEntry (address.Address).HostName == host_name) {
+                string addressHostname = null;
+                try {
+                    addressHostname = Dns.GetHostEntry (address.Address).HostName;
+                } catch (SocketException) {
+                }
+                if (address.Address.AddressFamily == AddressFamily.InterNetwork && addressHostname == host_name) {
                     return new NetworkInterfaceInfo (address.Address, ipv4_properties.Index);
                 }
             }
