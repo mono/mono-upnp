@@ -36,7 +36,7 @@ namespace Mono.Upnp.Tests
         {
         }
         
-        public DummyRoot (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, RootDeviceOptions options)
+        public DummyRoot (DeviceType type, string udn, string friendlyName, string manufacturer, string modelName, DeviceOptions options)
             : base (type, udn, friendlyName, manufacturer, modelName, options)
         {
         }

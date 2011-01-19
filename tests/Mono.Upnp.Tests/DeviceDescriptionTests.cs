@@ -45,7 +45,7 @@ namespace Mono.Upnp.Tests
                 "Mono.Upnp.Tests Full Device",
                 "Mono Project",
                 "Full Device",
-                new RootDeviceOptions {
+                new DeviceOptions {
                     ManufacturerUrl = new Uri ("http://www.mono-project.org"),
                     ModelDescription = "A device description with all optional information.",
                     ModelNumber = "1",

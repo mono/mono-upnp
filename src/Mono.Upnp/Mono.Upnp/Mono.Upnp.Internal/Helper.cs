@@ -131,6 +131,19 @@ namespace Mono.Upnp.Internal
                 return string.Concat (errorDescription, ": ", message);
             }
         }
+
+        public static IEnumerable<T> Flatten<T>(params IEnumerable<T>[] lists)
+        {
+            foreach (var enumerable in lists) {
+                if (enumerable == null) {
+                    continue;
+                }
+
+                foreach (var item in enumerable) {
+                    yield return item;
+                }
+            }
+        }
         
         public readonly static Encoding UTF8Unsigned = new UTF8Encoding (false);
     }

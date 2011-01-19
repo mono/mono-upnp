@@ -207,7 +207,7 @@ namespace Mono.Upnp.Tests
                 "Mono.Upnp.Tests Device",
                 "Mono Project",
                 "Device",
-                new RootDeviceOptions {
+                new DeviceOptions {
                     Services = new[] {
                         new Service<ControlTestClass> (
                             new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)),
@@ -321,7 +321,7 @@ namespace Mono.Upnp.Tests
                 "Mono.Upnp.Tests Device",
                 "Mono Project",
                 "Device",
-                new RootDeviceOptions {
+                new DeviceOptions {
                     Services = new[] {
                         new Service<EventTestClass> (
                             new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)),
@@ -368,7 +368,7 @@ namespace Mono.Upnp.Tests
                 "Mono.Upnp.Tests Device",
                 "Mono Project",
                 "Device",
-                new RootDeviceOptions {
+                new DeviceOptions {
                     Services = new[] {
                         new DummyService (
                             new ServiceType ("schemas-upnp-org", "mono-upnp-test-service", new Version (1, 0)),

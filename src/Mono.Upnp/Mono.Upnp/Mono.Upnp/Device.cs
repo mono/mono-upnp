@@ -66,7 +66,9 @@ namespace Mono.Upnp
                                    string modelName,
                                    DeviceOptions options,
                                    IEnumerable<Device> devices)
-            : this (devices, GetServices (options), GetIcons (options))
+            : this (Helper.Flatten(devices, options != null ? options.EmbeddedDevices : null),
+                    GetServices (options),
+                    GetIcons (options))
         {
             if (type == null) {
                 throw new ArgumentNullException ("type");
