@@ -285,7 +285,7 @@ namespace Mono.Upnp.Tests
                             Assert.IsNotNull (response.Headers["SID"]);
                             sid = response.Headers["SID"];
                         }
-                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (30))) {
+                        if (Monitor.Wait (mutex, TimeSpan.FromSeconds (10))) {
                             Assert.Fail ("The event server sent updates to an unsubscribed client.");
                         }
                     }

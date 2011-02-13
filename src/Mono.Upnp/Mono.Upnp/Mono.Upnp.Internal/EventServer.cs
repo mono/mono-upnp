@@ -235,6 +235,13 @@ namespace Mono.Upnp.Internal
             Log.Information (string.Format (
                 "{0} from {1} subscribed to {2} as {3}.",
                 subscriber.Callback, context.Request.RemoteEndPoint, context.Request.Url, subscriber.Sid));
+
+            // NOTE: This will cause an exception in UpnpServer when it tries to close the OutputStream
+            //       I think we should be ok just closing the response and it should handle closing the OutputStream, but not sure
+            // We have to finish responding with our previous context otherwise the updates don't mean anything to the client
+            // The client won't have an SID so it won't make sense to publish the updates yet
+            context.Response.OutputStream.Close();
+            context.Response.Close();
             
             PublishUpdates (subscriber, state_variables);
         }

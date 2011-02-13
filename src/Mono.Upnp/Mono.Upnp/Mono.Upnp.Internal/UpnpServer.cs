@@ -55,9 +55,18 @@ namespace Mono.Upnp.Internal
                 }
                 var context = listener.EndGetContext (asyncResult);
                 HandleContext (context);
-                // FIXME this is a bug in Mono
-                context.Response.OutputStream.Close ();
-                context.Response.Close ();
+
+                try
+                {
+                    // FIXME this is a bug in Mono
+                    context.Response.OutputStream.Close();
+                    context.Response.Close();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // If we already completed the context in HandleContext we may get this exception, just ignore it...
+                }
+
                 listener.BeginGetContext (OnGetContext, null);
             }
         }
