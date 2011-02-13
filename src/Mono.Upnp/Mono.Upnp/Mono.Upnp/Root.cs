@@ -62,8 +62,8 @@ namespace Mono.Upnp
                      string modelName,
                      DeviceOptions options)
         {
-            var embedded_devices = options != null ? options.EmbeddedDevices : null;
-            RootDevice = new Device (type, udn, friendlyName, manufacturer, modelName, options, embedded_devices);
+            // The device knows how to handle embedded devices itself so don't pass them in
+            RootDevice = new Device(type, udn, friendlyName, manufacturer, modelName, options, null);
             SpecVersion = new SpecVersion (1, 1);
         }
         
