@@ -199,7 +199,7 @@ namespace Mono.Upnp.Xml.Compilation
         
         ElementDeserializer CreateElementDeserializer ()
         {
-            if (ValueProperty != null) {
+            if (ValueProperty != null && ValueProperty.CanWrite) {
                 var property = ValueProperty;
                 var deserializer = GetDeserializerForType (property.PropertyType);
                 return (obj, context, depth) => property.SetValue (obj, deserializer (context), null);

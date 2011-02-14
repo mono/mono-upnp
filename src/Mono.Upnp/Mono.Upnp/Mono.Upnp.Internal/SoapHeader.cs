@@ -35,6 +35,10 @@ namespace Mono.Upnp.Internal
     {
         readonly T header;
         readonly bool must_understand;
+
+        protected SoapHeader() : this(default(T), false)
+        {
+        }
         
         public SoapHeader (T header, bool mustUnderstand)
         {
