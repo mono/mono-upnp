@@ -105,6 +105,8 @@ namespace Mono.Upnp.Xml.Compilation
                 return context => context.Reader.ReadElementContentAsDecimal ();
             } else if (Type == typeof (DateTime)) {
                 return context => context.Reader.ReadElementContentAsDateTime ();
+            } else if (Type == typeof (TimeSpan)) {
+                return context => TimeSpan.Parse (context.Reader.ReadElementContentAsString ());
             } else if (Type == typeof (Uri)) {
                 return context => {
                     var url = context.Reader.ReadElementContentAsString ();
@@ -409,6 +411,8 @@ namespace Mono.Upnp.Xml.Compilation
                 return context => context.Reader.ReadContentAsDecimal ();
             } else if (type == typeof (DateTime)) {
                 return context => context.Reader.ReadContentAsDateTime ();
+            } else if (type == typeof (TimeSpan)) {
+                return context => TimeSpan.Parse (context.Reader.ReadContentAsString ());
             } else if (type == typeof (Uri)) {
                 return context => new Uri (context.Reader.ReadContentAsString ());
             } else if (type.IsEnum) {
