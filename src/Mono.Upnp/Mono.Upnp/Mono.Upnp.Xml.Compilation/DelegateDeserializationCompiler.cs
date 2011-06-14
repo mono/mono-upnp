@@ -101,6 +101,8 @@ namespace Mono.Upnp.Xml.Compilation
                 return context => context.Reader.ReadElementContentAsBoolean ();
             } else if (Type == typeof (long)) {
                 return context => context.Reader.ReadElementContentAsLong ();
+            } else if (Type == typeof (ulong)) {
+                return context => ulong.Parse (context.Reader.ReadElementContentAsString ());
             } else if (Type == typeof (float)) {
                 return context => context.Reader.ReadElementContentAsFloat ();
             } else if (Type == typeof (decimal)) {
@@ -409,6 +411,8 @@ namespace Mono.Upnp.Xml.Compilation
                 return context => context.Reader.ReadContentAsBoolean ();
             } else if (type == typeof (long)) {
                 return context => context.Reader.ReadContentAsLong ();
+            } else if (type == typeof (ulong)) {
+                return context => ulong.Parse (context.Reader.ReadContentAsString ());
             } else if (type == typeof (float)) {
                 return context => context.Reader.ReadContentAsFloat ();
             } else if (type == typeof (decimal)) {
