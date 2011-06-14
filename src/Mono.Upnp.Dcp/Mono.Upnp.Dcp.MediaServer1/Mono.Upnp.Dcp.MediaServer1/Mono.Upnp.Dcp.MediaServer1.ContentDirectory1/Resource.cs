@@ -107,7 +107,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [XmlAttribute ("nrAudioChannels", OmitIfNull = true)]
         public virtual uint? NrAudioChannels { get; protected set; }
 
-        [XmlAttribute ("resolution", OmitIfNull = true)]
+        //[XmlAttribute ("resolution", OmitIfNull = true)]
         public virtual Resolution? Resolution { get; protected set; }
 
         [XmlAttribute ("colorDepth", OmitIfNull = true)]
