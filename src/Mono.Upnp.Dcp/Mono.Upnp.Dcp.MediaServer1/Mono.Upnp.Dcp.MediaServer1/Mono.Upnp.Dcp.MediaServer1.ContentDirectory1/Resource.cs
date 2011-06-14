@@ -98,7 +98,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [XmlAttribute ("bitrate", OmitIfNull = true)]
         public virtual uint? BitRate { get; protected set; }
 
-        [XmlAttribute ("samplyFrequency", OmitIfNull = true)]
+        [XmlAttribute ("sampleFrequency", OmitIfNull = true)]
         public virtual uint? SampleFrequency { get; protected set; }
 
         [XmlAttribute ("bitsPerSample", OmitIfNull = true)]
