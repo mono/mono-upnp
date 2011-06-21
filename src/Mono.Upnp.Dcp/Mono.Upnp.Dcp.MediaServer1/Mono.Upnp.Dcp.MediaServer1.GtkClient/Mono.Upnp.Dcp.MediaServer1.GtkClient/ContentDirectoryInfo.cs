@@ -168,7 +168,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.GtkClient
         }
     }
 
-    struct ItemRow
+    class ItemRow
     {
         public ItemRow (Item item, TreePath path)
         {
