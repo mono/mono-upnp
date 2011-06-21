@@ -19,7 +19,6 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnvironmentVariables>
       <EnvironmentVariables>
         <Variable name="MONO_UPNP_DEBUG" value="TRUE" />
