@@ -114,7 +114,14 @@ namespace Mono.Upnp.Xml.Compilation
             } else if (Type == typeof (Uri)) {
                 return context => {
                     var url = context.Reader.ReadElementContentAsString ();
-                    return url.Length == 0 ? null : new Uri (url);
+                    if (url.Length != 0) {
+                        try {
+                            Uri uri = new Uri (url);
+                            return uri;
+                        } catch (Exception e) {
+                        }
+                    }
+                    return null;
                 };
             } else if (Type.IsEnum) {
                 var map = GetEnumMap (Type);
@@ -422,7 +429,17 @@ namespace Mono.Upnp.Xml.Compilation
             } else if (type == typeof (TimeSpan)) {
                 return context => TimeSpan.Parse (context.Reader.ReadContentAsString ());
             } else if (type == typeof (Uri)) {
-                return context => new Uri (context.Reader.ReadContentAsString ());
+                return context => {
+                    var url = context.Reader.ReadContentAsString ();
+                    if (url.Length != 0) {
+                        try {
+                            Uri uri = new Uri (url);
+                            return uri;
+                        } catch (Exception e) {
+                        }
+                    }
+                    return null;     
+                };
             } else if (type.IsEnum) {
                 var map = GetEnumMap (type);
                 return context => map[context.Reader.ReadContentAsString ()];
