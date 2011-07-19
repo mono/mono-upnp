@@ -156,7 +156,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem
                 throw new ArgumentNullException ("objects");
             }
 
-            var endIndex = System.Math.Min (startIndex + requestCount, objects.Count);
+            var endIndex = requestCount > 0 ? System.Math.Min (startIndex + requestCount, objects.Count) : objects.Count;
             for (var i = startIndex; i < endIndex; i++) {
                 consumer (objects[i]);
             }
