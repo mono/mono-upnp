@@ -31,7 +31,8 @@ using Mono.Upnp.Internal;
 namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     using Expression = System.Action<QueryVisitor>;
-    using OperatorHandler = Func<int, Func<Expression, Expression>, Func<Expression, Expression>>;
+    using OperatorHandler = Func<int, Func<System.Action<QueryVisitor>, System.Action<QueryVisitor>>,
+        Func<System.Action<QueryVisitor>, System.Action<QueryVisitor>>>;
     
     // Refer to ContentDirectory1 Service Template 1.0.1, Section 2.5.5.1: Search Criteria String Syntax
     public abstract class QueryParser
