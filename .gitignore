@@ -1,13 +1,9 @@
-# ignore assemblies
 *.dll
 *.exe
-#ignore debug info
-*.pidb
 *.mdb
-#ignore project settings
+*.pidb
 *.userprefs
 *.usertasks
-#ignore test results
-test-results/
-#ignore Mac OS files
 .DS_Store
+obj
+test-results/
