@@ -1,2 +1,0 @@
-#!/bin/bash
-mono --debug @expanded_libdir@/mono-ssdp/Mono.Ssdp.ConsoleClient.exe "$@"

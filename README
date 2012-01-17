@@ -1,16 +1,31 @@
-WARNING: Mono.Ssdp and Mono.UPnP are under initial development. They are not
-         meant to be used at all unless you are actively working on them!
+Mono.Upnp is set of client/server libraries for the Universal Plug 'n Play specifications. See http://www.upnp.org.
 
-Mono.Ssdp provides a fully managed implementation of the Simple Service
-Discovery Protocol. SSDP is used primarily for discovery of UPnP services
-on a local administrative network.
+To build with Visual Studio or MonoDevelop, open Mono.Upnp.sln and build the solution.
 
-  http://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol
-  http://quimby.gnus.org/internet-drafts/draft-cai-ssdp-v1-03.txt
+To build with from the command line with Mono:
+    xbuild Mono.Upnp.sln
 
-Mono.Upnp provides a fully managed implementation of the Universal Plug
-and Play standard. It enables both browsing for and broadcasting of
-UPnP services.
+To build with from the command line with .NET:
+    msbuild Mono.Upnp.sln
 
-  http://en.wikipedia.org/wiki/UPnP
-  http://www.upnp.org/
+About the projects:
+    Mono.Ssdp:
+        An implementation of the Simple Discovery Protocol (see UPnP Device Architecture 1.1, Section 1).
+    
+    Mono.Upnp:
+        An implementation of the UPnP Device Archetecture 1.1, Secions 2-5.
+    
+    Mono.Upnp.GtkClient:
+        An executable GTK+ user interface for inspecting UPnP devices and services on the network.
+    
+    Mono.Upnp.Dcp.MediaServer1:
+        An implementation of the UPnP Audio/Video MediaServer1 Device Control Protocol.
+    
+    Mono.Upnp.Dcp.MediaServer1.FileSystem:
+        A MediaServer1 implementation which serves media from the file system.
+    
+    Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer:
+        An executable console program which serves media from the file system.
+    
+    Mono.Upnp.Dcp.MSMediaServerRegistrar1:
+        An implementation of the Microsoft MSMediaServerRegistrar1 Device Control Protocol.

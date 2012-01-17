@@ -2,9 +2,9 @@
 // SerializeElement.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,17 +41,23 @@ namespace Mono.Upnp.Xml
         }
         
         public XmlElementAttribute (string name, string @namespace)
+            : this (name, @namespace, null)
+        {
+        }
+        
+        public XmlElementAttribute (string name, string @namespace, string prefix)
         {
             Name = name;
             Namespace = @namespace;
+            Prefix = prefix;
         }
         
         public string Name { get; set; }
         
         public string Namespace { get; set; }
         
-        public bool OmitIfNull { get; set; }
+        public string Prefix { get; set; }
         
-        public Type Type { get; set; }
+        public bool OmitIfNull { get; set; }
     }
 }

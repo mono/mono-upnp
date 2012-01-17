@@ -31,45 +31,4 @@ using System;
 namespace Mono.Ssdp
 {
     public delegate void ServiceHandler (object o, ServiceArgs args);
-    
-    public enum ServiceOperation
-    {
-        Added,
-        Updated,
-        Removed
-    }
-
-    public sealed class ServiceArgs : EventArgs
-    {
-        private ServiceOperation operation;
-        private string usn;
-        private Service service;
-        
-        public ServiceArgs (string usn) : this (ServiceOperation.Removed, usn, null)
-        {
-        }
-        
-        public ServiceArgs (ServiceOperation operation, Service service) : this (operation, service.Usn, service)
-        {
-        }
-        
-        public ServiceArgs (ServiceOperation operation, string usn, Service service)
-        {
-            this.operation = operation;
-            this.usn = usn;
-            this.service = service;
-        }
-        
-        public ServiceOperation Operation {
-            get { return operation; }
-        }
-        
-        public string Usn {
-            get { return usn; }
-        }
-        
-        public Service Service {
-            get { return service; }
-        }
-    }
 }

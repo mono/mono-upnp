@@ -2,9 +2,9 @@
 // SerializeTypeAttribute.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,8 @@ namespace Mono.Upnp.Xml
     public sealed class XmlTypeAttribute : Attribute
     {
         readonly string name;
+        readonly string @namespace;
+        readonly string prefix;
         
         public XmlTypeAttribute (string name)
             : this (name, null)
@@ -39,15 +41,27 @@ namespace Mono.Upnp.Xml
         }
         
         public XmlTypeAttribute (string name, string @namespace)
+            : this (name, @namespace, null)
+        {
+        }
+        
+        public XmlTypeAttribute (string name, string @namespace, string prefix)
         {
             this.name = name;
-            Namespace = @namespace;
+            this.@namespace = @namespace;
+            this.prefix = prefix;
         }
         
         public string Name {
             get { return name; }
         }
         
-        public string Namespace { get; set; }
+        public string Namespace {
+            get { return @namespace; }
+        }
+        
+        public string Prefix {
+            get { return prefix; }
+        }
     }
 }

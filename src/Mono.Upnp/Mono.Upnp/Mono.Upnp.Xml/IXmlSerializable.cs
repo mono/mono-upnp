@@ -2,9 +2,9 @@
 // IXmlSerializable.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,13 @@ namespace Mono.Upnp.Xml
 {
     public interface IXmlSerializable
     {
-        void SerializeSelfAndMembers (XmlSerializationContext context);
-        void SerializeMembersOnly (XmlSerializationContext context);
+        void Serialize (XmlSerializationContext context);
+        void SerializeMembers (XmlSerializationContext context);
+    }
+    
+    public interface IXmlSerializable<TContext>
+    {
+        void Serialize (XmlSerializationContext<TContext> context);
+        void SerializeMembers (XmlSerializationContext<TContext> context);
     }
 }

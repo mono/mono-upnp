@@ -2,9 +2,9 @@
 // XmlSerializable.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,18 +28,35 @@ namespace Mono.Upnp.Xml
 {
     public abstract class XmlSerializable : IXmlSerializable
     {
-        void IXmlSerializable.SerializeSelfAndMembers (XmlSerializationContext context)
+        void IXmlSerializable.Serialize (XmlSerializationContext context)
         {
-            SerializeSelfAndMembers (context);
+            Serialize (context);
         }
         
-        void IXmlSerializable.SerializeMembersOnly (XmlSerializationContext context)
+        void IXmlSerializable.SerializeMembers (XmlSerializationContext context)
         {
-            SerializeMembersOnly (context);
+            SerializeMembers (context);
         }
         
-        protected abstract void SerializeSelfAndMembers (XmlSerializationContext context);
+        protected abstract void Serialize (XmlSerializationContext context);
         
-        protected abstract void SerializeMembersOnly (XmlSerializationContext context);
+        protected abstract void SerializeMembers (XmlSerializationContext context);
+    }
+    
+    public abstract class XmlSerializable<TContext> : IXmlSerializable<TContext>
+    {
+        void IXmlSerializable<TContext>.Serialize (XmlSerializationContext<TContext> context)
+        {
+            Serialize (context);
+        }
+        
+        void IXmlSerializable<TContext>.SerializeMembers (XmlSerializationContext<TContext> context)
+        {
+            SerializeMembers (context);
+        }
+        
+        protected abstract void Serialize (XmlSerializationContext<TContext> context);
+        
+        protected abstract void SerializeMembers (XmlSerializationContext<TContext> context);
     }
 }

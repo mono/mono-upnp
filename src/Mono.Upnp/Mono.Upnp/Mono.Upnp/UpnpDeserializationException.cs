@@ -1,8 +1,8 @@
-﻿//
+//
 // UpnpDeserializationException.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -30,8 +30,8 @@ using System;
 
 namespace Mono.Upnp
 {
-	public class UpnpDeserializationException : Exception
-	{
+    public class UpnpDeserializationException : Exception
+    {
         public UpnpDeserializationException (string message)
             : base (message)
         {
@@ -41,5 +41,5 @@ namespace Mono.Upnp
             : base (message, innerException)
         {
         }
-	}
+    }
 }

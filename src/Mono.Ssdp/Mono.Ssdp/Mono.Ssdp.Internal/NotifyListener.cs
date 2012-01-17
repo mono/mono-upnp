@@ -32,11 +32,11 @@ using System.Net.Sockets;
 
 namespace Mono.Ssdp.Internal
 {
-    internal class NotifyListener : MulticastReader
+    class NotifyListener : MulticastReader
     {
-        private readonly object mutex = new object ();
-        private SsdpSocket socket;
-        private Client client;
+        readonly object mutex = new object ();
+        readonly Client client;
+        SsdpSocket socket;
         
         public NotifyListener (Client client)
         {
@@ -48,7 +48,7 @@ namespace Mono.Ssdp.Internal
             lock (mutex) {
                 Stop ();
                 
-                socket = new SsdpSocket ();
+                socket = new MulticastSsdpSocket (client.NetworkInterfaceInfo);
                 socket.Bind ();
                 AsyncReadResult (socket);
             }
@@ -67,16 +67,16 @@ namespace Mono.Ssdp.Internal
         internal override bool OnAsyncResultReceived (AsyncReceiveBuffer result)
         {
             try {
-                HttpDatagram dgram = HttpDatagram.Parse (result.Buffer);
+                var dgram = HttpDatagram.Parse (result.Buffer);
                 if (dgram == null || dgram.Type != HttpDatagramType.Notify) {
                     return true;
                 }
                 
-                string nts = dgram.Headers.Get ("NTS");
-                string usn = dgram.Headers.Get ("USN");
-                string nt = dgram.Headers.Get ("NT");
+                var nts = dgram.Headers.Get ("NTS");
+                var usn = dgram.Headers.Get ("USN");
+                var nt = dgram.Headers.Get ("NT");
                 
-                if (String.IsNullOrEmpty (nts) || String.IsNullOrEmpty (usn)) {
+                if (string.IsNullOrEmpty (nts) || string.IsNullOrEmpty (usn)) {
                     return true;
                 }
                 

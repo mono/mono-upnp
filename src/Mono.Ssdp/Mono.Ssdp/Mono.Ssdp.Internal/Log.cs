@@ -30,10 +30,10 @@ using System;
 
 namespace Mono.Ssdp.Internal
 {
-    internal static class Log
+    static class Log
     {
-        private static bool? enabled;
-        private static bool Enabled {
+        static bool? enabled;
+        static bool Enabled {
             get {
                 if (enabled == null) {
                     enabled = Environment.GetEnvironmentVariable ("MONO_SSDP_DEBUG") != null;

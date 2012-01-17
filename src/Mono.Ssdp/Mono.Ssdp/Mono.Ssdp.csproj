@@ -4,20 +4,14 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
-    <ProjectGuid>{9EC4EF8A-0EB2-48E3-9A2E-E47D4DA5487D}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <UseParentDirectoryAsNamespace>true</UseParentDirectoryAsNamespace>
-    <AssemblyName>Mono.Ssdp</AssemblyName>
     <SchemaVersion>2.0</SchemaVersion>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <OldToolsVersion>2.0</OldToolsVersion>
+    <ProjectGuid>{AD422A19-BA07-4039-B843-84E386804DD1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Mono.Ssdp</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <RootNamespace>Mono.Ssdp</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>mono-ssdp.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,64 +21,47 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug Linq|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
     <OutputPath>.</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release Linq|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Release Linq</OutputPath>
-    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
+    <Reference Include="System">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mono.Ssdp.Internal\RequestListener.cs" />
+    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Mono.Ssdp\Announcer.cs" />
+    <Compile Include="Mono.Ssdp\Browser.cs" />
+    <Compile Include="Mono.Ssdp\BrowseService.cs" />
+    <Compile Include="Mono.Ssdp\Client.cs" />
+    <Compile Include="Mono.Ssdp\MulticastReader.cs" />
     <Compile Include="Mono.Ssdp\Server.cs" />
     <Compile Include="Mono.Ssdp\Service.cs" />
-    <Compile Include="Mono.Ssdp\Browser.cs" />
-    <Compile Include="Mono.Ssdp\MulticastReader.cs" />
     <Compile Include="Mono.Ssdp\ServiceArgs.cs" />
-    <Compile Include="Mono.Ssdp\Client.cs" />
-    <Compile Include="Mono.Ssdp.Internal\SsdpSocket.cs" />
+    <Compile Include="Mono.Ssdp\ServiceHandler.cs" />
     <Compile Include="Mono.Ssdp.Internal\AsyncReceiveBuffer.cs" />
-    <Compile Include="Mono.Ssdp.Internal\Protocol.cs" />
     <Compile Include="Mono.Ssdp.Internal\HttpDatagram.cs" />
     <Compile Include="Mono.Ssdp.Internal\HttpDatagramType.cs" />
-    <Compile Include="Mono.Ssdp.Internal\ServiceCache.cs" />
-    <Compile Include="Mono.Ssdp.Internal\NotifyListener.cs" />
-    <Compile Include="Mono.Ssdp.Internal\TimeoutDispatcher.cs" />
-    <Compile Include="Mono.Ssdp\BrowseService.cs" />
     <Compile Include="Mono.Ssdp.Internal\Log.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="mono-ssdp.snk" />
+    <Compile Include="Mono.Ssdp.Internal\NotifyListener.cs" />
+    <Compile Include="Mono.Ssdp.Internal\Protocol.cs" />
+    <Compile Include="Mono.Ssdp.Internal\RequestListener.cs" />
+    <Compile Include="Mono.Ssdp.Internal\ServiceCache.cs" />
+    <Compile Include="Mono.Ssdp.Internal\SsdpSocket.cs" />
+    <Compile Include="Mono.Ssdp.Internal\TimeoutDispatcher.cs" />
+    <Compile Include="Mono.Ssdp.Internal\MulticastSsdpSocket.cs" />
+    <Compile Include="Mono.Ssdp.Internal\NetworkInterfaceInfo.cs" />
+    <Compile Include="Mono.Ssdp\ServiceOperation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <Deployment.LinuxDeployData generateScript="false" generatePcFile="false" />
-        <MonoDevelop.Autotools.MakefileInfo RelativeMakefileName="Makefile.am" BuildTargetName="" CleanTargetName="" IsAutotoolsProject="true" RelativeConfigureInPath="../..">
-          <BuildFilesVar Sync="true" Name="MONO_SSDP_SRC" />
-          <DeployFilesVar />
-          <ResourcesVar />
-          <OthersVar />
-          <GacRefVar />
-          <AsmRefVar />
-          <ProjectRefVar />
-        </MonoDevelop.Autotools.MakefileInfo>
-      </Properties>
-    </MonoDevelop>
-    <VisualStudio />
-  </ProjectExtensions>
 </Project>

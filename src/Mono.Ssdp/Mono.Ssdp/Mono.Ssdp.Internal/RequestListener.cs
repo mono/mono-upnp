@@ -1,4 +1,4 @@
-﻿//
+//
 // RequestListener.cs
 //
 // Author:
@@ -32,12 +32,12 @@ using System.Threading;
 
 namespace Mono.Ssdp.Internal
 {
-    internal struct Request
+    struct Request
     {
         public readonly IPEndPoint EndPoint;
         public readonly string ST;
         public readonly ushort MX;
-
+        
         public Request (IPEndPoint endPoint, string st, ushort mx)
         {
             EndPoint = endPoint;
@@ -46,11 +46,11 @@ namespace Mono.Ssdp.Internal
         }
     }
 
-    internal class RequestListener : MulticastReader, IDisposable
+    class RequestListener : MulticastReader, IDisposable
     {
-        private readonly object mutex = new object ();
-        private Server server;
-        private SsdpSocket socket;
+        readonly object mutex = new object ();
+        readonly Server server;
+        SsdpSocket socket;
 
         public RequestListener (Server server)
         {
@@ -62,7 +62,7 @@ namespace Mono.Ssdp.Internal
             lock (mutex) {
                 Stop ();
 
-                socket = new SsdpSocket ();
+                socket = new MulticastSsdpSocket (server.NetworkInterfaceInfo);
                 socket.Bind ();
                 AsyncReadResult (socket);
             }
@@ -81,20 +81,20 @@ namespace Mono.Ssdp.Internal
         internal override bool OnAsyncResultReceived (AsyncReceiveBuffer result)
         {
             try {
-                HttpDatagram dgram = HttpDatagram.Parse (result.Buffer);
+                var dgram = HttpDatagram.Parse (result.Buffer);
                 if (dgram == null || dgram.Type != HttpDatagramType.MSearch) {
                     return true;
                 }
 
-                string st = dgram.Headers.Get ("ST");
-                string mx = dgram.Headers.Get ("MX");
-                string man = dgram.Headers.Get ("Man");
+                var st = dgram.Headers.Get ("ST");
+                var mx = dgram.Headers.Get ("MX");
+                var man = dgram.Headers.Get ("Man");
 
-                if (String.IsNullOrEmpty (st) || String.IsNullOrEmpty (mx) || man != Protocol.SsdpDiscoverMan) {
+                if (string.IsNullOrEmpty (st) || string.IsNullOrEmpty (mx) || man != Protocol.SsdpDiscoverMan) {
                     return true;
                 }
 
-                server.RequestRecieved (new Request(result.SenderIPEndPoint, st, UInt16.Parse(mx)));
+                server.RequestRecieved (new Request (result.SenderIPEndPoint, st, UInt16.Parse(mx)));
             } catch (Exception e) {
                 Log.Exception ("Invalid HTTPMU/M-SEARCH datagram", e);
             }
@@ -104,7 +104,8 @@ namespace Mono.Ssdp.Internal
 
         public void Dispose ()
         {
-            throw new NotImplementedException ();
+            // TODO more here
+            Stop ();
         }
     }
 }

@@ -30,13 +30,6 @@ using System;
 
 namespace Mono.Ssdp
 {
-    public enum ServiceOperation
-    {
-        Added,
-        Updated,
-        Removed
-    }
-
     public sealed class ServiceArgs : EventArgs
     {
         private readonly ServiceOperation operation;

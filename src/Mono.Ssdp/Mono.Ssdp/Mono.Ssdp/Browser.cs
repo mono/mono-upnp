@@ -45,6 +45,7 @@ namespace Mono.Ssdp
         }
 
         private ushort mx = Protocol.DefaultMx;
+        [CLSCompliantAttribute (false)]
         public ushort MX {
             get { return mx; }
             set { mx = System.Math.Min (value, Protocol.MaxMX); }
@@ -74,8 +75,15 @@ namespace Mono.Ssdp
         
         public void Dispose ()
         {
+            Dispose (true);
+        }
+        
+        internal void Dispose (bool removeFromClient)
+        {
             Stop ();
-            client.RemoveBrowser (this);
+            if (removeFromClient) {
+                client.RemoveBrowser (this);
+            }
             client = null;
             disposed = true;
         }
@@ -98,7 +106,7 @@ namespace Mono.Ssdp
                     throw new ArgumentNullException ("ServiceType");
                 }
                 
-                socket = new SsdpSocket (/*false*/);
+                socket = new MulticastSsdpSocket (client.NetworkInterfaceInfo);
                 socket.BeginSendTo (Protocol.CreateDiscoveryRequest (service_type, MX), OnBrowseRequestFinished);
 
                 // wait for 4 times MX

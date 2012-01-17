@@ -45,14 +45,14 @@ namespace Mono.Ssdp
             AsyncReadResult(new AsyncReceiveBuffer (socket));
         }
 
-        private void AsyncReadResult (AsyncReceiveBuffer buffer)
+        void AsyncReadResult (AsyncReceiveBuffer buffer)
         {
             buffer.Socket.BeginReceiveFrom (buffer, OnAsyncResultReceived);
         }
         
-        private void OnAsyncResultReceived (IAsyncResult asyncResult)
+        void OnAsyncResultReceived (IAsyncResult asyncResult)
         {
-            AsyncReceiveBuffer buffer = (AsyncReceiveBuffer)asyncResult.AsyncState;
+            var buffer = (AsyncReceiveBuffer)asyncResult.AsyncState;
             buffer.BytesReceived = buffer.Socket.EndReceiveFrom (asyncResult, ref buffer.SenderEndPoint);
             
             if (OnAsyncResultReceived (buffer)) {

@@ -2,9 +2,9 @@
 // XmlSerializationContext.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,33 +29,97 @@ using System.Xml;
 
 namespace Mono.Upnp.Xml
 {
-    public struct XmlSerializationContext
+    public abstract class XmlSerializationContext
     {
-        readonly XmlSerializer serializer;
         readonly XmlWriter writer;
         
-        internal XmlSerializationContext(XmlSerializer serializer, XmlWriter writer)
+        internal XmlSerializationContext (XmlWriter writer)
         {
-            this.serializer = serializer;
             this.writer = writer;
         }
         
         public XmlWriter Writer {
             get { return writer; }
         }
+
+        public abstract void AutoSerializeObjectStart<TObject> (TObject obj);
+
+        public abstract void AutoSerializeObjectEnd<TObject> (TObject obj);
         
-        public void AutoSerializeObjectAndMembers<T> (T obj)
+        public abstract void AutoSerializeMembers<TObject> (TObject obj);
+        
+        public abstract void Serialize<TObject> (TObject obj);
+    }
+    
+    public sealed class XmlSerializationContext<TContext> : XmlSerializationContext
+    {
+        readonly XmlSerializer<TContext> serializer;
+        readonly TContext context;
+        
+        internal XmlSerializationContext (XmlSerializer<TContext> serializer, XmlWriter writer, TContext context)
+            : base (writer)
         {
-            if (obj == null) throw new ArgumentNullException ("obj");
-            
-            serializer.AutoSerializeObjectAndMembers (obj, this);
+            this.serializer = serializer;
+            this.context = context;
         }
         
-        public void AutoSerializeMembersOnly<T> (T obj)
+        public TContext Context {
+            get { return context; }
+        }
+        
+        public override void AutoSerializeObjectStart<TObject> (TObject obj)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            serializer.AutoSerializeMembersOnly (obj, this);
+            serializer.AutoSerializeObjectStart (obj, this);
+        }
+        
+        public void AutoSerializeObjectStart<TObject> (TObject obj, TContext context)
+        {
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            serializer.AutoSerializeObjectStart (obj,
+                new XmlSerializationContext<TContext> (serializer, Writer, context));
+        }
+        
+        public override void AutoSerializeObjectEnd<TObject> (TObject obj)
+        {
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            serializer.AutoSerializeObjectEnd (obj, this);
+        }
+        
+        public void AutoSerializeObjectEnd<TObject> (TObject obj, TContext context)
+        {
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            serializer.AutoSerializeObjectEnd (obj,
+                new XmlSerializationContext<TContext> (serializer, Writer, context));
+        }
+        
+        public override void AutoSerializeMembers<TObject> (TObject obj)
+        {
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            serializer.AutoSerializeMembers (obj, this);
+        }
+        
+        public void AutoSerializeMembers<TObject> (TObject obj, TContext context)
+        {
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            serializer.AutoSerializeMembers (obj,
+                new XmlSerializationContext<TContext> (serializer, Writer, context));
+        }
+        
+        public override void Serialize<TObject> (TObject obj)
+        {
+            serializer.Serialize (obj, this);
+        }
+        
+        public void Serialize<TObject> (TObject obj, TContext context)
+        {
+            serializer.Serialize (obj, new XmlSerializationContext<TContext> (serializer, Writer, context));
         }
     }
 }

@@ -2,9 +2,9 @@
 // XmlDeserializationContext.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
 using System.Xml;
 
 namespace Mono.Upnp.Xml
 {
-    public struct XmlDeserializationContext
+    public class XmlDeserializationContext
     {
         readonly XmlDeserializer deserializer;
         readonly XmlReader reader;
@@ -45,23 +46,28 @@ namespace Mono.Upnp.Xml
         
         public void AutoDeserialize<T> (T obj)
         {
-            if (deserializer != null) {
-                deserializer.AutoDeserialize (obj, this);
-            }
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            deserializer.AutoDeserialize (obj, this);
         }
         
         public void AutoDeserializeAttribute<T> (T obj)
         {
-            if (deserializer != null) {
-                deserializer.AutoDeserializeAttribute (obj, this);
-            }
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            deserializer.AutoDeserializeAttribute (obj, this);
         }
         
         public void AutoDeserializeElement<T> (T obj)
         {
-            if (deserializer != null) {
-                deserializer.AutoDeserializeElement (obj, this);
-            }
+            if (obj == null) throw new ArgumentNullException ("obj");
+            
+            deserializer.AutoDeserializeElement (obj, this);
+        }
+        
+        public T Deserialize<T> ()
+        {
+            return deserializer.Deserialize<T> (Reader);
         }
     }
 }

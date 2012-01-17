@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Mono.Upnp.Tests</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <RootNamespace>Mono.Upnp.Tests</RootNamespace>
+    <AssemblyOriginatorKeyFile>mono-upnp.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>.</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="System.Xml">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="nunit.core, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
+      <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
+      <Name>Mono.Upnp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj">
+      <Project>{AD422A19-BA07-4039-B843-84E386804DD1}</Project>
+      <Name>Mono.Ssdp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="XmlSerializationTests.cs" />
+    <Compile Include="XmlDeserializationTests.cs" />
+    <Compile Include="DummyDeserializer.cs" />
+    <Compile Include="Xml.cs" />
+    <Compile Include="DummyIcon.cs" />
+    <Compile Include="DummyService.cs" />
+    <Compile Include="DummyServiceController.cs" />
+    <Compile Include="DummyRoot.cs" />
+    <Compile Include="DeviceDescriptionTests.cs" />
+    <Compile Include="ServiceDescriptionTests.cs" />
+    <Compile Include="ServerTests.cs" />
+    <Compile Include="ClientTests.cs" />
+    <Compile Include="DummyServiceAction.cs" />
+    <Compile Include="DummyStateVariableEventer.cs" />
+    <Compile Include="ServiceTests.cs" />
+    <Compile Include="DummyStateVariable.cs" />
+    <Compile Include="DummyDeserializerFactory.cs" />
+    <Compile Include="TypeInfoTests.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Deployment.LinuxDeployData generatePcFile="false" />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>

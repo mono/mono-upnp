@@ -2,9 +2,9 @@
 // XmlDeserializable.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+
+using System;
 
 namespace Mono.Upnp.Xml
 {
@@ -43,10 +45,39 @@ namespace Mono.Upnp.Xml
             DeserializeElement (context);
         }
         
-        protected abstract void Deserialize (XmlDeserializationContext context);
+        protected virtual void Deserialize (XmlDeserializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+            
+            context.AutoDeserialize (this);
+        }
         
-        protected abstract void DeserializeAttribute (XmlDeserializationContext context);
+        protected virtual void DeserializeAttribute (XmlDeserializationContext context)
+        {
+        }
         
-        protected abstract void DeserializeElement (XmlDeserializationContext context);
+        protected virtual void DeserializeElement (XmlDeserializationContext context)
+        {
+        }
+
+        internal static void AutoDeserializeAttribute<T> (T @this, XmlDeserializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoDeserializeAttribute (@this);
+        }
+
+        internal static void AutoDeserializeElement<T> (T @this, XmlDeserializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoDeserializeElement (@this);
+        }
     }
 }

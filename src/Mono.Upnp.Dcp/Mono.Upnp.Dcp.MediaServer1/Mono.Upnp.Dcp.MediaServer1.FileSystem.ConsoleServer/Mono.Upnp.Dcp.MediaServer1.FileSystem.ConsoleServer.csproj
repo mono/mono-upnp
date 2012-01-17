@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DA49F3FC-22F1-4714-8C21-5971B62262FE}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>.</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Commandlineparameters>-f "mac2: upnp" -n "Windows Media Connect" "/Users/lunchtimemama/Music/Rdio Downloads"</Commandlineparameters>
+    <Externalconsole>true</Externalconsole>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="MONO_UPNP_DEBUG" value="TRUE" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>.</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\ConsoleServer.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\DummyConnectionManager.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\Options.cs" />
+    <Compile Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\DummyMSMediaReceiverRegistrar.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1.FileSystem\Mono.Upnp.Dcp.MediaServer1.FileSystem.csproj">
+      <Project>{5AD8D852-8ADA-477E-AA76-0958CAB1D881}</Project>
+      <Name>Mono.Upnp.Dcp.MediaServer1.FileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">
+      <Project>{D095ADE0-D74E-449C-BAF2-174A952B2056}</Project>
+      <Name>Mono.Upnp.Dcp.MediaServer1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
+      <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
+      <Name>Mono.Upnp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1.csproj">
+      <Project>{1203E9D4-B1F3-4838-8275-91782C8EC6E4}</Project>
+      <Name>Mono.Upnp.Dcp.MSMediaReceiverRegistrar1</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Deployment.LinuxDeployData scriptName="mono-upnp-simple-media-server" />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>

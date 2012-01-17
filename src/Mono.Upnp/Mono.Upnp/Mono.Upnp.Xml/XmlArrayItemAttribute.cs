@@ -2,9 +2,9 @@
 // XmlArrayItem.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,9 @@ namespace Mono.Upnp.Xml
     [AttributeUsage (AttributeTargets.Property)]
     public sealed class XmlArrayItemAttribute : Attribute
     {
-        readonly string name;
+        public XmlArrayItemAttribute ()
+        {
+        }
         
         public XmlArrayItemAttribute (string name)
             : this (name, null)
@@ -39,17 +41,21 @@ namespace Mono.Upnp.Xml
         }
         
         public XmlArrayItemAttribute (string name, string @namespace)
+            : this (name, @namespace, null)
         {
-            this.name = name;
-            Namespace = @namespace;
         }
         
-        public string Name {
-            get { return name; }
+        public XmlArrayItemAttribute (string name, string @namespace, string prefix)
+        {
+            Name = name;
+            Namespace = @namespace;
+            Prefix = prefix;
         }
+        
+        public string Name { get; set; }
         
         public string Namespace { get; set; }
         
-        public Type Type { get; set; }
+        public string Prefix { get; set; }
     }
 }

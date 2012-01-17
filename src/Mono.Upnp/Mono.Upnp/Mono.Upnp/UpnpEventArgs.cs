@@ -1,8 +1,8 @@
-﻿//
+//
 // UpnpEventArgs.cs
 //
 // Author:
-//   Scott Peterson <lunchtimemama@gmail.com>
+//   Scott Thomas <lunchtimemama@gmail.com>
 //
 // Copyright (C) 2008 S&S Black Ltd.
 //
@@ -27,7 +27,6 @@
 //
 
 using System;
-using Mono.Upnp.Description;
 
 namespace Mono.Upnp
 {
@@ -37,8 +36,8 @@ namespace Mono.Upnp
         Removed
     }
 
-	public class DeviceEventArgs : EventArgs
-	{
+    public class DeviceEventArgs : EventArgs
+    {
         readonly DeviceAnnouncement device;
         readonly UpnpOperation operation;
 
@@ -55,7 +54,7 @@ namespace Mono.Upnp
         public UpnpOperation Operation {
             get { return operation; }
         }
-	}
+    }
 
     public class ServiceEventArgs : EventArgs
     {

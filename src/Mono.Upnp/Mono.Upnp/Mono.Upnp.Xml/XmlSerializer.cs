@@ -2,9 +2,9 @@
 // XmlSerializer.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,386 +25,233 @@
 // THE SOFTWARE.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
+using System.Text;
 using System.Xml;
+
+using Mono.Upnp.Internal;
+using Mono.Upnp.Xml.Compilation;
 
 namespace Mono.Upnp.Xml
 {
     public sealed class XmlSerializer
     {
-        delegate void Serializer (object obj, XmlSerializationContext context);
-        
-        class Serializers
+        struct Nothing
         {
-            public Serializer TypeSerializer;
-            public Serializer TypeAutoSerializer;
-            public Serializer MemberSerializer;
-            public Serializer MemberAutoSerializer;
         }
         
-        readonly Dictionary<Type, Serializers> serializers = new Dictionary<Type, Serializers> ();
+        readonly XmlSerializer<Nothing> serializer = new XmlSerializer<Nothing> ();
         
-        public void Serialize<T> (T obj, XmlWriter writer)
+        public void Serialize<TObject> (TObject obj, XmlWriter writer)
+        {
+            serializer.Serialize (obj, writer, new Nothing ());
+        }
+        
+        public void Serialize<TObject> (TObject obj, Stream stream)
+        {
+            Serialize (obj, stream, null);
+        }
+        
+        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationOptions options)
+        {
+            if (options == null) {
+                serializer.Serialize (obj, stream);
+            } else {
+                serializer.Serialize (obj, stream, new XmlSerializationOptions<Nothing> {
+                    Encoding = options.Encoding, XmlDeclarationType = options.XmlDeclarationType });
+            }
+        }
+        
+        public byte[] GetBytes<TObject> (TObject obj)
+        {
+            return GetBytes (obj, null);
+        }
+        
+        public byte[] GetBytes<TObject> (TObject obj, XmlSerializationOptions options)
+        {
+            if (options == null) {
+                return serializer.GetBytes (obj);
+            } else {
+                return serializer.GetBytes (obj, new XmlSerializationOptions<Nothing> {
+                    Encoding = options.Encoding, XmlDeclarationType = options.XmlDeclarationType }); 
+            }
+        }
+        
+        public string GetString<TObject> (TObject obj)
+        {
+            return GetString (obj, null);
+        }
+        
+        public string GetString<TObject> (TObject obj, XmlSerializationOptions options)
+        {
+            if (options == null) {
+                return serializer.GetString (obj);
+            } else {
+                return serializer.GetString (obj, new XmlSerializationOptions<Nothing> {
+                    Encoding = options.Encoding, XmlDeclarationType = options.XmlDeclarationType }); 
+            }
+        }
+    }
+    
+    public sealed class XmlSerializer<TContext>
+    {
+        readonly SerializationCompilerProvider<TContext> compiler_provider;
+        readonly Dictionary<Type, SerializationCompiler<TContext>> compilers =
+            new Dictionary<Type, SerializationCompiler<TContext>> ();
+        
+        public XmlSerializer ()
+            : this (null)
+        {
+        }
+        
+        public XmlSerializer (SerializationCompilerProvider<TContext> compilerProvider)
+        {
+            if (compilerProvider == null) {
+                compiler_provider = (serializer, type) =>
+                    new DelegateSerializationCompiler<TContext> (serializer, type);
+            } else {
+                compiler_provider = compilerProvider;
+            }
+        }
+        
+        public void Serialize<TObject> (TObject obj, XmlWriter writer)
+        {
+            Serialize (obj, writer, default (TContext));
+        }
+        
+        public void Serialize<TObject> (TObject obj, XmlWriter writer, TContext context)
         {
             if (writer == null) throw new ArgumentNullException ("writer");
-
-            SerializeCore (obj, writer);
+            
+            SerializeCore (obj, writer, context);
         }
-                
-        public byte[] GetBytes<T> (T obj)
+        
+        public void Serialize<TObject> (TObject obj, Stream stream)
         {
+            Serialize (obj, stream, null);
+        }
+        
+        public void Serialize<TObject> (TObject obj, Stream stream, XmlSerializationOptions<TContext> options)
+        {
+            if (stream == null) throw new ArgumentNullException ("stream");
+            
+            var serializationOptions = new XmlSerializationOptions(options);
+            
+            using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
+                Encoding = serializationOptions.Encoding, OmitXmlDeclaration = true })) {
+                WriteXmlDeclaration (writer, serializationOptions);
+                SerializeCore (obj, writer, serializationOptions.Context);
+            }
+        }
+        
+        public byte[] GetBytes<TObject> (TObject obj)
+        {
+            return GetBytes (obj, null);
+        }
+        
+        public byte[] GetBytes<TObject> (TObject obj, XmlSerializationOptions<TContext> options)
+        {
+            var serializationOptions = new XmlSerializationOptions(options);
+            
             using (var stream = new MemoryStream ()) {
-                using (var writer = XmlWriter.Create (stream)) {
-                    SerializeCore (obj, writer);
-                    return stream.ToArray ();
+                using (var writer = XmlWriter.Create (stream, new XmlWriterSettings {
+                    Encoding = serializationOptions.Encoding ?? Helper.UTF8Unsigned, OmitXmlDeclaration = true, })) {
+                    WriteXmlDeclaration (writer, serializationOptions);
+                    SerializeCore (obj, writer, serializationOptions.Context);
                 }
+                return stream.ToArray ();
             }
         }
         
-        public string GetString<T> (T obj)
+        public string GetString<TObject> (TObject obj)
         {
-            using (var string_writer = new StringWriter ()) {
-                using (var xml_writer = XmlWriter.Create (string_writer)) {
-                    SerializeCore (obj, xml_writer);
-                    return string_writer.ToString ();
-                }
+            return GetString (obj, null);
+        }
+        
+        public string GetString<TObject> (TObject obj, XmlSerializationOptions<TContext> options)
+        {
+            if (options == null) {
+                options = new XmlSerializationOptions<TContext> ();
+            }
+            
+            var encoding = options.Encoding ?? Helper.UTF8Unsigned;
+            
+            return encoding.GetString (GetBytes (obj, options));
+        }
+        
+        void WriteXmlDeclaration (XmlWriter writer, XmlSerializationOptions options)
+        {
+            switch (options.XmlDeclarationType) {
+            case XmlDeclarationType.Version:
+                writer.WriteProcessingInstruction ("xml", @"version=""1.0""");
+                break;
+            case XmlDeclarationType.VersionAndEncoding:
+                writer.WriteProcessingInstruction ("xml", string.Format(
+                    @"version=""1.0"" encoding=""{0}""", options.Encoding.HeaderName));
+                break;
             }
         }
         
-        void SerializeCore<T> (T obj, XmlWriter writer)
+        void SerializeCore<TObject> (TObject obj, XmlWriter writer, TContext context)
+        {
+            Serialize (obj, new XmlSerializationContext<TContext> (this, writer, context));
+        }
+        
+        internal void Serialize<TObject> (TObject obj, XmlSerializationContext<TContext> context)
         {
             if (obj == null) throw new ArgumentNullException ("obj");
             
-            var serializer = GetTypeSerializer (typeof (T));
-            serializer (obj, new XmlSerializationContext (this, writer));
+            var serializer = GetCompilerForType (typeof (TObject)).TypeSerializer;
+            serializer (obj, context);
         }
 
-        internal void AutoSerializeObjectAndMembers<T> (T obj, XmlSerializationContext context)
+        internal void AutoSerializeObjectStart<TObject> (TObject obj, XmlSerializationContext<TContext> context)
         {
-            var serializer = GetTypeAutoSerializer (typeof (T));
+            var serializer = GetCompilerForType (typeof (TObject)).TypeStartAutoSerializer;
+            serializer (obj, context);
+        }
+
+        internal void AutoSerializeObjectEnd<TObject> (TObject obj, XmlSerializationContext<TContext> context)
+        {
+            var serializer = GetCompilerForType (typeof (TObject)).TypeEndAutoSerializer;
             serializer (obj, context);
         }
         
-        internal void AutoSerializeMembersOnly<T> (T obj, XmlSerializationContext context)
+        internal void AutoSerializeMembers<TObject> (TObject obj, XmlSerializationContext<TContext> context)
         {
-            var serialzer = GetMemberAutoSerializer (typeof (T));
+            var serialzer = GetCompilerForType (typeof (TObject)).MemberAutoSerializer;
             serialzer (obj, context);
         }
         
-        Serializers GetSerializers (Type type)
+        internal SerializationCompiler<TContext> GetCompilerForType (Type type)
         {
-            if (!serializers.ContainsKey (type)) {
-                return serializers[type] = new Serializers ();
+            SerializationCompiler<TContext> compiler;
+            if (!compilers.TryGetValue (type, out compiler)) {
+                compiler = compiler_provider (this, type);
+                compilers[type] = compiler;
             }
-            return serializers[type];
+            return compiler;
         }
         
-        Serializer GetTypeSerializer (Type type)
+        struct XmlSerializationOptions
         {
-            var serializers = GetSerializers (type);
-            if (serializers.TypeSerializer == null) {
-                Serializer serializer = null;
-                serializers.TypeSerializer = (obj, context) => serializer (obj, context);
-                serializer = CreateTypeSerializer (type, serializers);
-                return serializers.TypeSerializer = serializer;
-            }
-            return serializers.TypeSerializer;
-        }
-        
-        Serializer CreateTypeSerializer (Type type, Serializers serializers)
-        {
-            if (typeof (IXmlSerializable).IsAssignableFrom (type)) {
-                return (obj, context) => ((IXmlSerializable)obj).SerializeSelfAndMembers (context);
-            } else {
-                return GetTypeAutoSerializer (type, serializers);
-            }
-        }
-        
-        Serializer GetMemberSerializer (Type type)
-        {
-            var serializers = GetSerializers (type);
-            if (serializers.MemberSerializer == null) {
-                Serializer serializer = null;
-                serializers.MemberSerializer = (obj, context) => serializer (obj, context);
-                serializer = CreateMemberSerializer (type, serializers);
-                return serializers.MemberSerializer = serializer;
-            }
-            return serializers.MemberSerializer;
-        }
-        
-        Serializer CreateMemberSerializer (Type type, Serializers serializers)
-        {
-            if (typeof (IXmlSerializable).IsAssignableFrom (type)) {
-                return (obj, context) => ((IXmlSerializable)obj).SerializeMembersOnly (context);
-            } else {
-                return GetMemberAutoSerializer (type, serializers);
-            }
-        }
-        
-        Serializer GetTypeAutoSerializer (Type type)
-        {
-            return GetTypeAutoSerializer (type, GetSerializers (type));
-        }
-        
-        Serializer GetTypeAutoSerializer (Type type, Serializers serializers)
-        {
-            if (serializers.TypeAutoSerializer == null) {
-                return serializers.TypeAutoSerializer = CreateTypeAutoSerializer (type);
-            }
-            return serializers.TypeAutoSerializer;
-        }
-        
-        Serializer CreateTypeAutoSerializer (Type type)
-        {
-            var name = type.Name;
-            string @namespace = null;
+            public readonly Encoding Encoding;
+            public readonly TContext Context;
+            public readonly XmlDeclarationType XmlDeclarationType;
             
-            var type_attributes = type.GetCustomAttributes (typeof (XmlTypeAttribute), false);
-            if (type_attributes.Length > 0) {
-                var type_attribute = (XmlTypeAttribute)type_attributes[0];
-                name = type_attribute.Name;
-                @namespace = type_attribute.Namespace;
-            }
-            
-            var next = GetMemberAutoSerializer (type);
-            
-            return (obj, context) => {
-                context.Writer.WriteStartElement (name, @namespace);
-                next (obj, context);
-                context.Writer.WriteEndElement ();
-            };
-        }
-        
-        Serializer GetMemberAutoSerializer (Type type)
-        {
-            return GetMemberAutoSerializer (type, GetSerializers (type));
-        }
-        
-        Serializer GetMemberAutoSerializer (Type type, Serializers serializers)
-        {
-            if (serializers.MemberAutoSerializer == null) {
-                return serializers.MemberAutoSerializer = CreateMemberAutoSerializer (type);
-            }
-            return serializers.MemberAutoSerializer;
-        }
-        
-        Serializer CreateMemberAutoSerializer (Type type)
-        {
-            var attribute_serializers = new List<Serializer>();
-            var element_serializers = new List<Serializer> ();
-            
-            foreach (var property in type.GetProperties ()) {
-                ProcessMember (property, attribute_serializers, element_serializers);
-            }
-            
-            attribute_serializers.AddRange (element_serializers);
-            var serializers = attribute_serializers.ToArray ();
-            if (serializers.Length > 0) {
-                return (obj, context) => {
-                    foreach (var serializer in serializers) {
-                        serializer (obj, context);
-                    }
-                };
-            } else {
-                return (obj, context) => context.Writer.WriteValue (obj.ToString ());
-            }
-        }
-        
-        void ProcessMember (PropertyInfo property, List<Serializer> attributeSerializers, List<Serializer> elementSerializers)
-        {
-            XmlAttributeAttribute attribute_attribute = null;
-            XmlElementAttribute element_attribute = null;
-            XmlFlagAttribute flag_attribute = null;
-            XmlArrayAttribute array_attribute = null;
-            XmlArrayItemAttribute array_item_attribute = null;
-            
-            foreach (var custom_attribute in property.GetCustomAttributes (false)) {
-                var attribute = custom_attribute as XmlAttributeAttribute;
-                if(attribute != null) {
-                    attribute_attribute = attribute;
-                    continue;
-                }
-                
-                var element = custom_attribute as XmlElementAttribute;
-                if (element != null) {
-                    element_attribute = element;
-                    continue;
-                }
-                
-                var flag = custom_attribute as XmlFlagAttribute;
-                if (flag != null) {
-                    flag_attribute = flag;
-                    continue;
-                }
-                
-                var array = custom_attribute as XmlArrayAttribute;
-                if (array != null) {
-                    array_attribute = array;
-                    continue;
-                }
-                
-                var array_item = custom_attribute as XmlArrayItemAttribute;
-                if (array_item != null) {
-                    array_item_attribute = array_item;
-                    continue;
+            public XmlSerializationOptions (XmlSerializationOptions<TContext> options)
+            {
+                if (options == null) {
+                    Encoding = Helper.UTF8Unsigned;
+                    Context = default (TContext);
+                    XmlDeclarationType = 0;
+                } else {
+                    Encoding = options.Encoding ?? Helper.UTF8Unsigned;
+                    Context = options.Context;
+                    XmlDeclarationType = options.XmlDeclarationType;
                 }
             }
-            
-            if (attribute_attribute != null) {
-                attributeSerializers.Add (CreateSerializer (property, attribute_attribute));
-                return;
-            }
-            
-            if (element_attribute != null) {
-                elementSerializers.Add (CreateSerializer (property, element_attribute));
-                return;
-            }
-            
-            if (flag_attribute != null) {
-                elementSerializers.Add (CreateSerializer (property, flag_attribute));
-                return;
-            }
-            
-            if (array_attribute != null) {
-                elementSerializers.Add (CreateSerializer (property, array_attribute, array_item_attribute));
-                return;
-            }
-        }
-        
-        static Serializer CreateSerializer (Serializer serializer, bool omitIfNull)
-        {
-            if (omitIfNull) {
-                return (obj, writer) => {
-                    if (obj != null) {
-                        serializer (obj, writer);
-                    }
-                };
-            } else {
-                return serializer;
-            }
-        }
-        
-        static Serializer CreateSerializer (PropertyInfo property, XmlAttributeAttribute attributeAttribute)
-        {
-            return CreateSerializer (CreateSerializerCore (property, attributeAttribute), attributeAttribute.OmitIfNull);
-        }
-        
-        static Serializer CreateSerializerCore (PropertyInfo property, XmlAttributeAttribute attributeAttribute)
-        {
-            if (!property.CanRead) {
-                // TODO throw
-            }
-            var name = attributeAttribute.Name ?? property.Name;
-            var @namespace = attributeAttribute.Namespace;
-            return (obj, context) =>
-                context.Writer.WriteAttributeString (name, @namespace, property.GetValue (obj, null).ToString ());
-        }
-        
-        Serializer CreateSerializer (PropertyInfo property, XmlElementAttribute elementAttribute)
-        {
-            return CreateSerializer (CreateSerializerCore (property, elementAttribute), elementAttribute.OmitIfNull);
-        }
-        
-        Serializer CreateSerializerCore (PropertyInfo property, XmlElementAttribute elementAttribute)
-        {
-            if (!property.CanRead) {
-                // TODO throw
-            }
-            var next = GetMemberSerializer (property.PropertyType);
-            var name = elementAttribute.Name ?? property.Name;
-            var @namespace = elementAttribute.Namespace;
-            return (obj, context) => {
-                context.Writer.WriteStartElement (name, @namespace);
-                next (property.GetValue (obj, null), context);
-                context.Writer.WriteEndElement ();
-            };
-        }
-        
-        Serializer CreateSerializer (PropertyInfo property, XmlArrayAttribute arrayAttribute, XmlArrayItemAttribute arrayItemAttribute)
-        {
-            return CreateSerializer (CreateSerializerCore (property, arrayAttribute, arrayItemAttribute), arrayAttribute.OmitIfNull);
-        }
-        
-        Serializer CreateSerializerCore (PropertyInfo property, XmlArrayAttribute arrayAttribute, XmlArrayItemAttribute arrayItemAttribute)
-        {
-            if (!property.CanRead) {
-                // TODO throw
-            }
-            Type ienumerable;
-            if (property.PropertyType.IsGenericType &&
-                property.PropertyType.GetGenericTypeDefinition () == typeof (IEnumerable<>)) {
-                ienumerable = property.PropertyType;
-            } else {
-                ienumerable = property.PropertyType.GetInterface ("IEnumerable`1");
-            }
-            if (ienumerable == null) {
-                // TODO throw
-            }
-            
-            var name = arrayAttribute.Name ?? property.Name;
-            var @namespace = arrayAttribute.Namespace;
-            var next = CreateSerializer (ienumerable.GetGenericArguments ()[0], arrayItemAttribute);
-            if (arrayAttribute.OmitIfEmpty) {
-                return (obj, context) => {
-                    if (obj != null) {
-                        var first = true;
-                        foreach (var item in (IEnumerable)property.GetValue (obj, null)) {
-                            if (first) {
-                                context.Writer.WriteStartElement (name, @namespace);
-                                first = false;
-                            }
-                            next (item, context);
-                        }
-                        if (!first) {
-                            context.Writer.WriteEndElement ();
-                        }
-                    }
-                };
-            } else {
-                return (obj, context) => {
-                    context.Writer.WriteStartElement (name, @namespace);
-                    if (obj != null) {
-                        foreach (var item in (IEnumerable)property.GetValue (obj, null)) {
-                            next (item, context);
-                        }
-                    }
-                    context.Writer.WriteEndElement ();
-                };
-            }
-        }
-        
-        Serializer CreateSerializer (Type type, XmlArrayItemAttribute arrayItemAttribute)
-        {
-            if (arrayItemAttribute == null) {
-                return GetTypeSerializer (type);
-            } else {
-                var name = arrayItemAttribute.Name;
-                var @namespace = arrayItemAttribute.Namespace;
-                var next = GetMemberSerializer (type);
-                return (obj, context) => {
-                    context.Writer.WriteStartElement (name, @namespace);
-                    next (obj, context);
-                    context.Writer.WriteEndElement ();
-                };
-            }
-        }
-        
-        static Serializer CreateSerializer (PropertyInfo property, XmlFlagAttribute flagAttribute)
-        {
-            if (property.PropertyType != typeof (bool)) {
-                // TODO throw
-            }
-            var name = flagAttribute.Name ?? property.Name;
-            var @namespace = flagAttribute.Namespace;
-            return (obj, context) => {
-                if ((bool)obj) {
-                    context.Writer.WriteStartElement (name, @namespace);
-                    context.Writer.WriteEndElement ();
-                }
-            };
         }
     }
 }

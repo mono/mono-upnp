@@ -1,4 +1,4 @@
-﻿//
+//
 // Announcer.cs
 //
 // Author:
@@ -37,56 +37,45 @@ namespace Mono.Ssdp
 {
     public class Announcer
     {
-        private static readonly Random random = new Random ();
+        static readonly Random random = new Random ();
 
-        private bool disposed;
-        private readonly object mutex = new object ();
+        readonly object mutex = new object ();
 
-        private string location;
-        public string Location {
-            get { return location; }
-            set { location = value; }
-        }
+        public string Location { get; set; }
 
-        private string type;
-        public string Type {
-            get { return type; }
-            set { type = value; }
-        }
+        public string Type { get; set; }
 
-        private string name;
-        public string Name {
-            get { return name; }
-            set { name = value; }
-        }
+        public string Name { get; set; }
 
-        private ushort max_age = Protocol.DefaultMaxAge;
+        ushort max_age = Protocol.DefaultMaxAge;
+        [CLSCompliantAttribute (false)]
         public ushort MaxAge {
             get { return max_age; }
             set { max_age = System.Math.Max (Protocol.DefaultMaxAge, value); }
         }
 
-        private volatile uint announcement_timeout_id;
+        volatile uint announcement_timeout_id;
 
-        private TimeSpan GetInterval ()
+        TimeSpan GetInterval ()
         {
             return TimeSpan.FromMilliseconds (random.Next (MaxAge * 1000 / 2));
         }
 
-        private static TimeSpan GetInterval (ushort mx)
+        static TimeSpan GetInterval (ushort mx)
         {
             // FIXME lame
             return TimeSpan.FromMilliseconds (random.Next (System.Math.Min (Protocol.MaxMX * 1000, mx * 1000)));
         }
 
-        private Server server;
+        readonly Server server;
         public Server Server {
             get { return server; }
         }
 
-        private volatile bool started;
-        public bool Started {
-            get { return started; }
+        public bool Started { get; private set; }
+        
+        public bool IsDisposed {
+            get { return server.IsDisposed; }
         }
 
         internal Announcer (Server server, string name, string type, string location)
@@ -102,7 +91,7 @@ namespace Mono.Ssdp
             lock (mutex) {
                 CheckDisposed ();
 
-                if (started) {
+                if (Started) {
                     throw new InvalidOperationException ("The announcer is already running. Cancel it first.");
                 }
 
@@ -113,7 +102,7 @@ namespace Mono.Ssdp
                 AnnounceAlive ();
 
                 announcement_timeout_id = server.Dispatcher.Add (GetInterval (), OnAnnounceTimeout);
-                started = true;
+                Started = true;
             }
         }
 
@@ -126,7 +115,7 @@ namespace Mono.Ssdp
                     return;
                 }
 
-                WaitHandle handle = StopAsync ();
+                var handle = StopAsync ();
                 handle.WaitOne ();
             }
         }
@@ -144,21 +133,21 @@ namespace Mono.Ssdp
             }
         }
 
-        private void OnByeBye (IAsyncResult asyncResult)
+        void OnByeBye (IAsyncResult asyncResult)
         {
-            SsdpSocket socket = (SsdpSocket)asyncResult.AsyncState;
+            var socket = (SsdpSocket)asyncResult.AsyncState;
             try {
                 socket.EndSendTo (asyncResult);
             } catch {
             }
-            started = false;
+            Started = false;
         }
 
         internal void Stop (WaitHandle wait)
         {
         }
 
-        private bool OnAnnounceTimeout (object state, ref TimeSpan interval)
+        bool OnAnnounceTimeout (object state, ref TimeSpan interval)
         {
             lock (mutex) {
                 AnnounceAlive ();
@@ -167,18 +156,18 @@ namespace Mono.Ssdp
             }
         }
 
-        private void AnnounceAlive ()
+        void AnnounceAlive ()
         {
-            server.AnnounceSocket.BeginSendTo (Protocol.CreateAliveNotify (Location, Type, Name, MaxAge), OnFinished);
+            Server.AnnounceSocket.BeginSendTo (Protocol.CreateAliveNotify (Location, Type, Name, MaxAge), OnFinished);
         }
 
         internal void Respond (IPEndPoint endPoint, ushort mx)
         {
-            TimeSpan interval = GetInterval (mx);
-            server.Dispatcher.Add (interval, OnRespondTimeout, endPoint);
+            var interval = GetInterval (mx);
+            Server.Dispatcher.Add (interval, OnRespondTimeout, endPoint);
         }
 
-        private bool OnRespondTimeout (object state, ref TimeSpan interval)
+        bool OnRespondTimeout (object state, ref TimeSpan interval)
         {
             lock (mutex) {
                 if (announcement_timeout_id != 0) {
@@ -188,15 +177,15 @@ namespace Mono.Ssdp
             }
         }
 
-        private void OnFinished (IAsyncResult asyncResult)
+        void OnFinished (IAsyncResult asyncResult)
         {
-            SsdpSocket socket = (SsdpSocket)asyncResult.AsyncState;
+            var socket = (SsdpSocket)asyncResult.AsyncState;
             socket.EndSendTo (asyncResult);
         }
 
-        private void CheckDisposed ()
+        void CheckDisposed ()
         {
-            if (disposed) {
+            if (IsDisposed) {
                 throw new ObjectDisposedException ("Announcer has been Disposed");
             }
         }

@@ -5,35 +5,70 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D647ECD5-AC2E-4B2C-9185-53FC9F061397}</ProjectGuid>
+    <ProjectGuid>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AssemblyName>Mono.Upnp</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <RootNamespace>Mono.Upnp</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>mono-upnp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG</DefineConstants>
+    <OutputPath>.</OutputPath>
+    <DefineConstants>DEBUG,TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <Optimize>true</Optimize>
+    <OutputPath>.</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="System.Xml">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Mono.Upnp\Client.cs" />
+    <Compile Include="Mono.Upnp\Description.cs" />
+    <Compile Include="Mono.Upnp\Device.cs" />
+    <Compile Include="Mono.Upnp\DeviceAnnouncement.cs" />
+    <Compile Include="Mono.Upnp\DeviceType.cs" />
+    <Compile Include="Mono.Upnp\DisposedEventArgs.cs" />
+    <Compile Include="Mono.Upnp\Icon.cs" />
+    <Compile Include="Mono.Upnp\Root.cs" />
+    <Compile Include="Mono.Upnp\Server.cs" />
+    <Compile Include="Mono.Upnp\Service.cs" />
+    <Compile Include="Mono.Upnp\ServiceAnnouncement.cs" />
+    <Compile Include="Mono.Upnp\ServiceType.cs" />
+    <Compile Include="Mono.Upnp\TypeInfo.cs" />
+    <Compile Include="Mono.Upnp\UpnpDeserializationException.cs" />
+    <Compile Include="Mono.Upnp\UpnpEventArgs.cs" />
+    <Compile Include="Mono.Upnp\UpnpException.cs" />
+    <Compile Include="Mono.Upnp.Control\AllowedValueRange.cs" />
+    <Compile Include="Mono.Upnp.Control\Argument.cs" />
+    <Compile Include="Mono.Upnp.Control\ServiceAction.cs" />
+    <Compile Include="Mono.Upnp.Control\StateVariable.cs" />
+    <Compile Include="Mono.Upnp.Control\StateVariableChangedArgs.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpControlException.cs" />
+    <Compile Include="Mono.Upnp.Internal\ControlServer.cs" />
+    <Compile Include="Mono.Upnp.Internal\DataServer.cs" />
+    <Compile Include="Mono.Upnp.Internal\EventServer.cs" />
+    <Compile Include="Mono.Upnp.Internal\UpnpServer.cs" />
     <Compile Include="Mono.Upnp.Xml\IXmlDeserializable.cs" />
     <Compile Include="Mono.Upnp.Xml\IXmlSerializable.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlArrayAttribute.cs" />
@@ -50,34 +85,67 @@
     <Compile Include="Mono.Upnp.Xml\XmlSerializationContext.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlSerializer.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlTypeAttribute.cs" />
-    <Compile Include="Mono.Upnp.Xml\XmlTypeDeserializerAttribute.cs" />
-    <Compile Include="Mono.Upnp\DeviceType.cs" />
-    <Compile Include="Mono.Upnp\ReadOnlyDictionary.cs" />
-    <Compile Include="Mono.Upnp\ServiceType.cs" />
-    <Compile Include="Mono.Upnp\TypeInfo.cs" />
-    <Compile Include="Mono.Upnp\UpnpClient.cs" />
-    <Compile Include="Mono.Upnp\UpnpDeserializationException.cs" />
-    <Compile Include="Mono.Upnp\UpnpEventArgs.cs" />
-    <Compile Include="Mono.Upnp\UpnpException.cs" />
-    <Compile Include="Mono.Upnp.Description\Description.cs" />
-    <Compile Include="Mono.Upnp.Description\DeviceAnnouncement.cs" />
-    <Compile Include="Mono.Upnp.Description\DeviceDescription.cs" />
-    <Compile Include="Mono.Upnp.Description\Factory.cs" />
-    <Compile Include="Mono.Upnp.Description\IconDescription.cs" />
-    <Compile Include="Mono.Upnp.Description\IDisposer.cs" />
-    <Compile Include="Mono.Upnp.Description\Root.cs" />
-    <Compile Include="Mono.Upnp.Description\ServiceAnnouncement.cs" />
-    <Compile Include="Mono.Upnp.Description\ServiceDescription.cs" />
-    <Compile Include="Mono.Upnp.Description\DisposedEventArgs.cs" />
-    <Compile Include="Mono.Upnp.Internal\ProtectedCollection.cs" />
-    <Compile Include="Mono.Upnp.Xml\DummyXmlReader.cs" />
-    <Compile Include="Mono.Upnp.Description\RootDevice.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Mono.Upnp.Xml\" />
-    <Folder Include="Mono.Upnp\" />
-    <Folder Include="Mono.Upnp.Description\" />
-    <Folder Include="Mono.Upnp.Internal\" />
+    <Compile Include="Mono.Upnp.Internal\Map.cs" />
+    <Compile Include="Mono.Upnp.Control\ServiceController.cs" />
+    <Compile Include="Mono.Upnp.Internal\EventClient.cs" />
+    <Compile Include="Mono.Upnp.Internal\Helper.cs" />
+    <Compile Include="Mono.Upnp.Internal\Log.cs" />
+    <Compile Include="Mono.Upnp.Internal\Protocol.cs" />
+    <Compile Include="Mono.Upnp.Internal\ControlClient.cs" />
+    <Compile Include="Mono.Upnp.Internal\TimeoutDispatcher.cs" />
+    <Compile Include="Mono.Upnp\Deserializer.cs" />
+    <Compile Include="Mono.Upnp\SpecVersion.cs" />
+    <Compile Include="Mono.Upnp.Xml\DoNotDeserializeAttribute.cs" />
+    <Compile Include="Mono.Upnp.Xml\DoNotSerializeAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\IMap.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlNamespaceAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\ArgumentDirection.cs" />
+    <Compile Include="Mono.Upnp.Internal\SoapEnvelope.cs" />
+    <Compile Include="Mono.Upnp.Internal\SoapHeader.cs" />
+    <Compile Include="Mono.Upnp.Internal\Arguments.cs" />
+    <Compile Include="Mono.Upnp.Internal\ServiceControllerBuilder.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpActionAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpArgumentAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpRelatedStateVariableAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpEnumAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpStateVariableAttribute.cs" />
+    <Compile Include="Mono.Upnp.Control\ServiceActionExecutor.cs" />
+    <Compile Include="Mono.Upnp.Control\StateVariableEventer.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlValueAttribute.cs" />
+    <Compile Include="Mono.Upnp.Internal\IMappable.cs" />
+    <Compile Include="Mono.Upnp.Internal\CollectionMap.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\Compiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\Serializer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DelegateSerializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlDeclarationType.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DelegateDeserializationCompiler.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\Deserializer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\ObjectDeserializer.cs" />
+    <Compile Include="Mono.Upnp.Control\StateVariableOptions.cs" />
+    <Compile Include="Mono.Upnp\DeviceOptions.cs" />
+    <Compile Include="Mono.Upnp\RootDeviceOptions.cs" />
+    <Compile Include="Mono.Upnp.Xml\XmlSerializationOptions.cs" />
+    <Compile Include="Mono.Upnp.Xml\IXmlDeserializer.cs" />
+    <Compile Include="Mono.Upnp.Internal\EmptyDictionary.cs" />
+    <Compile Include="Mono.Upnp.Internal\SoapFault.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpError.cs" />
+    <Compile Include="Mono.Upnp.Internal\XmlShell.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\SerializationCompilerProvider.cs" />
+    <Compile Include="Mono.Upnp.Control\UpnpServiceDefinitionException.cs" />
+    <Compile Include="Mono.Upnp\DeserializerProducer.cs" />
+    <Compile Include="Mono.Upnp.Xml.Compilation\DeserializationCompilerProvider.cs" />
+    <Compile Include="Mono.Upnp.Internal\Func.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj">
+      <Project>{AD422A19-BA07-4039-B843-84E386804DD1}</Project>
+      <Name>Mono.Ssdp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mono.Upnp.Xml.Compilation\" />
+  </ItemGroup>
 </Project>

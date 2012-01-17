@@ -1,0 +1,18 @@
+<Addin namespace="FSpot" 
+    category="Services"
+    author="Yavor Georgiev" 
+    name="UPnP Photo Sharing" 
+    defaultEnabled="true">
+        <Dependencies>
+            <Addin id="Core" version="0.7"/>
+        </Dependencies>
+        <Extension path = "/FSpot/Services">
+            <Service class="Mono.Upnp.Dcp.MediaServer1.FSpot.FSpotUpnpService"/>
+        </Extension>
+        <Extension path = "/FSpot/Sidebar">
+            <SidebarPage sidebar_page_type="Mono.Upnp.Dcp.MediaServer1.FSpot.FSpotUpnpSidebarPage"/>
+        </Extension>
+        <Extension path = "/FSpot/Menus/Tools">
+            <Command id = "UpnpSharingConfig" _label = "Configure UPnP Sharing" command_type = "Mono.Upnp.Dcp.MediaServer1.FSpot.SharingConfig" />
+        </Extension>
+</Addin>

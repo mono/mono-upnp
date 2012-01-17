@@ -2,9 +2,9 @@
 // XmlAutomatable.cs
 //  
 // Author:
-//       Scott Peterson <lunchtimemama@gmail.com>
+//       Scott Thomas <lunchtimemama@gmail.com>
 // 
-// Copyright (c) 2009 Scott Peterson
+// Copyright (c) 2009 Scott Thomas
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,43 +24,81 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System;
+
 namespace Mono.Upnp.Xml
 {
-    public abstract class XmlAutomatable : IXmlSerializable, IXmlDeserializable
+    public abstract class XmlAutomatable : XmlDeserializable, IXmlSerializable
     {
-        void IXmlSerializable.SerializeSelfAndMembers (XmlSerializationContext context)
+        void IXmlSerializable.Serialize (XmlSerializationContext context)
         {
-            SerializeSelfAndMembers (context);
+            Serialize (context);
         }
         
-        void IXmlSerializable.SerializeMembersOnly (XmlSerializationContext context)
+        void IXmlSerializable.SerializeMembers (XmlSerializationContext context)
         {
-            SerializeMembersOnly (context);
+            SerializeMembers (context);
         }
         
-        void IXmlDeserializable.Deserialize (XmlDeserializationContext context)
+        protected abstract void Serialize (XmlSerializationContext context);
+        
+        protected abstract void SerializeMembers (XmlSerializationContext context);
+
+        protected void AutoSerialize<T> (T @this, XmlSerializationContext context)
         {
-            Deserialize (context);
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoSerializeObjectStart (@this);
+            SerializeMembers (context);
+            context.AutoSerializeObjectEnd (@this);
+        }
+
+        protected static void AutoSerializeMembers<T> (T @this, XmlSerializationContext context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoSerializeMembers (@this);
+        }
+    }
+    
+    public abstract class XmlAutomatable<TContext> : XmlDeserializable, IXmlSerializable<TContext>
+    {
+        void IXmlSerializable<TContext>.Serialize (XmlSerializationContext<TContext> context)
+        {
+            Serialize (context);
         }
         
-        void IXmlDeserializable.DeserializeAttribute (XmlDeserializationContext context)
+        void IXmlSerializable<TContext>.SerializeMembers (XmlSerializationContext<TContext> context)
         {
-            DeserializeAttribute (context);
+            SerializeMembers (context);
         }
         
-        void IXmlDeserializable.DeserializeElement (XmlDeserializationContext context)
+        protected abstract void Serialize (XmlSerializationContext<TContext> context);
+        
+        protected abstract void SerializeMembers (XmlSerializationContext<TContext> context);
+
+        internal void AutoSerialize<T> (T @this, XmlSerializationContext<TContext> context)
         {
-            DeserializeElement (context);
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoSerializeObjectStart (@this);
+            SerializeMembers (context);
+            context.AutoSerializeObjectEnd (@this);
         }
-        
-        protected abstract void SerializeSelfAndMembers (XmlSerializationContext context);
-        
-        protected abstract void SerializeMembersOnly (XmlSerializationContext context);
-        
-        protected abstract void Deserialize (XmlDeserializationContext context);
-        
-        protected abstract void DeserializeAttribute (XmlDeserializationContext context);
-        
-        protected abstract void DeserializeElement (XmlDeserializationContext context);
+
+        internal static void AutoSerializeMembersOnly<T> (T @this, XmlSerializationContext<TContext> context)
+        {
+            if (context == null) {
+                throw new ArgumentNullException ("context");
+            }
+
+            context.AutoSerializeMembers (@this);
+        }
     }
 }

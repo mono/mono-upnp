@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="3.5" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2EC6A92C-816D-45DB-B73E-8CA25BD92E57}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Mono.Upnp.Dcp.MediaServer1.FSpot</RootNamespace>
+    <AssemblyName>FSpot.Service.Upnp</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\.config\f-spot\addins</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Externalconsole>true</Externalconsole>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\.config\f-spot\addins</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+    </Reference>
+    <Reference Include="Mono.Addins, Version=0.4.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+    </Reference>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+    </Reference>
+    <Reference Include="Mono.Posix" />
+    <Reference Include="System.Core" />
+    <Reference Include="f-spot, Version=0.7.0.0, Culture=neutral">
+    </Reference>
+    <Reference Include="FSpot.Core, Version=0.7.0.0, Culture=neutral">
+    </Reference>
+    <Reference Include="FSpot.Utils, Version=0.7.0.0, Culture=neutral">
+    </Reference>
+    <Reference Include="FSpot.Query, Version=0.7.0.0, Culture=neutral">
+    </Reference>
+    <Reference Include="gnome-vfs-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+    </Reference>
+    <Reference Include="gconf-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="FSpotUpnpSidebarPage.cs" />
+    <Compile Include="gtk-gui\generated.cs" />
+    <Compile Include="UpnpServiceWidget.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.Dcp.MediaServer1.FSpot.UpnpServiceWidget.cs" />
+    <Compile Include="Service\DummyConnectionManager.cs" />
+    <Compile Include="Service\DummyMSMediaServerRegistrar.cs" />
+    <Compile Include="Service\FSpotContentDirectory.cs" />
+    <Compile Include="Service\MimeTypeHelper.cs" />
+    <Compile Include="Service\FSpotUpnpService.cs" />
+    <Compile Include="MenuCommand\SharingConfig.cs" />
+    <Compile Include="MenuCommand\SharingConfigDialog.cs" />
+    <Compile Include="gtk-gui\Mono.Upnp.Dcp.MediaServer1.FSpot.SharingConfigDialog.cs" />
+    <Compile Include="GConfHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">
+      <Project>{D095ADE0-D74E-449C-BAF2-174A952B2056}</Project>
+      <Name>Mono.Upnp.Dcp.MediaServer1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj">
+      <Project>{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}</Project>
+      <Name>Mono.Upnp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Upnp.addin.xml" />
+    <EmbeddedResource Include="gtk-gui\gui.stetic">
+      <LogicalName>gui.stetic</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Service\" />
+    <Folder Include="MenuCommand\" />
+  </ItemGroup>
+</Project>
