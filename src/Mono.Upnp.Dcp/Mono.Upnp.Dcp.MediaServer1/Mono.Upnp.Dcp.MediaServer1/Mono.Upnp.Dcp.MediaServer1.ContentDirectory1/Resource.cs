@@ -98,7 +98,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [XmlAttribute ("bitrate", OmitIfNull = true)]
         public virtual uint? BitRate { get; protected set; }
 
-        [XmlAttribute ("samplyFrequency", OmitIfNull = true)]
+        [XmlAttribute ("sampleFrequency", OmitIfNull = true)]
         public virtual uint? SampleFrequency { get; protected set; }
 
         [XmlAttribute ("bitsPerSample", OmitIfNull = true)]
@@ -107,7 +107,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
         [XmlAttribute ("nrAudioChannels", OmitIfNull = true)]
         public virtual uint? NrAudioChannels { get; protected set; }
 
-        [XmlAttribute ("resolution", OmitIfNull = true)]
+        //[XmlAttribute ("resolution", OmitIfNull = true)]
         public virtual Resolution? Resolution { get; protected set; }
 
         [XmlAttribute ("colorDepth", OmitIfNull = true)]

@@ -19,7 +19,6 @@
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Commandlineparameters>-f "mac2: upnp" -n "Windows Media Connect" "/Users/lunchtimemama/Music/Rdio Downloads"</Commandlineparameters>
     <Externalconsole>true</Externalconsole>
     <EnvironmentVariables>

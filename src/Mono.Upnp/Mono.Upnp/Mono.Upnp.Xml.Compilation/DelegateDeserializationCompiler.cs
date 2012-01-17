@@ -93,22 +93,35 @@ namespace Mono.Upnp.Xml.Compilation
                 return context => context.Reader.ReadElementContentAsString ();
             } else if (Type == typeof (int)) {
                 return context => context.Reader.ReadElementContentAsInt ();
+            } else if (Type == typeof (uint)) {
+                return context => uint.Parse (context.Reader.ReadElementContentAsString ());
             } else if (Type == typeof (double)) {
                 return context => context.Reader.ReadElementContentAsDouble ();
             } else if (Type == typeof (bool)) {
                 return context => context.Reader.ReadElementContentAsBoolean ();
             } else if (Type == typeof (long)) {
                 return context => context.Reader.ReadElementContentAsLong ();
+            } else if (Type == typeof (ulong)) {
+                return context => ulong.Parse (context.Reader.ReadElementContentAsString ());
             } else if (Type == typeof (float)) {
                 return context => context.Reader.ReadElementContentAsFloat ();
             } else if (Type == typeof (decimal)) {
                 return context => context.Reader.ReadElementContentAsDecimal ();
             } else if (Type == typeof (DateTime)) {
                 return context => context.Reader.ReadElementContentAsDateTime ();
+            } else if (Type == typeof (TimeSpan)) {
+                return context => TimeSpan.Parse (context.Reader.ReadElementContentAsString ());
             } else if (Type == typeof (Uri)) {
                 return context => {
                     var url = context.Reader.ReadElementContentAsString ();
-                    return url.Length == 0 ? null : new Uri (url);
+                    if (url.Length != 0) {
+                        try {
+                            Uri uri = new Uri (url);
+                            return uri;
+                        } catch (Exception e) {
+                        }
+                    }
+                    return null;
                 };
             } else if (Type.IsEnum) {
                 var map = GetEnumMap (Type);
@@ -397,20 +410,36 @@ namespace Mono.Upnp.Xml.Compilation
                 return context => context.Reader.ReadContentAsString ();
             } else if (type == typeof (int)) {
                 return context => context.Reader.ReadContentAsInt ();
+            } else if (type == typeof (uint)) {
+                return context => uint.Parse (context.Reader.ReadContentAsString ());
             } else if (type == typeof (double)) {
                 return context => context.Reader.ReadContentAsDouble ();
             } else if (type == typeof (bool)) {
                 return context => context.Reader.ReadContentAsBoolean ();
             } else if (type == typeof (long)) {
                 return context => context.Reader.ReadContentAsLong ();
+            } else if (type == typeof (ulong)) {
+                return context => ulong.Parse (context.Reader.ReadContentAsString ());
             } else if (type == typeof (float)) {
                 return context => context.Reader.ReadContentAsFloat ();
             } else if (type == typeof (decimal)) {
                 return context => context.Reader.ReadContentAsDecimal ();
             } else if (type == typeof (DateTime)) {
                 return context => context.Reader.ReadContentAsDateTime ();
+            } else if (type == typeof (TimeSpan)) {
+                return context => TimeSpan.Parse (context.Reader.ReadContentAsString ());
             } else if (type == typeof (Uri)) {
-                return context => new Uri (context.Reader.ReadContentAsString ());
+                return context => {
+                    var url = context.Reader.ReadContentAsString ();
+                    if (url.Length != 0) {
+                        try {
+                            Uri uri = new Uri (url);
+                            return uri;
+                        } catch (Exception e) {
+                        }
+                    }
+                    return null;     
+                };
             } else if (type.IsEnum) {
                 var map = GetEnumMap (type);
                 return context => map[context.Reader.ReadContentAsString ()];
