@@ -159,6 +159,5 @@
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.Xml\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1\" />
     <Folder Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\" />
-    <Folder Include="Mono.Upnp.Dcp.MediaServer1.ContentDirectory1\" />
   </ItemGroup>
 </Project>

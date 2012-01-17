@@ -191,7 +191,7 @@ namespace Mono.Upnp
         
         TResult GetDescription<TAnnouncement, TResult> (IEnumerable<string> urls,
                                                         TAnnouncement announcement,
-                                                        Func<TAnnouncement, Device, TResult> getter)
+                                                        Mono.Upnp.Internal.Func<TAnnouncement, Device, TResult> getter)
             where TResult : class
         {
             foreach (var url in urls) {

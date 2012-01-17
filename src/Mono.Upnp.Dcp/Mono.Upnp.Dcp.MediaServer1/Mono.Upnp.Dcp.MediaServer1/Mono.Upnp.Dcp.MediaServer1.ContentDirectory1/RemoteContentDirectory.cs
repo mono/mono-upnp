@@ -134,14 +134,14 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             return Deserialize<T> (xml, Deserializers<T> (types));
         }
 
-        IEnumerable<Func<XmlReader, Object>> Deserializers ()
+        IEnumerable<Mono.Upnp.Internal.Func<XmlReader, Object>> Deserializers ()
         {
             while (true) {
                 yield return reader => deserializer.Deserialize<Object> (reader);
             }
         }
 
-        IEnumerable<Func<XmlReader, T>> Deserializers<T> (IEnumerable<Type> types)
+        IEnumerable<Mono.Upnp.Internal.Func<XmlReader, T>> Deserializers<T> (IEnumerable<Type> types)
         {
             foreach (var type in types) {
                 var method = deserialize_method.MakeGenericMethod (type);
@@ -149,7 +149,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
             }
         }
 
-        IEnumerable<T> Deserialize<T> (string xml, IEnumerable<Func<XmlReader, T>> deserializers)
+        IEnumerable<T> Deserialize<T> (string xml, IEnumerable<Mono.Upnp.Internal.Func<XmlReader, T>> deserializers)
         {
             var enumerator = deserializers.GetEnumerator ();
             using (var reader = XmlReader.Create (new StringReader (xml))) {
