@@ -124,7 +124,6 @@
     <Compile Include="Mono.Upnp.Xml.Compilation\ObjectDeserializer.cs" />
     <Compile Include="Mono.Upnp.Control\StateVariableOptions.cs" />
     <Compile Include="Mono.Upnp\DeviceOptions.cs" />
-    <Compile Include="Mono.Upnp\RootDeviceOptions.cs" />
     <Compile Include="Mono.Upnp.Xml\XmlSerializationOptions.cs" />
     <Compile Include="Mono.Upnp.Xml\IXmlDeserializer.cs" />
     <Compile Include="Mono.Upnp.Internal\EmptyDictionary.cs" />

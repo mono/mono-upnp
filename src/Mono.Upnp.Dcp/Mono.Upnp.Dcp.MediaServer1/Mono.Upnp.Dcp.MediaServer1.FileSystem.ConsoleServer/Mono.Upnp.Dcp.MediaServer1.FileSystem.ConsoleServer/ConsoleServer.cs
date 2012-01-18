@@ -124,7 +124,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer
                 friendly_name,
                 manufacturer,
                 model_name,
-                new RootDeviceOptions {
+                new DeviceOptions {
                     Services = new[] { ms_media_server_registrar },
                     ManufacturerUrl = manufacturer_url,
                     ModelDescription = model_description,

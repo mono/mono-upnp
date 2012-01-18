@@ -44,13 +44,13 @@ namespace Mono.Upnp.Dcp.MediaServer1
         {
         }
         
-        public MediaServer (string udn, string friendlyName, string manufacturer, string modelName, RootDeviceOptions options, ConnectionManager connectionManager, LocalContentDirectory contentDirectory)
+        public MediaServer (string udn, string friendlyName, string manufacturer, string modelName, DeviceOptions options, ConnectionManager connectionManager, LocalContentDirectory contentDirectory)
         {
             if (connectionManager == null) throw new ArgumentNullException ("connnectionManager");
             if (contentDirectory == null) throw new ArgumentNullException ("contentDirectory");
             
             if (options == null) {
-                options = new RootDeviceOptions ();
+                options = new DeviceOptions ();
             }
             
             this.content_directory = contentDirectory;
