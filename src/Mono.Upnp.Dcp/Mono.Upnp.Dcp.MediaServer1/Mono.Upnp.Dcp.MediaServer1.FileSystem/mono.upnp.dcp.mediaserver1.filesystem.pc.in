@@ -1,0 +1,6 @@
+Name: Mono.Upnp.Dcp.MediaServer1.FileSystem
+Description: Mono.Upnp.Dcp.MediaServer1.FileSystem
+Version: 0.1
+
+Requires: 
+Libs: -r:@expanded_libdir@/@PACKAGE@/Mono.Upnp.Dcp.MediaServer1.FileSystem.dll

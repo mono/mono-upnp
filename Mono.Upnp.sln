@@ -1,95 +1,68 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp", "Mono.Upnp", "{42D6ED99-B55B-49DF-9D77-55C5FC2D2266}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Ssdp", "Mono.Ssdp", "{5720EB87-0A37-403E-B262-826CC8982090}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp", "src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj", "{AD422A19-BA07-4039-B843-84E386804DD1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp", "Mono.Upnp", "{BBFEA784-F6F7-42AE-9222-87751257E135}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp", "src\Mono.Upnp\Mono.Upnp\Mono.Upnp.csproj", "{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.GtkClient", "src\Mono.Upnp\Mono.Upnp.GtkClient\Mono.Upnp.GtkClient.csproj", "{582939F7-13F0-49EB-A970-15955BCE8E8E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8D933A32-E3C8-4750-BB32-B6C70C9390A9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.Dcp", "Mono.Upnp.Dcp", "{36B3F6C8-9AD3-4B47-ABE3-429205D4974C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Tests", "tests\Mono.Upnp.Tests\Mono.Upnp.Tests.csproj", "{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.Tests", "tests\Mono.Ssdp.Tests\Mono.Ssdp.Tests.csproj", "{D6ADBD6C-8A83-4429-8975-624822AF7D3D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests", "tests\Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests\Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests.csproj", "{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Tests", "tests\Mono.Upnp.Dcp.MediaServer1.Tests\Mono.Upnp.Dcp.MediaServer1.Tests.csproj", "{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Ssdp", "Mono.Ssdp", "{10FB35F1-FBF6-42C7-85E2-9A52345FD0F3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp", "src\Mono.Ssdp\Mono.Ssdp\Mono.Ssdp.csproj", "{AD422A19-BA07-4039-B843-84E386804DD1}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.Dcp", "Mono.Upnp.Dcp", "{251579B4-B8E2-4ACD-B5BD-0DC208BB8114}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.Dcp.MediaServer1", "Mono.Upnp.Dcp.MediaServer1", "{E2789A20-B336-4121-8C5A-2EC6DBD031CA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mono.Upnp.Dcp.MediaServer1", "Mono.Upnp.Dcp.MediaServer1", "{10D079DB-45C4-4FC7-BAFE-2844295D1D19}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj", "{D095ADE0-D74E-449C-BAF2-174A952B2056}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MSMediaReceiverRegistrar1", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1.csproj", "{1203E9D4-B1F3-4838-8275-91782C8EC6E4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.FileSystem", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.FileSystem\Mono.Upnp.Dcp.MediaServer1.FileSystem.csproj", "{5AD8D852-8ADA-477E-AA76-0958CAB1D881}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer\Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer.csproj", "{DA49F3FC-22F1-4714-8C21-5971B62262FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.FSpot", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.FSpot\Mono.Upnp.Dcp.MediaServer1.FSpot.csproj", "{2EC6A92C-816D-45DB-B73E-8CA25BD92E57}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MSMediaReceiverRegistrar1", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1\Mono.Upnp.Dcp.MSMediaReceiverRegistrar1.csproj", "{1203E9D4-B1F3-4838-8275-91782C8EC6E4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.GtkClient", "src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.GtkClient\Mono.Upnp.Dcp.MediaServer1.GtkClient.csproj", "{CA92678C-BC68-4E02-A14E-C213BF6403F6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DEA343EA-6B89-4360-B169-F0474A32B259}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CB550FCC-8D11-4A9F-B4C9-A0DC13F5F190}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Ssdp.Tests", "tests\Mono.Ssdp.Tests\Mono.Ssdp.Tests.csproj", "{D6ADBD6C-8A83-4429-8975-624822AF7D3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Tests", "tests\Mono.Upnp.Tests\Mono.Upnp.Tests.csproj", "{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.Tests", "tests\Mono.Upnp.Dcp.MediaServer1.Tests\Mono.Upnp.Dcp.MediaServer1.Tests.csproj", "{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests", "tests\Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests\Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests.csproj", "{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E4206773-9D80-46EE-A4CE-1BCB71904968}"
 	ProjectSection(SolutionItems) = preProject
-		README = README
 		AUTHORS = AUTHORS
 		COPYING = COPYING
 		HACKING = HACKING
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-		Debug Linq|Any CPU = Debug Linq|Any CPU
-		Release Linq|Any CPU = Release Linq|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Debug Linq|Any CPU.ActiveCfg = Debug|Any CPU
-		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Debug Linq|Any CPU.Build.0 = Debug|Any CPU
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Release Linq|Any CPU.ActiveCfg = Debug|Any CPU
-		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Release Linq|Any CPU.Build.0 = Debug|Any CPU
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1203E9D4-B1F3-4838-8275-91782C8EC6E4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Debug Linq|Any CPU.ActiveCfg = Debug|Any CPU
-		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Debug Linq|Any CPU.Build.0 = Debug|Any CPU
 		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Release Linq|Any CPU.ActiveCfg = Debug|Any CPU
-		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Release Linq|Any CPU.Build.0 = Debug|Any CPU
 		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2EC6A92C-816D-45DB-B73E-8CA25BD92E57}.Debug Linq|Any CPU.ActiveCfg = Debug|Any CPU
-		{2EC6A92C-816D-45DB-B73E-8CA25BD92E57}.Debug Linq|Any CPU.Build.0 = Debug|Any CPU
-		{2EC6A92C-816D-45DB-B73E-8CA25BD92E57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2EC6A92C-816D-45DB-B73E-8CA25BD92E57}.Release Linq|Any CPU.ActiveCfg = Debug|Any CPU
-		{2EC6A92C-816D-45DB-B73E-8CA25BD92E57}.Release Linq|Any CPU.Build.0 = Debug|Any CPU
-		{2EC6A92C-816D-45DB-B73E-8CA25BD92E57}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2EC6A92C-816D-45DB-B73E-8CA25BD92E57}.Release|Any CPU.Build.0 = Release|Any CPU
-		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Debug Linq|Any CPU.ActiveCfg = Debug Linq|Any CPU
-		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Debug Linq|Any CPU.Build.0 = Debug Linq|Any CPU
 		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Release Linq|Any CPU.ActiveCfg = Release Linq|Any CPU
-		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Release Linq|Any CPU.Build.0 = Release Linq|Any CPU
 		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{582939F7-13F0-49EB-A970-15955BCE8E8E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Debug Linq|Any CPU.ActiveCfg = Debug Linq|Any CPU
-		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Debug Linq|Any CPU.Build.0 = Debug Linq|Any CPU
 		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Release Linq|Any CPU.ActiveCfg = Release Linq|Any CPU
-		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Release Linq|Any CPU.Build.0 = Release Linq|Any CPU
 		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AD8D852-8ADA-477E-AA76-0958CAB1D881}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E5A8C5E-334D-4ED2-B40F-34712C7E085C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -104,58 +77,41 @@ Global
 		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Debug Linq|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Debug Linq|Any CPU.Build.0 = Debug|Any CPU
 		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Release Linq|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Release Linq|Any CPU.Build.0 = Debug|Any CPU
 		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA92678C-BC68-4E02-A14E-C213BF6403F6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Debug Linq|Any CPU.ActiveCfg = Debug Linq|Any CPU
-		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Debug Linq|Any CPU.Build.0 = Debug Linq|Any CPU
 		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Release Linq|Any CPU.ActiveCfg = Release Linq|Any CPU
-		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Release Linq|Any CPU.Build.0 = Release Linq|Any CPU
 		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D095ADE0-D74E-449C-BAF2-174A952B2056}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D6ADBD6C-8A83-4429-8975-624822AF7D3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D6ADBD6C-8A83-4429-8975-624822AF7D3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6ADBD6C-8A83-4429-8975-624822AF7D3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6ADBD6C-8A83-4429-8975-624822AF7D3D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA49F3FC-22F1-4714-8C21-5971B62262FE}.Debug Linq|Any CPU.ActiveCfg = Debug Linq|Any CPU
-		{DA49F3FC-22F1-4714-8C21-5971B62262FE}.Debug Linq|Any CPU.Build.0 = Debug Linq|Any CPU
 		{DA49F3FC-22F1-4714-8C21-5971B62262FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA49F3FC-22F1-4714-8C21-5971B62262FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA49F3FC-22F1-4714-8C21-5971B62262FE}.Release Linq|Any CPU.ActiveCfg = Release Linq|Any CPU
-		{DA49F3FC-22F1-4714-8C21-5971B62262FE}.Release Linq|Any CPU.Build.0 = Release Linq|Any CPU
 		{DA49F3FC-22F1-4714-8C21-5971B62262FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA49F3FC-22F1-4714-8C21-5971B62262FE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Debug Linq|Any CPU.ActiveCfg = Debug Linq|Any CPU
-		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Debug Linq|Any CPU.Build.0 = Debug Linq|Any CPU
 		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Release Linq|Any CPU.ActiveCfg = Release Linq|Any CPU
-		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Release Linq|Any CPU.Build.0 = Release Linq|Any CPU
 		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{5E5A8C5E-334D-4ED2-B40F-34712C7E085C} = {42D6ED99-B55B-49DF-9D77-55C5FC2D2266}
-		{582939F7-13F0-49EB-A970-15955BCE8E8E} = {42D6ED99-B55B-49DF-9D77-55C5FC2D2266}
-		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
-		{D6ADBD6C-8A83-4429-8975-624822AF7D3D} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
-		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
-		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D} = {8D933A32-E3C8-4750-BB32-B6C70C9390A9}
-		{AD422A19-BA07-4039-B843-84E386804DD1} = {10FB35F1-FBF6-42C7-85E2-9A52345FD0F3}
-		{E2789A20-B336-4121-8C5A-2EC6DBD031CA} = {251579B4-B8E2-4ACD-B5BD-0DC208BB8114}
-		{D095ADE0-D74E-449C-BAF2-174A952B2056} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
-		{5AD8D852-8ADA-477E-AA76-0958CAB1D881} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
-		{DA49F3FC-22F1-4714-8C21-5971B62262FE} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
-		{2EC6A92C-816D-45DB-B73E-8CA25BD92E57} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
-		{1203E9D4-B1F3-4838-8275-91782C8EC6E4} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
-		{CA92678C-BC68-4E02-A14E-C213BF6403F6} = {E2789A20-B336-4121-8C5A-2EC6DBD031CA}
+		{AD422A19-BA07-4039-B843-84E386804DD1} = {5720EB87-0A37-403E-B262-826CC8982090}
+		{5E5A8C5E-334D-4ED2-B40F-34712C7E085C} = {BBFEA784-F6F7-42AE-9222-87751257E135}
+		{582939F7-13F0-49EB-A970-15955BCE8E8E} = {BBFEA784-F6F7-42AE-9222-87751257E135}
+		{10D079DB-45C4-4FC7-BAFE-2844295D1D19} = {36B3F6C8-9AD3-4B47-ABE3-429205D4974C}
+		{D095ADE0-D74E-449C-BAF2-174A952B2056} = {10D079DB-45C4-4FC7-BAFE-2844295D1D19}
+		{1203E9D4-B1F3-4838-8275-91782C8EC6E4} = {10D079DB-45C4-4FC7-BAFE-2844295D1D19}
+		{5AD8D852-8ADA-477E-AA76-0958CAB1D881} = {10D079DB-45C4-4FC7-BAFE-2844295D1D19}
+		{DA49F3FC-22F1-4714-8C21-5971B62262FE} = {10D079DB-45C4-4FC7-BAFE-2844295D1D19}
+		{CA92678C-BC68-4E02-A14E-C213BF6403F6} = {10D079DB-45C4-4FC7-BAFE-2844295D1D19}
+		{D6ADBD6C-8A83-4429-8975-624822AF7D3D} = {CB550FCC-8D11-4A9F-B4C9-A0DC13F5F190}
+		{B0FC5FC0-3AB1-4AB6-9B3B-793B441A4288} = {CB550FCC-8D11-4A9F-B4C9-A0DC13F5F190}
+		{2A6588C5-BA02-4597-823A-C4DE81A8CB1D} = {CB550FCC-8D11-4A9F-B4C9-A0DC13F5F190}
+		{EEAC4F7E-6E3D-4241-A477-8D5CB658E0B2} = {CB550FCC-8D11-4A9F-B4C9-A0DC13F5F190}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = src\Mono.Upnp\Mono.Upnp.GtkClient\Mono.Upnp.GtkClient.csproj
@@ -164,7 +120,8 @@ Global
 		$1.DirectoryNamespaceAssociation = Flat
 		$1.ResourceNamePolicy = FileFormatDefault
 		$0.StandardHeader = $2
-		$2.inheritsSet = MITX11License
+		$2.Text = @\n${FileName}\n \nAuthor:\n      ${AuthorName} <${AuthorEmail}>\n\nCopyright (c) ${Year} ${CopyrightHolder}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in\nall copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\nTHE SOFTWARE.
+		$2.IncludeInNewFiles = True
 		$0.TextStylePolicy = $3
 		$3.FileWidth = 120
 		$3.inheritsSet = VisualStudio

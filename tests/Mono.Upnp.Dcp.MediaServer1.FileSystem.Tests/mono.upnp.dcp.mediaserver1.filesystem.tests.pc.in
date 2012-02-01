@@ -1,0 +1,6 @@
+Name: Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
+Description: Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests
+Version: 0.1
+
+Requires: 
+Libs: -r:@expanded_libdir@/@PACKAGE@/Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests.dll

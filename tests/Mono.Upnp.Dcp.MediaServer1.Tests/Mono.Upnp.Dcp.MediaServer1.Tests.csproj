@@ -39,6 +39,9 @@
     <Reference Include="nunit.core, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <Private>False</Private>
     </Reference>
+    <Reference Include="nunit.core.interfaces, Version=2.4.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mono.Upnp.Dcp\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1\Mono.Upnp.Dcp.MediaServer1.csproj">
@@ -66,4 +69,19 @@
     <Compile Include="VirtualXmlSerializerTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="true" RelativeMakefileName="Makefile.am" SyncReferences="true" IsAutotoolsProject="true" RelativeConfigureInPath="../..">
+          <BuildFilesVar Sync="true" Name="FILES" />
+          <DeployFilesVar />
+          <ResourcesVar Sync="true" Name="RESOURCES" />
+          <OthersVar />
+          <GacRefVar Sync="true" Name="REFERENCES" />
+          <AsmRefVar Sync="true" Name="REFERENCES" />
+          <ProjectRefVar Sync="true" Name="REFERENCES" />
+        </MonoDevelop.Autotools.MakefileInfo>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

@@ -8,7 +8,6 @@
     <ProjectGuid>{DA49F3FC-22F1-4714-8C21-5971B62262FE}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AssemblyName>Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <RootNamespace>Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -36,9 +35,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -73,6 +70,15 @@
     <MonoDevelop>
       <Properties>
         <Deployment.LinuxDeployData scriptName="mono-upnp-simple-media-server" />
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="true" RelativeMakefileName="Makefile.am" SyncReferences="true" IsAutotoolsProject="true" RelativeConfigureInPath="../../../..">
+          <BuildFilesVar Sync="true" Name="FILES" />
+          <DeployFilesVar />
+          <ResourcesVar Sync="true" Name="RESOURCES" />
+          <OthersVar />
+          <GacRefVar Sync="true" Name="REFERENCES" />
+          <AsmRefVar Sync="true" Name="REFERENCES" />
+          <ProjectRefVar Sync="true" Name="REFERENCES" />
+        </MonoDevelop.Autotools.MakefileInfo>
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>

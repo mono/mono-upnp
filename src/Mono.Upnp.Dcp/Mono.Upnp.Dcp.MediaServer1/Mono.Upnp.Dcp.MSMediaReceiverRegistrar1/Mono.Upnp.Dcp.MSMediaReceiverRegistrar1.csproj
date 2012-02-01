@@ -32,9 +32,7 @@
     <AssemblyName>MSMediaServerRegistrar1</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System">
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -50,4 +48,19 @@
     <Folder Include="Mono.Upnp.Dcp.MSMediaReceiverRegistrar1\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="true" RelativeMakefileName="Makefile.am" SyncReferences="true" IsAutotoolsProject="true" RelativeConfigureInPath="../../../..">
+          <BuildFilesVar Sync="true" Name="FILES" />
+          <DeployFilesVar />
+          <ResourcesVar Sync="true" Name="RESOURCES" />
+          <OthersVar />
+          <GacRefVar Sync="true" Name="REFERENCES" />
+          <AsmRefVar Sync="true" Name="REFERENCES" />
+          <ProjectRefVar Sync="true" Name="REFERENCES" />
+        </MonoDevelop.Autotools.MakefileInfo>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>
