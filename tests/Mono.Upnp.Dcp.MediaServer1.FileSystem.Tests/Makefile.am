@@ -17,8 +17,6 @@ BUILD_DIR = .
 
 MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_TESTS_DLL_MDB_SOURCE=Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests.dll.mdb
 MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_TESTS_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests.dll.mdb
-TAGLIB_SHARP_DLL_SOURCE=../../../taglib-sharp/src/taglib-sharp.dll
-TAGLIB_SHARP_DLL_MDB_SOURCE=../../../taglib-sharp/src/taglib-sharp.dll.mdb
 MONO_UPNP_DLL_SOURCE=../../src/Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
 MONO_SSDP_DLL_SOURCE=../../src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
 MONO_SSDP_DLL_MDB_SOURCE=../../src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll.mdb
@@ -43,8 +41,6 @@ PROJECT_REFERENCES =  \
 BUILD_DIR = .
 
 MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_TESTS_DLL_MDB=
-TAGLIB_SHARP_DLL_SOURCE=../../../taglib-sharp/src/taglib-sharp.dll
-TAGLIB_SHARP_DLL_MDB_SOURCE=../../../taglib-sharp/src/taglib-sharp.dll.mdb
 MONO_UPNP_DLL_SOURCE=../../src/Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
 MONO_SSDP_DLL_SOURCE=../../src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
 MONO_SSDP_DLL_MDB=
@@ -59,8 +55,6 @@ SATELLITE_ASSEMBLY_NAME=$(notdir $(basename $(ASSEMBLY))).resources.dll
 
 PROGRAMFILES = \
 	$(MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_TESTS_DLL_MDB) \
-	$(TAGLIB_SHARP_DLL) \
-	$(TAGLIB_SHARP_DLL_MDB) \
 	$(MONO_UPNP_DLL) \
 	$(MONO_SSDP_DLL) \
 	$(MONO_SSDP_DLL_MDB) \
@@ -95,23 +89,16 @@ REFERENCES =  \
 	-pkg:taglib-sharp \
 	System
 
-DLL_REFERENCES =  \
-	../../../taglib-sharp/src/taglib-sharp.dll
-
 CLEANFILES = $(PROGRAMFILES) $(LINUX_PKGCONFIG) 
 
 include $(top_srcdir)/Makefile.include
 
-TAGLIB_SHARP_DLL = $(BUILD_DIR)/taglib-sharp.dll
-TAGLIB_SHARP_DLL_MDB = $(BUILD_DIR)/taglib-sharp.dll.mdb
 MONO_UPNP_DLL = $(BUILD_DIR)/Mono.Upnp.dll
 MONO_SSDP_DLL = $(BUILD_DIR)/Mono.Ssdp.dll
 MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_DLL = $(BUILD_DIR)/Mono.Upnp.Dcp.MediaServer1.FileSystem.dll
 MONO_UPNP_DCP_MEDIASERVER1_DLL = $(BUILD_DIR)/Mono.Upnp.Dcp.MediaServer1.dll
 MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_TESTS_PC = $(BUILD_DIR)/mono.upnp.dcp.mediaserver1.filesystem.tests.pc
 
-$(eval $(call emit-deploy-target,TAGLIB_SHARP_DLL))
-$(eval $(call emit-deploy-target,TAGLIB_SHARP_DLL_MDB))
 $(eval $(call emit-deploy-target,MONO_UPNP_DLL))
 $(eval $(call emit-deploy-target,MONO_SSDP_DLL))
 $(eval $(call emit-deploy-target,MONO_SSDP_DLL_MDB))
