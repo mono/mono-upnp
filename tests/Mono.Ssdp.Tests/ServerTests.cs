@@ -39,7 +39,7 @@ namespace Mono.Ssdp.Tests
         const string address = "239.255.255.250";
         const int port = 1900;
         static readonly IPAddress ipaddress = IPAddress.Parse (address);
-        static readonly IPEndPoint ip_endpoint = new IPEndPoint (ipaddress, port);
+        //static readonly IPEndPoint ip_endpoint = new IPEndPoint (ipaddress, port);
         static EndPoint endpoint = new IPEndPoint (IPAddress.Any, port);
         
         readonly object mutex = new object ();

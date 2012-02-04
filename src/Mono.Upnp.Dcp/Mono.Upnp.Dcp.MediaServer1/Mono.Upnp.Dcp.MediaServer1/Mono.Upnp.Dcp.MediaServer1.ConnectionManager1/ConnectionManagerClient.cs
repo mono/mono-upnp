@@ -8,8 +8,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ConnectionManager1
     {
         readonly Client client;
 
-        public event EventHandler<DiscoveryEventArgs<ConnectionManager>> ConnectionManagerAdded;
-
         public ConnectionManagerClient () : this (new Client ())
         {
         }

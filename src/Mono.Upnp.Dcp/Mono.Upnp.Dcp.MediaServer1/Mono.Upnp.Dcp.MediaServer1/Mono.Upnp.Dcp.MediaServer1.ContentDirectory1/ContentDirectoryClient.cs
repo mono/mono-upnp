@@ -10,8 +10,6 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
     {
         readonly Client client;
 
-        public event EventHandler<DiscoveryEventArgs<LocalContentDirectory>> ContentDirectoryAdded;
-
         public ContentDirectoryClient ()
             : this (null)
         {

@@ -118,7 +118,7 @@ namespace Mono.Upnp.Xml.Compilation
                         try {
                             Uri uri = new Uri (url);
                             return uri;
-                        } catch (Exception e) {
+                        } catch {
                         }
                     }
                     return null;
@@ -435,7 +435,7 @@ namespace Mono.Upnp.Xml.Compilation
                         try {
                             Uri uri = new Uri (url);
                             return uri;
-                        } catch (Exception e) {
+                        } catch {
                         }
                     }
                     return null;     
