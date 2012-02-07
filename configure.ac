@@ -77,9 +77,7 @@ src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.GtkClien
 src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.MediaServer1/Makefile
 tests/Mono.Ssdp.Tests/Makefile
 tests/Mono.Upnp.Tests/Makefile
-tests/Mono.Upnp.Dcp.MediaServer1.Tests/mono.upnp.dcp.mediaserver1.tests.pc
 tests/Mono.Upnp.Dcp.MediaServer1.Tests/Makefile
-tests/Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests/mono.upnp.dcp.mediaserver1.filesystem.tests.pc
 tests/Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests/Makefile
 tests/Makefile
 Makefile

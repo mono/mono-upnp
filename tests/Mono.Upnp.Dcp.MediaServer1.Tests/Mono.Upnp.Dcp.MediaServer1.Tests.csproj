@@ -72,6 +72,7 @@
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
+        <Deployment.LinuxDeployData generatePcFile="false" />
         <MonoDevelop.Autotools.MakefileInfo IntegrationEnabled="true" RelativeMakefileName="Makefile.am" SyncReferences="true" IsAutotoolsProject="true" RelativeConfigureInPath="../..">
           <BuildFilesVar Sync="true" Name="FILES" />
           <DeployFilesVar />

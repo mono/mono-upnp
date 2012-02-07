@@ -85,8 +85,7 @@ DATA_FILES =
 RESOURCES = 
 
 EXTRAS = \
-	mono-upnp-dcp-mediaserver1-tests.snk \
-	mono.upnp.dcp.mediaserver1.tests.pc.in 
+	mono-upnp-dcp-mediaserver1-tests.snk
 
 REFERENCES =  \
 	../../src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll \
@@ -104,14 +103,12 @@ include $(top_srcdir)/Makefile.include
 MONO_UPNP_DCP_MEDIASERVER1_DLL = $(BUILD_DIR)/Mono.Upnp.Dcp.MediaServer1.dll
 MONO_UPNP_DLL = $(BUILD_DIR)/Mono.Upnp.dll
 MONO_SSDP_DLL = $(BUILD_DIR)/Mono.Ssdp.dll
-MONO_UPNP_DCP_MEDIASERVER1_TESTS_PC = $(BUILD_DIR)/mono.upnp.dcp.mediaserver1.tests.pc
 
 $(eval $(call emit-deploy-target,MONO_UPNP_DCP_MEDIASERVER1_DLL))
 $(eval $(call emit-deploy-target,MONO_UPNP_DLL))
 $(eval $(call emit-deploy-target,MONO_SSDP_DLL))
 $(eval $(call emit-deploy-target,MONO_SSDP_DLL_MDB))
 $(eval $(call emit-deploy-target,MONO_UPNP_DLL_MDB))
-$(eval $(call emit-deploy-wrapper,MONO_UPNP_DCP_MEDIASERVER1_TESTS_PC,mono.upnp.dcp.mediaserver1.tests.pc))
 
 
 $(eval $(call emit_resgen_targets))
