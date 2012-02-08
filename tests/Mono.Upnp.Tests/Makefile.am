@@ -6,21 +6,21 @@ EXTRA_DIST =
 if ENABLE_DEBUG
 ASSEMBLY_COMPILER_COMMAND = gmcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG"
-ASSEMBLY = Mono.Upnp.Tests.dll
+ASSEMBLY = ../../bin/Mono.Upnp.Tests.dll
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
 COMPILE_TARGET = library
 PROJECT_REFERENCES =  \
-	../../src/Mono.Upnp/Mono.Upnp/Mono.Upnp.dll \
-	../../src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
-BUILD_DIR = .
+	../../bin/Mono.Ssdp.dll \
+	../../bin/Mono.Upnp.dll
+BUILD_DIR = ../../bin
 
-MONO_UPNP_TESTS_DLL_MDB_SOURCE=Mono.Upnp.Tests.dll.mdb
+MONO_UPNP_TESTS_DLL_MDB_SOURCE=../../bin/Mono.Upnp.Tests.dll.mdb
 MONO_UPNP_TESTS_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.Tests.dll.mdb
-MONO_UPNP_DLL_SOURCE=../../src/Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-MONO_SSDP_DLL_SOURCE=../../src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
-MONO_SSDP_DLL_MDB_SOURCE=../../src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll.mdb
+MONO_UPNP_DLL_SOURCE=../../bin/Mono.Upnp.dll
+MONO_SSDP_DLL_SOURCE=../../bin/Mono.Ssdp.dll
+MONO_SSDP_DLL_MDB_SOURCE=../../bin/Mono.Ssdp.dll.mdb
 MONO_SSDP_DLL_MDB=$(BUILD_DIR)/Mono.Ssdp.dll.mdb
-MONO_UPNP_DLL_MDB_SOURCE=../../src/Mono.Upnp/Mono.Upnp/Mono.Upnp.dll.mdb
+MONO_UPNP_DLL_MDB_SOURCE=../../bin/Mono.Upnp.dll.mdb
 MONO_UPNP_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.dll.mdb
 
 endif
@@ -28,17 +28,17 @@ endif
 if ENABLE_RELEASE
 ASSEMBLY_COMPILER_COMMAND = gmcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+
-ASSEMBLY = Mono.Upnp.Tests.dll
+ASSEMBLY = ../../bin/Mono.Upnp.Tests.dll
 ASSEMBLY_MDB = 
 COMPILE_TARGET = library
 PROJECT_REFERENCES =  \
-	../../src/Mono.Upnp/Mono.Upnp/Mono.Upnp.dll \
-	../../src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
-BUILD_DIR = .
+	../../bin/Mono.Upnp.dll \
+	../../bin/Mono.Ssdp.dll
+BUILD_DIR = ../../bin
 
 MONO_UPNP_TESTS_DLL_MDB=
-MONO_UPNP_DLL_SOURCE=../../src/Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-MONO_SSDP_DLL_SOURCE=../../src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
+MONO_UPNP_DLL_SOURCE=../../bin/Mono.Upnp.dll
+MONO_SSDP_DLL_SOURCE=../../bin/Mono.Ssdp.dll
 MONO_SSDP_DLL_MDB=
 MONO_UPNP_DLL_MDB=
 
@@ -86,8 +86,6 @@ RESOURCES =
 EXTRAS = 
 
 REFERENCES =  \
-	../../src/Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll \
-	../../src/Mono.Upnp/Mono.Upnp/Mono.Upnp.dll \
 	-pkg:nunit \
 	System \
 	System.Xml
@@ -101,10 +99,6 @@ include $(top_srcdir)/Makefile.include
 MONO_UPNP_DLL = $(BUILD_DIR)/Mono.Upnp.dll
 MONO_SSDP_DLL = $(BUILD_DIR)/Mono.Ssdp.dll
 
-$(eval $(call emit-deploy-target,MONO_UPNP_DLL))
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL))
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL_MDB))
-$(eval $(call emit-deploy-target,MONO_UPNP_DLL_MDB))
 
 
 $(eval $(call emit_resgen_targets))

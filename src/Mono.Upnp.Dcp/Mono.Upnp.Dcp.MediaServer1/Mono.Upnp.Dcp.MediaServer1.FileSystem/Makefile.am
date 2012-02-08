@@ -5,44 +5,47 @@ EXTRA_DIST =
 
 if ENABLE_DEBUG
 ASSEMBLY_COMPILER_COMMAND = gmcs
-ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG" "-keyfile:mono-upnp-dcp-mediaserver1-filesystem.snk"
-ASSEMBLY = Mono.Upnp.Dcp.MediaServer1.FileSystem.dll
+ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG" "-keyfile:$(srcdir)/mono-upnp-dcp-mediaserver1-filesystem.snk"
+ASSEMBLY = ../../../../bin/Mono.Upnp.Dcp.MediaServer1.FileSystem.dll
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
 COMPILE_TARGET = library
 PROJECT_REFERENCES =  \
-	../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll \
-	../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-BUILD_DIR = .
+	../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll \
+	../../../../bin/Mono.Upnp.dll
+BUILD_DIR = ../../../../bin
 
-MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_DLL_MDB_SOURCE=Mono.Upnp.Dcp.MediaServer1.FileSystem.dll.mdb
+MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_DLL_MDB_SOURCE=../../../../bin/Mono.Upnp.Dcp.MediaServer1.FileSystem.dll.mdb
 MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.Dcp.MediaServer1.FileSystem.dll.mdb
-MONO_UPNP_DCP_MEDIASERVER1_DLL_SOURCE=../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll
-MONO_UPNP_DLL_SOURCE=../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-MONO_SSDP_DLL_SOURCE=../../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
-MONO_SSDP_DLL_MDB_SOURCE=../../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll.mdb
+MONO_UPNP_DCP_MEDIASERVER1_DLL_SOURCE=../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll
+MONO_UPNP_DLL_SOURCE=../../../../bin/Mono.Upnp.dll
+MONO_SSDP_DLL_SOURCE=../../../../bin/Mono.Ssdp.dll
+MONO_SSDP_DLL_MDB_SOURCE=../../../../bin/Mono.Ssdp.dll.mdb
 MONO_SSDP_DLL_MDB=$(BUILD_DIR)/Mono.Ssdp.dll.mdb
-MONO_UPNP_DLL_MDB_SOURCE=../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll.mdb
+MONO_UPNP_DLL_MDB_SOURCE=../../../../bin/Mono.Upnp.dll.mdb
 MONO_UPNP_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.dll.mdb
+MONO_UPNP_DCP_MEDIASERVER1_DLL_MDB_SOURCE=../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll.mdb
+MONO_UPNP_DCP_MEDIASERVER1_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.Dcp.MediaServer1.dll.mdb
 
 endif
 
 if ENABLE_RELEASE
 ASSEMBLY_COMPILER_COMMAND = gmcs
-ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+ "-keyfile:mono-upnp-dcp-mediaserver1-filesystem.snk"
-ASSEMBLY = Mono.Upnp.Dcp.MediaServer1.FileSystem.dll
+ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+ "-keyfile:$(srcdir)/mono-upnp-dcp-mediaserver1-filesystem.snk"
+ASSEMBLY = ../../../../bin/Mono.Upnp.Dcp.MediaServer1.FileSystem.dll
 ASSEMBLY_MDB = 
 COMPILE_TARGET = library
 PROJECT_REFERENCES =  \
-	../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll \
-	../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-BUILD_DIR = .
+	../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll \
+	../../../../bin/Mono.Upnp.dll
+BUILD_DIR = ../../../../bin
 
 MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_DLL_MDB=
-MONO_UPNP_DCP_MEDIASERVER1_DLL_SOURCE=../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll
-MONO_UPNP_DLL_SOURCE=../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-MONO_SSDP_DLL_SOURCE=../../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
+MONO_UPNP_DCP_MEDIASERVER1_DLL_SOURCE=../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll
+MONO_UPNP_DLL_SOURCE=../../../../bin/Mono.Upnp.dll
+MONO_SSDP_DLL_SOURCE=../../../../bin/Mono.Ssdp.dll
 MONO_SSDP_DLL_MDB=
 MONO_UPNP_DLL_MDB=
+MONO_UPNP_DCP_MEDIASERVER1_DLL_MDB=
 
 endif
 
@@ -55,7 +58,8 @@ PROGRAMFILES = \
 	$(MONO_UPNP_DLL) \
 	$(MONO_SSDP_DLL) \
 	$(MONO_SSDP_DLL_MDB) \
-	$(MONO_UPNP_DLL_MDB)  
+	$(MONO_UPNP_DLL_MDB) \
+	$(MONO_UPNP_DCP_MEDIASERVER1_DLL_MDB)  
 
 LINUX_PKGCONFIG = \
 	$(MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_PC)  
@@ -91,8 +95,8 @@ EXTRAS = \
 	mono.upnp.dcp.mediaserver1.filesystem.pc.in 
 
 REFERENCES =  \
-	../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll \
-	../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll \
+	../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll \
+	../../../../bin/Mono.Upnp.dll \
 	-pkg:taglib-sharp \
 	System
 
@@ -107,11 +111,6 @@ MONO_UPNP_DLL = $(BUILD_DIR)/Mono.Upnp.dll
 MONO_SSDP_DLL = $(BUILD_DIR)/Mono.Ssdp.dll
 MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_PC = $(BUILD_DIR)/mono.upnp.dcp.mediaserver1.filesystem.pc
 
-$(eval $(call emit-deploy-target,MONO_UPNP_DCP_MEDIASERVER1_DLL))
-$(eval $(call emit-deploy-target,MONO_UPNP_DLL))
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL))
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL_MDB))
-$(eval $(call emit-deploy-target,MONO_UPNP_DLL_MDB))
 $(eval $(call emit-deploy-wrapper,MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_PC,mono.upnp.dcp.mediaserver1.filesystem.pc))
 
 

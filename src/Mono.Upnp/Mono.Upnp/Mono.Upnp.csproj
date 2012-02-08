@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>.</OutputPath>
+    <OutputPath>..\..\..\bin</OutputPath>
     <DefineConstants>DEBUG,TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>.</OutputPath>
+    <OutputPath>..\..\..\bin</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -151,8 +151,8 @@
           <ResourcesVar Sync="true" Name="RESOURCES" />
           <OthersVar />
           <GacRefVar Sync="true" Name="REFERENCES" />
-          <AsmRefVar Sync="true" Name="REFERENCES" />
-          <ProjectRefVar Sync="true" Name="REFERENCES" />
+          <AsmRefVar Sync="true" Name="DLL_REFERENCES" />
+          <ProjectRefVar Sync="true" Name="PROJECT_REFERENCES" />
         </MonoDevelop.Autotools.MakefileInfo>
       </Properties>
     </MonoDevelop>
