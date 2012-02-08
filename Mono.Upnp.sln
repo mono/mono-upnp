@@ -148,5 +148,6 @@ Global
 		$6.inheritsSet = VisualStudio
 		$6.inheritsScope = text/plain
 		$6.scope = text/plain
+		outputpath = bin
 	EndGlobalSection
 EndGlobal

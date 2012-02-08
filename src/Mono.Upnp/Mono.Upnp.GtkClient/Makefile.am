@@ -6,20 +6,20 @@ EXTRA_DIST =
 if ENABLE_DEBUG
 ASSEMBLY_COMPILER_COMMAND = gmcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG"
-ASSEMBLY = Mono.Upnp.GtkClient.exe
+ASSEMBLY = ../../../bin/Mono.Upnp.GtkClient.exe
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
 COMPILE_TARGET = winexe
 PROJECT_REFERENCES =  \
-	../Mono.Upnp/Mono.Upnp.dll
-BUILD_DIR = .
+	../../../bin/Mono.Upnp.dll
+BUILD_DIR = ../../../bin
 
-MONO_UPNP_GTKCLIENT_EXE_MDB_SOURCE=Mono.Upnp.GtkClient.exe.mdb
+MONO_UPNP_GTKCLIENT_EXE_MDB_SOURCE=../../../bin/Mono.Upnp.GtkClient.exe.mdb
 MONO_UPNP_GTKCLIENT_EXE_MDB=$(BUILD_DIR)/Mono.Upnp.GtkClient.exe.mdb
-MONO_UPNP_DLL_SOURCE=../Mono.Upnp/Mono.Upnp.dll
-MONO_SSDP_DLL_SOURCE=../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
-MONO_SSDP_DLL_MDB_SOURCE=../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll.mdb
+MONO_UPNP_DLL_SOURCE=../../../bin/Mono.Upnp.dll
+MONO_SSDP_DLL_SOURCE=../../../bin/Mono.Ssdp.dll
+MONO_SSDP_DLL_MDB_SOURCE=../../../bin/Mono.Ssdp.dll.mdb
 MONO_SSDP_DLL_MDB=$(BUILD_DIR)/Mono.Ssdp.dll.mdb
-MONO_UPNP_DLL_MDB_SOURCE=../Mono.Upnp/Mono.Upnp.dll.mdb
+MONO_UPNP_DLL_MDB_SOURCE=../../../bin/Mono.Upnp.dll.mdb
 MONO_UPNP_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.dll.mdb
 
 endif
@@ -27,16 +27,16 @@ endif
 if ENABLE_RELEASE
 ASSEMBLY_COMPILER_COMMAND = gmcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+
-ASSEMBLY = Mono.Upnp.GtkClient.exe
+ASSEMBLY = ../../../bin/Mono.Upnp.GtkClient.exe
 ASSEMBLY_MDB = 
 COMPILE_TARGET = winexe
 PROJECT_REFERENCES =  \
-	../Mono.Upnp/Mono.Upnp.dll
-BUILD_DIR = .
+	../../../bin/Mono.Upnp.dll
+BUILD_DIR = ../../../bin
 
 MONO_UPNP_GTKCLIENT_EXE_MDB=
-MONO_UPNP_DLL_SOURCE=../Mono.Upnp/Mono.Upnp.dll
-MONO_SSDP_DLL_SOURCE=../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
+MONO_UPNP_DLL_SOURCE=../../../bin/Mono.Upnp.dll
+MONO_SSDP_DLL_SOURCE=../../../bin/Mono.Ssdp.dll
 MONO_SSDP_DLL_MDB=
 MONO_UPNP_DLL_MDB=
 
@@ -107,7 +107,7 @@ EXTRAS = \
 	mono-upnp-gtk.in 
 
 REFERENCES =  \
-	../Mono.Upnp/Mono.Upnp.dll \
+	../../../bin/Mono.Upnp.dll \
 	Mono.Posix \
 	-pkg:glade-sharp-2.0 \
 	-pkg:glib-sharp-2.0 \
@@ -126,10 +126,6 @@ MONO_UPNP_DLL = $(BUILD_DIR)/Mono.Upnp.dll
 MONO_SSDP_DLL = $(BUILD_DIR)/Mono.Ssdp.dll
 MONO_UPNP_GTK = $(BUILD_DIR)/mono-upnp-gtk
 
-$(eval $(call emit-deploy-target,MONO_UPNP_DLL))
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL))
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL_MDB))
-$(eval $(call emit-deploy-target,MONO_UPNP_DLL_MDB))
 $(eval $(call emit-deploy-wrapper,MONO_UPNP_GTK,mono-upnp-gtk,x))
 
 

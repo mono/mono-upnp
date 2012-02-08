@@ -5,34 +5,33 @@ EXTRA_DIST =
 
 if ENABLE_DEBUG
 ASSEMBLY_COMPILER_COMMAND = gmcs
-ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug -define:DEBUG "-define:DEBUG,TRACE" "-keyfile:mono-upnp.snk"
-ASSEMBLY = Mono.Upnp.dll
+ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug -define:DEBUG "-define:DEBUG,TRACE" "-keyfile:$(srcdir)/mono-upnp.snk"
+ASSEMBLY = ../../../bin/Mono.Upnp.dll
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
 COMPILE_TARGET = library
-PROJECT_REFERENCES =  \
-	../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
-BUILD_DIR = .
+PROJECT_REFERENCES = ../../../bin/Mono.Ssdp.dll
+BUILD_DIR = ../../../bin
 
-MONO_UPNP_DLL_MDB_SOURCE=Mono.Upnp.dll.mdb
+MONO_UPNP_DLL_MDB_SOURCE=../../../bin/Mono.Upnp.dll.mdb
 MONO_UPNP_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.dll.mdb
-MONO_SSDP_DLL_SOURCE=../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
-MONO_SSDP_DLL_MDB_SOURCE=../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll.mdb
+MONO_SSDP_DLL_SOURCE=../../../bin/Mono.Ssdp.dll
+MONO_SSDP_DLL_MDB_SOURCE=../../../bin/Mono.Ssdp.dll.mdb
 MONO_SSDP_DLL_MDB=$(BUILD_DIR)/Mono.Ssdp.dll.mdb
 
 endif
 
 if ENABLE_RELEASE
 ASSEMBLY_COMPILER_COMMAND = gmcs
-ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+ "-keyfile:mono-upnp.snk"
-ASSEMBLY = Mono.Upnp.dll
+ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+ "-keyfile:$(srcdir)/mono-upnp.snk"
+ASSEMBLY = ../../../bin/Mono.Upnp.dll
 ASSEMBLY_MDB = 
 COMPILE_TARGET = library
 PROJECT_REFERENCES =  \
-	../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
-BUILD_DIR = .
+	../../../bin/Mono.Ssdp.dll
+BUILD_DIR = ../../../bin
 
 MONO_UPNP_DLL_MDB=
-MONO_SSDP_DLL_SOURCE=../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
+MONO_SSDP_DLL_SOURCE=../../../bin/Mono.Ssdp.dll
 MONO_SSDP_DLL_MDB=
 
 endif
@@ -159,7 +158,6 @@ EXTRAS = \
 	mono.upnp.pc.in 
 
 REFERENCES =  \
-	../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll \
 	System \
 	System.Xml
 
@@ -172,8 +170,6 @@ include $(top_srcdir)/Makefile.include
 MONO_SSDP_DLL = $(BUILD_DIR)/Mono.Ssdp.dll
 MONO_UPNP_PC = $(BUILD_DIR)/mono.upnp.pc
 
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL))
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL_MDB))
 $(eval $(call emit-deploy-wrapper,MONO_UPNP_PC,mono.upnp.pc))
 
 
