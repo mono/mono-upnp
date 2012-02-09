@@ -4,26 +4,26 @@
 
 if ENABLE_DEBUG
 ASSEMBLY_COMPILER_COMMAND = gmcs
-ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG" "-keyfile:mono-ssdp.snk"
-ASSEMBLY = Mono.Ssdp.dll
+ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG" "-keyfile:$(srcdir)/mono-ssdp.snk"
+ASSEMBLY = ../../../bin/Mono.Ssdp.dll
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
 COMPILE_TARGET = library
 PROJECT_REFERENCES = 
-BUILD_DIR = .
+BUILD_DIR = ../../../bin
 
-MONO_SSDP_DLL_MDB_SOURCE=Mono.Ssdp.dll.mdb
+MONO_SSDP_DLL_MDB_SOURCE=../../../bin/Mono.Ssdp.dll.mdb
 MONO_SSDP_DLL_MDB=$(BUILD_DIR)/Mono.Ssdp.dll.mdb
 
 endif
 
 if ENABLE_RELEASE
 ASSEMBLY_COMPILER_COMMAND = gmcs
-ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+ "-keyfile:mono-ssdp.snk"
-ASSEMBLY = Mono.Ssdp.dll
+ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+ "-keyfile:$(srcdir)/mono-ssdp.snk"
+ASSEMBLY = ../../../bin/Mono.Ssdp.dll
 ASSEMBLY_MDB = 
 COMPILE_TARGET = library
 PROJECT_REFERENCES = 
-BUILD_DIR = .
+BUILD_DIR = ../../../bin
 
 MONO_SSDP_DLL_MDB=
 

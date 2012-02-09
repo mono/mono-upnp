@@ -6,47 +6,53 @@ EXTRA_DIST =
 if ENABLE_DEBUG
 ASSEMBLY_COMPILER_COMMAND = gmcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG"
-ASSEMBLY = ../../../Mono.Upnp/Mono.Upnp.GtkClient/Mono.Upnp.Dcp.MediaServer1.GtkClient.dll
+ASSEMBLY = ../../../../bin/Mono.Upnp.Dcp.MediaServer1.GtkClient.dll
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
 COMPILE_TARGET = library
 PROJECT_REFERENCES =  \
-	../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll \
-	../../../Mono.Upnp/Mono.Upnp.GtkClient/Mono.Upnp.GtkClient.exe \
-	../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-BUILD_DIR = ../../../Mono.Upnp/Mono.Upnp.GtkClient
+	../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll \
+	../../../../bin/Mono.Upnp.GtkClient.exe \
+	../../../../bin/Mono.Upnp.dll
+BUILD_DIR = ../../../../bin
 
-MONO_UPNP_DCP_MEDIASERVER1_GTKCLIENT_DLL_MDB_SOURCE=../../../Mono.Upnp/Mono.Upnp.GtkClient/Mono.Upnp.Dcp.MediaServer1.GtkClient.dll.mdb
+MONO_UPNP_DCP_MEDIASERVER1_GTKCLIENT_DLL_MDB_SOURCE=../../../../bin/Mono.Upnp.Dcp.MediaServer1.GtkClient.dll.mdb
 MONO_UPNP_DCP_MEDIASERVER1_GTKCLIENT_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.Dcp.MediaServer1.GtkClient.dll.mdb
-MONO_UPNP_DCP_MEDIASERVER1_DLL_SOURCE=../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll
-MONO_UPNP_DLL_SOURCE=../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-MONO_SSDP_DLL_SOURCE=../../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
-MONO_SSDP_DLL_MDB_SOURCE=../../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll.mdb
+MONO_UPNP_DCP_MEDIASERVER1_DLL_SOURCE=../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll
+MONO_UPNP_DLL_SOURCE=../../../../bin/Mono.Upnp.dll
+MONO_SSDP_DLL_SOURCE=../../../../bin/Mono.Ssdp.dll
+MONO_SSDP_DLL_MDB_SOURCE=../../../../bin/Mono.Ssdp.dll.mdb
 MONO_SSDP_DLL_MDB=$(BUILD_DIR)/Mono.Ssdp.dll.mdb
-MONO_UPNP_DLL_MDB_SOURCE=../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll.mdb
+MONO_UPNP_DLL_MDB_SOURCE=../../../../bin/Mono.Upnp.dll.mdb
 MONO_UPNP_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.dll.mdb
-MONO_UPNP_GTKCLIENT_EXE_SOURCE=../../../Mono.Upnp/Mono.Upnp.GtkClient/Mono.Upnp.GtkClient.exe
+MONO_UPNP_DCP_MEDIASERVER1_DLL_MDB_SOURCE=../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll.mdb
+MONO_UPNP_DCP_MEDIASERVER1_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.Dcp.MediaServer1.dll.mdb
+MONO_UPNP_GTKCLIENT_EXE_SOURCE=../../../../bin/Mono.Upnp.GtkClient.exe
+MONO_UPNP_GTKCLIENT_EXE_MDB_SOURCE=../../../../bin/Mono.Upnp.GtkClient.exe.mdb
+MONO_UPNP_GTKCLIENT_EXE_MDB=$(BUILD_DIR)/Mono.Upnp.GtkClient.exe.mdb
 
 endif
 
 if ENABLE_RELEASE
 ASSEMBLY_COMPILER_COMMAND = gmcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize-
-ASSEMBLY = ../../../Mono.Upnp/Mono.Upnp.GtkClient/Mono.Upnp.Dcp.MediaServer1.GtkClient.dll
+ASSEMBLY = ../../../../bin/Mono.Upnp.Dcp.MediaServer1.GtkClient.dll
 ASSEMBLY_MDB = 
 COMPILE_TARGET = library
 PROJECT_REFERENCES =  \
-	../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll \
-	../../../Mono.Upnp/Mono.Upnp.GtkClient/Mono.Upnp.GtkClient.exe \
-	../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-BUILD_DIR = ../../../Mono.Upnp/Mono.Upnp.GtkClient
+	../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll \
+	../../../../bin/Mono.Upnp.GtkClient.exe \
+	../../../../bin/Mono.Upnp.dll
+BUILD_DIR = ../../../../bin
 
 MONO_UPNP_DCP_MEDIASERVER1_GTKCLIENT_DLL_MDB=
-MONO_UPNP_DCP_MEDIASERVER1_DLL_SOURCE=../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll
-MONO_UPNP_DLL_SOURCE=../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll
-MONO_SSDP_DLL_SOURCE=../../../Mono.Ssdp/Mono.Ssdp/Mono.Ssdp.dll
+MONO_UPNP_DCP_MEDIASERVER1_DLL_SOURCE=../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll
+MONO_UPNP_DLL_SOURCE=../../../../bin/Mono.Upnp.dll
+MONO_SSDP_DLL_SOURCE=../../../../bin/Mono.Ssdp.dll
 MONO_SSDP_DLL_MDB=
 MONO_UPNP_DLL_MDB=
-MONO_UPNP_GTKCLIENT_EXE_SOURCE=../../../Mono.Upnp/Mono.Upnp.GtkClient/Mono.Upnp.GtkClient.exe
+MONO_UPNP_DCP_MEDIASERVER1_DLL_MDB=
+MONO_UPNP_GTKCLIENT_EXE_SOURCE=../../../../bin/Mono.Upnp.GtkClient.exe
+MONO_UPNP_GTKCLIENT_EXE_MDB=
 
 endif
 
@@ -60,7 +66,9 @@ PROGRAMFILES = \
 	$(MONO_SSDP_DLL) \
 	$(MONO_SSDP_DLL_MDB) \
 	$(MONO_UPNP_DLL_MDB) \
-	$(MONO_UPNP_GTKCLIENT_EXE)  
+	$(MONO_UPNP_DCP_MEDIASERVER1_DLL_MDB) \
+	$(MONO_UPNP_GTKCLIENT_EXE) \
+	$(MONO_UPNP_GTKCLIENT_EXE_MDB)  
 
 LINUX_PKGCONFIG = \
 	$(MONO_UPNP_DCP_MEDIASERVER1_GTKCLIENT_PC)  
@@ -85,9 +93,9 @@ EXTRAS = \
 	mono.upnp.dcp.mediaserver1.gtkclient.pc.in 
 
 REFERENCES =  \
-	../../../Mono.Upnp/Mono.Upnp.GtkClient/Mono.Upnp.GtkClient.exe \
-	../../../Mono.Upnp/Mono.Upnp/Mono.Upnp.dll \
-	../Mono.Upnp.Dcp.MediaServer1/Mono.Upnp.Dcp.MediaServer1.dll \
+	../../../../bin/Mono.Upnp.Dcp.MediaServer1.dll \
+	../../../../bin/Mono.Upnp.dll \
+	../../../../bin/Mono.Upnp.GtkClient.exe \
 	-pkg:glib-sharp-2.0 \
 	-pkg:gtk-sharp-2.0 \
 	-pkg:mono-addins \
@@ -105,11 +113,6 @@ MONO_SSDP_DLL = $(BUILD_DIR)/Mono.Ssdp.dll
 MONO_UPNP_GTKCLIENT_EXE = $(BUILD_DIR)/Mono.Upnp.GtkClient.exe
 MONO_UPNP_DCP_MEDIASERVER1_GTKCLIENT_PC = $(BUILD_DIR)/mono.upnp.dcp.mediaserver1.gtkclient.pc
 
-$(eval $(call emit-deploy-target,MONO_UPNP_DCP_MEDIASERVER1_DLL))
-$(eval $(call emit-deploy-target,MONO_UPNP_DLL))
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL))
-$(eval $(call emit-deploy-target,MONO_SSDP_DLL_MDB))
-$(eval $(call emit-deploy-target,MONO_UPNP_DLL_MDB))
 $(eval $(call emit-deploy-wrapper,MONO_UPNP_DCP_MEDIASERVER1_GTKCLIENT_PC,mono.upnp.dcp.mediaserver1.gtkclient.pc))
 
 
