@@ -8,3 +8,8 @@ endif
 if ENABLE_RELEASE
  SUBDIRS =  src/Mono.Ssdp/Mono.Ssdp src/Mono.Upnp src/Mono.Upnp.Dcp/Mono.Upnp.Dcp.MediaServer1 tests
 endif
+
+.PHONY: test
+
+test: all
+	(cd bin; $(NUNIT_CMD) *.Tests.dll)

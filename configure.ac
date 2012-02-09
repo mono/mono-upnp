@@ -53,7 +53,8 @@ PKG_CHECK_MODULES([MONO_ADDINS], [mono-addins])
 PKG_CHECK_MODULES([TAGLIB_SHARP], [taglib-sharp])
 PKG_CHECK_MODULES([NUNIT], [nunit])
 
-dnl package checks, per config
+AC_PATH_PROG(NUNIT_CMD, nunit-console2, nunit-console)
+AC_SUBST(NUNIT_CMD)
 
 
 AC_CONFIG_FILES([
