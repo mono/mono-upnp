@@ -1,6 +1,9 @@
+assemblies_dir=@expanded_libdir@/@PACKAGE@
+Libraries=${assemblies_dir}/Mono.Ssdp.dll
+
 Name: Mono.Ssdp
 Description: Mono.Ssdp
 Version: 0.1
 
 Requires: 
-Libs: -r:@expanded_libdir@/@PACKAGE@/Mono.Ssdp.dll
+Libs: -r:${assemblies_dir}/Mono.Ssdp.dll
