@@ -16,8 +16,8 @@ To build with from the command line with .NET:
 
 Alternatively, on Unix, you can use the Autotools infrastructure:
 
-   ./configure # or ./autogen.sh if working on a cloned repository
-   make
+    ./configure # or ./autogen.sh if working on a cloned repository
+    make
 
 About the projects:
 
