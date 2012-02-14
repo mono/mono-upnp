@@ -1,5 +1,7 @@
 
-EXTRA_DIST =  expansions.m4
+EXTRA_DIST = \
+	expansions.m4 \
+	README.md
 
 #Warning: This is an automatically generated file, do not edit!
 if ENABLE_DEBUG
