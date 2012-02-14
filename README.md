@@ -14,36 +14,29 @@ To build with from the command line with .NET:
 
     msbuild Mono.Upnp.sln
 
+Alternatively, on Unix, you can use the Autotools infrastructure:
+
+   ./configure # or ./autogen.sh if working on a cloned repository
+   make
+
 About the projects:
 
-* Mono.Ssdp:
-
-  An implementation of the Simple Discovery Protocol (see UPnP Device
+* Mono.Ssdp: An implementation of the Simple Discovery Protocol (see UPnP Device
   Architecture 1.1, Section 1).
 
-* Mono.Upnp:
+* Mono.Upnp: An implementation of the UPnP Device Archetecture 1.1, Secions 2-5.
 
-  An implementation of the UPnP Device Archetecture 1.1, Secions 2-5.
+* Mono.Upnp.GtkClient: An executable GTK+ user interface for inspecting UPnP
+  devices and services on the network.
 
-* Mono.Upnp.GtkClient:
+* Mono.Upnp.Dcp.MediaServer1: An implementation of the UPnP Audio/Video
+  MediaServer1 Device Control Protocol.
 
-  An executable GTK+ user interface for inspecting UPnP devices and services on
-  the network.
+* Mono.Upnp.Dcp.MediaServer1.FileSystem: A MediaServer1 implementation which
+  serves media from the file system.
 
-* Mono.Upnp.Dcp.MediaServer1:
+* Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer: An executable console
+  program which serves media from the file system.
 
-  An implementation of the UPnP Audio/Video MediaServer1 Device Control
-  Protocol.
-
-* Mono.Upnp.Dcp.MediaServer1.FileSystem:
-
-  A MediaServer1 implementation which serves media from the file system.
-
-* Mono.Upnp.Dcp.MediaServer1.FileSystem.ConsoleServer:
-
-  An executable console program which serves media from the file system.
-
-* Mono.Upnp.Dcp.MSMediaServerRegistrar1:
-
-  An implementation of the Microsoft MSMediaServerRegistrar1 Device Control
-  Protocol.
+* Mono.Upnp.Dcp.MSMediaServerRegistrar1: An implementation of the Microsoft
+  MSMediaServerRegistrar1 Device Control Protocol.

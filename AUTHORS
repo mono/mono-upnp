@@ -1,6 +1,14 @@
-Mono.Ssdp:
-    Aaron Bockover
-    Scott Thomas
+Original developers:
 
-Mono.Upnp:
-    Scott Thomas
+  Aaron Bockover
+  Scott Thomas Peterson
+
+Maintainer:
+  Alexander Kojevnikov <alexander@kojevnikov.com>
+
+Contributors:
+  Alan McGovern
+  Bertrand Lorentz
+  Kevin Thompson
+  Tobias Arrskog
+  Yavor Georgiev
