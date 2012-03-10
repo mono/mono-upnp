@@ -139,14 +139,18 @@ namespace Mono.Upnp
 
             var colon = args.Usn.IndexOf (':', 5);
             var usn = colon == -1 ? args.Usn : args.Usn.Substring (0, colon);
+            var suffix = colon == -1 ? args.Usn : args.Usn.Substring (colon + 2);
+
+            var service_type = args.Service == null ? suffix : args.Service.ServiceType;
+            var locations = args.Service == null ? null : args.Service.Locations;
 
             if (args.Usn.Contains (":device:")) {
-                var type = DeviceType.Parse (args.Service.ServiceType);
-                var device = new DeviceAnnouncement (this, type, usn, args.Service.Locations);
+                var type = DeviceType.Parse (service_type);
+                var device = new DeviceAnnouncement (this, type, usn, locations);
                 deviceHandler (device);
             } else if (args.Usn.Contains (":service:")) {
-                var type = ServiceType.Parse (args.Service.ServiceType);
-                var service = new ServiceAnnouncement (this, type, usn, args.Service.Locations);
+                var type = ServiceType.Parse (service_type);
+                var service = new ServiceAnnouncement (this, type, usn, locations);
                 serviceHandler (service);
             }
         }
