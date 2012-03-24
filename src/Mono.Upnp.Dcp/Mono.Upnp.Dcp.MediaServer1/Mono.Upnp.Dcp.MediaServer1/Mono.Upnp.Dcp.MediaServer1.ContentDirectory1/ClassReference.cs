@@ -33,6 +33,10 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1
 {
     public class ClassReference : Class, IComparable<ClassReference>, IEquatable<ClassReference>
     {
+        protected ClassReference ()
+        {
+        }
+        
         public ClassReference (bool includeDerived, string fullClassName)
             : this (includeDerived, fullClassName, null)
         {
