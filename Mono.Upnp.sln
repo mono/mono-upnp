@@ -130,7 +130,6 @@ Global
 		$4.FileWidth = 120
 		$4.NoTabsAfterNonTabs = True
 		$4.RemoveTrailingWhitespace = True
-		$4.EolMarker = Unix
 		$4.inheritsSet = VisualStudio
 		$4.inheritsScope = text/plain
 		$4.scope = text/x-csharp
