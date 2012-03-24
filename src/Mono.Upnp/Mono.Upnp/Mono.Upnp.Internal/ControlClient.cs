@@ -75,12 +75,13 @@ namespace Mono.Upnp.Internal
             HttpWebResponse response;
             WebException exception;
             try {
-                response = (HttpWebResponse)request.GetResponse ();
+                response = Helper.GetResponse (request);
                 exception = null;
             } catch (WebException e) {
                 response = e.Response as HttpWebResponse;
                 if (response == null) {
-                    // TODO check for timeout
+                    Log.Error (string.Format (
+                                "The request for the {0} action request on {1} failed.", actionName, url));
                     throw new UpnpControlException (UpnpError.Unknown(), "The invokation failed.", e);
                 }
                 exception = e;
@@ -137,6 +138,8 @@ namespace Mono.Upnp.Internal
                                 "The invokation failed but the service did not provide valid fault information " +
                                 "(unable to deserialize a UPnPError from the SOAP envelope).", exception);
                         }
+                        Log.Error (string.Format (
+                                "The invokation for the {0} action request on {1} failed: {2}", actionName, url, envelope.Body.Value.Detail.Value));
                         throw new UpnpControlException (envelope.Body.Value.Detail.Value,
                             "The invokation failed.", exception);
                     }
