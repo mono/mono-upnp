@@ -148,16 +148,26 @@ namespace Mono.Upnp.Control
                                                                 int retryAttempts)
         {
             // TODO try dispose on timeout
-            // TODO retry attempts
             if (control_client == null) {
                 throw new InvalidOperationException (
                     "The service controller was created to describe a local service and cannot be invoked " +
                     "across the network. Use the constructor which takes a Deserializer.");
             }
-            
-            return control_client.Invoke (action.Name, arguments);
+
+            while (true) {
+                try {
+                    return control_client.Invoke (action.Name, arguments);
+                } catch (UpnpControlException e) {
+                    if (retryAttempts > 0) {
+                        retryAttempts--;
+                        System.Threading.Thread.Sleep (5000);
+                    } else {
+                        throw;
+                    }
+                }
+            }
         }
-        
+
         internal void RefEvents ()
         {
             event_client.Ref ();
