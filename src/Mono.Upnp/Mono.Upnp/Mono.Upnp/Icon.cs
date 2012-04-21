@@ -137,16 +137,18 @@ namespace Mono.Upnp
                 try {
                     var request = (HttpWebRequest)WebRequest.Create (Url);
                     using (var response = Helper.GetResponse (request)) {
-                        int response_length;
-                        if (response.ContentLength < 1 || response.ContentLength > Int32.MaxValue) {
-                            response_length = Int32.MaxValue;
-                        } else {
-                            response_length = (int)response.ContentLength;
-                        }
-                        data = new byte[response_length];
+                        var ms = new MemoryStream ();
+                        long bytes_read = 0;
                         using (var stream = response.GetResponseStream ()) {
-                            stream.Read (data, 0, response_length);
+                            byte [] buffer = new byte[8192];
+                            int chunk_bytes_read = 0;
+
+                            while ((chunk_bytes_read = stream.Read (buffer, 0, buffer.Length)) > 0) {
+                                ms.Write (buffer, 0, chunk_bytes_read);
+                                bytes_read += chunk_bytes_read;
+                            }
                         }
+                        data = ms.ToArray ();
                     }
                 } catch (WebException e) {
                     if (e.Status == WebExceptionStatus.Timeout) {
