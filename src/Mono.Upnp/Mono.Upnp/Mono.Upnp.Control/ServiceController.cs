@@ -157,7 +157,7 @@ namespace Mono.Upnp.Control
             while (true) {
                 try {
                     return control_client.Invoke (action.Name, arguments);
-                } catch (UpnpControlException e) {
+                } catch (UpnpControlException) {
                     if (retryAttempts > 0) {
                         retryAttempts--;
                         System.Threading.Thread.Sleep (5000);
