@@ -83,7 +83,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.Internal
 
         public override void VisitDerivedFrom (string property, string value)
         {
-            VisitPropertyOperator (property, "derivedFrom", value);
+            VisitPropertyOperator (property, "derivedfrom", value);
         }
 
         public override void VisitExists (string property, bool value)
