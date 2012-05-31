@@ -3,7 +3,7 @@ Libraries=${assemblies_dir}/Mono.Ssdp.dll
 
 Name: Mono.Ssdp
 Description: Mono.Ssdp
-Version: 0.1
+Version: @VERSION@
 
 Requires: 
 Libs: -r:${assemblies_dir}/Mono.Ssdp.dll

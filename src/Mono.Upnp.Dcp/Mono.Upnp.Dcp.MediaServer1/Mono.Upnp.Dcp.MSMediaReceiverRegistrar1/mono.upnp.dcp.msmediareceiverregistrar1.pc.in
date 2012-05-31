@@ -3,7 +3,7 @@ Libraries=${assemblies_dir}/MSMediaServerRegistrar1.dll
 
 Name: Mono.Upnp.Dcp.MSMediaReceiverRegistrar1
 Description: Mono.Upnp.Dcp.MSMediaReceiverRegistrar1
-Version: 0.1
+Version: @VERSION@
 
 Requires: 
 Libs: -r:${assemblies_dir}/MSMediaServerRegistrar1.dll

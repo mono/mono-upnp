@@ -3,7 +3,7 @@ Libraries=${assemblies_dir}/Mono.Upnp.Dcp.MediaServer1.FileSystem.dll
 
 Name: Mono.Upnp.Dcp.MediaServer1.FileSystem
 Description: Mono.Upnp.Dcp.MediaServer1.FileSystem
-Version: 0.1
+Version: @VERSION@
 
 Requires: 
 Libs: -r:${assemblies_dir}/Mono.Upnp.Dcp.MediaServer1.FileSystem.dll

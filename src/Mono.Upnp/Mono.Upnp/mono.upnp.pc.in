@@ -3,7 +3,7 @@ Libraries=${assemblies_dir}/Mono.Upnp.dll
 
 Name: Mono.Upnp
 Description: Mono.Upnp
-Version: 0.1
+Version: @VERSION@
 
 Requires: 
 Libs: -r:${assemblies_dir}/Mono.Upnp.dll
