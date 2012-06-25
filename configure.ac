@@ -51,11 +51,17 @@ PKG_CHECK_MODULES([GLIB_SHARP_20], [glib-sharp-2.0])
 PKG_CHECK_MODULES([GLADE_SHARP_20], [glade-sharp-2.0])
 PKG_CHECK_MODULES([MONO_ADDINS], [mono-addins])
 PKG_CHECK_MODULES([TAGLIB_SHARP], [taglib-sharp])
-PKG_CHECK_MODULES([NUNIT], [nunit])
 
-AC_PATH_PROG(NUNIT_CMD, nunit-console2, nunit-console)
-AC_SUBST(NUNIT_CMD)
-
+AC_ARG_ENABLE(tests,
+	AC_HELP_STRING([--enable-tests],
+		[Build nunit tests [default=YES]]),
+		[], enable_tests=yes)
+	AM_CONDITIONAL(ENABLE_TESTS, test x$enable_tests = xyes)
+	if test "x$enable_tests" = "xyes" ; then
+		PKG_CHECK_MODULES([NUNIT], [nunit])
+		AC_PATH_PROG(NUNIT_CMD, nunit-console2, nunit-console)
+		AC_SUBST(NUNIT_CMD)
+	fi
 
 AC_CONFIG_FILES([
 src/Mono.Ssdp/Mono.Ssdp/mono.ssdp.pc
