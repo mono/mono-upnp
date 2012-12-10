@@ -44,52 +44,51 @@ namespace Mono.Upnp.Internal
 
         class EventHandlerEventer : StateVariableEventer
         {
-            public static readonly MethodInfo HandlerMethod = typeof(Eventer).GetMethod("Handler");
+            public static readonly MethodInfo HandlerMethod = typeof (Eventer).GetMethod ("Handler");
 
-            public void Handler<T>(object sender, StateVariableChangedArgs<T> args)
+            public void Handler<T> (object sender, StateVariableChangedArgs<T> args)
             {
-                OnStateVariableUpdated(args.NewValue.ToString());
+                OnStateVariableUpdated (args.NewValue.ToString ());
             }
         }
 
         class PropertyChangedEventer : StateVariableEventer
         {
-            public PropertyChangedEventer(PropertyInfo propertyInfo)
+            public PropertyChangedEventer (PropertyInfo propertyInfo)
             {
                 PropertyInfo = propertyInfo;
             }
 
             public PropertyInfo PropertyInfo { get; private set; }
 
-            public void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
+            public void OnPropertyChanged (object sender, PropertyChangedEventArgs args)
             {
-                if (args.PropertyName == PropertyInfo.Name)
-                {
-                    var value = PropertyInfo.GetValue(sender, null);
-                    OnStateVariableUpdated(value != null ? value.ToString() : null);
+                if (args.PropertyName == PropertyInfo.Name) {
+                    var value = PropertyInfo.GetValue (sender, null);
+                    OnStateVariableUpdated (value != null ? value.ToString () : null);
                 }
             }
         }
-        
+
         class ArgumentInfo
         {
             public Argument Argument;
             public ParameterInfo ParameterInfo;
         }
-        
+
         class StateVariableInfo
         {
             public StateVariable StateVariable;
             public Type Type;
         }
-        
+
         public static ServiceController Build<T> (T service)
         {
             var state_variables = new Dictionary<string, StateVariableInfo> ();
             return new ServiceController (
                 BuildActions (service, state_variables), BuildStateVariables (service, state_variables));
         }
-        
+
         static IEnumerable<ServiceAction> BuildActions<T> (T service,
                                                            Dictionary<string, StateVariableInfo> stateVariables)
         {
@@ -100,9 +99,9 @@ namespace Mono.Upnp.Internal
                 }
             }
         }
-        
+
         readonly static object[] empty_args = new object[0];
-        
+
         static bool Omit (Type type, object service, string unless)
         {
             if (unless == null) {
@@ -115,7 +114,7 @@ namespace Mono.Upnp.Internal
             }
             return property.GetValue (service, empty_args).Equals (false);
         }
-        
+
         static ServiceAction BuildAction (MethodInfo method,
                                           object service,
                                           Dictionary<string, StateVariableInfo> stateVariables)
@@ -133,7 +132,8 @@ namespace Mono.Upnp.Internal
                     arguments[i] = BuildArgumentInfo (parameters[i], name, stateVariables);
                 }
                 var return_argument = BuildArgumentInfo (method.ReturnParameter, name, stateVariables, true);
-                return new ServiceAction (name, Combine (arguments, return_argument), args => {
+                return new ServiceAction (name, Combine (arguments, return_argument), args =>
+                {
                     Trace (name, args.Values);
 
                     var argument_array = new object[arguments.Length];
@@ -142,7 +142,7 @@ namespace Mono.Upnp.Internal
                         if (argument.Argument.Direction == ArgumentDirection.Out) {
                             continue;
                         }
-                        
+
                         string value;
                         if (args.TryGetValue (argument.Argument.Name, out value)) {
                             var parameter_type = argument.ParameterInfo.ParameterType;
@@ -227,12 +227,12 @@ namespace Mono.Upnp.Internal
             }
             Log.Trace (builder.ToString ());
         }
-        
+
         static ArgumentInfo BuildArgumentInfo (ParameterInfo parameterInfo,
                                                string actionName,
                                                Dictionary<string, StateVariableInfo> stateVariables)
         {
-            return BuildArgumentInfo(parameterInfo, actionName, stateVariables, false);
+            return BuildArgumentInfo (parameterInfo, actionName, stateVariables, false);
         }
 
         static ArgumentInfo BuildArgumentInfo (ParameterInfo parameterInfo,
@@ -243,7 +243,7 @@ namespace Mono.Upnp.Internal
             if (parameterInfo.ParameterType == typeof (void)) {
                 return null;
             }
-            
+
             var attributes = parameterInfo.GetCustomAttributes (typeof (UpnpArgumentAttribute), false);
             var attribute = attributes.Length != 0
                 ? (UpnpArgumentAttribute)attributes[0]
@@ -258,13 +258,14 @@ namespace Mono.Upnp.Internal
             var direction = parameterInfo.IsRetval || parameterInfo.ParameterType.IsByRef || isReturnValue
                 ? ArgumentDirection.Out
                 : ArgumentDirection.In;
-            return new ArgumentInfo {
+            return new ArgumentInfo
+            {
                 ParameterInfo = parameterInfo,
                 Argument = new Argument (
                     name, related_state_variable.StateVariable.Name, direction, parameterInfo.IsRetval || isReturnValue)
             };
         }
-        
+
         static StateVariableInfo BuildRelatedStateVariable (ParameterInfo parameterInfo,
                                                             string actionName,
                                                             string argumentName,
@@ -289,7 +290,7 @@ namespace Mono.Upnp.Internal
             var allowed_value_range = attribute != null && !string.IsNullOrEmpty (attribute.MinimumValue)
                 ? new AllowedValueRange (attribute.MinimumValue, attribute.MaximumValue, attribute.StepValue)
                 : null;
-                
+
             StateVariableInfo state_variable_info;
             if (stateVariables.TryGetValue (name, out state_variable_info)) {
                 var state_variable = state_variable_info.StateVariable;
@@ -297,8 +298,7 @@ namespace Mono.Upnp.Internal
                     state_variable.DefaultValue != default_value ||
                     state_variable.AllowedValueRange != allowed_value_range ||
                     ((state_variable.AllowedValues != null || allowed_values != null) &&
-                    state_variable_info.Type != parameterInfo.ParameterType))
-                {
+                    state_variable_info.Type != parameterInfo.ParameterType)) {
                     if (attribute == null || string.IsNullOrEmpty (attribute.Name)) {
                         name = CreateRelatedStateVariableName (actionName, parameterInfo.Name);
                     }
@@ -306,20 +306,23 @@ namespace Mono.Upnp.Internal
                     return state_variable_info;
                 }
             }
-            
+
             if (allowed_values != null) {
-                state_variable_info = new StateVariableInfo {
+                state_variable_info = new StateVariableInfo
+                {
                     StateVariable = new StateVariable (name, allowed_values,
                         new StateVariableOptions { DefaultValue = default_value }),
                     Type = parameterInfo.ParameterType
                 };
             } else if (allowed_value_range != null) {
-                state_variable_info = new StateVariableInfo {
+                state_variable_info = new StateVariableInfo
+                {
                     StateVariable = new StateVariable (name, data_type, allowed_value_range,
                         new StateVariableOptions { DefaultValue = default_value })
                 };
             } else {
-                state_variable_info = new StateVariableInfo {
+                state_variable_info = new StateVariableInfo
+                {
                     StateVariable = new StateVariable (name, data_type,
                         new StateVariableOptions { DefaultValue = default_value })
                 };
@@ -327,40 +330,55 @@ namespace Mono.Upnp.Internal
             stateVariables[name] = state_variable_info;
             return state_variable_info;
         }
-        
+
         static string CreateRelatedStateVariableName (string name)
         {
             return string.Format ("A_ARG_{0}", name);
         }
-        
+
         static string CreateRelatedStateVariableName (string actionName, string argumentName)
         {
             return string.Format ("A_ARG_{0}_{1}", actionName, argumentName);
         }
-            
+
         static string GetDataType (Type type)
         {
             if (type.IsByRef) {
                 type = type.GetElementType ();
             }
-            if (type.IsEnum || type == typeof (string)) return "string";
-            if (type == typeof (int)) return "i4";
-            if (type == typeof (byte)) return "ui1";
-            if (type == typeof (ushort)) return "ui2";
-            if (type == typeof (uint)) return "ui4";
-            if (type == typeof (sbyte)) return "i1";
-            if (type == typeof (short)) return "i2";
-            if (type == typeof (long)) return "int"; // TODO Is this right? The UPnP docs are vague
-            if (type == typeof (float)) return "r4";
-            if (type == typeof (double)) return "r8";
-            if (type == typeof (char)) return "char";
-            if (type == typeof (DateTime)) return "date"; // TODO what about "time"?
-            if (type == typeof (bool)) return "boolean";
-            if (type == typeof (byte[])) return "bin";
-            if (type == typeof (Uri)) return "uri";
+            if (type.IsEnum || type == typeof (string))
+                return "string";
+            if (type == typeof (int))
+                return "i4";
+            if (type == typeof (byte))
+                return "ui1";
+            if (type == typeof (ushort))
+                return "ui2";
+            if (type == typeof (uint))
+                return "ui4";
+            if (type == typeof (sbyte))
+                return "i1";
+            if (type == typeof (short))
+                return "i2";
+            if (type == typeof (long))
+                return "int"; // TODO Is this right? The UPnP docs are vague
+            if (type == typeof (float))
+                return "r4";
+            if (type == typeof (double))
+                return "r8";
+            if (type == typeof (char))
+                return "char";
+            if (type == typeof (DateTime))
+                return "date"; // TODO what about "time"?
+            if (type == typeof (bool))
+                return "boolean";
+            if (type == typeof (byte[]))
+                return "bin";
+            if (type == typeof (Uri))
+                return "uri";
             throw new UpnpServiceDefinitionException (string.Format ("The data type {0} is unsupported.", type));
         }
-        
+
         static IEnumerable<string> BuildAllowedValues (Type type)
         {
             foreach (var field in type.GetFields (BindingFlags.Public | BindingFlags.Static)) {
@@ -373,7 +391,7 @@ namespace Mono.Upnp.Internal
                 }
             }
         }
-        
+
         static IEnumerable<StateVariable> BuildStateVariables<T> (T service,
                                                                   Dictionary<string, StateVariableInfo> stateVariables)
         {
@@ -381,12 +399,12 @@ namespace Mono.Upnp.Internal
                 yield return state_variable_info.StateVariable;
             }
 
-            foreach (var property_info in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
-                var state_variable = BuildStateVariable(property_info, service, stateVariables);
+            foreach (var property_info in typeof (T).GetProperties (BindingFlags.Public | BindingFlags.Instance)) {
+                var state_variable = BuildStateVariable (property_info, service, stateVariables);
                 if (state_variable != null)
                     yield return state_variable;
             }
-            
+
             foreach (var event_info in typeof (T).GetEvents (BindingFlags.Public | BindingFlags.Instance)) {
                 var state_variable = BuildStateVariable (event_info, service, stateVariables);
                 if (state_variable != null) {
@@ -394,7 +412,7 @@ namespace Mono.Upnp.Internal
                 }
             }
         }
-        
+
         static StateVariable BuildStateVariable (EventInfo eventInfo,
                                                  object service,
                                                  Dictionary<string, StateVariableInfo> stateVariables)
@@ -403,27 +421,27 @@ namespace Mono.Upnp.Internal
             if (attributes.Length == 0) {
                 return null;
             }
-            
+
             var type = eventInfo.EventHandlerType;
             if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (EventHandler<>)) {
                 throw new UpnpServiceDefinitionException (
                     "A event must be handled by the type EventHandler<StateVariableChangedArgs<T>>.");
             }
-            
+
             type = type.GetGenericArguments ()[0];
             if (!type.IsGenericType || type.GetGenericTypeDefinition () != typeof (StateVariableChangedArgs<>)) {
                 throw new UpnpServiceDefinitionException (
                     "A event must be handled by the type EventHandler<StateVariableChangedArgs<T>>.");
             }
-            
+
             var attribute = (UpnpStateVariableAttribute)attributes[0];
             if (Omit (eventInfo.DeclaringType, service, attribute.OmitUnless)) {
                 return null;
             }
-            
+
             type = type.GetGenericArguments ()[0];
             var eventer = new EventHandlerEventer ();
-            var method = EventHandlerEventer.HandlerMethod.MakeGenericMethod(new[] { type });
+            var method = EventHandlerEventer.HandlerMethod.MakeGenericMethod (new[] { type });
             var handler = Delegate.CreateDelegate (eventInfo.EventHandlerType, eventer, method);
             eventInfo.AddEventHandler (service, handler);
             var name = string.IsNullOrEmpty (attribute.Name) ? eventInfo.Name : attribute.Name;
@@ -431,8 +449,8 @@ namespace Mono.Upnp.Internal
             StateVariableInfo info;
             if (stateVariables.TryGetValue (name, out info)) {
                 if (info.StateVariable.Eventer != null)
-                    throw new UpnpServiceDefinitionException(
-                        string.Format("An event handler is declared multiple times for {0}.",
+                    throw new UpnpServiceDefinitionException (
+                        string.Format ("An event handler is declared multiple times for {0}.",
                             name));
 
                 // TODO check type
@@ -444,49 +462,49 @@ namespace Mono.Upnp.Internal
             }
         }
 
-        static StateVariable BuildStateVariable(PropertyInfo propertyInfo,
+        static StateVariable BuildStateVariable (PropertyInfo propertyInfo,
                                                  object service,
                                                  Dictionary<string, StateVariableInfo> stateVariables)
         {
-            var attributes = propertyInfo.GetCustomAttributes(typeof(UpnpStateVariableAttribute), false);
+            var attributes = propertyInfo.GetCustomAttributes (typeof (UpnpStateVariableAttribute), false);
             if (attributes.Length == 0) {
                 return null;
             }
 
             var attribute = (UpnpStateVariableAttribute)attributes[0];
-            if (Omit(propertyInfo.DeclaringType, service, attribute.OmitUnless)) {
+            if (Omit (propertyInfo.DeclaringType, service, attribute.OmitUnless)) {
                 return null;
             }
 
             PropertyChangedEventer eventer = null;
             var notifyService = service as INotifyPropertyChanged;
             if (notifyService != null) {
-                eventer = new PropertyChangedEventer(propertyInfo);
+                eventer = new PropertyChangedEventer (propertyInfo);
                 notifyService.PropertyChanged += eventer.OnPropertyChanged;
             }
 
             var type = propertyInfo.PropertyType;
-            var name = string.IsNullOrEmpty(attribute.Name) ? propertyInfo.Name : attribute.Name;
-            var data_type = string.IsNullOrEmpty(attribute.DataType) ? GetDataType(type) : attribute.DataType;
+            var name = string.IsNullOrEmpty (attribute.Name) ? propertyInfo.Name : attribute.Name;
+            var data_type = string.IsNullOrEmpty (attribute.DataType) ? GetDataType (type) : attribute.DataType;
             StateVariableInfo info;
-            if (stateVariables.TryGetValue(name, out info)) {
+            if (stateVariables.TryGetValue (name, out info)) {
                 if (info.StateVariable.Eventer != null)
-                    throw new UpnpServiceDefinitionException(
-                        string.Format("An event handler is declared multiple times for {0}.",
+                    throw new UpnpServiceDefinitionException (
+                        string.Format ("An event handler is declared multiple times for {0}.",
                             name));
 
                 // set initial value of state variable
-                var value = propertyInfo.GetValue(service, null);
-                info.StateVariable.Value = value != null ? value.ToString() : null;
+                var value = propertyInfo.GetValue (service, null);
+                info.StateVariable.Value = value != null ? value.ToString () : null;
 
-                info.StateVariable.SetEventer(eventer, attribute.IsMulticast);
+                info.StateVariable.SetEventer (eventer, attribute.IsMulticast);
                 return null;
             } else {
-                return new StateVariable(name, data_type,
-                    new StateVariableOptions { Eventer = eventer, IsMulticast = attribute.IsMulticast});
+                return new StateVariable (name, data_type,
+                    new StateVariableOptions { Eventer = eventer, IsMulticast = attribute.IsMulticast });
             }
         }
-        
+
         static IEnumerable<Argument> Combine (IEnumerable<ArgumentInfo> arguments, ArgumentInfo return_argument)
         {
             foreach (var argument in arguments) {
