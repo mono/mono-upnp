@@ -34,7 +34,7 @@ using Mono.Upnp.Xml;
 
 namespace Mono.Upnp.Control
 {
-    [XmlType("scpd", Protocol.ServiceSchema)]
+    [XmlType ("scpd", Protocol.ServiceSchema)]
     public class ServiceController :
         Description,
         IXmlDeserializable,
@@ -50,35 +50,30 @@ namespace Mono.Upnp.Control
         CollectionMap<string, ServiceAction> actions;
         CollectionMap<string, StateVariable> state_variables;
 
-        protected internal ServiceController(Deserializer deserializer, Service service)
-            : base(deserializer)
+        protected internal ServiceController (Deserializer deserializer, Service service)
+            : base (deserializer)
         {
-            if (service == null)
-            {
-                throw new ArgumentNullException("service");
-            }
-            else if (service.ControlUrl == null)
-            {
-                throw new ArgumentException("The service has no ControlUrl.", "service");
-            }
-            else if (service.EventUrl == null)
-            {
-                throw new ArgumentException("The service has no EventUrl.", "service");
+            if (service == null) {
+                throw new ArgumentNullException ("service");
+            } else if (service.ControlUrl == null) {
+                throw new ArgumentException ("The service has no ControlUrl.", "service");
+            } else if (service.EventUrl == null) {
+                throw new ArgumentException ("The service has no EventUrl.", "service");
             }
 
             this.service = service;
-            actions = new CollectionMap<string, ServiceAction>();
-            state_variables = new CollectionMap<string, StateVariable>();
-            control_client = new ControlClient(
-                service.Type.ToString(), service.ControlUrl, deserializer.XmlDeserializer);
-            event_client = new EventClient(state_variables, service.EventUrl);
+            actions = new CollectionMap<string, ServiceAction> ();
+            state_variables = new CollectionMap<string, StateVariable> ();
+            control_client = new ControlClient (
+                service.Type.ToString (), service.ControlUrl, deserializer.XmlDeserializer);
+            event_client = new EventClient (state_variables, service.EventUrl);
         }
 
-        public ServiceController(IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
+        public ServiceController (IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
         {
-            this.actions = Helper.MakeReadOnlyCopy<string, ServiceAction>(actions);
-            this.state_variables = Helper.MakeReadOnlyCopy<string, StateVariable>(stateVariables);
-            SpecVersion = new SpecVersion(1, 1);
+            this.actions = Helper.MakeReadOnlyCopy<string, ServiceAction> (actions);
+            this.state_variables = Helper.MakeReadOnlyCopy<string, StateVariable> (stateVariables);
+            SpecVersion = new SpecVersion (1, 1);
         }
 
         public Service Service
@@ -86,13 +81,13 @@ namespace Mono.Upnp.Control
             get { return service; }
         }
 
-        [XmlAttribute("configId")]
+        [XmlAttribute ("configId")]
         protected internal virtual string ConfigurationId { get; set; }
 
-        [XmlElement("specVersion")]
+        [XmlElement ("specVersion")]
         public virtual SpecVersion SpecVersion { get; protected set; }
 
-        [XmlArray("actionList")]
+        [XmlArray ("actionList")]
         protected virtual ICollection<ServiceAction> ActionCollection
         {
             get { return actions; }
@@ -103,7 +98,7 @@ namespace Mono.Upnp.Control
             get { return actions; }
         }
 
-        [XmlArray("serviceStateTable")]
+        [XmlArray ("serviceStateTable")]
         protected virtual ICollection<StateVariable> StateVariableCollection
         {
             get { return state_variables; }
@@ -114,161 +109,141 @@ namespace Mono.Upnp.Control
             get { return state_variables; }
         }
 
-        protected internal virtual void Initialize(XmlSerializer serializer, Service service)
+        protected internal virtual void Initialize (XmlSerializer serializer, Service service)
         {
-            if (serializer == null)
-            {
-                throw new ArgumentNullException("serializer");
-            }
-            else if (service == null)
-            {
-                throw new ArgumentNullException("service");
-            }
-            else if (service.ScpdUrl == null)
-            {
-                throw new ArgumentException("The service has no ScpdUrl.", "service");
-            }
-            else if (service.ControlUrl == null)
-            {
-                throw new ArgumentException("The service has no ControlUrl.", "service");
-            }
-            else if (service.EventUrl == null)
-            {
-                throw new ArgumentException("The service has no EventUrl.", "service");
+            if (serializer == null) {
+                throw new ArgumentNullException ("serializer");
+            } else if (service == null) {
+                throw new ArgumentNullException ("service");
+            } else if (service.ScpdUrl == null) {
+                throw new ArgumentException ("The service has no ScpdUrl.", "service");
+            } else if (service.ControlUrl == null) {
+                throw new ArgumentException ("The service has no ControlUrl.", "service");
+            } else if (service.EventUrl == null) {
+                throw new ArgumentException ("The service has no EventUrl.", "service");
             }
 
-            scpd_server = new DataServer(serializer.GetBytes(this), @"text/xml; charset=""utf-8""", service.ScpdUrl);
-            control_server = new ControlServer(actions, service.Type.ToString(), service.ControlUrl, serializer);
-            event_server = new EventServer(state_variables.Values, service.EventUrl);
+            scpd_server = new DataServer (serializer.GetBytes (this), @"text/xml; charset=""utf-8""", service.ScpdUrl);
+            control_server = new ControlServer (actions, service.Type.ToString (), service.ControlUrl, serializer);
+            event_server = new EventServer (state_variables.Values, service.EventUrl);
 
-            foreach (var state_variable in state_variables.Values)
-            {
-                state_variable.Initialize(this);
+            foreach (var state_variable in state_variables.Values) {
+                state_variable.Initialize (this);
             }
         }
 
-        protected internal virtual void Start()
+        protected internal virtual void Start ()
         {
-            if (scpd_server == null)
-            {
-                throw new InvalidOperationException("The service controller has not been initialized.");
+            if (scpd_server == null) {
+                throw new InvalidOperationException ("The service controller has not been initialized.");
             }
 
-            scpd_server.Start();
-            control_server.Start();
-            event_server.Start();
+            scpd_server.Start ();
+            control_server.Start ();
+            event_server.Start ();
         }
 
-        protected internal virtual void Stop()
+        protected internal virtual void Stop ()
         {
-            if (scpd_server == null)
-            {
-                throw new InvalidOperationException("The service controller has not been initialized.");
+            if (scpd_server == null) {
+                throw new InvalidOperationException ("The service controller has not been initialized.");
             }
 
-            scpd_server.Stop();
-            control_server.Stop();
-            event_server.Stop();
+            scpd_server.Stop ();
+            control_server.Stop ();
+            event_server.Stop ();
         }
 
-        protected internal virtual IMap<string, string> Invoke(ServiceAction action,
+        protected internal virtual IMap<string, string> Invoke (ServiceAction action,
                                                                 IDictionary<string, string> arguments,
                                                                 int retryAttempts)
         {
             // TODO try dispose on timeout
-            if (control_client == null)
-            {
-                throw new InvalidOperationException(
+            if (control_client == null) {
+                throw new InvalidOperationException (
                     "The service controller was created to describe a local service and cannot be invoked " +
                     "across the network. Use the constructor which takes a Deserializer.");
             }
 
-            while (true)
-            {
-                try
-                {
-                    return control_client.Invoke(action.Name, arguments);
-                }
-                catch (UpnpControlException)
-                {
-                    if (retryAttempts > 0)
-                    {
+            while (true) {
+                try {
+                    return control_client.Invoke (action.Name, arguments);
+                } catch (UpnpControlException) {
+                    if (retryAttempts > 0) {
                         retryAttempts--;
-                        System.Threading.Thread.Sleep(5000);
-                    }
-                    else
-                    {
+                        System.Threading.Thread.Sleep (5000);
+                    } else {
                         throw;
                     }
                 }
             }
         }
 
-        internal void RefEvents()
+        internal void RefEvents ()
         {
-            event_client.Ref();
+            event_client.Ref ();
         }
 
-        internal void UnrefEvents()
+        internal void UnrefEvents ()
         {
-            event_client.Unref();
+            event_client.Unref ();
         }
 
-        internal void UpdateStateVariable(StateVariable stateVariable)
+        internal void UpdateStateVariable (StateVariable stateVariable)
         {
-            event_server.QueueUpdate(stateVariable);
+            event_server.QueueUpdate (stateVariable);
         }
 
-        ServiceAction IXmlDeserializer<ServiceAction>.Deserialize(XmlDeserializationContext context)
+        ServiceAction IXmlDeserializer<ServiceAction>.Deserialize (XmlDeserializationContext context)
         {
-            return DeserializeAction(context);
+            return DeserializeAction (context);
         }
 
-        protected virtual ServiceAction DeserializeAction(XmlDeserializationContext context)
+        protected virtual ServiceAction DeserializeAction (XmlDeserializationContext context)
         {
-            return Deserializer != null ? Deserializer.DeserializeAction(this, context) : null;
+            return Deserializer != null ? Deserializer.DeserializeAction (this, context) : null;
         }
 
-        StateVariable IXmlDeserializer<StateVariable>.Deserialize(XmlDeserializationContext context)
+        StateVariable IXmlDeserializer<StateVariable>.Deserialize (XmlDeserializationContext context)
         {
-            return DeserializeStateVariable(context);
+            return DeserializeStateVariable (context);
         }
 
-        protected virtual StateVariable DeserializeStateVariable(XmlDeserializationContext context)
+        protected virtual StateVariable DeserializeStateVariable (XmlDeserializationContext context)
         {
-            return Deserializer != null ? Deserializer.DeserializeStateVariable(this, context) : null;
+            return Deserializer != null ? Deserializer.DeserializeStateVariable (this, context) : null;
         }
 
-        void IXmlDeserializable.Deserialize(XmlDeserializationContext context)
+        void IXmlDeserializable.Deserialize (XmlDeserializationContext context)
         {
-            Deserialize(context);
-            actions.MakeReadOnly();
-            state_variables.MakeReadOnly();
+            Deserialize (context);
+            actions.MakeReadOnly ();
+            state_variables.MakeReadOnly ();
         }
 
-        void IXmlDeserializable.DeserializeAttribute(XmlDeserializationContext context)
+        void IXmlDeserializable.DeserializeAttribute (XmlDeserializationContext context)
         {
-            DeserializeAttribute(context);
+            DeserializeAttribute (context);
         }
 
-        void IXmlDeserializable.DeserializeElement(XmlDeserializationContext context)
+        void IXmlDeserializable.DeserializeElement (XmlDeserializationContext context)
         {
-            DeserializeElement(context);
+            DeserializeElement (context);
         }
 
-        protected override void DeserializeElement(XmlDeserializationContext context)
+        protected override void DeserializeElement (XmlDeserializationContext context)
         {
-            AutoDeserializeElement(this, context);
+            AutoDeserializeElement (this, context);
         }
 
-        protected override void Serialize(Mono.Upnp.Xml.XmlSerializationContext context)
+        protected override void Serialize (Mono.Upnp.Xml.XmlSerializationContext context)
         {
-            AutoSerialize(this, context);
+            AutoSerialize (this, context);
         }
 
-        protected override void SerializeMembers(XmlSerializationContext context)
+        protected override void SerializeMembers (XmlSerializationContext context)
         {
-            AutoSerializeMembers(this, context);
+            AutoSerializeMembers (this, context);
         }
     }
 }
