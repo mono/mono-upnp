@@ -26,10 +26,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
-
 using Mono.Upnp.Control;
 
 namespace Mono.Upnp.Internal
@@ -37,13 +37,37 @@ namespace Mono.Upnp.Internal
     // FIXME I am not happy with the state of this class. Let's clean it up later.
     static class ServiceControllerBuilder
     {
-        class Eventer : StateVariableEventer
+        abstract class Eventer : StateVariableEventer
         {
-            public static readonly MethodInfo HandlerMethod = typeof (Eventer).GetMethod ("Handler");
-            
-            public void Handler<T> (object sender, StateVariableChangedArgs<T> args)
+
+        }
+
+        class EventHandlerEventer : StateVariableEventer
+        {
+            public static readonly MethodInfo HandlerMethod = typeof(Eventer).GetMethod("Handler");
+
+            public void Handler<T>(object sender, StateVariableChangedArgs<T> args)
             {
-                OnStateVariableUpdated (args.NewValue.ToString ());
+                OnStateVariableUpdated(args.NewValue.ToString());
+            }
+        }
+
+        class PropertyChangedEventer : StateVariableEventer
+        {
+            public PropertyChangedEventer(PropertyInfo propertyInfo)
+            {
+                PropertyInfo = propertyInfo;
+            }
+
+            public PropertyInfo PropertyInfo { get; private set; }
+
+            public void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
+            {
+                if (args.PropertyName == PropertyInfo.Name)
+                {
+                    var value = PropertyInfo.GetValue(sender, null);
+                    OnStateVariableUpdated(value != null ? value.ToString() : null);
+                }
             }
         }
         
@@ -356,6 +380,12 @@ namespace Mono.Upnp.Internal
             foreach (var state_variable_info in stateVariables.Values) {
                 yield return state_variable_info.StateVariable;
             }
+
+            foreach (var property_info in typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
+                var state_variable = BuildStateVariable(property_info, service, stateVariables);
+                if (state_variable != null)
+                    yield return state_variable;
+            }
             
             foreach (var event_info in typeof (T).GetEvents (BindingFlags.Public | BindingFlags.Instance)) {
                 var state_variable = BuildStateVariable (event_info, service, stateVariables);
@@ -392,20 +422,68 @@ namespace Mono.Upnp.Internal
             }
             
             type = type.GetGenericArguments ()[0];
-            var eventer = new Eventer ();
-            var method = Eventer.HandlerMethod.MakeGenericMethod (new[] { type });
+            var eventer = new EventHandlerEventer ();
+            var method = EventHandlerEventer.HandlerMethod.MakeGenericMethod(new[] { type });
             var handler = Delegate.CreateDelegate (eventInfo.EventHandlerType, eventer, method);
             eventInfo.AddEventHandler (service, handler);
             var name = string.IsNullOrEmpty (attribute.Name) ? eventInfo.Name : attribute.Name;
             var data_type = string.IsNullOrEmpty (attribute.DataType) ? GetDataType (type) : attribute.DataType;
             StateVariableInfo info;
             if (stateVariables.TryGetValue (name, out info)) {
+                if (info.StateVariable.Eventer != null)
+                    throw new UpnpServiceDefinitionException(
+                        string.Format("An event handler is declared multiple times for {0}.",
+                            name));
+
                 // TODO check type
                 info.StateVariable.SetEventer (eventer, attribute.IsMulticast);
                 return null;
             } else {
                 return new StateVariable (name, data_type,
                     new StateVariableOptions { Eventer = eventer, IsMulticast = attribute.IsMulticast });
+            }
+        }
+
+        static StateVariable BuildStateVariable(PropertyInfo propertyInfo,
+                                                 object service,
+                                                 Dictionary<string, StateVariableInfo> stateVariables)
+        {
+            var attributes = propertyInfo.GetCustomAttributes(typeof(UpnpStateVariableAttribute), false);
+            if (attributes.Length == 0) {
+                return null;
+            }
+
+            var attribute = (UpnpStateVariableAttribute)attributes[0];
+            if (Omit(propertyInfo.DeclaringType, service, attribute.OmitUnless)) {
+                return null;
+            }
+
+            PropertyChangedEventer eventer = null;
+            var notifyService = service as INotifyPropertyChanged;
+            if (notifyService != null) {
+                eventer = new PropertyChangedEventer(propertyInfo);
+                notifyService.PropertyChanged += eventer.OnPropertyChanged;
+            }
+
+            var type = propertyInfo.PropertyType;
+            var name = string.IsNullOrEmpty(attribute.Name) ? propertyInfo.Name : attribute.Name;
+            var data_type = string.IsNullOrEmpty(attribute.DataType) ? GetDataType(type) : attribute.DataType;
+            StateVariableInfo info;
+            if (stateVariables.TryGetValue(name, out info)) {
+                if (info.StateVariable.Eventer != null)
+                    throw new UpnpServiceDefinitionException(
+                        string.Format("An event handler is declared multiple times for {0}.",
+                            name));
+
+                // set initial value of state variable
+                var value = propertyInfo.GetValue(service, null);
+                info.StateVariable.Value = value != null ? value.ToString() : null;
+
+                info.StateVariable.SetEventer(eventer, attribute.IsMulticast);
+                return null;
+            } else {
+                return new StateVariable(name, data_type,
+                    new StateVariableOptions { Eventer = eventer, IsMulticast = attribute.IsMulticast});
             }
         }
         

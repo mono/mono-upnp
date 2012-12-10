@@ -40,6 +40,7 @@ namespace Mono.Upnp.Control
         readonly LinkedList<EventHandler<StateVariableChangedArgs<string>>> value_changed =
             new LinkedList<EventHandler<StateVariableChangedArgs<string>>> ();
         ServiceController controller;
+        StateVariableEventer eventer;
         IList<string> allowed_values;
         string value;
         
@@ -102,6 +103,11 @@ namespace Mono.Upnp.Control
             : this (name, dataType, options)
         {
             AllowedValueRange = allowedValueRange;
+        }
+
+        public ServiceController Controller
+        {
+            get { return controller; }
         }
         
         [XmlElement ("name")]
@@ -175,9 +181,18 @@ namespace Mono.Upnp.Control
                 }
             }
         }
+
+        internal StateVariableEventer Eventer
+        {
+            get { return eventer; }
+        }
         
         internal void SetEventer (StateVariableEventer eventer, bool isMulticast)
         {
+            if (this.eventer != null)
+                throw new InvalidOperationException("Eventer already set.");
+
+            this.eventer = eventer;
             eventer.StateVariableUpdated += OnStateVariableUpdated;
             SendsEvents = true;
             IsMulticast = isMulticast;
@@ -194,9 +209,11 @@ namespace Mono.Upnp.Control
         
         protected virtual void OnStateVariableUpdated (object sender, StateVariableChangedArgs<string> args)
         {
-            Value = args.NewValue;
-            if (controller != null) {
-                controller.UpdateStateVariable (this);
+            if (Value != args.NewValue)
+            {
+                Value = args.NewValue;
+                if (controller != null)
+                    controller.UpdateStateVariable(this);
             }
         }
         

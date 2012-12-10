@@ -28,7 +28,7 @@ using System;
 
 namespace Mono.Upnp.Control
 {
-    [AttributeUsage (AttributeTargets.Event)]
+    [AttributeUsage (AttributeTargets.Event | AttributeTargets.Property)]
     public class UpnpStateVariableAttribute : Attribute
     {
         public UpnpStateVariableAttribute ()
