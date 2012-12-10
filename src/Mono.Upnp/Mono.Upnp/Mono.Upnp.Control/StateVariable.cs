@@ -1,4 +1,4 @@
-//
+﻿//
 // StateVariable.cs
 //
 // Author:
