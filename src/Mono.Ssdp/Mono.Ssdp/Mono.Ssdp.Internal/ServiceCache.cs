@@ -56,6 +56,7 @@ namespace Mono.Ssdp.Internal
         public void Dispose ()
         {
             lock (mutex) {
+                timeouts.Dispose();
                 if (services != null) {
                     services.Clear ();
                     services = null;
