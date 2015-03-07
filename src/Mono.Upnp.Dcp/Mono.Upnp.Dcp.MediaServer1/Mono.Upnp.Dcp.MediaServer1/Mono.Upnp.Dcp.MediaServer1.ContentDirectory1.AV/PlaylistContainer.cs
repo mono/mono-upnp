@@ -111,6 +111,15 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         {
             base.Deserialize (context);
 
+            if (Artists == null)
+            {
+                Artists = new List<PersonWithRole>();
+                Producers = new List<string>();
+                Contributors = new List<string>();
+                Genres = new List<string>();
+                Rights = new List<string>();
+            }
+
             Artists = new ReadOnlyCollection<PersonWithRole> (Artists);
             Producers = new ReadOnlyCollection<string> (Producers);
             Contributors = new ReadOnlyCollection<string> (Contributors);
