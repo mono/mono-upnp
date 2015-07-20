@@ -27,8 +27,8 @@
 //
 
 // Compile With:
-//   gmcs -debug+ -r:System.Core Options.cs -o:NDesk.Options.dll
-//   gmcs -debug+ -d:LINQ -r:System.Core Options.cs -o:NDesk.Options.dll
+//   mcs -debug+ -r:System.Core Options.cs -o:NDesk.Options.dll
+//   mcs -debug+ -d:LINQ -r:System.Core Options.cs -o:NDesk.Options.dll
 //
 // The LINQ version just changes the implementation of
 // OptionSet.Parse(IEnumerable<string>), and confers no semantic changes.
