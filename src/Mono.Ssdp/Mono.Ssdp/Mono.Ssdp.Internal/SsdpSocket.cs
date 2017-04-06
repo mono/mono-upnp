@@ -34,6 +34,16 @@ namespace Mono.Ssdp.Internal
 {
     class SsdpSocket : Socket
     {
+        /// <summary>
+        /// Winsock ioctl code which will disable ICMP errors from being propagated to a UDP socket.
+        /// This can occur if a UDP packet is sent to a valid destination but there is no socket
+        /// registered to listen on the given port.
+        /// </summary>
+        /// http://msdn.microsoft.com/en-us/library/cc242275.aspx
+        /// http://msdn.microsoft.com/en-us/library/bb736550(VS.85).aspx
+        /// 0x9800000C == 2550136844 (uint) == -1744830452 (int) == 0x9800000C
+        const int SIO_UDP_CONNRESET = -1744830452;
+
         static readonly IPEndPoint ssdp_send_point = new IPEndPoint (Protocol.IPAddress, Protocol.Port);
         
         readonly IPEndPoint ssdp_receive_point;
@@ -43,6 +53,9 @@ namespace Mono.Ssdp.Internal
         {
             ssdp_receive_point = new IPEndPoint (address, Protocol.Port);
             SetSocketOption (SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
+            // set socket to disregard ICMP errors.
+            this.IOControl((IOControlCode)(SIO_UDP_CONNRESET), new byte[] { 0, 0, 0, 0 }, null);
         }
         
         public IAsyncResult BeginSendTo (byte [] data, AsyncCallback callback)
