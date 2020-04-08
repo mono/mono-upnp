@@ -39,7 +39,7 @@ namespace Mono.Upnp.Dcp.MediaServer1.ContentDirectory1.AV
         public PersonWithRole (string name, string role)
         {
             if (name == null) {
-                throw new ArgumentNullException ("name");
+                name = "unknown";
             } else if (role == null) {
                 throw new ArgumentNullException ("role");
             }
