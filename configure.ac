@@ -17,9 +17,9 @@ SHAMROCK_EXPAND_DATADIR
 
 AC_PROG_INSTALL
 
-AC_PATH_PROG(GMCS, gmcs, no)
-if test "x$GMCS" = "xno"; then
-        AC_MSG_ERROR([gmcs Not found])
+AC_PATH_PROG(MCS, mcs, no)
+if test "x$MCS" = "xno"; then
+        AC_MSG_ERROR([mcs Not found])
 fi
 
 

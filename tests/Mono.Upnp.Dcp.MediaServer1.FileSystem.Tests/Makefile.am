@@ -4,7 +4,7 @@ EXTRA_DIST =
 # Warning: This is an automatically generated file, do not edit!
 
 if ENABLE_DEBUG
-ASSEMBLY_COMPILER_COMMAND = gmcs
+ASSEMBLY_COMPILER_COMMAND = mcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize- -debug "-define:DEBUG"
 ASSEMBLY = ../../bin/Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests.dll
 ASSEMBLY_MDB = $(ASSEMBLY).mdb
@@ -33,7 +33,7 @@ MONO_UPNP_DCP_MEDIASERVER1_FILESYSTEM_DLL_MDB=$(BUILD_DIR)/Mono.Upnp.Dcp.MediaSe
 endif
 
 if ENABLE_RELEASE
-ASSEMBLY_COMPILER_COMMAND = gmcs
+ASSEMBLY_COMPILER_COMMAND = mcs
 ASSEMBLY_COMPILER_FLAGS =  -noconfig -codepage:utf8 -warn:4 -optimize+
 ASSEMBLY = ../../bin/Mono.Upnp.Dcp.MediaServer1.FileSystem.Tests.dll
 ASSEMBLY_MDB = 
