@@ -1,4 +1,4 @@
-//
+﻿//
 // StateVariable.cs
 //
 // Author:
@@ -40,9 +40,10 @@ namespace Mono.Upnp.Control
         readonly LinkedList<EventHandler<StateVariableChangedArgs<string>>> value_changed =
             new LinkedList<EventHandler<StateVariableChangedArgs<string>>> ();
         ServiceController controller;
+        StateVariableEventer eventer;
         IList<string> allowed_values;
         string value;
-        
+
         protected StateVariable ()
         {
         }
@@ -55,7 +56,7 @@ namespace Mono.Upnp.Control
 
             this.controller = serviceController;
         }
-        
+
         public StateVariable (string name, string dataType)
         {
             if (name == null) {
@@ -63,11 +64,11 @@ namespace Mono.Upnp.Control
             } else if (dataType == null) {
                 throw new ArgumentNullException ("dataType");
             }
-            
+
             Name = name;
             DataType = dataType;
         }
-        
+
         public StateVariable (string name, string dataType, StateVariableOptions options)
             : this (name, dataType)
         {
@@ -78,23 +79,23 @@ namespace Mono.Upnp.Control
                 }
             }
         }
-        
+
         public StateVariable (string name, IEnumerable<string> allowedValues)
             : this (name, allowedValues, null)
         {
         }
-        
+
         public StateVariable (string name, IEnumerable<string> allowedValues, StateVariableOptions options)
             : this (name, "string", options)
         {
             allowed_values = Helper.MakeReadOnlyCopy (allowedValues);
         }
-        
+
         public StateVariable (string name, string dataType, AllowedValueRange allowedValueRange)
             : this (name, dataType, allowedValueRange, null)
         {
         }
-        
+
         public StateVariable (string name,
                               string dataType,
                               AllowedValueRange allowedValueRange,
@@ -103,7 +104,12 @@ namespace Mono.Upnp.Control
         {
             AllowedValueRange = allowedValueRange;
         }
-        
+
+        public ServiceController Controller
+        {
+            get { return controller; }
+        }
+
         [XmlElement ("name")]
         public virtual string Name { get; protected set; }
 
@@ -111,46 +117,53 @@ namespace Mono.Upnp.Control
         public virtual string DataType { get; protected set; }
 
         [XmlAttribute ("sendEvents", OmitIfNull = true)]
-        protected virtual string SendsEventsString {
+        protected virtual string SendsEventsString
+        {
             get { return SendsEvents ? "yes" : null; }
             set { SendsEvents = value == "yes"; }
         }
-        
+
         public bool SendsEvents { get; protected set; }
-        
+
         public virtual bool IsMulticast { get; protected set; }
 
         [XmlAttribute ("multicast", OmitIfNull = true)]
-        protected virtual string IsMulticastString {
+        protected virtual string IsMulticastString
+        {
             get { return IsMulticast ? "yes" : null; }
             set { IsMulticast = value == "yes"; }
         }
-        
+
         [XmlElement ("defaultValue", OmitIfNull = true)]
         public string DefaultValue { get; protected set; }
 
         [XmlArray ("allowedValueList", OmitIfNull = true)]
         [XmlArrayItem ("allowedValue")]
-        protected virtual ICollection<string> AllowedValueCollection {
+        protected virtual ICollection<string> AllowedValueCollection
+        {
             get { return allowed_values; }
         }
-        
-        public IEnumerable<string> AllowedValues {
+
+        public IEnumerable<string> AllowedValues
+        {
             get { return allowed_values; }
         }
 
         [XmlElement ("allowedValueRange", OmitIfNull = true)]
         public virtual AllowedValueRange AllowedValueRange { get; protected set; }
-        
-        public event EventHandler<StateVariableChangedArgs<string>> ValueChanged {
-            add {
+
+        public event EventHandler<StateVariableChangedArgs<string>> ValueChanged
+        {
+            add
+            {
                 if (value == null) {
                     return;
                 }
                 value_changed.AddLast (value);
                 controller.RefEvents ();
             }
-            remove {
+            remove
+            {
                 if (value == null || value_changed.Count == 0) {
                     return;
                 }
@@ -165,52 +178,64 @@ namespace Mono.Upnp.Control
                 } while (node != null);
             }
         }
-        
-        protected internal string Value {
+
+        protected internal string Value
+        {
             get { return value; }
-            set {
+            set
+            {
                 this.value = value;
                 foreach (var handler in value_changed) {
                     handler (this, new StateVariableChangedArgs<string> (value));
                 }
             }
         }
-        
+
+        internal StateVariableEventer Eventer
+        {
+            get { return eventer; }
+        }
+
         internal void SetEventer (StateVariableEventer eventer, bool isMulticast)
         {
+            if (this.eventer != null)
+                throw new InvalidOperationException ("Eventer already set.");
+
+            this.eventer = eventer;
             eventer.StateVariableUpdated += OnStateVariableUpdated;
             SendsEvents = true;
             IsMulticast = isMulticast;
         }
-        
+
         protected internal virtual void Initialize (ServiceController serviceController)
         {
             if (serviceController == null) {
                 throw new ArgumentNullException ("serviceController");
             }
-            
+
             this.controller = serviceController;
         }
-        
+
         protected virtual void OnStateVariableUpdated (object sender, StateVariableChangedArgs<string> args)
         {
-            Value = args.NewValue;
-            if (controller != null) {
-                controller.UpdateStateVariable (this);
+            if (Value != args.NewValue) {
+                Value = args.NewValue;
+                if (controller != null)
+                    controller.UpdateStateVariable (this);
             }
         }
-        
+
         protected override void DeserializeAttribute (XmlDeserializationContext context)
         {
             AutoDeserializeAttribute (this, context);
         }
-        
+
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
             if (context == null) {
                 throw new ArgumentNullException ("context");
             }
-            
+
             if (context.Reader.Name == "allowedValueList") {
                 allowed_values = new List<string> ();
             }
@@ -226,7 +251,7 @@ namespace Mono.Upnp.Control
         {
             AutoSerializeMembers (this, context);
         }
-        
+
         string IMappable<string>.Map ()
         {
             return Name;

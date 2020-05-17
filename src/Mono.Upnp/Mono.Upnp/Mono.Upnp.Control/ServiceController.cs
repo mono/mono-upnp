@@ -1,4 +1,4 @@
-//
+﻿//
 // ServiceController.cs
 //
 // Author:
@@ -41,6 +41,7 @@ namespace Mono.Upnp.Control
         IXmlDeserializer<ServiceAction>,
         IXmlDeserializer<StateVariable>
     {
+        Service service;
         DataServer scpd_server;
         ControlServer control_server;
         ControlClient control_client;
@@ -59,45 +60,55 @@ namespace Mono.Upnp.Control
             } else if (service.EventUrl == null) {
                 throw new ArgumentException ("The service has no EventUrl.", "service");
             }
-            
+
+            this.service = service;
             actions = new CollectionMap<string, ServiceAction> ();
             state_variables = new CollectionMap<string, StateVariable> ();
             control_client = new ControlClient (
                 service.Type.ToString (), service.ControlUrl, deserializer.XmlDeserializer);
             event_client = new EventClient (state_variables, service.EventUrl);
         }
-        
+
         public ServiceController (IEnumerable<ServiceAction> actions, IEnumerable<StateVariable> stateVariables)
         {
             this.actions = Helper.MakeReadOnlyCopy<string, ServiceAction> (actions);
             this.state_variables = Helper.MakeReadOnlyCopy<string, StateVariable> (stateVariables);
             SpecVersion = new SpecVersion (1, 1);
         }
-        
+
+        public Service Service
+        {
+            get { return service; }
+        }
+
         [XmlAttribute ("configId")]
         protected internal virtual string ConfigurationId { get; set; }
-        
+
         [XmlElement ("specVersion")]
         public virtual SpecVersion SpecVersion { get; protected set; }
-        
+
         [XmlArray ("actionList")]
-        protected virtual ICollection<ServiceAction> ActionCollection {
+        protected virtual ICollection<ServiceAction> ActionCollection
+        {
             get { return actions; }
         }
 
-        public IMap<string, ServiceAction> Actions {
+        public IMap<string, ServiceAction> Actions
+        {
             get { return actions; }
         }
-        
+
         [XmlArray ("serviceStateTable")]
-        protected virtual ICollection<StateVariable> StateVariableCollection {
+        protected virtual ICollection<StateVariable> StateVariableCollection
+        {
             get { return state_variables; }
         }
 
-        public IMap<string, StateVariable> StateVariables {
+        public IMap<string, StateVariable> StateVariables
+        {
             get { return state_variables; }
         }
-        
+
         protected internal virtual void Initialize (XmlSerializer serializer, Service service)
         {
             if (serializer == null) {
@@ -111,38 +122,38 @@ namespace Mono.Upnp.Control
             } else if (service.EventUrl == null) {
                 throw new ArgumentException ("The service has no EventUrl.", "service");
             }
-            
+
             scpd_server = new DataServer (serializer.GetBytes (this), @"text/xml; charset=""utf-8""", service.ScpdUrl);
             control_server = new ControlServer (actions, service.Type.ToString (), service.ControlUrl, serializer);
             event_server = new EventServer (state_variables.Values, service.EventUrl);
-            
+
             foreach (var state_variable in state_variables.Values) {
                 state_variable.Initialize (this);
             }
         }
-        
+
         protected internal virtual void Start ()
         {
             if (scpd_server == null) {
                 throw new InvalidOperationException ("The service controller has not been initialized.");
             }
-            
+
             scpd_server.Start ();
             control_server.Start ();
             event_server.Start ();
         }
-        
+
         protected internal virtual void Stop ()
         {
             if (scpd_server == null) {
                 throw new InvalidOperationException ("The service controller has not been initialized.");
             }
-            
+
             scpd_server.Stop ();
             control_server.Stop ();
             event_server.Stop ();
         }
-        
+
         protected internal virtual IMap<string, string> Invoke (ServiceAction action,
                                                                 IDictionary<string, string> arguments,
                                                                 int retryAttempts)
@@ -172,64 +183,64 @@ namespace Mono.Upnp.Control
         {
             event_client.Ref ();
         }
-        
+
         internal void UnrefEvents ()
         {
             event_client.Unref ();
         }
-        
+
         internal void UpdateStateVariable (StateVariable stateVariable)
         {
             event_server.QueueUpdate (stateVariable);
         }
-        
+
         ServiceAction IXmlDeserializer<ServiceAction>.Deserialize (XmlDeserializationContext context)
         {
             return DeserializeAction (context);
         }
-        
+
         protected virtual ServiceAction DeserializeAction (XmlDeserializationContext context)
         {
             return Deserializer != null ? Deserializer.DeserializeAction (this, context) : null;
         }
-        
+
         StateVariable IXmlDeserializer<StateVariable>.Deserialize (XmlDeserializationContext context)
         {
             return DeserializeStateVariable (context);
         }
-        
+
         protected virtual StateVariable DeserializeStateVariable (XmlDeserializationContext context)
         {
             return Deserializer != null ? Deserializer.DeserializeStateVariable (this, context) : null;
         }
-        
+
         void IXmlDeserializable.Deserialize (XmlDeserializationContext context)
         {
             Deserialize (context);
             actions.MakeReadOnly ();
             state_variables.MakeReadOnly ();
         }
-        
+
         void IXmlDeserializable.DeserializeAttribute (XmlDeserializationContext context)
         {
             DeserializeAttribute (context);
         }
-        
+
         void IXmlDeserializable.DeserializeElement (XmlDeserializationContext context)
         {
             DeserializeElement (context);
         }
-        
+
         protected override void DeserializeElement (XmlDeserializationContext context)
         {
             AutoDeserializeElement (this, context);
         }
-        
+
         protected override void Serialize (Mono.Upnp.Xml.XmlSerializationContext context)
         {
             AutoSerialize (this, context);
         }
-        
+
         protected override void SerializeMembers (XmlSerializationContext context)
         {
             AutoSerializeMembers (this, context);

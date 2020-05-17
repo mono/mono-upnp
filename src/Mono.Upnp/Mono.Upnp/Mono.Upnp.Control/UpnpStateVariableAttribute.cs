@@ -1,4 +1,4 @@
-// 
+﻿// 
 // UpnpStateVariableAttribute.cs
 //  
 // Author:
@@ -28,30 +28,30 @@ using System;
 
 namespace Mono.Upnp.Control
 {
-    [AttributeUsage (AttributeTargets.Event)]
+    [AttributeUsage (AttributeTargets.Event | AttributeTargets.Property)]
     public class UpnpStateVariableAttribute : Attribute
     {
         public UpnpStateVariableAttribute ()
         {
         }
-        
+
         public UpnpStateVariableAttribute (string name)
             : this (name, null)
         {
         }
-        
+
         public UpnpStateVariableAttribute (string name, string dataType)
         {
             Name = name;
             DataType = dataType;
         }
-        
+
         public string Name { get; set; }
-        
+
         public string DataType { get; set; }
-        
+
         public bool IsMulticast { get; set; }
-        
+
         public string OmitUnless { get; set; }
     }
 }
